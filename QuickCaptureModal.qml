@@ -26,7 +26,13 @@ DankModal {
         }
     }
     property color currentColor: Theme.primary
+    onCurrentColorChanged: {
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
+    }
     property int strokeWidth: 8
+    onStrokeWidthChanged: {
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
+    }
     property int stampCounter: 1
     property bool isScreenshotDark: false
     property bool hasSampledContrast: false
