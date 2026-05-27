@@ -1217,7 +1217,7 @@ DankModal {
                                 textInputField.visible = false;
                                 window.isTyping = false;
                                 textInputField.text = "";
-                                window.forceActiveFocus();
+                                if (window.modalFocusScope) window.modalFocusScope.forceActiveFocus();
                                 event.accepted = true;
                             }
 
@@ -1235,7 +1235,7 @@ DankModal {
                                 textInputField.text = "";
                                 textInputField.visible = false;
                                 window.isTyping = false;
-                                window.forceActiveFocus();
+                                if (window.modalFocusScope) window.modalFocusScope.forceActiveFocus();
                             }
                         }
 
