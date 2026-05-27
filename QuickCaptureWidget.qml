@@ -92,18 +92,7 @@ PluginComponent {
     }
 
     function startActualCapture() {
-        const hasData = root.pluginData !== null && typeof root.pluginData !== "undefined";
-        const captureMode = hasData ? (root.pluginData.captureMode || "region") : "region";
-
-        const args = ["dms", "screenshot"];
-        if (captureMode === "full") {
-            args.push("full");
-        } else {
-            args.push("region");
-        }
-
-        // Capture to temporary file for annotation phase
-        args.push("--no-clipboard", "--no-notify", "--dir", "/tmp", "--filename", "dms_capture_bg.png");
+        const args = ["dms", "screenshot", "full", "--no-clipboard", "--no-notify", "--dir", "/tmp", "--filename", "dms_capture_bg.png"];
 
         Proc.runCommand(
             "dms-screenshot",
@@ -120,7 +109,7 @@ PluginComponent {
                 }
             },
             0,     // 0ms debounce (execute instantly)
-            60000  // 60 seconds timeout for region selection
+            60000  // 60 seconds timeout
         );
     }
 

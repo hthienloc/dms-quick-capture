@@ -55,10 +55,10 @@ DankModal {
 
     shouldBeVisible: false
     
-    // Spacious modal dimensions occupying 90% width and 90% height of the screen
-    modalWidth: Math.round(Quickshell.screens[0].width * 0.9)
-    modalHeight: Math.round(Quickshell.screens[0].height * 0.9)
-    enableShadow: true
+    // Full-screen desktop crop simulator modal dimensions
+    modalWidth: Quickshell.screens[0].width
+    modalHeight: Quickshell.screens[0].height
+    enableShadow: false
     positioning: "center"
 
     // Component scope bridging properties
@@ -67,15 +67,46 @@ DankModal {
     property var bgImageItem: null
     property var boardContainerItem: null
 
-    // Reactive aspect-fit scale computation
-    property real fitScale: {
-        if (!activeCanvas || !bgImageItem || !boardContainerItem) return 1.0;
-        const maxW = boardContainerItem.width - 32;
-        const maxH = boardContainerItem.height - 32;
-        if (bgImageItem.sourceSize.width <= 0 || bgImageItem.sourceSize.height <= 0) return 1.0;
-        const scaleX = maxW / bgImageItem.sourceSize.width;
-        const scaleY = maxH / bgImageItem.sourceSize.height;
-        return Math.min(1.0, Math.min(scaleX, scaleY));
+    // Unscaled 1-to-1 canvas mapping for full-screen pixel editing
+    property real fitScale: 1.0
+
+    // Crop Selection State
+    property rect cropRect: Qt.rect(0, 0, 0, 0)
+    property bool hasSelection: false
+    property string activeHandle: "none" // "tl", "tr", "bl", "br", "new", "none"
+    property point selectStart: Qt.point(0, 0)
+    property var exportCallback: null
+
+    function getHoveredHandle(mx, my) {
+        if (!hasSelection) return "none";
+        const threshold = 15;
+        const x1 = cropRect.x;
+        const y1 = cropRect.y;
+        const x2 = cropRect.x + cropRect.width;
+        const y2 = cropRect.y + cropRect.height;
+        if (Math.abs(mx - x1) <= threshold && Math.abs(my - y1) <= threshold) return "tl";
+        if (Math.abs(mx - x2) <= threshold && Math.abs(my - y1) <= threshold) return "tr";
+        if (Math.abs(mx - x1) <= threshold && Math.abs(my - y2) <= threshold) return "bl";
+        if (Math.abs(mx - x2) <= threshold && Math.abs(my - y2) <= threshold) return "br";
+        return "none";
+    }
+
+    function isInsideCropRect(mx, my) {
+        if (!hasSelection) return false;
+        return mx >= cropRect.x && mx <= (cropRect.x + cropRect.width) &&
+               my >= cropRect.y && my <= (cropRect.y + cropRect.height);
+    }
+
+    function exportAndExecute(callback) {
+        window.exportCallback = callback;
+        if (window.hasSelection) {
+            exportCanvas.width = window.cropRect.width;
+            exportCanvas.height = window.cropRect.height;
+        } else if (window.activeCanvas) {
+            exportCanvas.width = window.activeCanvas.width;
+            exportCanvas.height = window.activeCanvas.height;
+        }
+        exportCanvas.requestPaint();
     }
 
     onBackgroundClicked: () => discardAndClose()
@@ -111,6 +142,9 @@ DankModal {
         window.bgImageSource = "file:///tmp/dms_capture_bg.png";
         window.isScreenshotDark = false;
         window.hasSampledContrast = false;
+        window.cropRect = Qt.rect(0, 0, 0, 0);
+        window.hasSelection = false;
+        window.activeHandle = "none";
         Qt.callLater(() => {
             if (modalFocusScope) modalFocusScope.forceActiveFocus();
         });
@@ -144,21 +178,23 @@ DankModal {
                 }
             }
 
-            Column {
-                id: mainColumn
+            Item {
+                id: mainLayout
                 anchors.fill: parent
-                anchors.margins: Theme.spacingL
-                spacing: Theme.spacingM
 
                 // 1. Top Glassmorphic Toolbar
                 Rectangle {
                     id: toolbarCard
-                    width: parent.width
+                    width: Math.min(parent.width - 32, 840)
                     height: 52
                     radius: Theme.cornerRadius
                     color: Theme.withAlpha(Theme.surfaceContainer, 0.95)
                     border.color: Theme.withAlpha(Theme.outline, 0.15)
                     border.width: 1
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.top
+                    anchors.topMargin: Theme.spacingM
+                    z: 100
 
                     // Left group: editing tools
                     Row {
@@ -395,8 +431,7 @@ DankModal {
                 // 2. Centered Canvas Board
                 Item {
                     id: boardContainer
-                    width: parent.width
-                    height: parent.height - toolbarCard.height - Theme.spacingM
+                    anchors.fill: parent
 
                     Component.onCompleted: {
                         window.boardContainerItem = boardContainer;
@@ -404,10 +439,8 @@ DankModal {
 
                     Rectangle {
                         anchors.fill: parent
-                        color: window.isScreenshotDark ? Theme.surfaceContainerHighest : Theme.withAlpha(Theme.surfaceContainerHighest, 0.3)
-                        border.color: Theme.withAlpha(Theme.outline, 0.1)
-                        border.width: 1
-                        radius: Theme.cornerRadius
+                        color: "transparent"
+                        border.width: 0
                     }
 
                     Canvas {
@@ -417,11 +450,7 @@ DankModal {
                         transformOrigin: Item.Center
                         renderTarget: Canvas.Image
 
-                        layer.enabled: true
-                        layer.effect: MultiEffect {
-                            maskEnabled: true
-                            maskSource: canvasRoundedMask
-                        }
+                        layer.enabled: false
 
                         Component.onCompleted: {
                             window.activeCanvas = drawingCanvas;
@@ -451,19 +480,79 @@ DankModal {
                                             window.hasSampledContrast = true;
                                         }
                                     } catch (e) {
-                                        // Ignore
+                            // Ignore
                                     }
                                 }
                             }
 
-                            // 2. Draw all committed annotations
+                            // 1.5. Draw Dimming Selection Overlay
+                            if (window.cropRect.width > 0 && window.cropRect.height > 0) {
+                                ctx.save();
+                                ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+                                // Left
+                                ctx.fillRect(0, 0, window.cropRect.x, drawingCanvas.height);
+                                // Right
+                                ctx.fillRect(window.cropRect.x + window.cropRect.width, 0, drawingCanvas.width - (window.cropRect.x + window.cropRect.width), drawingCanvas.height);
+                                // Top
+                                ctx.fillRect(window.cropRect.x, 0, window.cropRect.width, window.cropRect.y);
+                                // Bottom
+                                ctx.fillRect(window.cropRect.x, window.cropRect.y + window.cropRect.height, window.cropRect.width, drawingCanvas.height - (window.cropRect.y + window.cropRect.height));
+
+                                // Selection border
+                                ctx.strokeStyle = Theme.primary;
+                                ctx.lineWidth = 1.5;
+                                ctx.strokeRect(window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height);
+
+                                // 4 Corner resize handles
+                                const hs = 10;
+                                const hh = hs / 2;
+                                ctx.fillStyle = Theme.primary;
+                                ctx.strokeStyle = "#ffffff";
+                                ctx.lineWidth = 1.5;
+
+                                const x1 = window.cropRect.x;
+                                const y1 = window.cropRect.y;
+                                const x2 = window.cropRect.x + window.cropRect.width;
+                                const y2 = window.cropRect.y + window.cropRect.height;
+
+                                // TL
+                                ctx.fillRect(x1 - hh, y1 - hh, hs, hs);
+                                ctx.strokeRect(x1 - hh, y1 - hh, hs, hs);
+                                // TR
+                                ctx.fillRect(x2 - hh, y1 - hh, hs, hs);
+                                ctx.strokeRect(x2 - hh, y1 - hh, hs, hs);
+                                // BL
+                                ctx.fillRect(x1 - hh, y2 - hh, hs, hs);
+                                ctx.strokeRect(x1 - hh, y2 - hh, hs, hs);
+                                // BR
+                                ctx.fillRect(x2 - hh, y2 - hh, hs, hs);
+                                ctx.strokeRect(x2 - hh, y2 - hh, hs, hs);
+                                ctx.restore();
+                            } else {
+                                // Dim full canvas slightly before selection
+                                ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
+                                ctx.fillRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+                            }
+
+                            // 2. Draw annotations (clipped to cropRect if hasSelection)
+                            if (window.hasSelection) {
+                                ctx.save();
+                                ctx.beginPath();
+                                ctx.rect(window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height);
+                                ctx.clip();
+                            }
+
                             for (var i = 0; i < window.strokes.length; i++) {
                                 drawStroke(ctx, window.strokes[i]);
                             }
 
-                            // 3. Draw the current active stroke (if dragging)
+                            // 3. Draw current dragging stroke
                             if (window.currentStroke) {
                                 drawStroke(ctx, window.currentStroke);
+                            }
+
+                            if (window.hasSelection) {
+                                ctx.restore();
                             }
                         }
 
@@ -654,81 +743,55 @@ DankModal {
                         MouseArea {
                             id: drawMouseArea
                             anchors.fill: parent
-                            hoverEnabled: false
+                            hoverEnabled: true
 
-                            onPressed: (mouse) => {
-                                if (window.isTyping) {
-                                    textInputField.completeTextEntry();
-                                    return;
-                                }
-
-                                if (window.currentTool === "text") {
-                                    window.typingCoords = Qt.point(mouse.x, mouse.y);
-                                    window.isTyping = true;
-                                    textInputField.text = "";
-                                    textInputField.x = mouse.x;
-                                    textInputField.y = mouse.y;
-                                    textInputField.visible = true;
-                                    Qt.callLater(() => {
-                                        textInputField.forceActiveFocus();
-                                    });
-                                    return;
-                                }
-
-                                if (window.currentTool === "stamp") {
-                                    window.pushStroke({
-                                        tool: "stamp",
-                                        color: window.currentColor,
-                                        width: window.strokeWidth,
-                                        points: [Qt.point(mouse.x, mouse.y)],
-                                        counter: window.stampCounter
-                                    });
-                                    window.stampCounter++;
-                                    return;
-                                }
-
-                                if (window.currentTool === "eraser") {
-                                    // Simple hit testing to remove clicked vector strokes
-                                    const sx = mouse.x;
-                                    const sy = mouse.y;
-                                    let found = -1;
-                                    for (let i = window.strokes.length - 1; i >= 0; i--) {
-                                        const stroke = window.strokes[i];
-                                        if (stroke.points.length === 0) continue;
-                                        
-                                        // Approximate bounding check
-                                        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-                                        for (let p of stroke.points) {
-                                            if (p.x < minX) minX = p.x;
-                                            if (p.y < minY) minY = p.y;
-                                            if (p.x > maxX) maxX = p.x;
-                                            if (p.y > maxY) maxY = p.y;
-                                        }
-                                        
-                                        const pad = 12 + stroke.width * 2;
-                                        if (sx >= minX - pad && sx <= maxX + pad && sy >= minY - pad && sy <= maxY + pad) {
-                                            found = i;
-                                            break;
-                                        }
-                                    }
-                                    if (found !== -1) {
-                                        window.strokes.splice(found, 1);
-                                        drawingCanvas.requestPaint();
-                                    }
-                                    return;
-                                }
-
-                                // Standard vector strokes
-                                window.currentStroke = {
-                                    tool: window.currentTool,
-                                    color: window.currentColor,
-                                    width: window.strokeWidth,
-                                    points: [Qt.point(mouse.x, mouse.y)]
-                                };
-                                drawingCanvas.requestPaint();
-                            }
-
+                            // Visual cursor feedback based on hover position
+                            property string hoveredHandle: "none"
                             onPositionChanged: (mouse) => {
+                                hoveredHandle = window.getHoveredHandle(mouse.x, mouse.y);
+
+                                if (window.activeHandle === "new") {
+                                    const x1 = Math.min(window.selectStart.x, mouse.x);
+                                    const y1 = Math.min(window.selectStart.y, mouse.y);
+                                    const w = Math.abs(mouse.x - window.selectStart.x);
+                                    const h = Math.abs(mouse.y - window.selectStart.y);
+                                    window.cropRect = Qt.rect(x1, y1, w, h);
+                                    drawingCanvas.requestPaint();
+                                    return;
+                                }
+
+                                if (window.activeHandle !== "none" && window.activeHandle !== "new") {
+                                    // Drag resizing one of the corners
+                                    const cr = window.cropRect;
+                                    let newX = cr.x;
+                                    let newY = cr.y;
+                                    let newW = cr.width;
+                                    let newH = cr.height;
+
+                                    if (window.activeHandle === "tl") {
+                                        newX = Math.min(mouse.x, cr.x + cr.width - 10);
+                                        newY = Math.min(mouse.y, cr.y + cr.height - 10);
+                                        newW = cr.x + cr.width - newX;
+                                        newH = cr.y + cr.height - newY;
+                                    } else if (window.activeHandle === "tr") {
+                                        newY = Math.min(mouse.y, cr.y + cr.height - 10);
+                                        newW = Math.max(10, mouse.x - cr.x);
+                                        newH = cr.y + cr.height - newY;
+                                    } else if (window.activeHandle === "bl") {
+                                        newX = Math.min(mouse.x, cr.x + cr.width - 10);
+                                        newW = cr.x + cr.width - newX;
+                                        newH = Math.max(10, mouse.y - cr.y);
+                                    } else if (window.activeHandle === "br") {
+                                        newW = Math.max(10, mouse.x - cr.x);
+                                        newH = Math.max(10, mouse.y - cr.y);
+                                    }
+
+                                    window.cropRect = Qt.rect(newX, newY, newW, newH);
+                                    drawingCanvas.requestPaint();
+                                    return;
+                                }
+
+                                // Standard stroke drawing positions update
                                 if (!window.currentStroke) return;
 
                                 if (window.currentTool === "pen" || window.currentTool === "highlighter") {
@@ -743,7 +806,6 @@ DankModal {
                                     }
                                 } else if (window.currentTool === "rect" || window.currentTool === "arrow"
                                          || window.currentTool === "redact" || window.currentTool === "pixelate") {
-                                    // Update end coordinate
                                     if (window.currentStroke.points.length > 1) {
                                         window.currentStroke.points[window.currentStroke.points.length - 1] = Qt.point(mouse.x, mouse.y);
                                     } else {
@@ -753,9 +815,130 @@ DankModal {
                                 drawingCanvas.requestPaint();
                             }
 
-                            onReleased: (mouse) => {
-                                if (!window.currentStroke) return;
+                            cursorShape: {
+                                if (hoveredHandle === "tl" || hoveredHandle === "br") return Qt.SizeFDiagCursor;
+                                if (hoveredHandle === "tr" || hoveredHandle === "bl") return Qt.SizeBDiagCursor;
+                                if (window.hasSelection && window.isInsideCropRect(mouseX, mouseY)) {
+                                    return Qt.CrossCursor;
+                                }
+                                return Qt.CrossCursor; // Default to selection cursor
+                            }
 
+                            onPressed: (mouse) => {
+                                if (window.isTyping) {
+                                    textInputField.completeTextEntry();
+                                    return;
+                                }
+
+                                const handle = window.getHoveredHandle(mouse.x, mouse.y);
+                                if (handle !== "none") {
+                                    window.activeHandle = handle;
+                                    return;
+                                }
+
+                                if (!window.hasSelection) {
+                                    // Start new crop selection
+                                    window.activeHandle = "new";
+                                    window.selectStart = Qt.point(mouse.x, mouse.y);
+                                    window.cropRect = Qt.rect(mouse.x, mouse.y, 0, 0);
+                                    drawingCanvas.requestPaint();
+                                    return;
+                                }
+
+                                // Inside selection box -> perform annotation/drawing!
+                                if (window.isInsideCropRect(mouse.x, mouse.y)) {
+                                    if (window.currentTool === "text") {
+                                        window.typingCoords = Qt.point(mouse.x, mouse.y);
+                                        window.isTyping = true;
+                                        textInputField.text = "";
+                                        textInputField.x = mouse.x;
+                                        textInputField.y = mouse.y;
+                                        textInputField.visible = true;
+                                        Qt.callLater(() => {
+                                            textInputField.forceActiveFocus();
+                                        });
+                                        return;
+                                    }
+
+                                    if (window.currentTool === "stamp") {
+                                        window.pushStroke({
+                                            tool: "stamp",
+                                            color: window.currentColor,
+                                            width: window.strokeWidth,
+                                            points: [Qt.point(mouse.x, mouse.y)],
+                                            counter: window.stampCounter
+                                        });
+                                        window.stampCounter++;
+                                        return;
+                                    }
+
+                                    if (window.currentTool === "eraser") {
+                                        const sx = mouse.x;
+                                        const sy = mouse.y;
+                                        let found = -1;
+                                        for (let i = window.strokes.length - 1; i >= 0; i--) {
+                                            const stroke = window.strokes[i];
+                                            if (stroke.points.length === 0) continue;
+                                            
+                                            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                                            for (let p of stroke.points) {
+                                                if (p.x < minX) minX = p.x;
+                                                if (p.y < minY) minY = p.y;
+                                                if (p.x > maxX) maxX = p.x;
+                                                if (p.y > maxY) maxY = p.y;
+                                            }
+                                            
+                                            const pad = 12 + stroke.width * 2;
+                                            if (sx >= minX - pad && sx <= maxX + pad && sy >= minY - pad && sy <= maxY + pad) {
+                                                found = i;
+                                                break;
+                                            }
+                                        }
+                                        if (found !== -1) {
+                                            window.strokes.splice(found, 1);
+                                            drawingCanvas.requestPaint();
+                                        }
+                                        return;
+                                    }
+
+                                    // Standard drawing stroke
+                                    window.currentStroke = {
+                                        tool: window.currentTool,
+                                        color: window.currentColor,
+                                        width: window.strokeWidth,
+                                        points: [Qt.point(mouse.x, mouse.y)]
+                                    };
+                                    drawingCanvas.requestPaint();
+                                } else {
+                                    // Click outside selection - reset selection to start fresh selection
+                                    window.activeHandle = "new";
+                                    window.selectStart = Qt.point(mouse.x, mouse.y);
+                                    window.cropRect = Qt.rect(mouse.x, mouse.y, 0, 0);
+                                    window.hasSelection = false;
+                                    drawingCanvas.requestPaint();
+                                }
+                            }
+
+                            onReleased: (mouse) => {
+                                if (window.activeHandle === "new") {
+                                    if (window.cropRect.width > 10 && window.cropRect.height > 10) {
+                                        window.hasSelection = true;
+                                    } else {
+                                        window.hasSelection = false;
+                                        window.cropRect = Qt.rect(0, 0, 0, 0);
+                                    }
+                                    window.activeHandle = "none";
+                                    drawingCanvas.requestPaint();
+                                    return;
+                                }
+
+                                if (window.activeHandle !== "none") {
+                                    window.activeHandle = "none";
+                                    drawingCanvas.requestPaint();
+                                    return;
+                                }
+
+                                if (!window.currentStroke) return;
                                 window.pushStroke(window.currentStroke);
                                 window.currentStroke = null;
                             }
@@ -875,6 +1058,37 @@ DankModal {
                         }
                     }
                 }
+
+                Canvas {
+                    id: exportCanvas
+                    visible: false
+                    z: 0
+                    renderTarget: Canvas.Image
+                    width: 1
+                    height: 1
+
+                    onPaint: {
+                        var ctx = exportCanvas.getContext("2d");
+                        ctx.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
+                        
+                        if (window.hasSelection && window.activeCanvas) {
+                            ctx.drawImage(window.activeCanvas, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, 0, 0, window.cropRect.width, window.cropRect.height);
+                        } else if (window.activeCanvas) {
+                            ctx.drawImage(window.activeCanvas, 0, 0);
+                        }
+
+                        const tempOut = "/tmp/dms_capture_output.png";
+                        exportCanvas.save(tempOut);
+
+                        if (window.exportCallback) {
+                            const cb = window.exportCallback;
+                            window.exportCallback = null;
+                            Qt.callLater(() => {
+                                cb(tempOut);
+                            });
+                        }
+                    }
+                }
             }
         }
     }
@@ -903,12 +1117,7 @@ DankModal {
     }
 
     function performSaveOnly() {
-        // Save the merged canvas
-        const tempOut = "/tmp/dms_capture_output.png";
-        if (window.activeCanvas) window.activeCanvas.save(tempOut);
-        
-        // Wait 100ms for QML canvas save thread to finish writing
-        Qt.callLater(() => {
+        window.exportAndExecute((tempOut) => {
             const hasParent = window.parentWidget && window.parentWidget.pluginData;
             const saveDir = hasParent ? (window.parentWidget.pluginData.saveDirectory || "~/Pictures/Screenshots") : "~/Pictures/Screenshots";
             const cleanDir = saveDir.replace("~", "$HOME");
@@ -931,13 +1140,7 @@ DankModal {
     }
 
     function performCopyOnly() {
-        // Save the merged canvas
-        const tempOut = "/tmp/dms_capture_output.png";
-        if (window.activeCanvas) window.activeCanvas.save(tempOut);
-
-        // Wait 100ms for QML canvas save thread to finish writing
-        Qt.callLater(() => {
-            // Clipboard copy pipeline
+        window.exportAndExecute((tempOut) => {
             const copyCmd = "wl-copy < " + tempOut;
             Proc.runCommand("copy-capture-clipboard", ["sh", "-c", copyCmd], (stdout, exitCode) => {
                 if (exitCode === 0) {
@@ -956,18 +1159,11 @@ DankModal {
     }
 
     function performCopyAndSave() {
-        // Save the merged canvas
-        const tempOut = "/tmp/dms_capture_output.png";
-        if (window.activeCanvas) window.activeCanvas.save(tempOut);
-
-        // Wait 100ms for QML canvas save thread to finish writing
-        Qt.callLater(() => {
-            const hasParent = window.parentWidget && window.parentWidget.pluginData;
-            
-            // Clipboard copy pipeline
+        window.exportAndExecute((tempOut) => {
             const copyCmd = "wl-copy < " + tempOut;
             Proc.runCommand("copy-capture-clipboard", ["sh", "-c", copyCmd], (stdout, exitCode) => {
                 if (exitCode === 0) {
+                    const hasParent = window.parentWidget && window.parentWidget.pluginData;
                     const saveDir = hasParent ? (window.parentWidget.pluginData.saveDirectory || "~/Pictures/Screenshots") : "~/Pictures/Screenshots";
                     const cleanDir = saveDir.replace("~", "$HOME");
                     const filename = "Screenshot_" + Date.now() + ".png";
