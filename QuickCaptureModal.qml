@@ -67,8 +67,16 @@ DankModal {
     property var bgImageItem: null
     property var boardContainerItem: null
 
-    // Unscaled 1-to-1 canvas mapping for full-screen pixel editing
-    property real fitScale: 1.0
+    // Dynamic scale to fit the screenshot (supports standard, high-DPI, and multi-monitor setups)
+    property real fitScale: {
+        if (!activeCanvas || !bgImageItem || !boardContainerItem) return 1.0;
+        const maxW = boardContainerItem.width;
+        const maxH = boardContainerItem.height;
+        if (bgImageItem.sourceSize.width <= 0 || bgImageItem.sourceSize.height <= 0) return 1.0;
+        const scaleX = maxW / bgImageItem.sourceSize.width;
+        const scaleY = maxH / bgImageItem.sourceSize.height;
+        return Math.min(scaleX, scaleY);
+    }
 
     // Crop Selection State
     property rect cropRect: Qt.rect(0, 0, 0, 0)
