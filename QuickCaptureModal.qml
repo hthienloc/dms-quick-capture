@@ -219,38 +219,38 @@ DankModal {
         } else if (event.key === Qt.Key_S && (event.modifiers & Qt.ControlModifier)) {
             window.performSaveOnly();
             event.accepted = true;
-        } else if (event.key === Qt.Key_1) {
+        } else if (event.key === Qt.Key_Q) {
+            window.currentTool = "select";
+            event.accepted = true;
+        } else if (event.key === Qt.Key_W) {
             window.currentTool = "pen";
             event.accepted = true;
-        } else if (event.key === Qt.Key_2) {
+        } else if (event.key === Qt.Key_E) {
             window.currentTool = "arrow";
             event.accepted = true;
-        } else if (event.key === Qt.Key_3) {
+        } else if (event.key === Qt.Key_R) {
             window.currentTool = "rect";
             event.accepted = true;
-        } else if (event.key === Qt.Key_4) {
+        } else if (event.key === Qt.Key_A) {
             window.currentTool = "text";
             event.accepted = true;
-        } else if (event.key === Qt.Key_5) {
+        } else if (event.key === Qt.Key_S) {
             window.currentTool = "pixelate";
             event.accepted = true;
-        } else if (event.key === Qt.Key_6) {
+        } else if (event.key === Qt.Key_D) {
             window.currentTool = "redact";
             event.accepted = true;
-        } else if (event.key === Qt.Key_7) {
+        } else if (event.key === Qt.Key_F) {
             window.currentTool = "stamp";
             event.accepted = true;
-        } else if (event.key === Qt.Key_8) {
+        } else if (event.key === Qt.Key_1) {
             window.currentTool = "highlighter";
             event.accepted = true;
-        } else if (event.key === Qt.Key_9) {
+        } else if (event.key === Qt.Key_2) {
             window.currentTool = "eraser";
             event.accepted = true;
-        } else if (event.key === Qt.Key_0) {
+        } else if (event.key === Qt.Key_3) {
             window.currentTool = "crop";
-            event.accepted = true;
-        } else if (event.key === Qt.Key_V || event.key === Qt.Key_v) {
-            window.currentTool = "select";
             event.accepted = true;
         }
     }
@@ -332,7 +332,7 @@ DankModal {
                             iconName: "near_me"
                             buttonSize: 36
                             iconSize: 18
-                            tooltipText: "Select & Move (V)"
+                            tooltipText: "Select & Move (Q)"
                             anchors.verticalCenter: parent.verticalCenter
 
                             backgroundColor: window.currentTool === "select" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
@@ -358,16 +358,16 @@ DankModal {
 
                             Repeater {
                                 model: [
-                                    { id: "pen", icon: "edit", tooltip: "Freehand Pen (1)" },
-                                    { id: "arrow", icon: "trending_flat", tooltip: "Arrow Vector (2)" },
-                                    { id: "rect", icon: "crop_square", tooltip: "Rectangle Outline (3)" },
-                                    { id: "text", icon: "text_fields", tooltip: "Text Note (4)" },
-                                    { id: "pixelate", icon: "blur_on", tooltip: "Pixelate / Blur (5)" },
-                                    { id: "redact", icon: "square", tooltip: "Redact / Blackout (6)" },
-                                    { id: "stamp", icon: "looks_one", tooltip: "Number Stamp (7)" },
-                                    { id: "highlighter", icon: "border_color", tooltip: "Highlighter (8)" },
-                                    { id: "eraser", icon: "auto_fix_normal", tooltip: "Eraser (9)" },
-                                    { id: "crop", icon: "crop", tooltip: "Crop / Resize Area (0)" }
+                                    { id: "pen", icon: "edit", tooltip: "Freehand Pen (W)" },
+                                    { id: "arrow", icon: "trending_flat", tooltip: "Arrow Vector (E)" },
+                                    { id: "rect", icon: "crop_square", tooltip: "Rectangle Outline (R)" },
+                                    { id: "text", icon: "text_fields", tooltip: "Text Note (A)" },
+                                    { id: "pixelate", icon: "blur_on", tooltip: "Pixelate / Blur (S)" },
+                                    { id: "redact", icon: "square", tooltip: "Redact / Blackout (D)" },
+                                    { id: "stamp", icon: "looks_one", tooltip: "Number Stamp (F)" },
+                                    { id: "highlighter", icon: "border_color", tooltip: "Highlighter (1)" },
+                                    { id: "eraser", icon: "auto_fix_normal", tooltip: "Eraser (2)" },
+                                    { id: "crop", icon: "crop", tooltip: "Crop / Resize Area (3)" }
                                 ]
 
                                 delegate: DankActionButton {
