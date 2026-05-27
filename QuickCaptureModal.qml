@@ -444,14 +444,22 @@ DankModal {
                                     const blockSize = Math.max(8, Math.round(Math.min(rw, rh) / 20));
                                     const imageData = ctx.getImageData(rx, ry, rw, rh);
                                     const data = imageData.data;
+                                    // Use imageData.width as stride to handle HiDPI (DPR > 1) correctly
+                                    const stride = imageData.width;
+                                    const dpr = stride / rw;
                                     for (let by = 0; by < rh; by += blockSize) {
                                         for (let bx = 0; bx < rw; bx += blockSize) {
                                             let r = 0, g = 0, b = 0, count = 0;
                                             const bw = Math.min(blockSize, rw - bx);
                                             const bh = Math.min(blockSize, rh - by);
-                                            for (let py = by; py < by + bh; py++) {
-                                                for (let px = bx; px < bx + bw; px++) {
-                                                    const idx = (py * rw + px) * 4;
+                                            // Sample in physical pixels
+                                            const pxStart = Math.round(bx * dpr);
+                                            const pyStart = Math.round(by * dpr);
+                                            const pxEnd = Math.round((bx + bw) * dpr);
+                                            const pyEnd = Math.round((by + bh) * dpr);
+                                            for (let py = pyStart; py < pyEnd; py++) {
+                                                for (let px = pxStart; px < pxEnd; px++) {
+                                                    const idx = (py * stride + px) * 4;
                                                     r += data[idx];
                                                     g += data[idx + 1];
                                                     b += data[idx + 2];
@@ -478,13 +486,15 @@ DankModal {
                                 ctx.arc(pt.x, pt.y, radius, 0, 2 * Math.PI);
                                 ctx.fill();
 
-                                // Dynamic contrasting label — offset +10% fontSize to correct QML Canvas middle baseline rendering
+                                // Dynamic contrasting label — measureText for reliable centering across digit counts
                                 const fontSize = Math.round(radius * 1.2);
+                                const text = String(stroke.counter);
                                 ctx.fillStyle = textColor;
                                 ctx.font = "bold " + fontSize + "px sans-serif";
-                                ctx.textAlign = "center";
                                 ctx.textBaseline = "middle";
-                                ctx.fillText(String(stroke.counter), pt.x, pt.y + Math.round(fontSize * 0.1));
+                                ctx.textAlign = "left";
+                                const textW = ctx.measureText(text).width;
+                                ctx.fillText(text, pt.x - textW / 2, pt.y + Math.round(fontSize * 0.1));
 
                             } else if (stroke.tool === "text") {
                                 const pt = stroke.points[0];
