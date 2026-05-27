@@ -131,17 +131,33 @@ PluginComponent {
 
     Component.onCompleted: {
         if (root.isDaemonInstance && pluginService && pluginId) {
-            // 1. Dynamic registration in pluginWidgetComponents
+            // 1. Register self into pluginInstances so CC instances can delegate capture to us
+            if (!pluginService.pluginInstances[pluginId]) {
+                const newInstances = Object.assign({}, pluginService.pluginInstances);
+                newInstances[pluginId] = root;
+                pluginService.pluginInstances = newInstances;
+            }
+            // 2. Dynamic registration in pluginWidgetComponents
             if (pluginService.pluginWidgetComponents && !pluginService.pluginWidgetComponents[pluginId]) {
                 const newWidgets = Object.assign({}, pluginService.pluginWidgetComponents);
                 newWidgets[pluginId] = pluginService.pluginDaemonComponents[pluginId];
                 pluginService.pluginWidgetComponents = newWidgets;
             }
-            // 2. Bypass daemon filter in WidgetModel by updating in-memory type to widget
+            // 3. Bypass daemon filter in WidgetModel by updating in-memory type to widget
             const plugins = pluginService.getLoadedPlugins ? pluginService.getLoadedPlugins() : [];
             const pluginInfo = plugins.find(p => p.id === pluginId);
             if (pluginInfo) {
                 pluginInfo.type = "widget";
+            }
+        }
+    }
+
+    Component.onDestruction: {
+        if (root.isDaemonInstance && pluginService && pluginId) {
+            if (pluginService.pluginInstances[pluginId] === root) {
+                const newInstances = Object.assign({}, pluginService.pluginInstances);
+                delete newInstances[pluginId];
+                pluginService.pluginInstances = newInstances;
             }
         }
     }
