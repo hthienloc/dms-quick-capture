@@ -507,7 +507,7 @@ DankModal {
                                 const ry = Math.min(p0.y, p1.y);
                                 const rw = Math.abs(p1.x - p0.x);
                                 const rh = Math.abs(p1.y - p0.y);
-                                const radius = Math.min(8, Math.min(rw, rh) / 2);
+                                const radius = Math.min(Theme.cornerRadius, Math.min(rw, rh) / 2);
 
                                 ctx.beginPath();
                                 ctx.moveTo(rx + radius, ry);
@@ -530,23 +530,34 @@ DankModal {
                                 ctx.lineJoin = "round";
                                 const p0 = stroke.points[0];
                                 const p1 = stroke.points[stroke.points.length - 1];
+                                const dx = p1.x - p0.x;
+                                const dy = p1.y - p0.y;
+                                const len = Math.sqrt(dx * dx + dy * dy);
 
-                                // Draw shaft
-                                ctx.beginPath();
-                                ctx.moveTo(p0.x, p0.y);
-                                ctx.lineTo(p1.x, p1.y);
-                                ctx.stroke();
+                                if (len > 0) {
+                                    const angle = Math.atan2(dy, dx);
+                                    const spread = Math.PI / 7;
+                                    const headLength = Math.max(15, stroke.width * 4);
+                                    
+                                    // Shorten shaft so it stops exactly inside the arrowhead base
+                                    const shaftLength = Math.max(0, len - headLength * 0.8);
+                                    const shaftEndX = p0.x + shaftLength * Math.cos(angle);
+                                    const shaftEndY = p0.y + shaftLength * Math.sin(angle);
 
-                                // Draw head (vector trigonometry)
-                                const angle = Math.atan2(p1.y - p0.y, p1.x - p0.x);
-                                const spread = Math.PI / 7;
-                                const size = stroke.width * 5;
-                                ctx.beginPath();
-                                ctx.moveTo(p1.x, p1.y);
-                                ctx.lineTo(p1.x - size * Math.cos(angle - spread), p1.y - size * Math.sin(angle - spread));
-                                ctx.lineTo(p1.x - size * Math.cos(angle + spread), p1.y - size * Math.sin(angle + spread));
-                                ctx.closePath();
-                                ctx.fill();
+                                    // Draw shaft
+                                    ctx.beginPath();
+                                    ctx.moveTo(p0.x, p0.y);
+                                    ctx.lineTo(shaftEndX, shaftEndY);
+                                    ctx.stroke();
+
+                                    // Draw head
+                                    ctx.beginPath();
+                                    ctx.moveTo(p1.x, p1.y);
+                                    ctx.lineTo(p1.x - headLength * Math.cos(angle - spread), p1.y - headLength * Math.sin(angle - spread));
+                                    ctx.lineTo(p1.x - headLength * Math.cos(angle + spread), p1.y - headLength * Math.sin(angle + spread));
+                                    ctx.closePath();
+                                    ctx.fill();
+                                }
 
                             } else if (stroke.tool === "redact") {
                                 const p0 = stroke.points[0];
@@ -555,7 +566,7 @@ DankModal {
                                 const ry = Math.min(p0.y, p1.y);
                                 const rw = Math.abs(p1.x - p0.x);
                                 const rh = Math.abs(p1.y - p0.y);
-                                const radius = Math.min(8, Math.min(rw, rh) / 2);
+                                const radius = Math.min(Theme.cornerRadius, Math.min(rw, rh) / 2);
 
                                 ctx.fillStyle = stroke.color;
                                 ctx.beginPath();
@@ -847,7 +858,7 @@ DankModal {
                         color: "transparent"
                         border.color: window.isScreenshotDark ? "rgba(255, 255, 255, 0.4)" : "rgba(0, 0, 0, 0.4)"
                         border.width: 1
-                        radius: 8
+                        radius: Theme.cornerRadius
                         z: 10
                     }
 
@@ -860,7 +871,7 @@ DankModal {
 
                         Rectangle {
                             anchors.fill: parent
-                            radius: 8
+                            radius: Theme.cornerRadius
                             color: "black"
                         }
                     }
