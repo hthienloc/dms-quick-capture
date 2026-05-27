@@ -150,14 +150,15 @@ DankModal {
                     border.color: Theme.withAlpha(Theme.outline, 0.15)
                     border.width: 1
 
+                    // Left group: editing tools
                     Row {
-                        id: toolbarLayout
-                        anchors.fill: parent
+                        id: leftGroup
+                        anchors.left: parent.left
                         anchors.leftMargin: Theme.spacingM
-                        anchors.rightMargin: Theme.spacingM
+                        anchors.verticalCenter: parent.verticalCenter
                         spacing: Theme.spacingM
 
-                        // Tool buttons list
+                        // Tool buttons
                         Row {
                             spacing: Theme.spacingXS
                             anchors.verticalCenter: parent.verticalCenter
@@ -178,7 +179,7 @@ DankModal {
                                     buttonSize: 36
                                     iconSize: 18
                                     tooltipText: modelData.tooltip
-                                    
+
                                     backgroundColor: window.currentTool === modelData.id ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                                     iconColor: window.currentTool === modelData.id ? Theme.primary : Theme.surfaceText
 
@@ -189,7 +190,7 @@ DankModal {
                             }
                         }
 
-                        // Divider line
+                        // Divider
                         Rectangle {
                             width: 1
                             height: 24
@@ -197,19 +198,19 @@ DankModal {
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
-                        // Dynamic Color picking circles
+                        // Color picker
                         Row {
                             spacing: Theme.spacingS
                             anchors.verticalCenter: parent.verticalCenter
 
                             Repeater {
                                 model: [
-                                    "#3b82f6", // Blue
-                                    "#ef4444", // Red
-                                    "#22c55e", // Green
-                                    "#eab308", // Yellow
-                                    "#ffffff", // White
-                                    "#000000"  // Black
+                                    "#3b82f6",
+                                    "#ef4444",
+                                    "#22c55e",
+                                    "#eab308",
+                                    "#ffffff",
+                                    "#000000"
                                 ]
 
                                 delegate: Rectangle {
@@ -231,55 +232,76 @@ DankModal {
                             }
                         }
 
-                        // Spacer
-                        Item {
+                        // Divider
+                        Rectangle {
                             width: 1
-                            height: 1
-                            Layout.fillWidth: true
+                            height: 24
+                            color: Theme.withAlpha(Theme.outline, 0.2)
+                            anchors.verticalCenter: parent.verticalCenter
                         }
 
-                        // Actions buttons
-                        Row {
-                            spacing: Theme.spacingXS
+                        // Undo
+                        DankActionButton {
                             anchors.verticalCenter: parent.verticalCenter
+                            iconName: "undo"
+                            buttonSize: 36
+                            iconSize: 18
+                            tooltipText: "Undo (Ctrl+Z)"
+                            enabled: window.strokes.length > 0
+                            iconColor: window.strokes.length > 0 ? Theme.surfaceText : Theme.withAlpha(Theme.surfaceText, 0.3)
+                            onClicked: window.performUndo()
+                        }
+                    }
 
-                            DankActionButton {
-                                iconName: "undo"
-                                buttonSize: 36
-                                iconSize: 18
-                                tooltipText: "Undo (Ctrl+Z)"
-                                enabled: window.strokes.length > 0
-                                iconColor: window.strokes.length > 0 ? Theme.surfaceText : Theme.withAlpha(Theme.surfaceText, 0.3)
-                                onClicked: window.performUndo()
-                            }
+                    // Right group: save + copy | close
+                    Row {
+                        id: rightGroup
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingM
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingXS
 
-                            DankActionButton {
-                                iconName: "save"
-                                buttonSize: 36
-                                iconSize: 18
-                                tooltipText: "Save to File (Ctrl+S)"
-                                onClicked: window.performSaveOnly()
-                            }
+                        DankActionButton {
+                            anchors.verticalCenter: parent.verticalCenter
+                            iconName: "save"
+                            buttonSize: 36
+                            iconSize: 18
+                            tooltipText: "Save to File (Ctrl+S)"
+                            onClicked: window.performSaveOnly()
+                        }
 
-                            DankActionButton {
-                                iconName: "content_copy"
-                                buttonSize: 36
-                                iconSize: 18
-                                tooltipText: "Copy to Clipboard & Done (Ctrl+C / Enter)"
-                                backgroundColor: Theme.withAlpha(Theme.primary, 0.1)
-                                iconColor: Theme.primary
-                                onClicked: window.performDone()
-                            }
+                        DankActionButton {
+                            anchors.verticalCenter: parent.verticalCenter
+                            iconName: "content_copy"
+                            buttonSize: 36
+                            iconSize: 18
+                            tooltipText: "Copy to Clipboard & Done (Ctrl+C / Enter)"
+                            backgroundColor: Theme.withAlpha(Theme.primary, 0.1)
+                            iconColor: Theme.primary
+                            onClicked: window.performDone()
+                        }
 
-                            DankActionButton {
-                                iconName: "close"
-                                buttonSize: 36
-                                iconSize: 18
-                                tooltipText: "Discard & Close (Escape)"
-                                backgroundColor: Theme.withAlpha(Theme.error, 0.1)
-                                iconColor: Theme.error
-                                onClicked: window.discardAndClose()
-                            }
+                        // Separator gap before close
+                        Item { width: Theme.spacingL; height: 1 }
+
+                        Rectangle {
+                            width: 1
+                            height: 24
+                            color: Theme.withAlpha(Theme.outline, 0.2)
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Item { width: Theme.spacingXS; height: 1 }
+
+                        DankActionButton {
+                            anchors.verticalCenter: parent.verticalCenter
+                            iconName: "close"
+                            buttonSize: 36
+                            iconSize: 18
+                            tooltipText: "Discard & Close (Escape)"
+                            backgroundColor: Theme.withAlpha(Theme.error, 0.1)
+                            iconColor: Theme.error
+                            onClicked: window.discardAndClose()
                         }
                     }
                 }
