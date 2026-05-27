@@ -249,7 +249,7 @@ DankModal {
         } else if (event.key === Qt.Key_2) {
             window.currentTool = "eraser";
             event.accepted = true;
-        } else if (event.key === Qt.Key_3) {
+        } else if (event.key === Qt.Key_P) {
             window.currentTool = "crop";
             event.accepted = true;
         }
@@ -367,7 +367,7 @@ DankModal {
                                     { id: "stamp", icon: "looks_one", tooltip: "Number Stamp (F)" },
                                     { id: "highlighter", icon: "border_color", tooltip: "Highlighter (1)" },
                                     { id: "eraser", icon: "auto_fix_normal", tooltip: "Eraser (2)" },
-                                    { id: "crop", icon: "crop", tooltip: "Crop / Resize Area (3)" }
+                                    { id: "crop", icon: "crop", tooltip: "Crop / Resize Area (P)" }
                                 ]
 
                                 delegate: DankActionButton {
