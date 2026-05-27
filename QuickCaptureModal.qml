@@ -73,10 +73,16 @@ DankModal {
         if (!activeCanvas || !bgImageItem || !boardContainerItem) return 1.0;
         const maxW = boardContainerItem.width;
         const maxH = boardContainerItem.height;
-        if (bgImageItem.sourceSize.width <= 0 || bgImageItem.sourceSize.height <= 0) return 1.0;
-        const scaleX = maxW / bgImageItem.sourceSize.width;
-        const scaleY = maxH / bgImageItem.sourceSize.height;
-        return Math.min(scaleX, scaleY);
+        const targetW = (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.width : bgImageItem.sourceSize.width;
+        const targetH = (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.height : bgImageItem.sourceSize.height;
+        if (targetW <= 0 || targetH <= 0) return 1.0;
+        const scaleX = maxW / targetW;
+        const scaleY = maxH / targetH;
+        const scale = Math.min(scaleX, scaleY);
+        if (window.currentTool !== "crop" && window.hasSelection) {
+            return Math.min(scale, 1.0);
+        }
+        return scale;
     }
 
     // Crop Selection State
@@ -183,8 +189,6 @@ DankModal {
                 onStatusChanged: {
                     if (status === Image.Ready) {
                         if (window.activeCanvas) {
-                            window.activeCanvas.width = sourceSize.width;
-                            window.activeCanvas.height = sourceSize.height;
                             window.activeCanvas.loadImage(source);
                         }
                     }
@@ -464,6 +468,19 @@ DankModal {
                         transformOrigin: Item.Center
                         renderTarget: Canvas.Image
 
+                        width: {
+                            if (window.currentTool !== "crop" && window.hasSelection) {
+                                return window.cropRect.width;
+                            }
+                            return window.bgImageItem ? window.bgImageItem.sourceSize.width : 1;
+                        }
+                        height: {
+                            if (window.currentTool !== "crop" && window.hasSelection) {
+                                return window.cropRect.height;
+                            }
+                            return window.bgImageItem ? window.bgImageItem.sourceSize.height : 1;
+                        }
+
                         layer.enabled: false
 
                         Component.onCompleted: {
@@ -480,79 +497,88 @@ DankModal {
 
                             // 1. Draw the screenshot background first
                             if (drawingCanvas.isImageLoaded("file:///tmp/dms_capture_bg.png")) {
-                                ctx.drawImage("file:///tmp/dms_capture_bg.png", 0, 0, drawingCanvas.width, drawingCanvas.height);
+                                if (window.currentTool !== "crop" && window.hasSelection) {
+                                    // Draw only the cropped portion
+                                    ctx.drawImage("file:///tmp/dms_capture_bg.png", window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, 0, 0, window.cropRect.width, window.cropRect.height);
+                                } else {
+                                    // Draw full screen background
+                                    ctx.drawImage("file:///tmp/dms_capture_bg.png", 0, 0, drawingCanvas.width, drawingCanvas.height);
 
-                                if (!window.hasSampledContrast) {
-                                    try {
-                                        var imgData = ctx.getImageData(0, 0, 1, 1);
-                                        if (imgData && imgData.data) {
-                                            var r = imgData.data[0];
-                                            var g = imgData.data[1];
-                                            var b = imgData.data[2];
-                                            var brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-                                            window.isScreenshotDark = (brightness < 0.35);
-                                            window.hasSampledContrast = true;
+                                    if (!window.hasSampledContrast) {
+                                        try {
+                                            var imgData = ctx.getImageData(0, 0, 1, 1);
+                                            if (imgData && imgData.data) {
+                                                var r = imgData.data[0];
+                                                var g = imgData.data[1];
+                                                var b = imgData.data[2];
+                                                var brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+                                                window.isScreenshotDark = (brightness < 0.35);
+                                                window.hasSampledContrast = true;
+                                            }
+                                        } catch (e) {
+                                            // Ignore
                                         }
-                                    } catch (e) {
-                            // Ignore
                                     }
                                 }
                             }
 
                             // 1.5. Draw Dimming Selection Overlay
-                            if (window.cropRect.width > 0 && window.cropRect.height > 0) {
-                                ctx.save();
-                                ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
-                                // Left
-                                ctx.fillRect(0, 0, window.cropRect.x, drawingCanvas.height);
-                                // Right
-                                ctx.fillRect(window.cropRect.x + window.cropRect.width, 0, drawingCanvas.width - (window.cropRect.x + window.cropRect.width), drawingCanvas.height);
-                                // Top
-                                ctx.fillRect(window.cropRect.x, 0, window.cropRect.width, window.cropRect.y);
-                                // Bottom
-                                ctx.fillRect(window.cropRect.x, window.cropRect.y + window.cropRect.height, window.cropRect.width, drawingCanvas.height - (window.cropRect.y + window.cropRect.height));
+                            if (window.currentTool === "crop") {
+                                if (window.cropRect.width > 0 && window.cropRect.height > 0) {
+                                    ctx.save();
+                                    ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+                                    // Left
+                                    ctx.fillRect(0, 0, window.cropRect.x, drawingCanvas.height);
+                                    // Right
+                                    ctx.fillRect(window.cropRect.x + window.cropRect.width, 0, drawingCanvas.width - (window.cropRect.x + window.cropRect.width), drawingCanvas.height);
+                                    // Top
+                                    ctx.fillRect(window.cropRect.x, 0, window.cropRect.width, window.cropRect.y);
+                                    // Bottom
+                                    ctx.fillRect(window.cropRect.x, window.cropRect.y + window.cropRect.height, window.cropRect.width, drawingCanvas.height - (window.cropRect.y + window.cropRect.height));
 
-                                // Selection border
-                                ctx.strokeStyle = Theme.primary;
-                                ctx.lineWidth = 1.5;
-                                ctx.strokeRect(window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height);
+                                    // Selection border
+                                    ctx.strokeStyle = Theme.primary;
+                                    ctx.lineWidth = 1.5;
+                                    ctx.strokeRect(window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height);
 
-                                 // 4 Corner resize handles (only visible when Crop/Select tool is active)
-                                 if (window.currentTool === "crop") {
-                                     const hs = 10;
-                                     const hh = hs / 2;
-                                     ctx.fillStyle = Theme.primary;
-                                     ctx.strokeStyle = "#ffffff";
-                                     ctx.lineWidth = 1.5;
+                                    // 4 Corner resize handles
+                                    const hs = 10;
+                                    const hh = hs / 2;
+                                    ctx.fillStyle = Theme.primary;
+                                    ctx.strokeStyle = "#ffffff";
+                                    ctx.lineWidth = 1.5;
 
-                                     const x1 = window.cropRect.x;
-                                     const y1 = window.cropRect.y;
-                                     const x2 = window.cropRect.x + window.cropRect.width;
-                                     const y2 = window.cropRect.y + window.cropRect.height;
+                                    const x1 = window.cropRect.x;
+                                    const y1 = window.cropRect.y;
+                                    const x2 = window.cropRect.x + window.cropRect.width;
+                                    const y2 = window.cropRect.y + window.cropRect.height;
 
-                                     // TL
-                                     ctx.fillRect(x1 - hh, y1 - hh, hs, hs);
-                                     ctx.strokeRect(x1 - hh, y1 - hh, hs, hs);
-                                     // TR
-                                     ctx.fillRect(x2 - hh, y1 - hh, hs, hs);
-                                     ctx.strokeRect(x2 - hh, y1 - hh, hs, hs);
-                                     // BL
-                                     ctx.fillRect(x1 - hh, y2 - hh, hs, hs);
-                                     ctx.strokeRect(x1 - hh, y2 - hh, hs, hs);
-                                     // BR
-                                     ctx.fillRect(x2 - hh, y2 - hh, hs, hs);
-                                     ctx.strokeRect(x2 - hh, y2 - hh, hs, hs);
-                                 }
-                                ctx.restore();
-                            } else {
-                                // Dim full canvas slightly before selection
-                                ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
-                                ctx.fillRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+                                    // TL
+                                    ctx.fillRect(x1 - hh, y1 - hh, hs, hs);
+                                    ctx.strokeRect(x1 - hh, y1 - hh, hs, hs);
+                                    // TR
+                                    ctx.fillRect(x2 - hh, y1 - hh, hs, hs);
+                                    ctx.strokeRect(x2 - hh, y1 - hh, hs, hs);
+                                    // BL
+                                    ctx.fillRect(x1 - hh, y2 - hh, hs, hs);
+                                    ctx.strokeRect(x1 - hh, y2 - hh, hs, hs);
+                                    // BR
+                                    ctx.fillRect(x2 - hh, y2 - hh, hs, hs);
+                                    ctx.strokeRect(x2 - hh, y2 - hh, hs, hs);
+                                    ctx.restore();
+                                } else {
+                                    // Dim full canvas slightly before selection
+                                    ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
+                                    ctx.fillRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+                                }
                             }
 
-                            // 2. Draw annotations (clipped to cropRect if hasSelection)
-                            if (window.hasSelection) {
-                                ctx.save();
+                            // 2. Draw annotations (translated in edit mode, or clipped in crop mode)
+                            ctx.save();
+                            if (window.currentTool !== "crop" && window.hasSelection) {
+                                // Shift context so drawings at absolute screen coords display correctly in cropped canvas view
+                                ctx.translate(-window.cropRect.x, -window.cropRect.y);
+                            } else if (window.hasSelection) {
                                 ctx.beginPath();
                                 ctx.rect(window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height);
                                 ctx.clip();
@@ -567,9 +593,7 @@ DankModal {
                                 drawStroke(ctx, window.currentStroke);
                             }
 
-                            if (window.hasSelection) {
-                                ctx.restore();
-                            }
+                            ctx.restore();
                         }
 
                         function drawStroke(ctx, stroke) {
@@ -761,6 +785,13 @@ DankModal {
                             anchors.fill: parent
                             hoverEnabled: true
 
+                            function getAbsolutePoint(mx, my) {
+                                if (window.currentTool !== "crop" && window.hasSelection) {
+                                    return Qt.point(mx + window.cropRect.x, my + window.cropRect.y);
+                                }
+                                return Qt.point(mx, my);
+                            }
+
                             // Visual cursor feedback based on hover position
                             property string hoveredHandle: "none"
                             onPositionChanged: (mouse) => {
@@ -811,22 +842,24 @@ DankModal {
                                     // Standard stroke drawing positions update
                                     if (!window.currentStroke) return;
 
+                                    const absPt = getAbsolutePoint(mouse.x, mouse.y);
+
                                     if (window.currentTool === "pen" || window.currentTool === "highlighter") {
                                         if (mouse.modifiers & Qt.ShiftModifier) {
                                             if (window.currentStroke.points.length > 1) {
-                                                window.currentStroke.points = [window.currentStroke.points[0], Qt.point(mouse.x, mouse.y)];
+                                                window.currentStroke.points = [window.currentStroke.points[0], absPt];
                                             } else {
-                                                window.currentStroke.points.push(Qt.point(mouse.x, mouse.y));
+                                                window.currentStroke.points.push(absPt);
                                             }
                                         } else {
-                                            window.currentStroke.points.push(Qt.point(mouse.x, mouse.y));
+                                            window.currentStroke.points.push(absPt);
                                         }
                                     } else if (window.currentTool === "rect" || window.currentTool === "arrow"
                                              || window.currentTool === "redact" || window.currentTool === "pixelate") {
                                         if (window.currentStroke.points.length > 1) {
-                                            window.currentStroke.points[window.currentStroke.points.length - 1] = Qt.point(mouse.x, mouse.y);
+                                            window.currentStroke.points[window.currentStroke.points.length - 1] = absPt;
                                         } else {
-                                            window.currentStroke.points.push(Qt.point(mouse.x, mouse.y));
+                                            window.currentStroke.points.push(absPt);
                                         }
                                     }
                                     drawingCanvas.requestPaint();
@@ -866,7 +899,7 @@ DankModal {
 
                                 // Annotation Mode: perform drawing!
                                 if (window.currentTool === "text") {
-                                    window.typingCoords = Qt.point(mouse.x, mouse.y);
+                                    window.typingCoords = getAbsolutePoint(mouse.x, mouse.y);
                                     window.isTyping = true;
                                     textInputField.text = "";
                                     textInputField.x = mouse.x;
@@ -883,7 +916,7 @@ DankModal {
                                         tool: "stamp",
                                         color: window.currentColor,
                                         width: window.strokeWidth,
-                                        points: [Qt.point(mouse.x, mouse.y)],
+                                        points: [getAbsolutePoint(mouse.x, mouse.y)],
                                         counter: window.stampCounter
                                     });
                                     window.stampCounter++;
@@ -891,8 +924,9 @@ DankModal {
                                 }
 
                                 if (window.currentTool === "eraser") {
-                                    const sx = mouse.x;
-                                    const sy = mouse.y;
+                                    const absPt = getAbsolutePoint(mouse.x, mouse.y);
+                                    const sx = absPt.x;
+                                    const sy = absPt.y;
                                     let found = -1;
                                     for (let i = window.strokes.length - 1; i >= 0; i--) {
                                         const stroke = window.strokes[i];
@@ -924,16 +958,18 @@ DankModal {
                                     tool: window.currentTool,
                                     color: window.currentColor,
                                     width: window.strokeWidth,
-                                    points: [Qt.point(mouse.x, mouse.y)]
+                                    points: [getAbsolutePoint(mouse.x, mouse.y)]
                                 };
                                 drawingCanvas.requestPaint();
                             }
 
                             onReleased: (mouse) => {
                                 if (window.currentTool === "crop") {
-                                    if (window.activeHandle === "new") {
+                                    if (window.activeHandle === "new" || window.activeHandle === "tl" || window.activeHandle === "tr" || window.activeHandle === "bl" || window.activeHandle === "br") {
                                         if (window.cropRect.width > 10 && window.cropRect.height > 10) {
                                             window.hasSelection = true;
+                                            // Automatically enter edit mode with the pen tool once selection is made/resized!
+                                            window.currentTool = "pen";
                                         } else {
                                             window.hasSelection = false;
                                             window.cropRect = Qt.rect(0, 0, 0, 0);
@@ -1085,7 +1121,13 @@ DankModal {
                         ctx.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
                         
                         if (window.hasSelection && window.activeCanvas) {
-                            ctx.drawImage(window.activeCanvas, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, 0, 0, window.cropRect.width, window.cropRect.height);
+                            if (window.activeCanvas.width === window.cropRect.width && window.activeCanvas.height === window.cropRect.height) {
+                                // Already cropped! Draw it directly from 0,0
+                                ctx.drawImage(window.activeCanvas, 0, 0);
+                            } else {
+                                // Fullscreen, draw the cropped area
+                                ctx.drawImage(window.activeCanvas, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, 0, 0, window.cropRect.width, window.cropRect.height);
+                            }
                         } else if (window.activeCanvas) {
                             ctx.drawImage(window.activeCanvas, 0, 0);
                         }
