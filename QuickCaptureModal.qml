@@ -66,6 +66,7 @@ DankModal {
     property var activeCanvas: null
     property var bgImageItem: null
     property var boardContainerItem: null
+    property var exportCanvasItem: null
 
     // Dynamic scale to fit the screenshot (supports standard, high-DPI, and multi-monitor setups)
     property real fitScale: {
@@ -107,14 +108,18 @@ DankModal {
 
     function exportAndExecute(callback) {
         window.exportCallback = callback;
-        if (window.hasSelection) {
-            exportCanvas.width = window.cropRect.width;
-            exportCanvas.height = window.cropRect.height;
-        } else if (window.activeCanvas) {
-            exportCanvas.width = window.activeCanvas.width;
-            exportCanvas.height = window.activeCanvas.height;
+        if (!window.exportCanvasItem) {
+            console.warn("exportCanvasItem is not initialized yet");
+            return;
         }
-        exportCanvas.requestPaint();
+        if (window.hasSelection) {
+            window.exportCanvasItem.width = window.cropRect.width;
+            window.exportCanvasItem.height = window.cropRect.height;
+        } else if (window.activeCanvas) {
+            window.exportCanvasItem.width = window.activeCanvas.width;
+            window.exportCanvasItem.height = window.activeCanvas.height;
+        }
+        window.exportCanvasItem.requestPaint();
     }
 
     onBackgroundClicked: () => discardAndClose()
@@ -1062,11 +1067,18 @@ DankModal {
 
                 Canvas {
                     id: exportCanvas
-                    visible: false
+                    visible: true
+                    opacity: 0
+                    x: -9999
+                    y: -9999
                     z: 0
                     renderTarget: Canvas.Image
                     width: 1
                     height: 1
+
+                    Component.onCompleted: {
+                        window.exportCanvasItem = exportCanvas;
+                    }
 
                     onPaint: {
                         var ctx = exportCanvas.getContext("2d");
