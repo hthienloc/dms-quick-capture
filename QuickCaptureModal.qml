@@ -593,11 +593,10 @@ DankModal {
 
                                     if (rw > 2 && rh > 2) {
                                         ctx.save();
-                                        const isSmooth = stroke.width <= 4;
-                                        ctx.imageSmoothingEnabled = isSmooth;
+                                        ctx.imageSmoothingEnabled = false;
 
-                                        // Blur/pixelate factor
-                                        const factor = isSmooth ? Math.max(4, stroke.width * 3) : stroke.width;
+                                        // Pixelate block size factor (minimum 4px for visible block effect)
+                                        const factor = Math.max(4, stroke.width);
                                         const tempW = Math.max(1, Math.round(rw / factor));
                                         const tempH = Math.max(1, Math.round(rh / factor));
 
