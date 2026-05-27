@@ -41,12 +41,9 @@ DankModal {
 
     // Helper to decode hex color to RGB
     function hexToRgb(hex) {
-        if (!hex || hex.length < 7) return { r: 0.2, g: 0.5, b: 1 };
-        return {
-            r: parseInt(hex.slice(1, 3), 16) / 255,
-            g: parseInt(hex.slice(3, 5), 16) / 255,
-            b: parseInt(hex.slice(5, 7), 16) / 255
-        };
+        if (!hex) return { r: 0.2, g: 0.5, b: 1 };
+        const c = Qt.color(hex);
+        return { r: c.r, g: c.g, b: c.b };
     }
 
     backgroundOpacity: 0.6
