@@ -168,6 +168,8 @@ DankModal {
                                     { id: "pen", icon: "edit", tooltip: "Freehand Pen" },
                                     { id: "highlighter", icon: "border_color", tooltip: "Highlighter" },
                                     { id: "rect", icon: "check_box_outline_blank", tooltip: "Rectangle" },
+                                    { id: "redact", icon: "stop", tooltip: "Redact (Filled Box)" },
+                                    { id: "pixelate", icon: "blur_on", tooltip: "Pixelate / Blur" },
                                     { id: "arrow", icon: "trending_flat", tooltip: "Arrow" },
                                     { id: "text", icon: "text_fields", tooltip: "Text" },
                                     { id: "stamp", icon: "looks_one", tooltip: "Number Stamp" },
@@ -425,6 +427,45 @@ DankModal {
                                 ctx.closePath();
                                 ctx.fill();
 
+                            } else if (stroke.tool === "redact") {
+                                const p0 = stroke.points[0];
+                                const p1 = stroke.points[stroke.points.length - 1];
+                                ctx.fillStyle = stroke.color;
+                                ctx.fillRect(Math.min(p0.x, p1.x), Math.min(p0.y, p1.y), Math.abs(p1.x - p0.x), Math.abs(p1.y - p0.y));
+
+                            } else if (stroke.tool === "pixelate") {
+                                const p0 = stroke.points[0];
+                                const p1 = stroke.points[stroke.points.length - 1];
+                                const rx = Math.floor(Math.min(p0.x, p1.x));
+                                const ry = Math.floor(Math.min(p0.y, p1.y));
+                                const rw = Math.floor(Math.abs(p1.x - p0.x));
+                                const rh = Math.floor(Math.abs(p1.y - p0.y));
+                                if (rw > 0 && rh > 0) {
+                                    const blockSize = Math.max(8, Math.round(Math.min(rw, rh) / 20));
+                                    const imageData = ctx.getImageData(rx, ry, rw, rh);
+                                    const data = imageData.data;
+                                    for (let by = 0; by < rh; by += blockSize) {
+                                        for (let bx = 0; bx < rw; bx += blockSize) {
+                                            let r = 0, g = 0, b = 0, count = 0;
+                                            const bw = Math.min(blockSize, rw - bx);
+                                            const bh = Math.min(blockSize, rh - by);
+                                            for (let py = by; py < by + bh; py++) {
+                                                for (let px = bx; px < bx + bw; px++) {
+                                                    const idx = (py * rw + px) * 4;
+                                                    r += data[idx];
+                                                    g += data[idx + 1];
+                                                    b += data[idx + 2];
+                                                    count++;
+                                                }
+                                            }
+                                            if (count > 0) {
+                                                ctx.fillStyle = "rgb(" + Math.round(r/count) + "," + Math.round(g/count) + "," + Math.round(b/count) + ")";
+                                                ctx.fillRect(rx + bx, ry + by, bw, bh);
+                                            }
+                                        }
+                                    }
+                                }
+
                             } else if (stroke.tool === "stamp") {
                                 const pt = stroke.points[0];
                                 const radius = stroke.width * 5;
@@ -437,12 +478,13 @@ DankModal {
                                 ctx.arc(pt.x, pt.y, radius, 0, 2 * Math.PI);
                                 ctx.fill();
 
-                                // Dynamic contrasting label
+                                // Dynamic contrasting label — offset +10% fontSize to correct QML Canvas middle baseline rendering
+                                const fontSize = Math.round(radius * 1.2);
                                 ctx.fillStyle = textColor;
-                                ctx.font = "bold " + Math.round(radius * 1.2) + "px sans-serif";
+                                ctx.font = "bold " + fontSize + "px sans-serif";
                                 ctx.textAlign = "center";
                                 ctx.textBaseline = "middle";
-                                ctx.fillText(String(stroke.counter), pt.x, pt.y);
+                                ctx.fillText(String(stroke.counter), pt.x, pt.y + Math.round(fontSize * 0.1));
 
                             } else if (stroke.tool === "text") {
                                 const pt = stroke.points[0];
@@ -537,7 +579,8 @@ DankModal {
 
                                 if (window.currentTool === "pen" || window.currentTool === "highlighter") {
                                     window.currentStroke.points.push(Qt.point(mouse.x, mouse.y));
-                                } else if (window.currentTool === "rect" || window.currentTool === "arrow") {
+                                } else if (window.currentTool === "rect" || window.currentTool === "arrow"
+                                        || window.currentTool === "redact" || window.currentTool === "pixelate") {
                                     // Update end coordinate
                                     if (window.currentStroke.points.length > 1) {
                                         window.currentStroke.points[window.currentStroke.points.length - 1] = Qt.point(mouse.x, mouse.y);
