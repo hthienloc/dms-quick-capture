@@ -845,6 +845,24 @@ DankModal {
                                 window.forceActiveFocus();
                             }
                         }
+
+                        Rectangle {
+                            id: sizePreviewItem
+                            visible: window.showSizePreview
+                            x: window.previewX - (width / 2)
+                            y: window.previewY - (height / 2)
+                            width: {
+                                if (window.currentTool === "highlighter") return window.strokeWidth * 4;
+                                if (window.currentTool === "stamp") return window.strokeWidth * 10;
+                                return window.strokeWidth;
+                            }
+                            height: width
+                            radius: window.currentTool === "highlighter" ? 0 : width / 2
+                            color: "transparent"
+                            border.color: Theme.primary
+                            border.width: 1.5
+                            z: 20
+                        }
                     }
 
                     Rectangle {
@@ -876,23 +894,7 @@ DankModal {
                         }
                     }
 
-                    Rectangle {
-                        id: sizePreviewItem
-                        visible: window.showSizePreview
-                        x: (window.previewX * drawingCanvas.scale) + drawingCanvas.x - (width / 2)
-                        y: (window.previewY * drawingCanvas.scale) + drawingCanvas.y - (height / 2)
-                        width: {
-                            if (window.currentTool === "highlighter") return window.strokeWidth * 4 * drawingCanvas.scale;
-                            if (window.currentTool === "stamp") return window.strokeWidth * 10 * drawingCanvas.scale;
-                            return window.strokeWidth * drawingCanvas.scale;
-                        }
-                        height: width
-                        radius: window.currentTool === "highlighter" ? 0 : width / 2
-                        color: "transparent"
-                        border.color: Theme.primary
-                        border.width: 1.5
-                        z: 20
-                    }
+
 
                     Timer {
                         id: previewTimer
