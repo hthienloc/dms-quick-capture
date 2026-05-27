@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import qs.Common
@@ -416,6 +417,12 @@ DankModal {
                         transformOrigin: Item.Center
                         renderTarget: Canvas.Image
 
+                        layer.enabled: true
+                        layer.effect: MultiEffect {
+                            maskEnabled: true
+                            maskSource: canvasRoundedMask
+                        }
+
                         Component.onCompleted: {
                             window.activeCanvas = drawingCanvas;
                         }
@@ -496,8 +503,23 @@ DankModal {
                                 ctx.lineJoin = "round";
                                 const p0 = stroke.points[0];
                                 const p1 = stroke.points[stroke.points.length - 1];
+                                const rx = Math.min(p0.x, p1.x);
+                                const ry = Math.min(p0.y, p1.y);
+                                const rw = Math.abs(p1.x - p0.x);
+                                const rh = Math.abs(p1.y - p0.y);
+                                const radius = Math.min(8, Math.min(rw, rh) / 2);
+
                                 ctx.beginPath();
-                                ctx.rect(Math.min(p0.x, p1.x), Math.min(p0.y, p1.y), Math.abs(p1.x - p0.x), Math.abs(p1.y - p0.y));
+                                ctx.moveTo(rx + radius, ry);
+                                ctx.lineTo(rx + rw - radius, ry);
+                                ctx.arcTo(rx + rw, ry, rx + rw, ry + radius, radius);
+                                ctx.lineTo(rx + rw, ry + rh - radius);
+                                ctx.arcTo(rx + rw, ry + rh, rx + rw - radius, ry + rh, radius);
+                                ctx.lineTo(rx + radius, ry + rh);
+                                ctx.arcTo(rx, ry + rh, rx, ry + rh - radius, radius);
+                                ctx.lineTo(rx, ry + radius);
+                                ctx.arcTo(rx, ry, rx + radius, ry, radius);
+                                ctx.closePath();
                                 ctx.stroke();
 
                             } else if (stroke.tool === "arrow") {
@@ -529,8 +551,25 @@ DankModal {
                             } else if (stroke.tool === "redact") {
                                 const p0 = stroke.points[0];
                                 const p1 = stroke.points[stroke.points.length - 1];
+                                const rx = Math.min(p0.x, p1.x);
+                                const ry = Math.min(p0.y, p1.y);
+                                const rw = Math.abs(p1.x - p0.x);
+                                const rh = Math.abs(p1.y - p0.y);
+                                const radius = Math.min(8, Math.min(rw, rh) / 2);
+
                                 ctx.fillStyle = stroke.color;
-                                ctx.fillRect(Math.min(p0.x, p1.x), Math.min(p0.y, p1.y), Math.abs(p1.x - p0.x), Math.abs(p1.y - p0.y));
+                                ctx.beginPath();
+                                ctx.moveTo(rx + radius, ry);
+                                ctx.lineTo(rx + rw - radius, ry);
+                                ctx.arcTo(rx + rw, ry, rx + rw, ry + radius, radius);
+                                ctx.lineTo(rx + rw, ry + rh - radius);
+                                ctx.arcTo(rx + rw, ry + rh, rx + rw - radius, ry + rh, radius);
+                                ctx.lineTo(rx + radius, ry + rh);
+                                ctx.arcTo(rx, ry + rh, rx, ry + rh - radius, radius);
+                                ctx.lineTo(rx, ry + radius);
+                                ctx.arcTo(rx, ry, rx + radius, ry, radius);
+                                ctx.closePath();
+                                ctx.fill();
 
                             } else if (stroke.tool === "pixelate") {
                                 // Draw pre-computed pixel blocks (sampled at commit time)
@@ -808,7 +847,22 @@ DankModal {
                         color: "transparent"
                         border.color: window.isScreenshotDark ? "rgba(255, 255, 255, 0.4)" : "rgba(0, 0, 0, 0.4)"
                         border.width: 1
+                        radius: 8
                         z: 10
+                    }
+
+                    Item {
+                        id: canvasRoundedMask
+                        width: drawingCanvas.width
+                        height: drawingCanvas.height
+                        layer.enabled: true
+                        visible: false
+
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: 8
+                            color: "black"
+                        }
                     }
 
                     Rectangle {
