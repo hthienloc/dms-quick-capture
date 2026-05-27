@@ -55,10 +55,10 @@ DankModal {
 
     shouldBeVisible: false
     
-    // Full-screen desktop crop simulator modal dimensions
-    modalWidth: Quickshell.screens[0].width
-    modalHeight: Quickshell.screens[0].height
-    enableShadow: false
+    // Spacious modal dimensions occupying 90% width and 90% height of the screen
+    modalWidth: Math.round(Quickshell.screens[0].width * 0.9)
+    modalHeight: Math.round(Quickshell.screens[0].height * 0.9)
+    enableShadow: true
     positioning: "center"
 
     // Component scope bridging properties
