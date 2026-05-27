@@ -20,7 +20,7 @@ DankModal {
 
     // State Variables
     property string currentTool: "crop" // crop, select, pen, line, arrow, rect, text, pixelate, redact, stamp, highlighter, eraser
-    property string currentColor: "#3b82f6" // Default to Tailwind Blue-500
+    property color currentColor: Theme.primary
     property int strokeWidth: 8
     property int stampCounter: 1
     property bool isScreenshotDark: false
@@ -219,6 +219,32 @@ DankModal {
         } else if (event.key === Qt.Key_S && (event.modifiers & Qt.ControlModifier)) {
             window.performSaveOnly();
             event.accepted = true;
+        } else if (event.modifiers & Qt.ControlModifier) {
+            if (event.key === Qt.Key_1) {
+                window.currentColor = Theme.primary;
+                event.accepted = true;
+            } else if (event.key === Qt.Key_2) {
+                window.currentColor = "#3b82f6";
+                event.accepted = true;
+            } else if (event.key === Qt.Key_3) {
+                window.currentColor = "#ef4444";
+                event.accepted = true;
+            } else if (event.key === Qt.Key_4) {
+                window.currentColor = "#22c55e";
+                event.accepted = true;
+            } else if (event.key === Qt.Key_Q) {
+                window.currentColor = "#eab308";
+                event.accepted = true;
+            } else if (event.key === Qt.Key_W) {
+                window.currentColor = "#a855f7";
+                event.accepted = true;
+            } else if (event.key === Qt.Key_E) {
+                window.currentColor = "#ffffff";
+                event.accepted = true;
+            } else if (event.key === Qt.Key_R) {
+                window.currentColor = "#000000";
+                event.accepted = true;
+            }
         } else if (event.key === Qt.Key_V) {
             window.currentTool = "select";
             event.accepted = true;
@@ -405,10 +431,12 @@ DankModal {
 
                             Repeater {
                                 model: [
+                                    Theme.primary,
                                     "#3b82f6",
                                     "#ef4444",
                                     "#22c55e",
                                     "#eab308",
+                                    "#a855f7",
                                     "#ffffff",
                                     "#000000"
                                 ]
@@ -418,8 +446,8 @@ DankModal {
                                     height: 24
                                     radius: 12
                                     color: modelData
-                                    border.color: window.currentColor === modelData ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
-                                    border.width: window.currentColor === modelData ? 2 : 1
+                                    border.color: Qt.colorEqual(window.currentColor, modelData) ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
+                                    border.width: Qt.colorEqual(window.currentColor, modelData) ? 2 : 1
 
                                     MouseArea {
                                         anchors.fill: parent
