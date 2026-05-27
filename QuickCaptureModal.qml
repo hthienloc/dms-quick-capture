@@ -360,10 +360,10 @@ DankModal {
                                 model: [
                                     { id: "pen", icon: "edit", tooltip: "Freehand Pen (1)" },
                                     { id: "arrow", icon: "trending_flat", tooltip: "Arrow Vector (2)" },
-                                    { id: "rect", icon: "check_box_outline_blank", tooltip: "Rectangle Outline (3)" },
+                                    { id: "rect", icon: "crop_square", tooltip: "Rectangle Outline (3)" },
                                     { id: "text", icon: "text_fields", tooltip: "Text Note (4)" },
                                     { id: "pixelate", icon: "blur_on", tooltip: "Pixelate / Blur (5)" },
-                                    { id: "redact", icon: "stop", tooltip: "Redact / Blackout (6)" },
+                                    { id: "redact", icon: "square", tooltip: "Redact / Blackout (6)" },
                                     { id: "stamp", icon: "looks_one", tooltip: "Number Stamp (7)" },
                                     { id: "highlighter", icon: "border_color", tooltip: "Highlighter (8)" },
                                     { id: "eraser", icon: "auto_fix_normal", tooltip: "Eraser (9)" },
