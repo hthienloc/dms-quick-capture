@@ -20,6 +20,11 @@ DankModal {
 
     // State Variables
     property string currentTool: "crop" // crop, select, pen, line, arrow, rect, text, pixelate, redact, stamp, highlighter, eraser
+    onCurrentToolChanged: {
+        if (currentTool !== "text" && window.isTyping) {
+            window.commitTypingText();
+        }
+    }
     property color currentColor: Theme.primary
     property int strokeWidth: 8
     property int stampCounter: 1
@@ -38,6 +43,7 @@ DankModal {
     // Text Input Management
     property bool isTyping: false
     property point typingCoords: Qt.point(0,0)
+    property string currentTypingText: ""
 
     // Helper to decode hex color to RGB
     function hexToRgb(hex) {
@@ -183,6 +189,9 @@ DankModal {
     }
 
     function exportAndExecute(callback) {
+        if (window.isTyping) {
+            window.commitTypingText();
+        }
         window.exportCallback = callback;
         if (!window.exportCanvasItem) {
             console.warn("exportCanvasItem is not initialized yet");
@@ -202,7 +211,28 @@ DankModal {
 
     // Keyboard Shortcuts Support
     modalFocusScope.Keys.onPressed: (event) => {
-        if (window.isTyping) return; // Ignore hotkeys while typing text
+        if (window.isTyping) {
+            if (event.key === Qt.Key_Escape) {
+                window.isTyping = false;
+                window.currentTypingText = "";
+                if (window.activeCanvas) window.activeCanvas.requestPaint();
+                event.accepted = true;
+            } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Return) {
+                window.commitTypingText();
+                event.accepted = true;
+            } else if (event.key === Qt.Key_Backspace) {
+                window.currentTypingText = window.currentTypingText.slice(0, -1);
+                if (window.activeCanvas) window.activeCanvas.requestPaint();
+                event.accepted = true;
+            } else if (event.text && event.text.length > 0) {
+                if (!(event.modifiers & Qt.ControlModifier) && !(event.modifiers & Qt.AltModifier)) {
+                    window.currentTypingText += event.text;
+                    if (window.activeCanvas) window.activeCanvas.requestPaint();
+                    event.accepted = true;
+                }
+            }
+            return;
+        }
         
         if (event.key === Qt.Key_Escape) {
             window.discardAndClose();
@@ -761,6 +791,15 @@ DankModal {
                                 drawStroke(ctx, window.currentStroke);
                             }
 
+                            // 4. Draw temporary live typing text
+                            if (window.isTyping) {
+                                ctx.fillStyle = window.currentColor;
+                                ctx.font = Math.round(window.strokeWidth * 3.5) + "px sans-serif";
+                                ctx.textAlign = "left";
+                                ctx.textBaseline = "top";
+                                ctx.fillText(window.currentTypingText + "|", window.typingCoords.x, window.typingCoords.y);
+                            }
+
                             ctx.restore();
                         }
 
@@ -1079,7 +1118,7 @@ DankModal {
 
                             onPressed: (mouse) => {
                                 if (window.isTyping) {
-                                    textInputField.completeTextEntry();
+                                    window.commitTypingText();
                                     return;
                                 }
 
@@ -1119,14 +1158,9 @@ DankModal {
                                 // Annotation Mode: perform drawing!
                                 if (window.currentTool === "text") {
                                     window.typingCoords = getAbsolutePoint(mouse.x, mouse.y);
+                                    window.currentTypingText = "";
                                     window.isTyping = true;
-                                    textInputField.text = "";
-                                    textInputField.x = mouse.x;
-                                    textInputField.y = mouse.y;
-                                    textInputField.visible = true;
-                                    Qt.callLater(() => {
-                                        textInputField.forceActiveFocus();
-                                    });
+                                    if (window.activeCanvas) window.activeCanvas.requestPaint();
                                     return;
                                 }
 
@@ -1219,56 +1253,6 @@ DankModal {
                                 window.showSizePreview = true;
                                 previewTimer.restart();
                                 wheel.accepted = true;
-                            }
-                        }
-
-                        // Overlay Text Input Field
-                        TextField {
-                            id: textInputField
-                            visible: false
-                            width: 250
-                            placeholderText: "Type text..."
-                            color: window.currentColor
-                            font.pixelSize: Math.round(window.strokeWidth * 3.5)
-                            
-                            background: Rectangle {
-                                color: Theme.withAlpha(Theme.surfaceContainerHighest, 0.85)
-                                border.color: window.currentColor
-                                border.width: 1
-                                radius: 4
-                            }
-
-                            onAccepted: completeTextEntry()
-
-                            Keys.onEscapePressed: (event) => {
-                                textInputField.focus = false;
-                                textInputField.visible = false;
-                                window.isTyping = false;
-                                textInputField.text = "";
-                                Qt.callLater(() => {
-                                    if (window.modalFocusScope) window.modalFocusScope.forceActiveFocus();
-                                });
-                                event.accepted = true;
-                            }
-
-                            function completeTextEntry() {
-                                const textStr = textInputField.text.trim();
-                                if (textStr.length > 0) {
-                                    window.pushStroke({
-                                        tool: "text",
-                                        color: window.currentColor,
-                                        width: window.strokeWidth,
-                                        points: [Qt.point(window.typingCoords.x, window.typingCoords.y)],
-                                        text: textStr
-                                    });
-                                }
-                                textInputField.focus = false;
-                                textInputField.text = "";
-                                textInputField.visible = false;
-                                window.isTyping = false;
-                                Qt.callLater(() => {
-                                    if (window.modalFocusScope) window.modalFocusScope.forceActiveFocus();
-                                });
                             }
                         }
 
@@ -1378,6 +1362,23 @@ DankModal {
                 }
             }
         }
+    }
+
+    function commitTypingText() {
+        if (!window.isTyping) return;
+        const textStr = window.currentTypingText.trim();
+        if (textStr.length > 0) {
+            window.pushStroke({
+                tool: "text",
+                color: window.currentColor,
+                width: window.strokeWidth,
+                points: [Qt.point(window.typingCoords.x, window.typingCoords.y)],
+                text: textStr
+            });
+        }
+        window.currentTypingText = "";
+        window.isTyping = false;
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
 
     function pushStroke(stroke) {
