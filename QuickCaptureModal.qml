@@ -1080,26 +1080,40 @@ DankModal {
                                     // Standard stroke drawing positions update
                                     if (!window.currentStroke) return;
 
-                                    const absPt = getAbsolutePoint(mouse.x, mouse.y);
+                                    const absPt = getAbsolutePoint(mouse.x, mouse.y);                                     
+                                    if (window.currentTool === "pen") {
+                                         if (mouse.modifiers & Qt.ShiftModifier) {
+                                             if (window.currentStroke.points.length > 1) {
+                                                 window.currentStroke.points = [window.currentStroke.points[0], absPt];
+                                             } else {
+                                                 window.currentStroke.points.push(absPt);
+                                             }
+                                         } else {
+                                             window.currentStroke.points.push(absPt);
+                                         }
+                                     } else if (window.currentTool === "rect" || window.currentTool === "arrow" || window.currentTool === "line"
+                                              || window.currentTool === "redact" || window.currentTool === "pixelate" || window.currentTool === "highlighter") {
+                                         
+                                         let finalPt = absPt;
+                                         if ((mouse.modifiers & Qt.ShiftModifier) && (window.currentTool === "line" || window.currentTool === "arrow" || window.currentTool === "highlighter")) {
+                                             // Snapping angle calculation (8 directions / 45 degrees)
+                                             const p0 = window.currentStroke.points[0];
+                                             const dx = absPt.x - p0.x;
+                                             const dy = absPt.y - p0.y;
+                                             const L = Math.sqrt(dx * dx + dy * dy);
+                                             if (L > 0) {
+                                                 const angle = Math.atan2(dy, dx);
+                                                 const snappedAngle = Math.round(angle / (Math.PI / 4)) * (Math.PI / 4);
+                                                 finalPt = Qt.point(p0.x + L * Math.cos(snappedAngle), p0.y + L * Math.sin(snappedAngle));
+                                             }
+                                         }
 
-                                    if (window.currentTool === "pen" || window.currentTool === "highlighter") {
-                                        if (mouse.modifiers & Qt.ShiftModifier) {
-                                            if (window.currentStroke.points.length > 1) {
-                                                window.currentStroke.points = [window.currentStroke.points[0], absPt];
-                                            } else {
-                                                window.currentStroke.points.push(absPt);
-                                            }
-                                        } else {
-                                            window.currentStroke.points.push(absPt);
-                                        }
-                                    } else if (window.currentTool === "rect" || window.currentTool === "arrow" || window.currentTool === "line"
-                                             || window.currentTool === "redact" || window.currentTool === "pixelate") {
-                                        if (window.currentStroke.points.length > 1) {
-                                            window.currentStroke.points[window.currentStroke.points.length - 1] = absPt;
-                                        } else {
-                                            window.currentStroke.points.push(absPt);
-                                        }
-                                    }
+                                         if (window.currentStroke.points.length > 1) {
+                                             window.currentStroke.points[window.currentStroke.points.length - 1] = finalPt;
+                                         } else {
+                                             window.currentStroke.points.push(finalPt);
+                                         }
+                                     }
                                     drawingCanvas.requestPaint();
                                 }
                             }
