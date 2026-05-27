@@ -45,8 +45,8 @@ DankModal {
         };
     }
 
-    backgroundOpacity: 1.0
-    backgroundColor: isScreenshotDark ? "#eceff1" : Theme.surfaceContainer
+    backgroundOpacity: 0.6
+    backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
 
     function openCentered() {
         open();
@@ -403,7 +403,7 @@ DankModal {
 
                     Rectangle {
                         anchors.fill: parent
-                        color: Theme.withAlpha(Theme.surfaceContainerHighest, 0.3)
+                        color: window.isScreenshotDark ? Theme.surfaceContainerHighest : Theme.withAlpha(Theme.surfaceContainerHighest, 0.3)
                         border.color: Theme.withAlpha(Theme.outline, 0.1)
                         border.width: 1
                         radius: Theme.cornerRadius
