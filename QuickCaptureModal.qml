@@ -1241,10 +1241,13 @@ DankModal {
                             onAccepted: completeTextEntry()
 
                             Keys.onEscapePressed: (event) => {
+                                textInputField.focus = false;
                                 textInputField.visible = false;
                                 window.isTyping = false;
                                 textInputField.text = "";
-                                if (window.modalFocusScope) window.modalFocusScope.forceActiveFocus();
+                                Qt.callLater(() => {
+                                    if (window.modalFocusScope) window.modalFocusScope.forceActiveFocus();
+                                });
                                 event.accepted = true;
                             }
 
@@ -1259,10 +1262,13 @@ DankModal {
                                         text: textStr
                                     });
                                 }
+                                textInputField.focus = false;
                                 textInputField.text = "";
                                 textInputField.visible = false;
                                 window.isTyping = false;
-                                if (window.modalFocusScope) window.modalFocusScope.forceActiveFocus();
+                                Qt.callLater(() => {
+                                    if (window.modalFocusScope) window.modalFocusScope.forceActiveFocus();
+                                });
                             }
                         }
 
