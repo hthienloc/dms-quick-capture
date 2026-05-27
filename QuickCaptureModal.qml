@@ -1029,7 +1029,7 @@ DankModal {
                                         tool: "text",
                                         color: window.currentColor,
                                         width: window.strokeWidth,
-                                        points: [window.typingCoords],
+                                        points: [Qt.point(window.typingCoords.x, window.typingCoords.y)],
                                         text: textStr
                                     });
                                 }
