@@ -19,7 +19,7 @@ DankModal {
     property var parentWidget: null
 
     // State Variables
-    property string currentTool: "crop" // crop, pen, highlighter, rect, arrow, text, stamp, eraser
+    property string currentTool: "crop" // crop, select, pen, line, arrow, rect, text, pixelate, redact, stamp, highlighter, eraser
     property string currentColor: "#3b82f6" // Default to Tailwind Blue-500
     property int strokeWidth: 8
     property int stampCounter: 1
@@ -151,7 +151,7 @@ DankModal {
                 if (mx >= x1 - 5 && mx <= x2 + 5 && my >= y1 - 5 && my <= y2 + 5) {
                     return i;
                 }
-            } else if (stroke.tool === "arrow") {
+            } else if (stroke.tool === "arrow" || stroke.tool === "line") {
                 const p0 = stroke.points[0];
                 const p1 = stroke.points[stroke.points.length - 1];
                 const dx = p1.x - p0.x;
@@ -219,34 +219,37 @@ DankModal {
         } else if (event.key === Qt.Key_S && (event.modifiers & Qt.ControlModifier)) {
             window.performSaveOnly();
             event.accepted = true;
-        } else if (event.key === Qt.Key_Q) {
+        } else if (event.key === Qt.Key_V) {
             window.currentTool = "select";
             event.accepted = true;
-        } else if (event.key === Qt.Key_W) {
+        } else if (event.key === Qt.Key_1) {
             window.currentTool = "pen";
             event.accepted = true;
-        } else if (event.key === Qt.Key_E) {
+        } else if (event.key === Qt.Key_2) {
+            window.currentTool = "line";
+            event.accepted = true;
+        } else if (event.key === Qt.Key_3) {
             window.currentTool = "arrow";
             event.accepted = true;
-        } else if (event.key === Qt.Key_R) {
+        } else if (event.key === Qt.Key_4) {
             window.currentTool = "rect";
             event.accepted = true;
-        } else if (event.key === Qt.Key_A) {
+        } else if (event.key === Qt.Key_Q) {
             window.currentTool = "text";
             event.accepted = true;
-        } else if (event.key === Qt.Key_S) {
+        } else if (event.key === Qt.Key_W) {
             window.currentTool = "pixelate";
             event.accepted = true;
-        } else if (event.key === Qt.Key_D) {
+        } else if (event.key === Qt.Key_E) {
             window.currentTool = "redact";
             event.accepted = true;
-        } else if (event.key === Qt.Key_F) {
+        } else if (event.key === Qt.Key_R) {
             window.currentTool = "stamp";
             event.accepted = true;
-        } else if (event.key === Qt.Key_1) {
+        } else if (event.key === Qt.Key_A) {
             window.currentTool = "highlighter";
             event.accepted = true;
-        } else if (event.key === Qt.Key_2) {
+        } else if (event.key === Qt.Key_S) {
             window.currentTool = "eraser";
             event.accepted = true;
         } else if (event.key === Qt.Key_P) {
@@ -332,7 +335,7 @@ DankModal {
                             iconName: "near_me"
                             buttonSize: 36
                             iconSize: 18
-                            tooltipText: "Select & Move (Q)"
+                            tooltipText: "Select & Move (V)"
                             anchors.verticalCenter: parent.verticalCenter
 
                             backgroundColor: window.currentTool === "select" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
@@ -358,15 +361,16 @@ DankModal {
 
                             Repeater {
                                 model: [
-                                    { id: "pen", icon: "edit", tooltip: "Freehand Pen (W)" },
-                                    { id: "arrow", icon: "trending_flat", tooltip: "Arrow Vector (E)" },
-                                    { id: "rect", icon: "crop_square", tooltip: "Rectangle Outline (R)" },
-                                    { id: "text", icon: "text_fields", tooltip: "Text Note (A)" },
-                                    { id: "pixelate", icon: "blur_on", tooltip: "Pixelate / Blur (S)" },
-                                    { id: "redact", icon: "square", tooltip: "Redact / Blackout (D)" },
-                                    { id: "stamp", icon: "looks_one", tooltip: "Number Stamp (F)" },
-                                    { id: "highlighter", icon: "border_color", tooltip: "Highlighter (1)" },
-                                    { id: "eraser", icon: "auto_fix_normal", tooltip: "Eraser (2)" },
+                                    { id: "pen", icon: "edit", tooltip: "Freehand Pen (1)" },
+                                    { id: "line", icon: "horizontal_rule", tooltip: "Straight Line (2)" },
+                                    { id: "arrow", icon: "trending_flat", tooltip: "Arrow Vector (3)" },
+                                    { id: "rect", icon: "crop_square", tooltip: "Rectangle Outline (4)" },
+                                    { id: "text", icon: "text_fields", tooltip: "Text Note (Q)" },
+                                    { id: "pixelate", icon: "blur_on", tooltip: "Pixelate / Blur (W)" },
+                                    { id: "redact", icon: "square", tooltip: "Redact / Blackout (E)" },
+                                    { id: "stamp", icon: "looks_one", tooltip: "Number Stamp (R)" },
+                                    { id: "highlighter", icon: "border_color", tooltip: "Highlighter (A)" },
+                                    { id: "eraser", icon: "auto_fix_normal", tooltip: "Eraser (S)" },
                                     { id: "crop", icon: "crop", tooltip: "Crop / Resize Area (P)" }
                                 ]
 
@@ -750,6 +754,18 @@ DankModal {
                                 }
                                 ctx.stroke();
 
+                            } else if (stroke.tool === "line") {
+                                ctx.strokeStyle = stroke.color;
+                                ctx.lineWidth = stroke.width;
+                                ctx.lineCap = "round";
+                                ctx.lineJoin = "round";
+                                const p0 = stroke.points[0];
+                                const p1 = stroke.points[stroke.points.length - 1];
+                                ctx.beginPath();
+                                ctx.moveTo(p0.x, p0.y);
+                                ctx.lineTo(p1.x, p1.y);
+                                ctx.stroke();
+
                             } else if (stroke.tool === "highlighter") {
                                 ctx.strokeStyle = Qt.rgba(rgb.r, rgb.g, rgb.b, 0.4);
                                 ctx.lineWidth = stroke.width * 4;
@@ -1010,7 +1026,7 @@ DankModal {
                                         } else {
                                             window.currentStroke.points.push(absPt);
                                         }
-                                    } else if (window.currentTool === "rect" || window.currentTool === "arrow"
+                                    } else if (window.currentTool === "rect" || window.currentTool === "arrow" || window.currentTool === "line"
                                              || window.currentTool === "redact" || window.currentTool === "pixelate") {
                                         if (window.currentStroke.points.length > 1) {
                                             window.currentStroke.points[window.currentStroke.points.length - 1] = absPt;
