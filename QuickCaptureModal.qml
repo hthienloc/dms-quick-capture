@@ -761,69 +761,71 @@ DankModal {
                             onPositionChanged: (mouse) => {
                                 hoveredHandle = window.getHoveredHandle(mouse.x, mouse.y);
 
-                                if (window.activeHandle === "new") {
-                                    const x1 = Math.min(window.selectStart.x, mouse.x);
-                                    const y1 = Math.min(window.selectStart.y, mouse.y);
-                                    const w = Math.abs(mouse.x - window.selectStart.x);
-                                    const h = Math.abs(mouse.y - window.selectStart.y);
-                                    window.cropRect = Qt.rect(x1, y1, w, h);
-                                    drawingCanvas.requestPaint();
-                                    return;
-                                }
-
-                                if (window.activeHandle !== "none" && window.activeHandle !== "new") {
-                                    // Drag resizing one of the corners
-                                    const cr = window.cropRect;
-                                    let newX = cr.x;
-                                    let newY = cr.y;
-                                    let newW = cr.width;
-                                    let newH = cr.height;
-
-                                    if (window.activeHandle === "tl") {
-                                        newX = Math.min(mouse.x, cr.x + cr.width - 10);
-                                        newY = Math.min(mouse.y, cr.y + cr.height - 10);
-                                        newW = cr.x + cr.width - newX;
-                                        newH = cr.y + cr.height - newY;
-                                    } else if (window.activeHandle === "tr") {
-                                        newY = Math.min(mouse.y, cr.y + cr.height - 10);
-                                        newW = Math.max(10, mouse.x - cr.x);
-                                        newH = cr.y + cr.height - newY;
-                                    } else if (window.activeHandle === "bl") {
-                                        newX = Math.min(mouse.x, cr.x + cr.width - 10);
-                                        newW = cr.x + cr.width - newX;
-                                        newH = Math.max(10, mouse.y - cr.y);
-                                    } else if (window.activeHandle === "br") {
-                                        newW = Math.max(10, mouse.x - cr.x);
-                                        newH = Math.max(10, mouse.y - cr.y);
+                                if (window.currentTool === "crop") {
+                                    if (window.activeHandle === "new") {
+                                        const x1 = Math.min(window.selectStart.x, mouse.x);
+                                        const y1 = Math.min(window.selectStart.y, mouse.y);
+                                        const w = Math.abs(mouse.x - window.selectStart.x);
+                                        const h = Math.abs(mouse.y - window.selectStart.y);
+                                        window.cropRect = Qt.rect(x1, y1, w, h);
+                                        drawingCanvas.requestPaint();
+                                        return;
                                     }
 
-                                    window.cropRect = Qt.rect(newX, newY, newW, newH);
-                                    drawingCanvas.requestPaint();
-                                    return;
-                                }
+                                    if (window.activeHandle !== "none" && window.activeHandle !== "new") {
+                                        // Drag resizing one of the corners
+                                        const cr = window.cropRect;
+                                        let newX = cr.x;
+                                        let newY = cr.y;
+                                        let newW = cr.width;
+                                        let newH = cr.height;
 
-                                // Standard stroke drawing positions update
-                                if (!window.currentStroke) return;
+                                        if (window.activeHandle === "tl") {
+                                            newX = Math.min(mouse.x, cr.x + cr.width - 10);
+                                            newY = Math.min(mouse.y, cr.y + cr.height - 10);
+                                            newW = cr.x + cr.width - newX;
+                                            newH = cr.y + cr.height - newY;
+                                        } else if (window.activeHandle === "tr") {
+                                            newY = Math.min(mouse.y, cr.y + cr.height - 10);
+                                            newW = Math.max(10, mouse.x - cr.x);
+                                            newH = cr.y + cr.height - newY;
+                                        } else if (window.activeHandle === "bl") {
+                                            newX = Math.min(mouse.x, cr.x + cr.width - 10);
+                                            newW = cr.x + cr.width - newX;
+                                            newH = Math.max(10, mouse.y - cr.y);
+                                        } else if (window.activeHandle === "br") {
+                                            newW = Math.max(10, mouse.x - cr.x);
+                                            newH = Math.max(10, mouse.y - cr.y);
+                                        }
 
-                                if (window.currentTool === "pen" || window.currentTool === "highlighter") {
-                                    if (mouse.modifiers & Qt.ShiftModifier) {
-                                        if (window.currentStroke.points.length > 1) {
-                                            window.currentStroke.points = [window.currentStroke.points[0], Qt.point(mouse.x, mouse.y)];
+                                        window.cropRect = Qt.rect(newX, newY, newW, newH);
+                                        drawingCanvas.requestPaint();
+                                        return;
+                                    }
+                                } else {
+                                    // Standard stroke drawing positions update
+                                    if (!window.currentStroke) return;
+
+                                    if (window.currentTool === "pen" || window.currentTool === "highlighter") {
+                                        if (mouse.modifiers & Qt.ShiftModifier) {
+                                            if (window.currentStroke.points.length > 1) {
+                                                window.currentStroke.points = [window.currentStroke.points[0], Qt.point(mouse.x, mouse.y)];
+                                            } else {
+                                                window.currentStroke.points.push(Qt.point(mouse.x, mouse.y));
+                                            }
                                         } else {
                                             window.currentStroke.points.push(Qt.point(mouse.x, mouse.y));
                                         }
-                                    } else {
-                                        window.currentStroke.points.push(Qt.point(mouse.x, mouse.y));
+                                    } else if (window.currentTool === "rect" || window.currentTool === "arrow"
+                                             || window.currentTool === "redact" || window.currentTool === "pixelate") {
+                                        if (window.currentStroke.points.length > 1) {
+                                            window.currentStroke.points[window.currentStroke.points.length - 1] = Qt.point(mouse.x, mouse.y);
+                                        } else {
+                                            window.currentStroke.points.push(Qt.point(mouse.x, mouse.y));
+                                        }
                                     }
-                                } else if (window.currentTool === "rect" || window.currentTool === "arrow"
-                                         || window.currentTool === "redact" || window.currentTool === "pixelate") {
-                                    if (window.currentStroke.points.length > 1) {
-                                        window.currentStroke.points[window.currentStroke.points.length - 1] = Qt.point(mouse.x, mouse.y);
-                                    } else {
-                                        window.currentStroke.points.push(Qt.point(mouse.x, mouse.y));
-                                    }
+                                    drawingCanvas.requestPaint();
                                 }
-                                drawingCanvas.requestPaint();
                             }
 
                             cursorShape: {
@@ -832,7 +834,7 @@ DankModal {
                                 if (window.hasSelection && window.isInsideCropRect(mouseX, mouseY)) {
                                     return Qt.CrossCursor;
                                 }
-                                return Qt.CrossCursor; // Default to selection cursor
+                                return Qt.CrossCursor;
                             }
 
                             onPressed: (mouse) => {
@@ -841,109 +843,97 @@ DankModal {
                                     return;
                                 }
 
-                                const handle = window.getHoveredHandle(mouse.x, mouse.y);
-                                if (handle !== "none") {
-                                    window.activeHandle = handle;
-                                    return;
-                                }
-
-                                if (!window.hasSelection) {
-                                    // Start new crop selection
-                                    window.activeHandle = "new";
-                                    window.selectStart = Qt.point(mouse.x, mouse.y);
-                                    window.cropRect = Qt.rect(mouse.x, mouse.y, 0, 0);
-                                    drawingCanvas.requestPaint();
-                                    return;
-                                }
-
-                                // Inside selection box -> perform annotation/drawing!
-                                if (window.isInsideCropRect(mouse.x, mouse.y)) {
-                                    if (window.currentTool === "text") {
-                                        window.typingCoords = Qt.point(mouse.x, mouse.y);
-                                        window.isTyping = true;
-                                        textInputField.text = "";
-                                        textInputField.x = mouse.x;
-                                        textInputField.y = mouse.y;
-                                        textInputField.visible = true;
-                                        Qt.callLater(() => {
-                                            textInputField.forceActiveFocus();
-                                        });
+                                if (window.currentTool === "crop") {
+                                    const handle = window.getHoveredHandle(mouse.x, mouse.y);
+                                    if (handle !== "none") {
+                                        window.activeHandle = handle;
                                         return;
                                     }
 
-                                    if (window.currentTool === "stamp") {
-                                        window.pushStroke({
-                                            tool: "stamp",
-                                            color: window.currentColor,
-                                            width: window.strokeWidth,
-                                            points: [Qt.point(mouse.x, mouse.y)],
-                                            counter: window.stampCounter
-                                        });
-                                        window.stampCounter++;
-                                        return;
-                                    }
-
-                                    if (window.currentTool === "eraser") {
-                                        const sx = mouse.x;
-                                        const sy = mouse.y;
-                                        let found = -1;
-                                        for (let i = window.strokes.length - 1; i >= 0; i--) {
-                                            const stroke = window.strokes[i];
-                                            if (stroke.points.length === 0) continue;
-                                            
-                                            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-                                            for (let p of stroke.points) {
-                                                if (p.x < minX) minX = p.x;
-                                                if (p.y < minY) minY = p.y;
-                                                if (p.x > maxX) maxX = p.x;
-                                                if (p.y > maxY) maxY = p.y;
-                                            }
-                                            
-                                            const pad = 12 + stroke.width * 2;
-                                            if (sx >= minX - pad && sx <= maxX + pad && sy >= minY - pad && sy <= maxY + pad) {
-                                                found = i;
-                                                break;
-                                            }
-                                        }
-                                        if (found !== -1) {
-                                            window.strokes.splice(found, 1);
-                                            drawingCanvas.requestPaint();
-                                        }
-                                        return;
-                                    }
-
-                                    // Standard drawing stroke
-                                    window.currentStroke = {
-                                        tool: window.currentTool,
-                                        color: window.currentColor,
-                                        width: window.strokeWidth,
-                                        points: [Qt.point(mouse.x, mouse.y)]
-                                    };
-                                    drawingCanvas.requestPaint();
-                                } else {
-                                    // Click outside selection - reset selection to start fresh selection
+                                    // Drag-to-select crop area
                                     window.activeHandle = "new";
                                     window.selectStart = Qt.point(mouse.x, mouse.y);
                                     window.cropRect = Qt.rect(mouse.x, mouse.y, 0, 0);
                                     window.hasSelection = false;
                                     drawingCanvas.requestPaint();
-                                }
-                            }
-
-                            onReleased: (mouse) => {
-                                if (window.activeHandle === "new") {
-                                    if (window.cropRect.width > 10 && window.cropRect.height > 10) {
-                                        window.hasSelection = true;
-                                    } else {
-                                        window.hasSelection = false;
-                                        window.cropRect = Qt.rect(0, 0, 0, 0);
-                                    }
-                                    window.activeHandle = "none";
-                                    drawingCanvas.requestPaint();
                                     return;
                                 }
 
-                                if (window.activeHandle !== "none") {
+                                // Annotation Mode: perform drawing!
+                                if (window.currentTool === "text") {
+                                    window.typingCoords = Qt.point(mouse.x, mouse.y);
+                                    window.isTyping = true;
+                                    textInputField.text = "";
+                                    textInputField.x = mouse.x;
+                                    textInputField.y = mouse.y;
+                                    textInputField.visible = true;
+                                    Qt.callLater(() => {
+                                        textInputField.forceActiveFocus();
+                                    });
+                                    return;
+                                }
+
+                                if (window.currentTool === "stamp") {
+                                    window.pushStroke({
+                                        tool: "stamp",
+                                        color: window.currentColor,
+                                        width: window.strokeWidth,
+                                        points: [Qt.point(mouse.x, mouse.y)],
+                                        counter: window.stampCounter
+                                    });
+                                    window.stampCounter++;
+                                    return;
+                                }
+
+                                if (window.currentTool === "eraser") {
+                                    const sx = mouse.x;
+                                    const sy = mouse.y;
+                                    let found = -1;
+                                    for (let i = window.strokes.length - 1; i >= 0; i--) {
+                                        const stroke = window.strokes[i];
+                                        if (stroke.points.length === 0) continue;
+                                        
+                                        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                                        for (let p of stroke.points) {
+                                            if (p.x < minX) minX = p.x;
+                                            if (p.y < minY) minY = p.y;
+                                            if (p.x > maxX) maxX = p.x;
+                                            if (p.y > maxY) maxY = p.y;
+                                        }
+                                        
+                                        const pad = 12 + stroke.width * 2;
+                                        if (sx >= minX - pad && sx <= maxX + pad && sy >= minY - pad && sy <= maxY + pad) {
+                                            found = i;
+                                            break;
+                                        }
+                                    }
+                                    if (found !== -1) {
+                                        window.strokes.splice(found, 1);
+                                        drawingCanvas.requestPaint();
+                                    }
+                                    return;
+                                }
+
+                                // Standard drawing stroke
+                                window.currentStroke = {
+                                    tool: window.currentTool,
+                                    color: window.currentColor,
+                                    width: window.strokeWidth,
+                                    points: [Qt.point(mouse.x, mouse.y)]
+                                };
+                                drawingCanvas.requestPaint();
+                            }
+
+                            onReleased: (mouse) => {
+                                if (window.currentTool === "crop") {
+                                    if (window.activeHandle === "new") {
+                                        if (window.cropRect.width > 10 && window.cropRect.height > 10) {
+                                            window.hasSelection = true;
+                                        } else {
+                                            window.hasSelection = false;
+                                            window.cropRect = Qt.rect(0, 0, 0, 0);
+                                        }
+                                    }
                                     window.activeHandle = "none";
                                     drawingCanvas.requestPaint();
                                     return;
