@@ -505,6 +505,8 @@ DankModal {
                                 
                                 Text {
                                     text: window.strokeWidth + "px"
+                                    width: 32
+                                    horizontalAlignment: Text.AlignRight
                                     color: Theme.surfaceText
                                     font.pixelSize: 11
                                     font.bold: true
@@ -1181,7 +1183,7 @@ DankModal {
                                 if (window.currentTool === "stamp") {
                                     window.pushStroke({
                                         tool: "stamp",
-                                        color: window.currentColor,
+                                        color: window.currentColor.toString(),
                                         width: window.strokeWidth,
                                         points: [getAbsolutePoint(mouse.x, mouse.y)],
                                         counter: window.stampCounter
@@ -1223,7 +1225,7 @@ DankModal {
                                 // Standard drawing stroke
                                 window.currentStroke = {
                                     tool: window.currentTool,
-                                    color: window.currentColor,
+                                    color: window.currentColor.toString(),
                                     width: window.strokeWidth,
                                     points: [getAbsolutePoint(mouse.x, mouse.y)]
                                 };
@@ -1384,7 +1386,7 @@ DankModal {
         if (textStr.length > 0) {
             window.pushStroke({
                 tool: "text",
-                color: window.currentColor,
+                color: window.currentColor.toString(),
                 width: window.strokeWidth,
                 points: [Qt.point(window.typingCoords.x, window.typingCoords.y)],
                 text: textStr
