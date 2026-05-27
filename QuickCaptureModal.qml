@@ -19,7 +19,7 @@ DankModal {
     property var parentWidget: null
 
     // State Variables
-    property string currentTool: "pen" // pen, highlighter, rect, arrow, text, stamp, eraser
+    property string currentTool: "crop" // crop, pen, highlighter, rect, arrow, text, stamp, eraser
     property string currentColor: "#3b82f6" // Default to Tailwind Blue-500
     property int strokeWidth: 4
     property int stampCounter: 1
@@ -86,7 +86,7 @@ DankModal {
     property var exportCallback: null
 
     function getHoveredHandle(mx, my) {
-        if (!hasSelection) return "none";
+        if (!hasSelection || currentTool !== "crop") return "none";
         const threshold = 15;
         const x1 = cropRect.x;
         const y1 = cropRect.y;
@@ -139,9 +139,9 @@ DankModal {
     }
 
     onOpened: {
+        window.currentTool = "crop";
         // Read initial settings from pluginData if available
         if (window.parentWidget && window.parentWidget.pluginData) {
-            window.currentTool = window.parentWidget.pluginData.defaultTool || "pen";
             window.strokeWidth = window.parentWidget.pluginData.defaultThickness || 4;
         }
         window.strokes = [];
@@ -219,6 +219,7 @@ DankModal {
 
                             Repeater {
                                 model: [
+                                    { id: "crop", icon: "crop", tooltip: "Crop / Select Area" },
                                     { id: "pen", icon: "edit", tooltip: "Freehand Pen" },
                                     { id: "highlighter", icon: "border_color", tooltip: "Highlighter" },
                                     { id: "rect", icon: "check_box_outline_blank", tooltip: "Rectangle" },
@@ -511,30 +512,32 @@ DankModal {
                                 ctx.lineWidth = 1.5;
                                 ctx.strokeRect(window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height);
 
-                                // 4 Corner resize handles
-                                const hs = 10;
-                                const hh = hs / 2;
-                                ctx.fillStyle = Theme.primary;
-                                ctx.strokeStyle = "#ffffff";
-                                ctx.lineWidth = 1.5;
+                                 // 4 Corner resize handles (only visible when Crop/Select tool is active)
+                                 if (window.currentTool === "crop") {
+                                     const hs = 10;
+                                     const hh = hs / 2;
+                                     ctx.fillStyle = Theme.primary;
+                                     ctx.strokeStyle = "#ffffff";
+                                     ctx.lineWidth = 1.5;
 
-                                const x1 = window.cropRect.x;
-                                const y1 = window.cropRect.y;
-                                const x2 = window.cropRect.x + window.cropRect.width;
-                                const y2 = window.cropRect.y + window.cropRect.height;
+                                     const x1 = window.cropRect.x;
+                                     const y1 = window.cropRect.y;
+                                     const x2 = window.cropRect.x + window.cropRect.width;
+                                     const y2 = window.cropRect.y + window.cropRect.height;
 
-                                // TL
-                                ctx.fillRect(x1 - hh, y1 - hh, hs, hs);
-                                ctx.strokeRect(x1 - hh, y1 - hh, hs, hs);
-                                // TR
-                                ctx.fillRect(x2 - hh, y1 - hh, hs, hs);
-                                ctx.strokeRect(x2 - hh, y1 - hh, hs, hs);
-                                // BL
-                                ctx.fillRect(x1 - hh, y2 - hh, hs, hs);
-                                ctx.strokeRect(x1 - hh, y2 - hh, hs, hs);
-                                // BR
-                                ctx.fillRect(x2 - hh, y2 - hh, hs, hs);
-                                ctx.strokeRect(x2 - hh, y2 - hh, hs, hs);
+                                     // TL
+                                     ctx.fillRect(x1 - hh, y1 - hh, hs, hs);
+                                     ctx.strokeRect(x1 - hh, y1 - hh, hs, hs);
+                                     // TR
+                                     ctx.fillRect(x2 - hh, y1 - hh, hs, hs);
+                                     ctx.strokeRect(x2 - hh, y1 - hh, hs, hs);
+                                     // BL
+                                     ctx.fillRect(x1 - hh, y2 - hh, hs, hs);
+                                     ctx.strokeRect(x1 - hh, y2 - hh, hs, hs);
+                                     // BR
+                                     ctx.fillRect(x2 - hh, y2 - hh, hs, hs);
+                                     ctx.strokeRect(x2 - hh, y2 - hh, hs, hs);
+                                 }
                                 ctx.restore();
                             } else {
                                 // Dim full canvas slightly before selection
