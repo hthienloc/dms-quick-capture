@@ -583,23 +583,40 @@ DankModal {
                                 ctx.fill();
 
                             } else if (stroke.tool === "pixelate") {
-                                // Draw pre-computed pixel blocks (sampled at commit time)
-                                if (stroke.pixelBlocks && stroke.pixelBlocks.length > 0) {
-                                    for (let i = 0; i < stroke.pixelBlocks.length; i++) {
-                                        const blk = stroke.pixelBlocks[i];
-                                        ctx.fillStyle = blk.color;
-                                        ctx.fillRect(blk.x, blk.y, blk.w, blk.h);
-                                    }
-                                } else if (stroke.points.length >= 2) {
-                                    // Drag preview: dashed selection rect
+                                if (stroke.points.length >= 2) {
                                     const p0 = stroke.points[0];
                                     const p1 = stroke.points[stroke.points.length - 1];
-                                    ctx.save();
-                                    ctx.strokeStyle = "rgba(255,255,255,0.8)";
-                                    ctx.lineWidth = 1.5;
-                                    ctx.setLineDash([6, 4]);
-                                    ctx.strokeRect(Math.min(p0.x, p1.x), Math.min(p0.y, p1.y), Math.abs(p1.x - p0.x), Math.abs(p1.y - p0.y));
-                                    ctx.restore();
+                                    const rx = Math.floor(Math.min(p0.x, p1.x));
+                                    const ry = Math.floor(Math.min(p0.y, p1.y));
+                                    const rw = Math.floor(Math.abs(p1.x - p0.x));
+                                    const rh = Math.floor(Math.abs(p1.y - p0.y));
+
+                                    if (rw > 2 && rh > 2) {
+                                        ctx.save();
+                                        const isSmooth = stroke.width <= 4;
+                                        ctx.imageSmoothingEnabled = isSmooth;
+
+                                        // Blur/pixelate factor
+                                        const factor = isSmooth ? Math.max(4, stroke.width * 3) : stroke.width;
+                                        const tempW = Math.max(1, Math.round(rw / factor));
+                                        const tempH = Math.max(1, Math.round(rh / factor));
+
+                                        if (drawingCanvas.isImageLoaded("file:///tmp/dms_capture_bg.png")) {
+                                            // 1. Draw cropped background downscaled onto a tiny region of the canvas
+                                            ctx.drawImage("file:///tmp/dms_capture_bg.png", rx, ry, rw, rh, rx, ry, tempW, tempH);
+                                            // 2. Draw that downscaled canvas region scaled back up to the full bounding box
+                                            ctx.drawImage(drawingCanvas, rx, ry, tempW, tempH, rx, ry, rw, rh);
+                                        }
+
+                                        // 3. Draw dynamic selection dashed outline if it is the active dragging stroke
+                                        if (stroke === window.currentStroke) {
+                                            ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+                                            ctx.lineWidth = 1;
+                                            ctx.setLineDash([4, 4]);
+                                            ctx.strokeRect(rx, ry, rw, rh);
+                                        }
+                                        ctx.restore();
+                                    }
                                 }
 
                             } else if (stroke.tool === "stamp") {
@@ -740,53 +757,6 @@ DankModal {
                             onReleased: (mouse) => {
                                 if (!window.currentStroke) return;
 
-                                // Pre-compute pixelate blocks from current canvas state before pushing
-                                if (window.currentStroke.tool === "pixelate" && window.currentStroke.points.length >= 2) {
-                                    const stroke = window.currentStroke;
-                                    const p0 = stroke.points[0];
-                                    const p1 = stroke.points[stroke.points.length - 1];
-                                    const rx = Math.floor(Math.min(p0.x, p1.x));
-                                    const ry = Math.floor(Math.min(p0.y, p1.y));
-                                    const rw = Math.floor(Math.abs(p1.x - p0.x));
-                                    const rh = Math.floor(Math.abs(p1.y - p0.y));
-                                    if (rw > 2 && rh > 2) {
-                                        const blockSize = Math.max(8, Math.round(Math.min(rw, rh) / 20));
-                                        const ctx2d = drawingCanvas.getContext("2d");
-                                        const imageData = ctx2d.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height);
-                                        const data = imageData.data;
-                                        const stride = imageData.width;
-                                        const dpr = stride / drawingCanvas.width;
-                                        const blocks = [];
-                                        for (let by = 0; by < rh; by += blockSize) {
-                                            for (let bx = 0; bx < rw; bx += blockSize) {
-                                                let r = 0, g = 0, b = 0, count = 0;
-                                                const bw = Math.min(blockSize, rw - bx);
-                                                const bh = Math.min(blockSize, rh - by);
-                                                const pxStart = Math.round((rx + bx) * dpr);
-                                                const pyStart = Math.round((ry + by) * dpr);
-                                                const pxEnd = Math.min(Math.round((rx + bx + bw) * dpr), stride);
-                                                const pyEnd = Math.min(Math.round((ry + by + bh) * dpr), imageData.height);
-                                                for (let py = pyStart; py < pyEnd; py++) {
-                                                    for (let px = pxStart; px < pxEnd; px++) {
-                                                        const idx = (py * stride + px) * 4;
-                                                        r += data[idx];
-                                                        g += data[idx + 1];
-                                                        b += data[idx + 2];
-                                                        count++;
-                                                    }
-                                                }
-                                                if (count > 0) {
-                                                    blocks.push({
-                                                        x: rx + bx, y: ry + by, w: bw, h: bh,
-                                                        color: "rgb(" + Math.round(r/count) + "," + Math.round(g/count) + "," + Math.round(b/count) + ")"
-                                                    });
-                                                }
-                                            }
-                                        }
-                                        stroke.pixelBlocks = blocks;
-                                    }
-                                }
-
                                 window.pushStroke(window.currentStroke);
                                 window.currentStroke = null;
                             }
@@ -857,7 +827,7 @@ DankModal {
                                 return window.strokeWidth;
                             }
                             height: width
-                            radius: window.currentTool === "highlighter" ? 0 : width / 2
+                            radius: (window.currentTool === "highlighter" || window.currentTool === "pixelate") ? 0 : width / 2
                             color: "transparent"
                             border.color: Theme.primary
                             border.width: 1.5
