@@ -434,44 +434,23 @@ DankModal {
                                 ctx.fillRect(Math.min(p0.x, p1.x), Math.min(p0.y, p1.y), Math.abs(p1.x - p0.x), Math.abs(p1.y - p0.y));
 
                             } else if (stroke.tool === "pixelate") {
-                                const p0 = stroke.points[0];
-                                const p1 = stroke.points[stroke.points.length - 1];
-                                const rx = Math.floor(Math.min(p0.x, p1.x));
-                                const ry = Math.floor(Math.min(p0.y, p1.y));
-                                const rw = Math.floor(Math.abs(p1.x - p0.x));
-                                const rh = Math.floor(Math.abs(p1.y - p0.y));
-                                if (rw > 0 && rh > 0) {
-                                    const blockSize = Math.max(8, Math.round(Math.min(rw, rh) / 20));
-                                    const imageData = ctx.getImageData(rx, ry, rw, rh);
-                                    const data = imageData.data;
-                                    // Use imageData.width as stride to handle HiDPI (DPR > 1) correctly
-                                    const stride = imageData.width;
-                                    const dpr = stride / rw;
-                                    for (let by = 0; by < rh; by += blockSize) {
-                                        for (let bx = 0; bx < rw; bx += blockSize) {
-                                            let r = 0, g = 0, b = 0, count = 0;
-                                            const bw = Math.min(blockSize, rw - bx);
-                                            const bh = Math.min(blockSize, rh - by);
-                                            // Sample in physical pixels
-                                            const pxStart = Math.round(bx * dpr);
-                                            const pyStart = Math.round(by * dpr);
-                                            const pxEnd = Math.round((bx + bw) * dpr);
-                                            const pyEnd = Math.round((by + bh) * dpr);
-                                            for (let py = pyStart; py < pyEnd; py++) {
-                                                for (let px = pxStart; px < pxEnd; px++) {
-                                                    const idx = (py * stride + px) * 4;
-                                                    r += data[idx];
-                                                    g += data[idx + 1];
-                                                    b += data[idx + 2];
-                                                    count++;
-                                                }
-                                            }
-                                            if (count > 0) {
-                                                ctx.fillStyle = "rgb(" + Math.round(r/count) + "," + Math.round(g/count) + "," + Math.round(b/count) + ")";
-                                                ctx.fillRect(rx + bx, ry + by, bw, bh);
-                                            }
-                                        }
+                                // Draw pre-computed pixel blocks (sampled at commit time)
+                                if (stroke.pixelBlocks && stroke.pixelBlocks.length > 0) {
+                                    for (let i = 0; i < stroke.pixelBlocks.length; i++) {
+                                        const blk = stroke.pixelBlocks[i];
+                                        ctx.fillStyle = blk.color;
+                                        ctx.fillRect(blk.x, blk.y, blk.w, blk.h);
                                     }
+                                } else if (stroke.points.length >= 2) {
+                                    // Drag preview: dashed selection rect
+                                    const p0 = stroke.points[0];
+                                    const p1 = stroke.points[stroke.points.length - 1];
+                                    ctx.save();
+                                    ctx.strokeStyle = "rgba(255,255,255,0.8)";
+                                    ctx.lineWidth = 1.5;
+                                    ctx.setLineDash([6, 4]);
+                                    ctx.strokeRect(Math.min(p0.x, p1.x), Math.min(p0.y, p1.y), Math.abs(p1.x - p0.x), Math.abs(p1.y - p0.y));
+                                    ctx.restore();
                                 }
 
                             } else if (stroke.tool === "stamp") {
@@ -603,6 +582,53 @@ DankModal {
 
                             onReleased: (mouse) => {
                                 if (!window.currentStroke) return;
+
+                                // Pre-compute pixelate blocks from current canvas state before pushing
+                                if (window.currentStroke.tool === "pixelate" && window.currentStroke.points.length >= 2) {
+                                    const stroke = window.currentStroke;
+                                    const p0 = stroke.points[0];
+                                    const p1 = stroke.points[stroke.points.length - 1];
+                                    const rx = Math.floor(Math.min(p0.x, p1.x));
+                                    const ry = Math.floor(Math.min(p0.y, p1.y));
+                                    const rw = Math.floor(Math.abs(p1.x - p0.x));
+                                    const rh = Math.floor(Math.abs(p1.y - p0.y));
+                                    if (rw > 2 && rh > 2) {
+                                        const blockSize = Math.max(8, Math.round(Math.min(rw, rh) / 20));
+                                        const ctx2d = drawingCanvas.getContext("2d");
+                                        const imageData = ctx2d.getImageData(rx, ry, rw, rh);
+                                        const data = imageData.data;
+                                        const stride = imageData.width;
+                                        const dpr = stride > rw ? stride / rw : 1;
+                                        const blocks = [];
+                                        for (let by = 0; by < rh; by += blockSize) {
+                                            for (let bx = 0; bx < rw; bx += blockSize) {
+                                                let r = 0, g = 0, b = 0, count = 0;
+                                                const bw = Math.min(blockSize, rw - bx);
+                                                const bh = Math.min(blockSize, rh - by);
+                                                const pxStart = Math.round(bx * dpr);
+                                                const pyStart = Math.round(by * dpr);
+                                                const pxEnd = Math.min(Math.round((bx + bw) * dpr), stride);
+                                                const pyEnd = Math.min(Math.round((by + bh) * dpr), imageData.height);
+                                                for (let py = pyStart; py < pyEnd; py++) {
+                                                    for (let px = pxStart; px < pxEnd; px++) {
+                                                        const idx = (py * stride + px) * 4;
+                                                        r += data[idx];
+                                                        g += data[idx + 1];
+                                                        b += data[idx + 2];
+                                                        count++;
+                                                    }
+                                                }
+                                                if (count > 0) {
+                                                    blocks.push({
+                                                        x: rx + bx, y: ry + by, w: bw, h: bh,
+                                                        color: "rgb(" + Math.round(r/count) + "," + Math.round(g/count) + "," + Math.round(b/count) + ")"
+                                                    });
+                                                }
+                                            }
+                                        }
+                                        stroke.pixelBlocks = blocks;
+                                    }
+                                }
 
                                 window.pushStroke(window.currentStroke);
                                 window.currentStroke = null;
