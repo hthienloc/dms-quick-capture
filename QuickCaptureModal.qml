@@ -503,13 +503,13 @@ DankModal {
                             ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
 
                             // 1. Draw the screenshot background first
-                            if (drawingCanvas.isImageLoaded("file:///tmp/dms_capture_bg.png")) {
+                            if (window.bgImageItem && window.bgImageItem.status === Image.Ready) {
                                 if (window.currentTool !== "crop" && window.hasSelection) {
                                     // Draw only the cropped portion
-                                    ctx.drawImage("file:///tmp/dms_capture_bg.png", window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, 0, 0, window.cropRect.width, window.cropRect.height);
+                                    ctx.drawImage(window.bgImageItem, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, 0, 0, window.cropRect.width, window.cropRect.height);
                                 } else {
                                     // Draw full screen background
-                                    ctx.drawImage("file:///tmp/dms_capture_bg.png", 0, 0, drawingCanvas.width, drawingCanvas.height);
+                                    ctx.drawImage(window.bgImageItem, 0, 0, drawingCanvas.width, drawingCanvas.height);
 
                                     if (!window.hasSampledContrast) {
                                         try {
@@ -736,9 +736,9 @@ DankModal {
                                         const tempW = Math.max(1, Math.round(rw / factor));
                                         const tempH = Math.max(1, Math.round(rh / factor));
 
-                                        if (drawingCanvas.isImageLoaded("file:///tmp/dms_capture_bg.png")) {
+                                        if (window.bgImageItem && window.bgImageItem.status === Image.Ready) {
                                             // 1. Draw cropped background downscaled onto a tiny region of the canvas
-                                            ctx.drawImage("file:///tmp/dms_capture_bg.png", rx, ry, rw, rh, rx, ry, tempW, tempH);
+                                            ctx.drawImage(window.bgImageItem, rx, ry, rw, rh, rx, ry, tempW, tempH);
                                             // 2. Draw that downscaled canvas region scaled back up to the full bounding box
                                             ctx.drawImage(drawingCanvas, rx, ry, tempW, tempH, rx, ry, rw, rh);
                                         }
