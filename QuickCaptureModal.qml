@@ -193,7 +193,7 @@ DankModal {
                 // 1. Top Glassmorphic Toolbar
                 Rectangle {
                     id: toolbarCard
-                    width: Math.min(parent.width - 32, 840)
+                    width: Math.min(parent.width - 32, 1100)
                     height: 52
                     radius: Theme.cornerRadius
                     color: Theme.withAlpha(Theme.surfaceContainer, 0.95)
