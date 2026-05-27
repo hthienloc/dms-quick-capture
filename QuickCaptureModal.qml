@@ -1,0 +1,685 @@
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import Quickshell
+import qs.Common
+import qs.Modals.Common
+import qs.Services
+import qs.Widgets
+import "../dms-common"
+
+DankModal {
+    id: window
+
+    layerNamespace: "dms:plugins:quickCapture"
+    keepPopoutsOpen: true
+
+    // Parent communication reference
+    property var parentWidget: null
+
+    // State Variables
+    property string currentTool: "pen" // pen, highlighter, rect, arrow, text, stamp, eraser
+    property string currentColor: "#3b82f6" // Default to Tailwind Blue-500
+    property int strokeWidth: 4
+    property int stampCounter: 1
+
+    property var strokes: []
+    property var currentStroke: null
+
+    // Text Input Management
+    property bool isTyping: false
+    property point typingCoords: Qt.point(0,0)
+
+    // Helper to decode hex color to RGB
+    function hexToRgb(hex) {
+        if (!hex || hex.length < 7) return { r: 0.2, g: 0.5, b: 1 };
+        return {
+            r: parseInt(hex.slice(1, 3), 16) / 255,
+            g: parseInt(hex.slice(3, 5), 16) / 255,
+            b: parseInt(hex.slice(5, 7), 16) / 255
+        };
+    }
+
+    function openCentered() {
+        backgroundOpacity = 0.6;
+        open();
+    }
+
+    shouldBeVisible: false
+    
+    // Spacious modal dimensions occupying 90% width and 90% height of the screen
+    modalWidth: Math.round(Quickshell.screens[0].width * 0.9)
+    modalHeight: Math.round(Quickshell.screens[0].height * 0.9)
+    enableShadow: true
+    positioning: "center"
+
+    // Component scope bridging properties
+    property string bgImageSource: ""
+    property var activeCanvas: null
+    property var bgImageItem: null
+    property var boardContainerItem: null
+
+    // Reactive aspect-fit scale computation
+    property real fitScale: {
+        if (!activeCanvas || !bgImageItem || !boardContainerItem) return 1.0;
+        const maxW = boardContainerItem.width - 32;
+        const maxH = boardContainerItem.height - 32;
+        if (bgImageItem.sourceSize.width <= 0 || bgImageItem.sourceSize.height <= 0) return 1.0;
+        const scaleX = maxW / bgImageItem.sourceSize.width;
+        const scaleY = maxH / bgImageItem.sourceSize.height;
+        return Math.min(1.0, Math.min(scaleX, scaleY));
+    }
+
+    onBackgroundClicked: () => discardAndClose()
+
+    // Keyboard Shortcuts Support
+    modalFocusScope.Keys.onPressed: (event) => {
+        if (window.isTyping) return; // Ignore hotkeys while typing text
+        
+        if (event.key === Qt.Key_Escape) {
+            window.discardAndClose();
+            event.accepted = true;
+        } else if (event.key === Qt.Key_Z && (event.modifiers & Qt.ControlModifier)) {
+            window.performUndo();
+            event.accepted = true;
+        } else if ((event.key === Qt.Key_C && (event.modifiers & Qt.ControlModifier)) || event.key === Qt.Key_Return) {
+            window.performDone();
+            event.accepted = true;
+        } else if (event.key === Qt.Key_S && (event.modifiers & Qt.ControlModifier)) {
+            window.performSaveOnly();
+            event.accepted = true;
+        }
+    }
+
+    onOpened: {
+        // Read initial settings from pluginData if available
+        if (window.parentWidget && window.parentWidget.pluginData) {
+            window.currentTool = window.parentWidget.pluginData.defaultTool || "pen";
+            window.strokeWidth = window.parentWidget.pluginData.defaultThickness || 4;
+        }
+        window.strokes = [];
+        window.stampCounter = 1;
+        window.bgImageSource = "";
+        window.bgImageSource = "file:///tmp/dms_capture_bg.png";
+        Qt.callLater(() => {
+            if (modalFocusScope) modalFocusScope.forceActiveFocus();
+        });
+    }
+
+    content: Component {
+        FocusScope {
+            id: contentRoot
+            focus: true
+            implicitWidth: window.modalWidth
+            implicitHeight: window.modalHeight
+
+            Image {
+                id: bgImage
+                source: window.bgImageSource
+                visible: false
+                cache: false
+
+                Component.onCompleted: {
+                    window.bgImageItem = bgImage;
+                }
+
+                onStatusChanged: {
+                    if (status === Image.Ready) {
+                        if (window.activeCanvas) {
+                            window.activeCanvas.width = sourceSize.width;
+                            window.activeCanvas.height = sourceSize.height;
+                            window.activeCanvas.loadImage(source);
+                        }
+                    }
+                }
+            }
+
+            Column {
+                id: mainColumn
+                anchors.fill: parent
+                anchors.margins: Theme.spacingL
+                spacing: Theme.spacingM
+
+                // 1. Top Glassmorphic Toolbar
+                Rectangle {
+                    id: toolbarCard
+                    width: parent.width
+                    height: 52
+                    radius: Theme.cornerRadius
+                    color: Theme.withAlpha(Theme.surfaceContainer, 0.95)
+                    border.color: Theme.withAlpha(Theme.outline, 0.15)
+                    border.width: 1
+
+                    Row {
+                        id: toolbarLayout
+                        anchors.fill: parent
+                        anchors.leftMargin: Theme.spacingM
+                        anchors.rightMargin: Theme.spacingM
+                        spacing: Theme.spacingM
+
+                        // Tool buttons list
+                        Row {
+                            spacing: Theme.spacingXS
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            Repeater {
+                                model: [
+                                    { id: "pen", icon: "edit", tooltip: "Freehand Pen" },
+                                    { id: "highlighter", icon: "border_color", tooltip: "Highlighter" },
+                                    { id: "rect", icon: "check_box_outline_blank", tooltip: "Rectangle" },
+                                    { id: "arrow", icon: "trending_flat", tooltip: "Arrow" },
+                                    { id: "text", icon: "text_fields", tooltip: "Text" },
+                                    { id: "stamp", icon: "looks_one", tooltip: "Number Stamp" },
+                                    { id: "eraser", icon: "auto_fix_normal", tooltip: "Eraser" }
+                                ]
+
+                                delegate: DankActionButton {
+                                    iconName: modelData.icon
+                                    buttonSize: 36
+                                    iconSize: 18
+                                    tooltipText: modelData.tooltip
+                                    
+                                    backgroundColor: window.currentTool === modelData.id ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                                    iconColor: window.currentTool === modelData.id ? Theme.primary : Theme.surfaceText
+
+                                    onClicked: {
+                                        window.currentTool = modelData.id;
+                                    }
+                                }
+                            }
+                        }
+
+                        // Divider line
+                        Rectangle {
+                            width: 1
+                            height: 24
+                            color: Theme.withAlpha(Theme.outline, 0.2)
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        // Dynamic Color picking circles
+                        Row {
+                            spacing: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            Repeater {
+                                model: [
+                                    "#3b82f6", // Blue
+                                    "#ef4444", // Red
+                                    "#22c55e", // Green
+                                    "#eab308", // Yellow
+                                    "#ffffff", // White
+                                    "#000000"  // Black
+                                ]
+
+                                delegate: Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 12
+                                    color: modelData
+                                    border.color: window.currentColor === modelData ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
+                                    border.width: window.currentColor === modelData ? 2 : 1
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            window.currentColor = modelData;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Spacer
+                        Item {
+                            width: 1
+                            height: 1
+                            Layout.fillWidth: true
+                        }
+
+                        // Actions buttons
+                        Row {
+                            spacing: Theme.spacingXS
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            DankActionButton {
+                                iconName: "undo"
+                                buttonSize: 36
+                                iconSize: 18
+                                tooltipText: "Undo (Ctrl+Z)"
+                                enabled: window.strokes.length > 0
+                                iconColor: window.strokes.length > 0 ? Theme.surfaceText : Theme.withAlpha(Theme.surfaceText, 0.3)
+                                onClicked: window.performUndo()
+                            }
+
+                            DankActionButton {
+                                iconName: "save"
+                                buttonSize: 36
+                                iconSize: 18
+                                tooltipText: "Save to File (Ctrl+S)"
+                                onClicked: window.performSaveOnly()
+                            }
+
+                            DankActionButton {
+                                iconName: "content_copy"
+                                buttonSize: 36
+                                iconSize: 18
+                                tooltipText: "Copy to Clipboard & Done (Ctrl+C / Enter)"
+                                backgroundColor: Theme.withAlpha(Theme.primary, 0.1)
+                                iconColor: Theme.primary
+                                onClicked: window.performDone()
+                            }
+
+                            DankActionButton {
+                                iconName: "close"
+                                buttonSize: 36
+                                iconSize: 18
+                                tooltipText: "Discard & Close (Escape)"
+                                backgroundColor: Theme.withAlpha(Theme.error, 0.1)
+                                iconColor: Theme.error
+                                onClicked: window.discardAndClose()
+                            }
+                        }
+                    }
+                }
+
+                // 2. Centered Canvas Board
+                Item {
+                    id: boardContainer
+                    width: parent.width
+                    height: parent.height - toolbarCard.height - Theme.spacingM
+
+                    Component.onCompleted: {
+                        window.boardContainerItem = boardContainer;
+                    }
+
+                    Rectangle {
+                        anchors.fill: parent
+                        color: Theme.withAlpha(Theme.surfaceContainerHighest, 0.3)
+                        border.color: Theme.withAlpha(Theme.outline, 0.1)
+                        border.width: 1
+                        radius: Theme.cornerRadius
+                    }
+
+                    Canvas {
+                        id: drawingCanvas
+                        anchors.centerIn: parent
+                        scale: window.fitScale
+                        transformOrigin: Item.Center
+                        renderTarget: Canvas.Image
+
+                        Component.onCompleted: {
+                            window.activeCanvas = drawingCanvas;
+                        }
+
+                        onImageLoaded: {
+                            drawingCanvas.requestPaint();
+                        }
+
+                        onPaint: {
+                            var ctx = drawingCanvas.getContext("2d");
+                            ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+
+                            // 1. Draw the screenshot background first
+                            if (drawingCanvas.isImageLoaded("file:///tmp/dms_capture_bg.png")) {
+                                ctx.drawImage("file:///tmp/dms_capture_bg.png", 0, 0, drawingCanvas.width, drawingCanvas.height);
+                            }
+
+                            // 2. Draw all committed annotations
+                            for (var i = 0; i < window.strokes.length; i++) {
+                                drawStroke(ctx, window.strokes[i]);
+                            }
+
+                            // 3. Draw the current active stroke (if dragging)
+                            if (window.currentStroke) {
+                                drawStroke(ctx, window.currentStroke);
+                            }
+                        }
+
+                        function drawStroke(ctx, stroke) {
+                            if (stroke.points.length === 0) return;
+
+                            const rgb = window.hexToRgb(stroke.color);
+
+                            if (stroke.tool === "pen") {
+                                ctx.strokeStyle = stroke.color;
+                                ctx.lineWidth = stroke.width;
+                                ctx.lineCap = "round";
+                                ctx.lineJoin = "round";
+                                ctx.beginPath();
+                                ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+                                for (var i = 1; i < stroke.points.length; i++) {
+                                    ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+                                }
+                                ctx.stroke();
+
+                            } else if (stroke.tool === "highlighter") {
+                                ctx.strokeStyle = Qt.rgba(rgb.r, rgb.g, rgb.b, 0.4);
+                                ctx.lineWidth = stroke.width * 4;
+                                ctx.lineCap = "square";
+                                ctx.lineJoin = "miter";
+                                ctx.beginPath();
+                                ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+                                for (var i = 1; i < stroke.points.length; i++) {
+                                    ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+                                }
+                                ctx.stroke();
+
+                            } else if (stroke.tool === "rect") {
+                                ctx.strokeStyle = stroke.color;
+                                ctx.lineWidth = stroke.width;
+                                ctx.lineCap = "round";
+                                ctx.lineJoin = "round";
+                                const p0 = stroke.points[0];
+                                const p1 = stroke.points[stroke.points.length - 1];
+                                ctx.beginPath();
+                                ctx.rect(Math.min(p0.x, p1.x), Math.min(p0.y, p1.y), Math.abs(p1.x - p0.x), Math.abs(p1.y - p0.y));
+                                ctx.stroke();
+
+                            } else if (stroke.tool === "arrow") {
+                                ctx.strokeStyle = stroke.color;
+                                ctx.fillStyle = stroke.color;
+                                ctx.lineWidth = stroke.width;
+                                ctx.lineCap = "round";
+                                ctx.lineJoin = "round";
+                                const p0 = stroke.points[0];
+                                const p1 = stroke.points[stroke.points.length - 1];
+
+                                // Draw shaft
+                                ctx.beginPath();
+                                ctx.moveTo(p0.x, p0.y);
+                                ctx.lineTo(p1.x, p1.y);
+                                ctx.stroke();
+
+                                // Draw head (vector trigonometry)
+                                const angle = Math.atan2(p1.y - p0.y, p1.x - p0.x);
+                                const spread = Math.PI / 7;
+                                const size = stroke.width * 5;
+                                ctx.beginPath();
+                                ctx.moveTo(p1.x, p1.y);
+                                ctx.lineTo(p1.x - size * Math.cos(angle - spread), p1.y - size * Math.sin(angle - spread));
+                                ctx.lineTo(p1.x - size * Math.cos(angle + spread), p1.y - size * Math.sin(angle + spread));
+                                ctx.closePath();
+                                ctx.fill();
+
+                            } else if (stroke.tool === "stamp") {
+                                const pt = stroke.points[0];
+                                const radius = stroke.width * 5;
+                                const lum = 0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b;
+                                const textColor = lum > 0.5 ? "#000000" : "#ffffff";
+
+                                // Circle backdrop
+                                ctx.fillStyle = stroke.color;
+                                ctx.beginPath();
+                                ctx.arc(pt.x, pt.y, radius, 0, 2 * Math.PI);
+                                ctx.fill();
+
+                                // Dynamic contrasting label
+                                ctx.fillStyle = textColor;
+                                ctx.font = "bold " + Math.round(radius * 1.2) + "px sans-serif";
+                                ctx.textAlign = "center";
+                                ctx.textBaseline = "middle";
+                                ctx.fillText(String(stroke.counter), pt.x, pt.y);
+
+                            } else if (stroke.tool === "text") {
+                                const pt = stroke.points[0];
+                                ctx.fillStyle = stroke.color;
+                                ctx.font = Math.round(stroke.width * 3.5) + "px sans-serif";
+                                ctx.textAlign = "left";
+                                ctx.textBaseline = "top";
+                                ctx.fillText(stroke.text, pt.x, pt.y);
+                            }
+                        }
+
+                        // Mouse Drawing & Action Capture
+                        MouseArea {
+                            id: drawMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: false
+
+                            onPressed: (mouse) => {
+                                if (window.isTyping) {
+                                    textInputField.completeTextEntry();
+                                    return;
+                                }
+
+                                if (window.currentTool === "text") {
+                                    window.typingCoords = Qt.point(mouse.x, mouse.y);
+                                    window.isTyping = true;
+                                    textInputField.text = "";
+                                    textInputField.x = mouse.x;
+                                    textInputField.y = mouse.y;
+                                    textInputField.visible = true;
+                                    Qt.callLater(() => {
+                                        textInputField.forceActiveFocus();
+                                    });
+                                    return;
+                                }
+
+                                if (window.currentTool === "stamp") {
+                                    window.pushStroke({
+                                        tool: "stamp",
+                                        color: window.currentColor,
+                                        width: window.strokeWidth,
+                                        points: [Qt.point(mouse.x, mouse.y)],
+                                        counter: window.stampCounter
+                                    });
+                                    window.stampCounter++;
+                                    return;
+                                }
+
+                                if (window.currentTool === "eraser") {
+                                    // Simple hit testing to remove clicked vector strokes
+                                    const sx = mouse.x;
+                                    const sy = mouse.y;
+                                    let found = -1;
+                                    for (let i = window.strokes.length - 1; i >= 0; i--) {
+                                        const stroke = window.strokes[i];
+                                        if (stroke.points.length === 0) continue;
+                                        
+                                        // Approximate bounding check
+                                        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                                        for (let p of stroke.points) {
+                                            if (p.x < minX) minX = p.x;
+                                            if (p.y < minY) minY = p.y;
+                                            if (p.x > maxX) maxX = p.x;
+                                            if (p.y > maxY) maxY = p.y;
+                                        }
+                                        
+                                        const pad = 12 + stroke.width * 2;
+                                        if (sx >= minX - pad && sx <= maxX + pad && sy >= minY - pad && sy <= maxY + pad) {
+                                            found = i;
+                                            break;
+                                        }
+                                    }
+                                    if (found !== -1) {
+                                        window.strokes.splice(found, 1);
+                                        drawingCanvas.requestPaint();
+                                    }
+                                    return;
+                                }
+
+                                // Standard vector strokes
+                                window.currentStroke = {
+                                    tool: window.currentTool,
+                                    color: window.currentColor,
+                                    width: window.strokeWidth,
+                                    points: [Qt.point(mouse.x, mouse.y)]
+                                };
+                                drawingCanvas.requestPaint();
+                            }
+
+                            onPositionChanged: (mouse) => {
+                                if (!window.currentStroke) return;
+
+                                if (window.currentTool === "pen" || window.currentTool === "highlighter") {
+                                    window.currentStroke.points.push(Qt.point(mouse.x, mouse.y));
+                                } else if (window.currentTool === "rect" || window.currentTool === "arrow") {
+                                    // Update end coordinate
+                                    if (window.currentStroke.points.length > 1) {
+                                        window.currentStroke.points[window.currentStroke.points.length - 1] = Qt.point(mouse.x, mouse.y);
+                                    } else {
+                                        window.currentStroke.points.push(Qt.point(mouse.x, mouse.y));
+                                    }
+                                }
+                                drawingCanvas.requestPaint();
+                            }
+
+                            onReleased: (mouse) => {
+                                if (!window.currentStroke) return;
+
+                                window.pushStroke(window.currentStroke);
+                                window.currentStroke = null;
+                            }
+                        }
+
+                        // Overlay Text Input Field
+                        TextField {
+                            id: textInputField
+                            visible: false
+                            width: 250
+                            placeholderText: "Type text..."
+                            color: window.currentColor
+                            font.pixelSize: Math.round(window.strokeWidth * 3.5)
+                            
+                            background: Rectangle {
+                                color: Theme.withAlpha(Theme.surfaceContainerHighest, 0.85)
+                                border.color: window.currentColor
+                                border.width: 1
+                                radius: 4
+                            }
+
+                            onAccepted: completeTextEntry()
+
+                            Keys.onEscapePressed: (event) => {
+                                textInputField.visible = false;
+                                window.isTyping = false;
+                                textInputField.text = "";
+                                window.forceActiveFocus();
+                                event.accepted = true;
+                            }
+
+                            function completeTextEntry() {
+                                const textStr = textInputField.text.trim();
+                                if (textStr.length > 0) {
+                                    window.pushStroke({
+                                        tool: "text",
+                                        color: window.currentColor,
+                                        width: window.strokeWidth,
+                                        points: [window.typingCoords],
+                                        text: textStr
+                                    });
+                                }
+                                textInputField.text = "";
+                                textInputField.visible = false;
+                                window.isTyping = false;
+                                window.forceActiveFocus();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    function pushStroke(stroke) {
+        const list = [...window.strokes];
+        list.push(stroke);
+        window.strokes = list;
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
+    }
+
+    function performUndo() {
+        if (window.strokes.length > 0) {
+            const list = [...window.strokes];
+            const last = list.pop();
+            window.strokes = list;
+            if (last.tool === "stamp" && window.stampCounter > 1) {
+                window.stampCounter--;
+            }
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+        }
+    }
+
+    function discardAndClose() {
+        window.close();
+    }
+
+    function performSaveOnly() {
+        // Save the merged canvas
+        const tempOut = "/tmp/dms_capture_output.png";
+        if (window.activeCanvas) window.activeCanvas.save(tempOut);
+        
+        // Wait 100ms for QML canvas save thread to finish writing
+        Qt.callLater(() => {
+            const hasParent = window.parentWidget && window.parentWidget.pluginData;
+            const saveDir = hasParent ? (window.parentWidget.pluginData.saveDirectory || "~/Pictures/Screenshots") : "~/Pictures/Screenshots";
+            const cleanDir = saveDir.replace("~", "$HOME");
+            const filename = "Screenshot_" + Date.now() + ".png";
+            const saveCmd = "mkdir -p " + cleanDir + " && cp " + tempOut + " " + cleanDir + "/" + filename;
+            
+            Proc.runCommand("save-capture-file", ["sh", "-c", saveCmd], (stdout, exitCode) => {
+                if (exitCode === 0) {
+                    if (typeof ToastService !== "undefined" && ToastService) {
+                        ToastService.showInfo("Screenshot saved to " + saveDir + "/" + filename);
+                    }
+                    window.discardAndClose();
+                } else {
+                    if (typeof ToastService !== "undefined" && ToastService) {
+                        ToastService.showError("Failed to save screenshot file.");
+                    }
+                }
+            }, 0, 5000);
+        });
+    }
+
+    function performDone() {
+        // Save the merged canvas
+        const tempOut = "/tmp/dms_capture_output.png";
+        if (window.activeCanvas) window.activeCanvas.save(tempOut);
+
+        // Wait 100ms for QML canvas save thread to finish writing
+        Qt.callLater(() => {
+            const hasParent = window.parentWidget && window.parentWidget.pluginData;
+            const doneAction = hasParent ? (window.parentWidget.pluginData.doneAction || "both") : "both";
+            
+            // Clipboard copy pipeline
+            const copyCmd = "wl-copy < " + tempOut;
+            Proc.runCommand("copy-capture-clipboard", ["sh", "-c", copyCmd], (stdout, exitCode) => {
+                if (exitCode === 0) {
+                    if (doneAction === "clipboard") {
+                        if (typeof ToastService !== "undefined" && ToastService) {
+                            ToastService.showInfo("Screenshot copied to clipboard.");
+                        }
+                        window.discardAndClose();
+                    } else {
+                        // "both" or "file" - proceed to save as file
+                        const saveDir = hasParent ? (window.parentWidget.pluginData.saveDirectory || "~/Pictures/Screenshots") : "~/Pictures/Screenshots";
+                        const cleanDir = saveDir.replace("~", "$HOME");
+                        const filename = "Screenshot_" + Date.now() + ".png";
+                        const saveCmd = "mkdir -p " + cleanDir + " && cp " + tempOut + " " + cleanDir + "/" + filename;
+                        
+                        Proc.runCommand("save-capture-file", ["sh", "-c", saveCmd], (saveOut, saveCode) => {
+                            if (saveCode === 0) {
+                                if (typeof ToastService !== "undefined" && ToastService) {
+                                    ToastService.showInfo("Screenshot copied to clipboard and saved to " + saveDir);
+                                }
+                            } else {
+                                if (typeof ToastService !== "undefined" && ToastService) {
+                                    ToastService.showWarning("Screenshot copied to clipboard but failed to save file.");
+                                }
+                            }
+                            window.discardAndClose();
+                        }, 0, 5000);
+                    }
+                } else {
+                    if (typeof ToastService !== "undefined" && ToastService) {
+                        ToastService.showError("Failed to copy screenshot to clipboard. Install 'wl-clipboard'.");
+                    }
+                    window.discardAndClose();
+                }
+            }, 0, 5000);
+        });
+    }
+}

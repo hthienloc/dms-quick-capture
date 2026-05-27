@@ -1,0 +1,22 @@
+{
+    "$schema": "https://github.com/AvengeMedia/DankMaterialShell/raw/refs/heads/master/PLUGINS/plugin-schema.json",
+    "id": "quickCapture",
+    "name": "Quick Capture",
+    "description": "Instant screenshot and overlay annotation utility for Wayland",
+    "version": "1.0.0",
+    "author": "Loc Huynh",
+    "icon": "photo_camera",
+    "type": "daemon",
+    "capabilities": [
+        "control-center"
+    ],
+    "component": "./QuickCaptureWidget.qml",
+    "settings": "./QuickCaptureSettings.qml",
+    "requires_dms": ">=1.2.0",
+    "requires": ["wl-copy"],
+    "permissions": [
+        "settings_read",
+        "settings_write",
+        "shell_execute"
+    ]
+}
