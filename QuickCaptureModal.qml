@@ -31,6 +31,9 @@ DankModal {
 
     property var strokes: []
     property var currentStroke: null
+    property var selectedStroke: null
+    property point pressCoords: Qt.point(0, 0)
+    property var originalPoints: []
 
     // Text Input Management
     property bool isTyping: false
@@ -112,6 +115,76 @@ DankModal {
                my >= cropRect.y && my <= (cropRect.y + cropRect.height);
     }
 
+    function findStrokeAt(mx, my) {
+        for (let i = window.strokes.length - 1; i >= 0; i--) {
+            const stroke = window.strokes[i];
+            if (stroke.points.length === 0) continue;
+
+            const threshold = 12 + stroke.width;
+
+            if (stroke.tool === "pen" || stroke.tool === "highlighter") {
+                for (let j = 0; j < stroke.points.length - 1; j++) {
+                    const A = stroke.points[j];
+                    const B = stroke.points[j+1];
+                    const dx = B.x - A.x;
+                    const dy = B.y - A.y;
+                    const lenSq = dx * dx + dy * dy;
+                    let dist = Infinity;
+                    if (lenSq === 0) {
+                        dist = Math.sqrt((mx - A.x) * (mx - A.x) + (my - A.y) * (my - A.y));
+                    } else {
+                        let t = ((mx - A.x) * dx + (my - A.y) * dy) / lenSq;
+                        t = Math.max(0, Math.min(1, t));
+                        const px = A.x + t * dx;
+                        const py = A.y + t * dy;
+                        dist = Math.sqrt((mx - px) * (mx - px) + (my - py) * (my - py));
+                    }
+                    if (dist < threshold) return i;
+                }
+            } else if (stroke.tool === "rect" || stroke.tool === "redact" || stroke.tool === "pixelate") {
+                const p0 = stroke.points[0];
+                const p1 = stroke.points[stroke.points.length - 1];
+                const x1 = Math.min(p0.x, p1.x);
+                const x2 = Math.max(p0.x, p1.x);
+                const y1 = Math.min(p0.y, p1.y);
+                const y2 = Math.max(p0.y, p1.y);
+                if (mx >= x1 - 5 && mx <= x2 + 5 && my >= y1 - 5 && my <= y2 + 5) {
+                    return i;
+                }
+            } else if (stroke.tool === "arrow") {
+                const p0 = stroke.points[0];
+                const p1 = stroke.points[stroke.points.length - 1];
+                const dx = p1.x - p0.x;
+                const dy = p1.y - p0.y;
+                const lenSq = dx * dx + dy * dy;
+                let dist = Infinity;
+                if (lenSq === 0) {
+                    dist = Math.sqrt((mx - p0.x) * (mx - p0.x) + (my - p0.y) * (my - p0.y));
+                } else {
+                    let t = ((mx - p0.x) * dx + (my - p0.y) * dy) / lenSq;
+                    t = Math.max(0, Math.min(1, t));
+                    const px = p0.x + t * dx;
+                    const py = p0.y + t * dy;
+                    dist = Math.sqrt((mx - px) * (mx - px) + (my - py) * (my - py));
+                }
+                if (dist < threshold) return i;
+            } else if (stroke.tool === "stamp") {
+                const p0 = stroke.points[0];
+                const radius = stroke.width * 5 + 6;
+                const dist = Math.sqrt((mx - p0.x) * (mx - p0.x) + (my - p0.y) * (my - p0.y));
+                if (dist <= radius) return i;
+            } else if (stroke.tool === "text") {
+                const p0 = stroke.points[0];
+                const h = stroke.width * 4 + 10;
+                const w = Math.max(40, stroke.text.length * stroke.width * 2 + 10);
+                if (mx >= p0.x - 5 && mx <= p0.x + w && my >= p0.y - 5 && my <= p0.y + h) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
     function exportAndExecute(callback) {
         window.exportCallback = callback;
         if (!window.exportCanvasItem) {
@@ -145,6 +218,39 @@ DankModal {
             event.accepted = true;
         } else if (event.key === Qt.Key_S && (event.modifiers & Qt.ControlModifier)) {
             window.performSaveOnly();
+            event.accepted = true;
+        } else if (event.key === Qt.Key_1) {
+            window.currentTool = "pen";
+            event.accepted = true;
+        } else if (event.key === Qt.Key_2) {
+            window.currentTool = "arrow";
+            event.accepted = true;
+        } else if (event.key === Qt.Key_3) {
+            window.currentTool = "rect";
+            event.accepted = true;
+        } else if (event.key === Qt.Key_4) {
+            window.currentTool = "text";
+            event.accepted = true;
+        } else if (event.key === Qt.Key_5) {
+            window.currentTool = "pixelate";
+            event.accepted = true;
+        } else if (event.key === Qt.Key_6) {
+            window.currentTool = "redact";
+            event.accepted = true;
+        } else if (event.key === Qt.Key_7) {
+            window.currentTool = "stamp";
+            event.accepted = true;
+        } else if (event.key === Qt.Key_8) {
+            window.currentTool = "highlighter";
+            event.accepted = true;
+        } else if (event.key === Qt.Key_9) {
+            window.currentTool = "eraser";
+            event.accepted = true;
+        } else if (event.key === Qt.Key_0) {
+            window.currentTool = "crop";
+            event.accepted = true;
+        } else if (event.key === Qt.Key_V || event.key === Qt.Key_v) {
+            window.currentTool = "select";
             event.accepted = true;
         }
     }
@@ -221,6 +327,30 @@ DankModal {
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: Theme.spacingM
 
+                        // Select & Move Button
+                        DankActionButton {
+                            iconName: "near_me"
+                            buttonSize: 36
+                            iconSize: 18
+                            tooltipText: "Select & Move (V)"
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            backgroundColor: window.currentTool === "select" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                            iconColor: window.currentTool === "select" ? Theme.primary : Theme.surfaceText
+
+                            onClicked: {
+                                window.currentTool = "select";
+                            }
+                        }
+
+                        // Separator between Select and other tools
+                        Rectangle {
+                            width: 1
+                            height: 24
+                            color: Theme.withAlpha(Theme.outline, 0.2)
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
                         // Tool buttons
                         Row {
                             spacing: Theme.spacingXS
@@ -228,16 +358,16 @@ DankModal {
 
                             Repeater {
                                 model: [
-                                    { id: "crop", icon: "crop", tooltip: "Crop / Select Area" },
-                                    { id: "pen", icon: "edit", tooltip: "Freehand Pen" },
-                                    { id: "highlighter", icon: "border_color", tooltip: "Highlighter" },
-                                    { id: "rect", icon: "check_box_outline_blank", tooltip: "Rectangle" },
-                                    { id: "redact", icon: "stop", tooltip: "Redact (Filled Box)" },
-                                    { id: "pixelate", icon: "blur_on", tooltip: "Pixelate / Blur" },
-                                    { id: "arrow", icon: "trending_flat", tooltip: "Arrow" },
-                                    { id: "text", icon: "text_fields", tooltip: "Text" },
-                                    { id: "stamp", icon: "looks_one", tooltip: "Number Stamp" },
-                                    { id: "eraser", icon: "auto_fix_normal", tooltip: "Eraser" }
+                                    { id: "pen", icon: "edit", tooltip: "Freehand Pen (1)" },
+                                    { id: "arrow", icon: "trending_flat", tooltip: "Arrow Vector (2)" },
+                                    { id: "rect", icon: "check_box_outline_blank", tooltip: "Rectangle Outline (3)" },
+                                    { id: "text", icon: "text_fields", tooltip: "Text Note (4)" },
+                                    { id: "pixelate", icon: "blur_on", tooltip: "Pixelate / Blur (5)" },
+                                    { id: "redact", icon: "stop", tooltip: "Redact / Blackout (6)" },
+                                    { id: "stamp", icon: "looks_one", tooltip: "Number Stamp (7)" },
+                                    { id: "highlighter", icon: "border_color", tooltip: "Highlighter (8)" },
+                                    { id: "eraser", icon: "auto_fix_normal", tooltip: "Eraser (9)" },
+                                    { id: "crop", icon: "crop", tooltip: "Crop / Resize Area (0)" }
                                 ]
 
                                 delegate: DankActionButton {
@@ -801,8 +931,27 @@ DankModal {
 
                             // Visual cursor feedback based on hover position
                             property string hoveredHandle: "none"
+                            property int hoveredStrokeIdx: -1
                             onPositionChanged: (mouse) => {
                                 hoveredHandle = window.getHoveredHandle(mouse.x, mouse.y);
+
+                                const absPt = getAbsolutePoint(mouse.x, mouse.y);
+
+                                if (window.currentTool === "select") {
+                                    if (window.selectedStroke) {
+                                        const dx = absPt.x - window.pressCoords.x;
+                                        const dy = absPt.y - window.pressCoords.y;
+                                        const newPoints = [];
+                                        for (let i = 0; i < window.originalPoints.length; i++) {
+                                            newPoints.push(Qt.point(window.originalPoints[i].x + dx, window.originalPoints[i].y + dy));
+                                        }
+                                        window.selectedStroke.points = newPoints;
+                                        drawingCanvas.requestPaint();
+                                    } else {
+                                        hoveredStrokeIdx = window.findStrokeAt(absPt.x, absPt.y);
+                                    }
+                                    return;
+                                }
 
                                 if (window.currentTool === "crop") {
                                     if (window.activeHandle === "new") {
@@ -876,6 +1025,9 @@ DankModal {
                             cursorShape: {
                                 if (hoveredHandle === "tl" || hoveredHandle === "br") return Qt.SizeFDiagCursor;
                                 if (hoveredHandle === "tr" || hoveredHandle === "bl") return Qt.SizeBDiagCursor;
+                                if (window.currentTool === "select") {
+                                    return window.selectedStroke ? Qt.ClosedHandCursor : (drawMouseArea.hoveredStrokeIdx !== -1 ? Qt.OpenHandCursor : Qt.ArrowCursor);
+                                }
                                 if (window.hasSelection && window.isInsideCropRect(mouseX, mouseY)) {
                                     return Qt.CrossCursor;
                                 }
@@ -885,6 +1037,23 @@ DankModal {
                             onPressed: (mouse) => {
                                 if (window.isTyping) {
                                     textInputField.completeTextEntry();
+                                    return;
+                                }
+
+                                const absPt = getAbsolutePoint(mouse.x, mouse.y);
+
+                                if (window.currentTool === "select") {
+                                    const strokeIdx = window.findStrokeAt(absPt.x, absPt.y);
+                                    if (strokeIdx !== -1) {
+                                        const stroke = window.strokes[strokeIdx];
+                                        window.selectedStroke = stroke;
+                                        window.pressCoords = absPt;
+                                        const orig = [];
+                                        for (let p of stroke.points) {
+                                            orig.push(Qt.point(p.x, p.y));
+                                        }
+                                        window.originalPoints = orig;
+                                    }
                                     return;
                                 }
 
@@ -971,6 +1140,13 @@ DankModal {
                             }
 
                             onReleased: (mouse) => {
+                                if (window.currentTool === "select") {
+                                    window.selectedStroke = null;
+                                    window.originalPoints = [];
+                                    drawingCanvas.requestPaint();
+                                    return;
+                                }
+
                                 if (window.currentTool === "crop") {
                                     if (window.activeHandle === "new" || window.activeHandle === "tl" || window.activeHandle === "tr" || window.activeHandle === "bl" || window.activeHandle === "br") {
                                         if (window.cropRect.width > 10 && window.cropRect.height > 10) {
