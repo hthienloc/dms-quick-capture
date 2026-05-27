@@ -22,6 +22,8 @@ DankModal {
     property string currentColor: "#3b82f6" // Default to Tailwind Blue-500
     property int strokeWidth: 4
     property int stampCounter: 1
+    property bool isScreenshotDark: false
+    property bool hasSampledContrast: false
 
     property var strokes: []
     property var currentStroke: null
@@ -40,8 +42,10 @@ DankModal {
         };
     }
 
+    backgroundOpacity: isScreenshotDark ? 0.75 : 0.6
+    backgroundColor: isScreenshotDark ? Theme.withAlpha("#ffffff", 0.2) : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+
     function openCentered() {
-        backgroundOpacity = 0.6;
         open();
     }
 
@@ -83,7 +87,7 @@ DankModal {
             window.performUndo();
             event.accepted = true;
         } else if ((event.key === Qt.Key_C && (event.modifiers & Qt.ControlModifier)) || event.key === Qt.Key_Return) {
-            window.performDone();
+            window.performCopyOnly();
             event.accepted = true;
         } else if (event.key === Qt.Key_S && (event.modifiers & Qt.ControlModifier)) {
             window.performSaveOnly();
@@ -101,6 +105,8 @@ DankModal {
         window.stampCounter = 1;
         window.bgImageSource = "";
         window.bgImageSource = "file:///tmp/dms_capture_bg.png";
+        window.isScreenshotDark = false;
+        window.hasSampledContrast = false;
         Qt.callLater(() => {
             if (modalFocusScope) modalFocusScope.forceActiveFocus();
         });
@@ -277,10 +283,21 @@ DankModal {
                             iconName: "content_copy"
                             buttonSize: 36
                             iconSize: 18
-                            tooltipText: "Copy to Clipboard & Done (Ctrl+C / Enter)"
+                            tooltipText: "Copy to Clipboard (Ctrl+C / Enter)"
                             backgroundColor: Theme.withAlpha(Theme.primary, 0.1)
                             iconColor: Theme.primary
-                            onClicked: window.performDone()
+                            onClicked: window.performCopyOnly()
+                        }
+
+                        DankActionButton {
+                            anchors.verticalCenter: parent.verticalCenter
+                            iconName: "assignment_turned_in"
+                            buttonSize: 36
+                            iconSize: 18
+                            tooltipText: "Copy & Save"
+                            backgroundColor: Theme.withAlpha(Theme.primary, 0.15)
+                            iconColor: Theme.primary
+                            onClicked: window.performCopyAndSave()
                         }
 
                         // Separator gap before close
@@ -348,6 +365,22 @@ DankModal {
                             // 1. Draw the screenshot background first
                             if (drawingCanvas.isImageLoaded("file:///tmp/dms_capture_bg.png")) {
                                 ctx.drawImage("file:///tmp/dms_capture_bg.png", 0, 0, drawingCanvas.width, drawingCanvas.height);
+
+                                if (!window.hasSampledContrast) {
+                                    try {
+                                        var imgData = ctx.getImageData(0, 0, 1, 1);
+                                        if (imgData && imgData.data) {
+                                            var r = imgData.data[0];
+                                            var g = imgData.data[1];
+                                            var b = imgData.data[2];
+                                            var brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+                                            window.isScreenshotDark = (brightness < 0.35);
+                                            window.hasSampledContrast = true;
+                                        }
+                                    } catch (e) {
+                                        // Ignore
+                                    }
+                                }
                             }
 
                             // 2. Draw all committed annotations
@@ -567,9 +600,17 @@ DankModal {
                                 if (!window.currentStroke) return;
 
                                 if (window.currentTool === "pen" || window.currentTool === "highlighter") {
-                                    window.currentStroke.points.push(Qt.point(mouse.x, mouse.y));
+                                    if (mouse.modifiers & Qt.ShiftModifier) {
+                                        if (window.currentStroke.points.length > 1) {
+                                            window.currentStroke.points = [window.currentStroke.points[0], Qt.point(mouse.x, mouse.y)];
+                                        } else {
+                                            window.currentStroke.points.push(Qt.point(mouse.x, mouse.y));
+                                        }
+                                    } else {
+                                        window.currentStroke.points.push(Qt.point(mouse.x, mouse.y));
+                                    }
                                 } else if (window.currentTool === "rect" || window.currentTool === "arrow"
-                                        || window.currentTool === "redact" || window.currentTool === "pixelate") {
+                                         || window.currentTool === "redact" || window.currentTool === "pixelate") {
                                     // Update end coordinate
                                     if (window.currentStroke.points.length > 1) {
                                         window.currentStroke.points[window.currentStroke.points.length - 1] = Qt.point(mouse.x, mouse.y);
@@ -595,20 +636,20 @@ DankModal {
                                     if (rw > 2 && rh > 2) {
                                         const blockSize = Math.max(8, Math.round(Math.min(rw, rh) / 20));
                                         const ctx2d = drawingCanvas.getContext("2d");
-                                        const imageData = ctx2d.getImageData(rx, ry, rw, rh);
+                                        const imageData = ctx2d.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height);
                                         const data = imageData.data;
                                         const stride = imageData.width;
-                                        const dpr = stride > rw ? stride / rw : 1;
+                                        const dpr = stride / drawingCanvas.width;
                                         const blocks = [];
                                         for (let by = 0; by < rh; by += blockSize) {
                                             for (let bx = 0; bx < rw; bx += blockSize) {
                                                 let r = 0, g = 0, b = 0, count = 0;
                                                 const bw = Math.min(blockSize, rw - bx);
                                                 const bh = Math.min(blockSize, rh - by);
-                                                const pxStart = Math.round(bx * dpr);
-                                                const pyStart = Math.round(by * dpr);
-                                                const pxEnd = Math.min(Math.round((bx + bw) * dpr), stride);
-                                                const pyEnd = Math.min(Math.round((by + bh) * dpr), imageData.height);
+                                                const pxStart = Math.round((rx + bx) * dpr);
+                                                const pyStart = Math.round((ry + by) * dpr);
+                                                const pxEnd = Math.min(Math.round((rx + bx + bw) * dpr), stride);
+                                                const pyEnd = Math.min(Math.round((ry + by + bh) * dpr), imageData.height);
                                                 for (let py = pyStart; py < pyEnd; py++) {
                                                     for (let px = pxStart; px < pxEnd; px++) {
                                                         const idx = (py * stride + px) * 4;
@@ -632,6 +673,12 @@ DankModal {
 
                                 window.pushStroke(window.currentStroke);
                                 window.currentStroke = null;
+                            }
+
+                            onWheel: (wheel) => {
+                                const step = wheel.angleDelta.y > 0 ? 1 : -1;
+                                window.strokeWidth = Math.max(1, Math.min(50, window.strokeWidth + step));
+                                wheel.accepted = true;
                             }
                         }
 
@@ -678,6 +725,20 @@ DankModal {
                                 window.forceActiveFocus();
                             }
                         }
+                    }
+
+                    Rectangle {
+                        id: canvasBorder
+                        x: drawingCanvas.x - 1
+                        y: drawingCanvas.y - 1
+                        width: drawingCanvas.width + 2
+                        height: drawingCanvas.height + 2
+                        scale: drawingCanvas.scale
+                        transformOrigin: drawingCanvas.transformOrigin
+                        color: "transparent"
+                        border.color: window.isScreenshotDark ? "rgba(255, 255, 255, 0.4)" : "rgba(0, 0, 0, 0.4)"
+                        border.width: 1
+                        z: 10
                     }
                 }
             }
@@ -735,7 +796,32 @@ DankModal {
         });
     }
 
-    function performDone() {
+    function performCopyOnly() {
+        // Save the merged canvas
+        const tempOut = "/tmp/dms_capture_output.png";
+        if (window.activeCanvas) window.activeCanvas.save(tempOut);
+
+        // Wait 100ms for QML canvas save thread to finish writing
+        Qt.callLater(() => {
+            // Clipboard copy pipeline
+            const copyCmd = "wl-copy < " + tempOut;
+            Proc.runCommand("copy-capture-clipboard", ["sh", "-c", copyCmd], (stdout, exitCode) => {
+                if (exitCode === 0) {
+                    if (typeof ToastService !== "undefined" && ToastService) {
+                        ToastService.showInfo("Screenshot copied to clipboard.");
+                    }
+                    window.discardAndClose();
+                } else {
+                    if (typeof ToastService !== "undefined" && ToastService) {
+                        ToastService.showError("Failed to copy screenshot to clipboard. Install 'wl-clipboard'.");
+                    }
+                    window.discardAndClose();
+                }
+            }, 0, 5000);
+        });
+    }
+
+    function performCopyAndSave() {
         // Save the merged canvas
         const tempOut = "/tmp/dms_capture_output.png";
         if (window.activeCanvas) window.activeCanvas.save(tempOut);
@@ -743,37 +829,28 @@ DankModal {
         // Wait 100ms for QML canvas save thread to finish writing
         Qt.callLater(() => {
             const hasParent = window.parentWidget && window.parentWidget.pluginData;
-            const doneAction = hasParent ? (window.parentWidget.pluginData.doneAction || "both") : "both";
             
             // Clipboard copy pipeline
             const copyCmd = "wl-copy < " + tempOut;
             Proc.runCommand("copy-capture-clipboard", ["sh", "-c", copyCmd], (stdout, exitCode) => {
                 if (exitCode === 0) {
-                    if (doneAction === "clipboard") {
-                        if (typeof ToastService !== "undefined" && ToastService) {
-                            ToastService.showInfo("Screenshot copied to clipboard.");
+                    const saveDir = hasParent ? (window.parentWidget.pluginData.saveDirectory || "~/Pictures/Screenshots") : "~/Pictures/Screenshots";
+                    const cleanDir = saveDir.replace("~", "$HOME");
+                    const filename = "Screenshot_" + Date.now() + ".png";
+                    const saveCmd = "mkdir -p " + cleanDir + " && cp " + tempOut + " " + cleanDir + "/" + filename;
+                    
+                    Proc.runCommand("save-capture-file", ["sh", "-c", saveCmd], (saveOut, saveCode) => {
+                        if (saveCode === 0) {
+                            if (typeof ToastService !== "undefined" && ToastService) {
+                                    ToastService.showInfo("Screenshot copied to clipboard and saved to " + saveDir);
+                            }
+                        } else {
+                            if (typeof ToastService !== "undefined" && ToastService) {
+                                ToastService.showWarning("Screenshot copied to clipboard but failed to save file.");
+                            }
                         }
                         window.discardAndClose();
-                    } else {
-                        // "both" or "file" - proceed to save as file
-                        const saveDir = hasParent ? (window.parentWidget.pluginData.saveDirectory || "~/Pictures/Screenshots") : "~/Pictures/Screenshots";
-                        const cleanDir = saveDir.replace("~", "$HOME");
-                        const filename = "Screenshot_" + Date.now() + ".png";
-                        const saveCmd = "mkdir -p " + cleanDir + " && cp " + tempOut + " " + cleanDir + "/" + filename;
-                        
-                        Proc.runCommand("save-capture-file", ["sh", "-c", saveCmd], (saveOut, saveCode) => {
-                            if (saveCode === 0) {
-                                if (typeof ToastService !== "undefined" && ToastService) {
-                                    ToastService.showInfo("Screenshot copied to clipboard and saved to " + saveDir);
-                                }
-                            } else {
-                                if (typeof ToastService !== "undefined" && ToastService) {
-                                    ToastService.showWarning("Screenshot copied to clipboard but failed to save file.");
-                                }
-                            }
-                            window.discardAndClose();
-                        }, 0, 5000);
-                    }
+                    }, 0, 5000);
                 } else {
                     if (typeof ToastService !== "undefined" && ToastService) {
                         ToastService.showError("Failed to copy screenshot to clipboard. Install 'wl-clipboard'.");

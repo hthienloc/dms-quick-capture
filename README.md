@@ -51,6 +51,10 @@ binds {
 
 ## TODO / Roadmap
 
+- [x] Vector straight-line drawing when holding `Shift` (for Pen and Highlighter).
+- [x] Mouse wheel scrolling over canvas to dynamically scale stroke thickness and text font sizes.
+- [x] Dynamic high-contrast canvas boundary and auto-adapting backdrop luminance for dark captures.
+- [x] Disjoint Copy vs Save toolbar pipelines separating clipboard and filesystem actions.
 - [ ] Fix and fully enable the **Click-to-Type Text** annotation tool to reliably capture active keyboard input and support native inline text overlay typing.
 
 ## License
