@@ -70,7 +70,7 @@ PluginSettings {
             settingKey: "defaultThickness"
             label: "Starting Stroke Width"
             description: "Starting line thickness for drawing tools."
-            defaultValue: 4
+            defaultValue: 8
             minValue: 1
             maxValue: 20
         }

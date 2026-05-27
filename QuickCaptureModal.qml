@@ -21,7 +21,7 @@ DankModal {
     // State Variables
     property string currentTool: "crop" // crop, pen, highlighter, rect, arrow, text, stamp, eraser
     property string currentColor: "#3b82f6" // Default to Tailwind Blue-500
-    property int strokeWidth: 4
+    property int strokeWidth: 8
     property int stampCounter: 1
     property bool isScreenshotDark: false
     property bool hasSampledContrast: false
@@ -153,7 +153,7 @@ DankModal {
         window.currentTool = "crop";
         // Read initial settings from pluginData if available
         if (window.parentWidget && window.parentWidget.pluginData) {
-            window.strokeWidth = window.parentWidget.pluginData.defaultThickness || 4;
+            window.strokeWidth = window.parentWidget.pluginData.defaultThickness || 8;
         }
         window.strokes = [];
         window.stampCounter = 1;
@@ -449,7 +449,14 @@ DankModal {
                 // 2. Centered Canvas Board
                 Item {
                     id: boardContainer
-                    anchors.fill: parent
+                    anchors.top: toolbarCard.bottom
+                    anchors.topMargin: Theme.spacingM
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: Theme.spacingM
+                    anchors.left: parent.left
+                    anchors.leftMargin: Theme.spacingM
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.spacingM
 
                     Component.onCompleted: {
                         window.boardContainerItem = boardContainer;
