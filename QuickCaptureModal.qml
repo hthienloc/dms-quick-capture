@@ -24,6 +24,9 @@ DankModal {
     property int stampCounter: 1
     property bool isScreenshotDark: false
     property bool hasSampledContrast: false
+    property real previewX: 0
+    property real previewY: 0
+    property bool showSizePreview: false
 
     property var strokes: []
     property var currentStroke: null
@@ -42,8 +45,8 @@ DankModal {
         };
     }
 
-    backgroundOpacity: isScreenshotDark ? 0.75 : 0.6
-    backgroundColor: isScreenshotDark ? Theme.withAlpha("#ffffff", 0.2) : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+    backgroundOpacity: 1.0
+    backgroundColor: isScreenshotDark ? "#eceff1" : Theme.surfaceContainer
 
     function openCentered() {
         open();
@@ -236,6 +239,69 @@ DankModal {
                                             window.currentColor = modelData;
                                         }
                                     }
+                                }
+                            }
+                        }
+
+                        // Divider
+                        Rectangle {
+                            width: 1
+                            height: 24
+                            color: Theme.withAlpha(Theme.outline, 0.2)
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        // Size Slider
+                        Row {
+                            spacing: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            
+                            Text {
+                                text: window.strokeWidth + "px"
+                                color: Theme.surfaceText
+                                font.pixelSize: 11
+                                font.bold: true
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            
+                            Slider {
+                                id: sizeSlider
+                                from: 1
+                                to: 50
+                                value: window.strokeWidth
+                                onMoved: {
+                                    window.strokeWidth = Math.round(value);
+                                }
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: 80
+                                
+                                background: Rectangle {
+                                    x: sizeSlider.leftPadding
+                                    y: sizeSlider.topPadding + sizeSlider.availableHeight / 2 - height / 2
+                                    implicitWidth: 80
+                                    implicitHeight: 4
+                                    width: sizeSlider.availableWidth
+                                    height: implicitHeight
+                                    radius: 2
+                                    color: Theme.withAlpha(Theme.outline, 0.3)
+
+                                    Rectangle {
+                                        width: sizeSlider.visualPosition * parent.width
+                                        height: parent.height
+                                        color: Theme.primary
+                                        radius: 2
+                                    }
+                                }
+
+                                handle: Rectangle {
+                                    x: sizeSlider.leftPadding + sizeSlider.visualPosition * (sizeSlider.availableWidth - width)
+                                    y: sizeSlider.topPadding + sizeSlider.availableHeight / 2 - height / 2
+                                    implicitWidth: 12
+                                    implicitHeight: 12
+                                    radius: 6
+                                    color: Theme.primary
+                                    border.color: Theme.surface
+                                    border.width: 1
                                 }
                             }
                         }
@@ -678,6 +744,10 @@ DankModal {
                             onWheel: (wheel) => {
                                 const step = wheel.angleDelta.y > 0 ? 1 : -1;
                                 window.strokeWidth = Math.max(1, Math.min(50, window.strokeWidth + step));
+                                window.previewX = wheel.x;
+                                window.previewY = wheel.y;
+                                window.showSizePreview = true;
+                                previewTimer.restart();
                                 wheel.accepted = true;
                             }
                         }
@@ -739,6 +809,34 @@ DankModal {
                         border.color: window.isScreenshotDark ? "rgba(255, 255, 255, 0.4)" : "rgba(0, 0, 0, 0.4)"
                         border.width: 1
                         z: 10
+                    }
+
+                    Rectangle {
+                        id: sizePreviewItem
+                        visible: window.showSizePreview
+                        x: (window.previewX * drawingCanvas.scale) + drawingCanvas.x - (width / 2)
+                        y: (window.previewY * drawingCanvas.scale) + drawingCanvas.y - (height / 2)
+                        width: {
+                            if (window.currentTool === "highlighter") return window.strokeWidth * 4 * drawingCanvas.scale;
+                            if (window.currentTool === "stamp") return window.strokeWidth * 10 * drawingCanvas.scale;
+                            return window.strokeWidth * drawingCanvas.scale;
+                        }
+                        height: width
+                        radius: window.currentTool === "highlighter" ? 0 : width / 2
+                        color: "transparent"
+                        border.color: Theme.primary
+                        border.width: 1.5
+                        z: 20
+                    }
+
+                    Timer {
+                        id: previewTimer
+                        interval: 800
+                        running: false
+                        repeat: false
+                        onTriggered: {
+                            window.showSizePreview = false;
+                        }
                     }
                 }
             }
