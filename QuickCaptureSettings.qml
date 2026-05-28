@@ -66,10 +66,10 @@ PluginSettings {
             defaultValue: "pen"
         }
 
-        IntSetting {
+        SliderSetting {
+            label: "Starting Thickness"
+            description: "Default line thickness for drawing tools."
             settingKey: "defaultThickness"
-            label: "Starting Stroke Width"
-            description: "Starting line thickness for drawing tools."
             defaultValue: 8
             minValue: 1
             maxValue: 20
