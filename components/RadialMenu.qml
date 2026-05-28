@@ -72,15 +72,15 @@ Item {
 
                     Column {
                         anchors.centerIn: parent
-                        spacing: 1
+                        spacing: 2
 
                         StyledText {
                             text: (index + 1)
-                            font.pixelSize: 8
+                            font.pixelSize: 9
                             font.bold: true
                             color: root.selectedIndex === index ? Theme.onPrimary : Theme.surfaceVariantText
                             anchors.horizontalCenter: parent.horizontalCenter
-                            opacity: 0.8
+                            opacity: 0.7
                         }
 
                         DankIcon {
@@ -88,15 +88,7 @@ Item {
                                 const tool = QuickCaptureConfig.toolButtons.find(t => t.id === modelData.tool);
                                 return tool ? tool.icon : "help";
                             }
-                            size: 18
-                            color: root.selectedIndex === index ? Theme.onPrimary : modelData.color
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                        
-                        Rectangle {
-                            width: 10
-                            height: 1.5
-                            radius: 1
+                            size: 28
                             color: root.selectedIndex === index ? Theme.onPrimary : modelData.color
                             anchors.horizontalCenter: parent.horizontalCenter
                         }

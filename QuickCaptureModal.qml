@@ -431,8 +431,12 @@ DankModal {
                         if (window.activeCanvas) {
                             window.activeCanvas.loadImage(source);
                         }
+                        if (!window.hasSampledContrast) {
+                            contrastSampler.requestPaint();
+                        }
                     }
                 }
+
             }
 
             Item {
@@ -483,6 +487,33 @@ DankModal {
                         border.width: 0
                     }
 
+                    // Background Image Layer (Hardware Accelerated)
+                    Item {
+                        id: bgImageLayer
+                        anchors.centerIn: parent
+                        width: drawingCanvas.width
+                        height: drawingCanvas.height
+                        scale: drawingCanvas.scale
+                        transformOrigin: drawingCanvas.transformOrigin
+                        clip: true
+
+                        Image {
+                            id: staticBgImage
+                            source: window.bgImageSource
+                            cache: false
+                            smooth: true
+                            mipmap: true
+                            
+                            // Handle crop positioning
+                            x: (window.currentTool !== "crop" && window.hasSelection) ? -window.cropRect.x : 0
+                            y: (window.currentTool !== "crop" && window.hasSelection) ? -window.cropRect.y : 0
+                            
+                            // Scale to original size if cropped, otherwise fit to canvas
+                            width: (window.currentTool !== "crop" && window.hasSelection) ? window.bgImageItem.sourceSize.width : parent.width
+                            height: (window.currentTool !== "crop" && window.hasSelection) ? window.bgImageItem.sourceSize.height : parent.height
+                        }
+                    }
+
                     Canvas {
                         id: drawingCanvas
                         anchors.centerIn: parent
@@ -517,34 +548,7 @@ DankModal {
                             var ctx = drawingCanvas.getContext("2d");
                             ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
 
-                            // 1. Draw the screenshot background first
-                            if (window.bgImageItem && window.bgImageItem.status === Image.Ready) {
-                                if (window.currentTool !== "crop" && window.hasSelection) {
-                                    // Draw only the cropped portion
-                                    ctx.drawImage(window.bgImageItem, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, 0, 0, window.cropRect.width, window.cropRect.height);
-                                } else {
-                                    // Draw full screen background
-                                    ctx.drawImage(window.bgImageItem, 0, 0, drawingCanvas.width, drawingCanvas.height);
-
-                                    if (!window.hasSampledContrast) {
-                                        try {
-                                            var imgData = ctx.getImageData(0, 0, 1, 1);
-                                            if (imgData && imgData.data) {
-                                                var r = imgData.data[0];
-                                                var g = imgData.data[1];
-                                                var b = imgData.data[2];
-                                                var brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-                                                window.isScreenshotDark = (brightness < 0.35);
-                                                window.hasSampledContrast = true;
-                                            }
-                                        } catch (e) {
-                                            // Ignore
-                                        }
-                                    }
-                                }
-                            }
-
-                            // 1.5. Draw Dimming Selection Overlay
+                            // 1. Draw Dimming Selection Overlay (only if in crop mode)
                             if (window.currentTool === "crop") {
                                 if (window.cropRect.width > 0 && window.cropRect.height > 0) {
                                     ctx.save();
@@ -1209,15 +1213,19 @@ DankModal {
                         var ctx = exportCanvas.getContext("2d");
                         ctx.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
                         
-                        if (window.hasSelection && window.activeCanvas) {
-                            if (window.activeCanvas.width === window.cropRect.width && window.activeCanvas.height === window.cropRect.height) {
-                                // Already cropped! Draw it directly from 0,0
-                                ctx.drawImage(window.activeCanvas, 0, 0);
-                            } else {
-                                // Fullscreen, draw the cropped area
-                                ctx.drawImage(window.activeCanvas, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, 0, 0, window.cropRect.width, window.cropRect.height);
-                            }
-                        } else if (window.activeCanvas) {
+                        // 1. Draw the background image first
+                        if (bgImage.status === Image.Ready) {
+                             if (window.hasSelection) {
+                                 // Draw the cropped portion of the raw background
+                                 ctx.drawImage(bgImage, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, 0, 0, window.cropRect.width, window.cropRect.height);
+                             } else {
+                                 // Fullscreen background
+                                 ctx.drawImage(bgImage, 0, 0);
+                             }
+                        }
+
+                        // 2. Overlay the annotations (drawingCanvas)
+                        if (window.activeCanvas) {
                             ctx.drawImage(window.activeCanvas, 0, 0);
                         }
 
@@ -1241,6 +1249,26 @@ DankModal {
                         window.currentTool = preset.tool;
                         window.currentColor = preset.color;
                         window.strokeWidth = preset.thickness;
+                    }
+                }
+
+                Canvas {
+                    id: contrastSampler
+                    visible: false
+                    width: 1
+                    height: 1
+                    onPaint: {
+                        var ctx = contrastSampler.getContext("2d");
+                        ctx.drawImage(bgImage, 0, 0, 1, 1, 0, 0, 1, 1);
+                        var imgData = ctx.getImageData(0, 0, 1, 1);
+                        if (imgData && imgData.data) {
+                            var r = imgData.data[0];
+                            var g = imgData.data[1];
+                            var b = imgData.data[2];
+                            var brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+                            window.isScreenshotDark = (brightness < 0.35);
+                            window.hasSampledContrast = true;
+                        }
                     }
                 }
             }

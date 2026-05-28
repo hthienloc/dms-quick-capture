@@ -18,10 +18,37 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 
 ## Features
 
-- Screenshot capture with IPC and Control Center integration.
-- Annotation tools for pen, highlighter, lines, arrows, shapes, text, stamps, redaction, and pixelation.
-- Crop-aware editing with copy, save, and copy-and-save export actions.
-- Keyboard shortcuts for fast capture cleanup and annotation.
+- **High-Performance Capture:** Decoupled rendering layers for smooth 60fps interaction even on 4K displays.
+- **Radial Menu:** Right-click anywhere during capture to access 8 customizable tool presets instantly.
+- **Rich Annotation Suite:** Pen, highlighter, lines, arrows, shapes, text notes, stamps, redaction, and pixelation.
+- **Workflow Focused:** One-key tool switching, mouse-wheel thickness control, and customizable "Enter" actions.
+- **Seamless Integration:** IPC, Control Center, and Niri-ready keybindings.
+
+## Usage
+
+1. **Trigger Capture:** Use the Control Center toggle or your configured `Print` key (via IPC).
+2. **Select Region (WIP):** Drag to select a crop area or press `Enter` for full screen.
+3. **Annotate:**
+   - **Switch Tools:** Use the toolbar or keyboard shortcuts (**1-4**, **Q-R**, **A-D**).
+   - **Radial Menu:** **Right-click** to open your custom presets circle.
+   - **Thickness:** Use the **Mouse Wheel** to dynamically scale the brush size.
+   - **Colors:** Click a color in the toolbar or use **Ctrl + 1-4/Q-R**.
+4. **Finish:** Press **Enter** to perform your default action (Save, Copy, or Both) or **Esc** to discard.
+
+## Keyboard Shortcuts
+
+| Key | Tool / Action |
+|-----|---------------|
+| `V` | Select / Move stroke |
+| `1` - `4` | Pen, Line, Arrow, Rect |
+| `Q` - `R` | Ellipse, Text, Pixelate, Redact |
+| `A` - `D` | Stamp, Highlighter, Eraser |
+| `P` | Crop / Resize Area |
+| `Enter` | **Done** (Action based on settings) |
+| `Esc` | Discard & Close |
+| `Ctrl + Z` | Undo last stroke |
+| `Ctrl + S` | Force Save to File |
+| `Ctrl + C` | Force Copy to Clipboard |
 
 ## IPC Commands
 
