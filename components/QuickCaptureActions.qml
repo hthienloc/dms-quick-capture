@@ -123,4 +123,17 @@ QtObject {
             });
         });
     }
+
+    function performDoneAction() {
+        const hasParent = root.parentWidget && root.parentWidget.pluginData;
+        const action = hasParent ? (root.parentWidget.pluginData.doneAction || "both") : "both";
+
+        if (action === "clipboard") {
+            root.performCopyOnly();
+        } else if (action === "file") {
+            root.performSaveOnly();
+        } else {
+            root.performCopyAndSave();
+        }
+    }
 }

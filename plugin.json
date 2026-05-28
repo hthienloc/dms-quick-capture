@@ -13,7 +13,7 @@
     "component": "./QuickCaptureWidget.qml",
     "settings": "./QuickCaptureSettings.qml",
     "requires_dms": ">=1.2.0",
-    "requires": ["wl-copy"],
+    "requires": [],
     "permissions": [
         "settings_read",
         "settings_write",

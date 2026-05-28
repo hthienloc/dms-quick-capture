@@ -79,6 +79,28 @@ DankModal {
     property var boardContainerItem: null
     property var exportCanvasItem: null
 
+    // Radial Menu Presets
+    property var radialPresets: []
+
+    function updateRadialPresets() {
+        const list = [];
+        if (!window.parentWidget || !window.parentWidget.pluginData) {
+            window.radialPresets = list;
+            return;
+        }
+        for (let i = 0; i < 8; i++) {
+            const t = window.parentWidget.pluginData["preset_" + i + "_tool"];
+            if (t && t !== "none") {
+                list.push({
+                    tool: t,
+                    color: window.parentWidget.pluginData["preset_" + i + "_color"] || "#3b82f6",
+                    thickness: window.parentWidget.pluginData["preset_" + i + "_thickness"] || 6
+                });
+            }
+        }
+        window.radialPresets = list;
+    }
+
     // Dynamic scale to fit the screenshot (supports standard, high-DPI, and multi-monitor setups)
     property real fitScale: {
         if (!activeCanvas || !bgImageItem || !boardContainerItem) return 1.0;
@@ -244,20 +266,41 @@ DankModal {
 
     function shortcutToken(key) {
         switch (key) {
+        case Qt.Key_0: return "0";
         case Qt.Key_1: return "1";
         case Qt.Key_2: return "2";
         case Qt.Key_3: return "3";
         case Qt.Key_4: return "4";
+        case Qt.Key_5: return "5";
+        case Qt.Key_6: return "6";
+        case Qt.Key_7: return "7";
+        case Qt.Key_8: return "8";
+        case Qt.Key_9: return "9";
         case Qt.Key_A: return "A";
+        case Qt.Key_B: return "B";
         case Qt.Key_C: return "C";
         case Qt.Key_D: return "D";
         case Qt.Key_E: return "E";
+        case Qt.Key_F: return "F";
+        case Qt.Key_G: return "G";
+        case Qt.Key_H: return "H";
+        case Qt.Key_I: return "I";
+        case Qt.Key_J: return "J";
+        case Qt.Key_K: return "K";
+        case Qt.Key_L: return "L";
+        case Qt.Key_M: return "M";
+        case Qt.Key_N: return "N";
+        case Qt.Key_O: return "O";
         case Qt.Key_P: return "P";
         case Qt.Key_Q: return "Q";
         case Qt.Key_R: return "R";
         case Qt.Key_S: return "S";
+        case Qt.Key_T: return "T";
+        case Qt.Key_U: return "U";
         case Qt.Key_V: return "V";
         case Qt.Key_W: return "W";
+        case Qt.Key_X: return "X";
+        case Qt.Key_Y: return "Y";
         case Qt.Key_Z: return "Z";
         default: return "";
         }
@@ -308,7 +351,7 @@ DankModal {
             return;
         }
         if ((hasCtrl && token === "C") || event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-            captureActions.performCopyOnly();
+            captureActions.performDoneAction();
             event.accepted = true;
             return;
         }
@@ -347,6 +390,7 @@ DankModal {
 
     onOpened: {
         window.currentTool = "crop";
+        window.updateRadialPresets();
         // Read initial settings from pluginData if available
         if (window.parentWidget && window.parentWidget.pluginData) {
             window.strokeWidth = window.parentWidget.pluginData.defaultThickness || 8;
@@ -809,6 +853,7 @@ DankModal {
                             id: drawMouseArea
                             anchors.fill: parent
                             hoverEnabled: true
+                            acceptedButtons: Qt.LeftButton | Qt.RightButton
 
                             function getAbsolutePoint(mx, my) {
                                 if (window.currentTool !== "crop" && window.hasSelection) {
@@ -941,6 +986,12 @@ DankModal {
                             onPressed: (mouse) => {
                                 if (window.isTyping) {
                                     window.commitTypingText();
+                                    return;
+                                }
+
+                                if (mouse.button === Qt.RightButton) {
+                                    const mapped = drawMouseArea.mapToItem(radialMenu.parent, mouse.x, mouse.y);
+                                    radialMenu.open(mapped.x, mapped.y);
                                     return;
                                 }
 
@@ -1180,6 +1231,16 @@ DankModal {
                                 cb(tempOut);
                             });
                         }
+                    }
+                }
+
+                RadialMenu {
+                    id: radialMenu
+                    presets: window.radialPresets
+                    onPresetSelected: (preset) => {
+                        window.currentTool = preset.tool;
+                        window.currentColor = preset.color;
+                        window.strokeWidth = preset.thickness;
                     }
                 }
             }
