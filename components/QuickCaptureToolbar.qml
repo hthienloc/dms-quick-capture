@@ -2,10 +2,12 @@ import QtQuick
 import QtQuick.Controls
 import qs.Common
 import qs.Widgets
-import "../lib/QuickCaptureConfig.js" as QuickCaptureConfig
+import "../lib"
 
 Rectangle {
     id: root
+
+    QuickCaptureConfig { id: config }
 
     property string currentTool: "crop"
     property color currentColor: Theme.primary
@@ -63,7 +65,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
 
                 Repeater {
-                    model: QuickCaptureConfig.toolButtons
+                    model: config.toolButtons
 
                     delegate: DankActionButton {
                         iconName: modelData.icon
@@ -91,7 +93,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
 
                 Repeater {
-                    model: [Theme.primary].concat(QuickCaptureConfig.accentColors)
+                    model: [Theme.primary].concat(config.accentColors)
 
                     delegate: Rectangle {
                         width: 24

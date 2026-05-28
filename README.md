@@ -86,7 +86,7 @@ dms-quick-capture/
     QuickCaptureActions.qml    # Export, copy, and save actions
     QuickCaptureToolbar.qml    # Annotation toolbar UI
   lib/
-    QuickCaptureConfig.js      # Tool, color, and shortcut config
+    QuickCaptureConfig.qml     # Tool, color, and shortcut config
 ```
 
 ## TODO / Roadmap

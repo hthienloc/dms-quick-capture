@@ -1,12 +1,14 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
-import "../lib/QuickCaptureConfig.js" as QuickCaptureConfig
+import "../lib"
 
 Item {
     id: root
     visible: false
     z: 1000
+
+    QuickCaptureConfig { id: config }
 
     property var presets: []
     property int selectedIndex: -1
@@ -85,7 +87,7 @@ Item {
 
                         DankIcon {
                             name: {
-                                const tool = QuickCaptureConfig.toolButtons.find(t => t.id === modelData.tool);
+                                const tool = config.toolButtons.find(t => t.id === modelData.tool);
                                 return tool ? tool.icon : "help";
                             }
                             size: 28

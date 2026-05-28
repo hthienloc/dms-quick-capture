@@ -6,10 +6,12 @@ import qs.Common
 import qs.Modals.Common
 import "../dms-common"
 import "components"
-import "lib/QuickCaptureConfig.js" as QuickCaptureConfig
+import "lib"
 
 DankModal {
     id: window
+
+    QuickCaptureConfig { id: config }
 
     layerNamespace: "dms:plugins:quickCapture"
     keepPopoutsOpen: true
@@ -361,7 +363,7 @@ DankModal {
             return;
         }
         if (hasCtrl) {
-            const colorShortcut = QuickCaptureConfig.findByKey(QuickCaptureConfig.colorShortcuts, token);
+            const colorShortcut = config.findByKey(config.colorShortcuts, token);
             if (colorShortcut) {
                 window.currentColor = window.shortcutColor(colorShortcut.color);
                 event.accepted = true;
@@ -369,7 +371,7 @@ DankModal {
             return;
         }
 
-        const toolShortcut = QuickCaptureConfig.findByKey(QuickCaptureConfig.toolShortcuts, token);
+        const toolShortcut = config.findByKey(config.toolShortcuts, token);
         if (toolShortcut) {
             window.currentTool = toolShortcut.tool;
             event.accepted = true;
