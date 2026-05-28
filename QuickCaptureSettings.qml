@@ -1,10 +1,13 @@
 import QtQuick
+import QtQuick.Controls
 import qs.Common
+import qs.Services
 import qs.Widgets
 import qs.Modules.Plugins
 import "../dms-common"
 
 PluginSettings {
+    id: root
     pluginId: "quickCapture"
 
     PluginHeader {
@@ -19,8 +22,8 @@ PluginSettings {
             label: "Capture Mode"
             description: "Choose whether to capture a selected region or the full screen."
             options: [
-                { "label": "Interactive Region", "value": "region" },
-                { "label": "Full Screen", "value": "full" }
+                { label: "Interactive Region", value: "region" },
+                { label: "Full Screen", value: "full" }
             ]
             defaultValue: "region"
         }
@@ -42,9 +45,9 @@ PluginSettings {
             label: "Action on Done"
             description: "Default action when clicking the Done button."
             options: [
-                { "label": "Copy to Clipboard only", "value": "clipboard" },
-                { "label": "Save to File only", "value": "file" },
-                { "label": "Both Copy and Save", "value": "both" }
+                { label: "Copy to Clipboard only", value: "clipboard" },
+                { label: "Save to File only", value: "file" },
+                { label: "Both Copy and Save", value: "both" }
             ]
             defaultValue: "both"
         }
@@ -58,10 +61,10 @@ PluginSettings {
             label: "Starting Tool"
             description: "Default tool selected when launching the annotation overlay."
             options: [
-                { "label": "Freehand Pen", "value": "pen" },
-                { "label": "Highlighter", "value": "highlighter" },
-                { "label": "Rectangle Outline", "value": "rect" },
-                { "label": "Arrow Vector", "value": "arrow" }
+                { label: "Freehand Pen", value: "pen" },
+                { label: "Highlighter", value: "highlighter" },
+                { label: "Rectangle Outline", value: "rect" },
+                { label: "Arrow Vector", value: "arrow" }
             ]
             defaultValue: "pen"
         }
