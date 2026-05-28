@@ -28,10 +28,35 @@ DankModal {
     }
     property color currentColor: Theme.primary
     onCurrentColorChanged: {
+        if (window.selectedStroke) {
+            window.selectedStroke.color = window.currentColor.toString();
+            const idx = window.strokes.indexOf(window.selectedStroke);
+            if (idx !== -1) {
+                window.strokes[idx] = window.selectedStroke;
+                window.strokes = [...window.strokes];
+            }
+        }
+        if (window.currentStroke) {
+            window.currentStroke.color = window.currentColor.toString();
+        }
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
     property int strokeWidth: 8
     onStrokeWidthChanged: {
+        // Apply new width to the currently selected stroke so live edits
+        // are reflected immediately without needing to re-draw.
+        if (window.selectedStroke) {
+            window.selectedStroke.width = window.strokeWidth;
+            const idx = window.strokes.indexOf(window.selectedStroke);
+            if (idx !== -1) {
+                window.strokes[idx] = window.selectedStroke;
+                window.strokes = [...window.strokes]; // trigger reactivity
+            }
+        }
+        // Also update an in-progress stroke (e.g. actively drawing a highlight)
+        if (window.currentStroke) {
+            window.currentStroke.width = window.strokeWidth;
+        }
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
     property int stampCounter: 1
