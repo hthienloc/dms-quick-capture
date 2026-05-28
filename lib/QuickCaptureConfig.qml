@@ -13,8 +13,7 @@ QtObject {
         { id: "redact", icon: "square", tooltip: qsTr("Redact / Blackout (R)") },
         { id: "stamp", icon: "looks_one", tooltip: qsTr("Number Stamp (A)") },
         { id: "highlighter", icon: "border_color", tooltip: qsTr("Highlighter (S)") },
-        { id: "eraser", icon: "auto_fix_normal", tooltip: qsTr("Eraser (D)") },
-        { id: "crop", icon: "crop", tooltip: qsTr("Crop / Resize Area (P)") }
+        { id: "eraser", icon: "auto_fix_normal", tooltip: qsTr("Eraser (D)") }
     ]
 
     readonly property var accentColors: [

@@ -53,6 +53,19 @@ Rectangle {
                 onClicked: root.toolSelected("select")
             }
 
+            DankActionButton {
+                iconName: "crop"
+                buttonSize: 36
+                iconSize: 18
+                tooltipText: "Crop / Resize Area (P)"
+                anchors.verticalCenter: parent.verticalCenter
+
+                backgroundColor: root.currentTool === "crop" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                iconColor: root.currentTool === "crop" ? Theme.primary : Theme.surfaceText
+
+                onClicked: root.toolSelected("crop")
+            }
+
             Rectangle {
                 width: 1
                 height: 24
