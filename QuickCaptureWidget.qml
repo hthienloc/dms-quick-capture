@@ -57,46 +57,45 @@ PluginComponent {
         id: captureDelayTimer
         interval: Math.max(50, Theme.popoutAnimationDuration + 50)
         repeat: false
-        onTriggered: {
-            root.startActualCapture();
-        }
+        onTriggered: root.startActualCapture()
     }
 
     function triggerCapture() {
         if (root.isDaemonInstance) {
-            if (root.isCapturing || modal.shouldBeVisible) return;
-            root.isCapturing = true;
-
-            if (typeof PopoutService !== "undefined" && PopoutService) {
-                PopoutService.closeControlCenter();
-            }
-
-            captureDelayTimer.start();
+            root.startCaptureAfterDelay();
         } else {
             const daemon = PluginService.pluginInstances["quickCapture"];
             if (daemon) {
-                if (typeof PopoutService !== "undefined" && PopoutService) {
-                    PopoutService.closeControlCenter();
-                }
+                root.closeControlCenter();
                 daemon.triggerCapture();
             } else {
                 // Fallback if daemon is somehow missing
-                if (root.isCapturing || modal.shouldBeVisible) return;
-                root.isCapturing = true;
-                if (typeof PopoutService !== "undefined" && PopoutService) {
-                    PopoutService.closeControlCenter();
-                }
-                captureDelayTimer.start();
+                root.startCaptureAfterDelay();
             }
         }
     }
 
-    function startActualCapture() {
-        const args = ["dms", "screenshot", "full", "--no-clipboard", "--no-notify", "--dir", "/tmp", "--filename", "dms_capture_bg.png"];
+    function closeControlCenter() {
+        if (typeof PopoutService !== "undefined" && PopoutService) {
+            PopoutService.closeControlCenter();
+        }
+    }
 
+    function startCaptureAfterDelay() {
+        if (root.isCapturing || modal.shouldBeVisible) return;
+        root.isCapturing = true;
+        root.closeControlCenter();
+        captureDelayTimer.start();
+    }
+
+    function screenshotArgs() {
+        return ["dms", "screenshot", "full", "--no-clipboard", "--no-notify", "--dir", "/tmp", "--filename", "dms_capture_bg.png"];
+    }
+
+    function startActualCapture() {
         Proc.runCommand(
             "dms-screenshot",
-            args,
+            root.screenshotArgs(),
             (stdout, exitCode) => {
                 root.isCapturing = false;
                 if (exitCode === 0) {
@@ -120,34 +119,43 @@ PluginComponent {
 
     Component.onCompleted: {
         if (root.isDaemonInstance && pluginService && pluginId) {
-            // 1. Register self into pluginInstances so CC instances can delegate capture to us
-            if (!pluginService.pluginInstances[pluginId]) {
-                const newInstances = Object.assign({}, pluginService.pluginInstances);
-                newInstances[pluginId] = root;
-                pluginService.pluginInstances = newInstances;
-            }
-            // 2. Dynamic registration in pluginWidgetComponents
-            if (pluginService.pluginWidgetComponents && !pluginService.pluginWidgetComponents[pluginId]) {
-                const newWidgets = Object.assign({}, pluginService.pluginWidgetComponents);
-                newWidgets[pluginId] = pluginService.pluginDaemonComponents[pluginId];
-                pluginService.pluginWidgetComponents = newWidgets;
-            }
-            // 3. Bypass daemon filter in WidgetModel by updating in-memory type to widget
-            const plugins = pluginService.getLoadedPlugins ? pluginService.getLoadedPlugins() : [];
-            const pluginInfo = plugins.find(p => p.id === pluginId);
-            if (pluginInfo) {
-                pluginInfo.type = "widget";
-            }
+            root.registerDaemonAsWidget();
         }
     }
 
     Component.onDestruction: {
         if (root.isDaemonInstance && pluginService && pluginId) {
-            if (pluginService.pluginInstances[pluginId] === root) {
-                const newInstances = Object.assign({}, pluginService.pluginInstances);
-                delete newInstances[pluginId];
-                pluginService.pluginInstances = newInstances;
-            }
+            root.unregisterDaemonInstance();
+        }
+    }
+
+    function registerDaemonAsWidget() {
+        // Register self so Control Center widget instances can delegate capture to the daemon.
+        if (!pluginService.pluginInstances[pluginId]) {
+            const newInstances = Object.assign({}, pluginService.pluginInstances);
+            newInstances[pluginId] = root;
+            pluginService.pluginInstances = newInstances;
+        }
+
+        // Expose this daemon component to widget placement without changing plugin.json.
+        if (pluginService.pluginWidgetComponents && !pluginService.pluginWidgetComponents[pluginId]) {
+            const newWidgets = Object.assign({}, pluginService.pluginWidgetComponents);
+            newWidgets[pluginId] = pluginService.pluginDaemonComponents[pluginId];
+            pluginService.pluginWidgetComponents = newWidgets;
+        }
+
+        const plugins = pluginService.getLoadedPlugins ? pluginService.getLoadedPlugins() : [];
+        const pluginInfo = plugins.find(p => p.id === pluginId);
+        if (pluginInfo) {
+            pluginInfo.type = "widget";
+        }
+    }
+
+    function unregisterDaemonInstance() {
+        if (pluginService.pluginInstances[pluginId] === root) {
+            const newInstances = Object.assign({}, pluginService.pluginInstances);
+            delete newInstances[pluginId];
+            pluginService.pluginInstances = newInstances;
         }
     }
 }

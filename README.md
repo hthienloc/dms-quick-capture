@@ -2,7 +2,7 @@
 
 Interactive Wayland-centric screen capture and instant vector annotation plugin for DankMaterialShell (DMS).
 
-<img src="screenshot.png" width="400" alt="Screenshot">
+<img src="screenshot.png" width="800" alt="Screenshot">
 
 ## Install
 
@@ -18,12 +18,10 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 
 ## Features
 
-- **Hybrid Daemon-Widget Lifecycles:** Seamlessly auto-starts on boot to listen for system screenshot hotkeys.
-- **Native Selection Capture:** Integrates cleanly with DMS interactive screenshot pipelines.
-- **Centered Aspect-Fit Annotator:** Center-aligned modal occupying 90% width/height of the viewport with aspect-ratio locked scaling.
-- **Vector Painting Board:** Multi-tool annotation workspace (Pen, Highlighter, Rectangle, Arrow, Erase, Contrast Stamp).
-- **Clipboard & File Save Pipelines:** One-click copy to clipboard via `wl-clipboard` and backup file writer.
-- **Hotkey Support:** Active keyboard binds (`Escape` to discard, `Ctrl+Z` to undo, `Ctrl+C`/`Enter` to copy, `Ctrl+S` to save).
+- Screenshot capture with IPC and Control Center integration.
+- Annotation tools for pen, highlighter, lines, arrows, shapes, text, stamps, redaction, and pixelation.
+- Crop-aware editing with copy, save, and copy-and-save export actions.
+- Keyboard shortcuts for fast capture cleanup and annotation.
 
 ## IPC Commands
 
@@ -48,6 +46,21 @@ binds {
 - DankMaterialShell >= 1.5
 - `wl-clipboard` (required for copying captures to system clipboard)
 - `dms-common`
+
+## Project Structure
+
+```text
+dms-quick-capture/
+  plugin.json
+  QuickCaptureWidget.qml       # DMS entrypoint, IPC, capture lifecycle
+  QuickCaptureModal.qml        # Annotation modal and canvas coordination
+  QuickCaptureSettings.qml     # Settings UI
+  components/
+    QuickCaptureActions.qml    # Export, copy, and save actions
+    QuickCaptureToolbar.qml    # Annotation toolbar UI
+  lib/
+    QuickCaptureConfig.js      # Tool, color, and shortcut config
+```
 
 ## TODO / Roadmap
 

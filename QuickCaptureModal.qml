@@ -1,13 +1,12 @@
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import qs.Common
 import qs.Modals.Common
-import qs.Services
-import qs.Widgets
 import "../dms-common"
+import "components"
+import "lib/QuickCaptureConfig.js" as QuickCaptureConfig
 
 DankModal {
     id: window
@@ -19,7 +18,7 @@ DankModal {
     property var parentWidget: null
 
     // State Variables
-    property string currentTool: "crop" // crop, select, pen, line, arrow, rect, text, pixelate, redact, stamp, highlighter, eraser
+    property string currentTool: "crop" // crop, select, pen, line, arrow, rect, ellipse, text, pixelate, redact, stamp, highlighter, eraser
     onCurrentToolChanged: {
         if (currentTool !== "text" && window.isTyping) {
             window.commitTypingText();
@@ -104,6 +103,13 @@ DankModal {
     property point selectStart: Qt.point(0, 0)
     property var exportCallback: null
 
+    QuickCaptureActions {
+        id: captureActions
+        parentWidget: window.parentWidget
+        exportAndExecute: window.exportAndExecute
+        onCloseRequested: window.discardAndClose()
+    }
+
     function getHoveredHandle(mx, my) {
         if (!hasSelection || currentTool !== "crop") return "none";
         const threshold = 15;
@@ -122,6 +128,15 @@ DankModal {
         if (!hasSelection) return false;
         return mx >= cropRect.x && mx <= (cropRect.x + cropRect.width) &&
                my >= cropRect.y && my <= (cropRect.y + cropRect.height);
+    }
+
+    function constrainSquarePoint(start, point) {
+        const dx = point.x - start.x;
+        const dy = point.y - start.y;
+        const size = Math.max(Math.abs(dx), Math.abs(dy));
+        const sx = dx < 0 ? -1 : 1;
+        const sy = dy < 0 ? -1 : 1;
+        return Qt.point(start.x + sx * size, start.y + sy * size);
     }
 
     function findStrokeAt(mx, my) {
@@ -160,6 +175,20 @@ DankModal {
                 if (mx >= x1 - 5 && mx <= x2 + 5 && my >= y1 - 5 && my <= y2 + 5) {
                     return i;
                 }
+            } else if (stroke.tool === "ellipse") {
+                const p0 = stroke.points[0];
+                const p1 = stroke.points[stroke.points.length - 1];
+                const x1 = Math.min(p0.x, p1.x);
+                const x2 = Math.max(p0.x, p1.x);
+                const y1 = Math.min(p0.y, p1.y);
+                const y2 = Math.max(p0.y, p1.y);
+                const rx = Math.max((x2 - x1) / 2, 1);
+                const ry = Math.max((y2 - y1) / 2, 1);
+                const cx = x1 + rx;
+                const cy = y1 + ry;
+                const normalized = Math.pow((mx - cx) / rx, 2) + Math.pow((my - cy) / ry, 2);
+                const tolerance = Math.max(0.08, threshold / Math.max(rx, ry));
+                if (Math.abs(normalized - 1) <= tolerance) return i;
             } else if (stroke.tool === "arrow" || stroke.tool === "line") {
                 const p0 = stroke.points[0];
                 const p1 = stroke.points[stroke.points.length - 1];
@@ -213,108 +242,107 @@ DankModal {
         window.exportCanvasItem.requestPaint();
     }
 
+    function shortcutToken(key) {
+        switch (key) {
+        case Qt.Key_1: return "1";
+        case Qt.Key_2: return "2";
+        case Qt.Key_3: return "3";
+        case Qt.Key_4: return "4";
+        case Qt.Key_A: return "A";
+        case Qt.Key_C: return "C";
+        case Qt.Key_D: return "D";
+        case Qt.Key_E: return "E";
+        case Qt.Key_P: return "P";
+        case Qt.Key_Q: return "Q";
+        case Qt.Key_R: return "R";
+        case Qt.Key_S: return "S";
+        case Qt.Key_V: return "V";
+        case Qt.Key_W: return "W";
+        case Qt.Key_Z: return "Z";
+        default: return "";
+        }
+    }
+
+    function shortcutColor(color) {
+        return color === "primary" ? Theme.primary : color;
+    }
+
+    function handleTypingKey(event) {
+        if (event.key === Qt.Key_Escape) {
+            window.isTyping = false;
+            window.currentTypingText = "";
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+            event.accepted = true;
+            return;
+        }
+        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+            window.commitTypingText();
+            event.accepted = true;
+            return;
+        }
+        if (event.key === Qt.Key_Backspace) {
+            window.currentTypingText = window.currentTypingText.slice(0, -1);
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+            event.accepted = true;
+            return;
+        }
+        if (event.text && event.text.length > 0 && !(event.modifiers & Qt.ControlModifier) && !(event.modifiers & Qt.AltModifier)) {
+            window.currentTypingText += event.text;
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+            event.accepted = true;
+        }
+    }
+
+    function handleShortcutKey(event) {
+        const token = window.shortcutToken(event.key);
+        const hasCtrl = event.modifiers & Qt.ControlModifier;
+
+        if (event.key === Qt.Key_Escape) {
+            window.discardAndClose();
+            event.accepted = true;
+            return;
+        }
+        if (hasCtrl && token === "Z") {
+            window.performUndo();
+            event.accepted = true;
+            return;
+        }
+        if ((hasCtrl && token === "C") || event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+            captureActions.performCopyOnly();
+            event.accepted = true;
+            return;
+        }
+        if (hasCtrl && token === "S") {
+            captureActions.performSaveOnly();
+            event.accepted = true;
+            return;
+        }
+        if (hasCtrl) {
+            const colorShortcut = QuickCaptureConfig.findByKey(QuickCaptureConfig.colorShortcuts, token);
+            if (colorShortcut) {
+                window.currentColor = window.shortcutColor(colorShortcut.color);
+                event.accepted = true;
+            }
+            return;
+        }
+
+        const toolShortcut = QuickCaptureConfig.findByKey(QuickCaptureConfig.toolShortcuts, token);
+        if (toolShortcut) {
+            window.currentTool = toolShortcut.tool;
+            event.accepted = true;
+        }
+    }
+
     onBackgroundClicked: () => discardAndClose()
 
     // Keyboard Shortcuts Support
     modalFocusScope.Keys.onPressed: (event) => {
         if (window.isTyping) {
-            if (event.key === Qt.Key_Escape) {
-                window.isTyping = false;
-                window.currentTypingText = "";
-                if (window.activeCanvas) window.activeCanvas.requestPaint();
-                event.accepted = true;
-            } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Return) {
-                window.commitTypingText();
-                event.accepted = true;
-            } else if (event.key === Qt.Key_Backspace) {
-                window.currentTypingText = window.currentTypingText.slice(0, -1);
-                if (window.activeCanvas) window.activeCanvas.requestPaint();
-                event.accepted = true;
-            } else if (event.text && event.text.length > 0) {
-                if (!(event.modifiers & Qt.ControlModifier) && !(event.modifiers & Qt.AltModifier)) {
-                    window.currentTypingText += event.text;
-                    if (window.activeCanvas) window.activeCanvas.requestPaint();
-                    event.accepted = true;
-                }
-            }
+            window.handleTypingKey(event);
             return;
         }
-        
-        if (event.key === Qt.Key_Escape) {
-            window.discardAndClose();
-            event.accepted = true;
-        } else if (event.key === Qt.Key_Z && (event.modifiers & Qt.ControlModifier)) {
-            window.performUndo();
-            event.accepted = true;
-        } else if ((event.key === Qt.Key_C && (event.modifiers & Qt.ControlModifier)) || event.key === Qt.Key_Return) {
-            window.performCopyOnly();
-            event.accepted = true;
-        } else if (event.key === Qt.Key_S && (event.modifiers & Qt.ControlModifier)) {
-            window.performSaveOnly();
-            event.accepted = true;
-        } else if (event.modifiers & Qt.ControlModifier) {
-            if (event.key === Qt.Key_1) {
-                window.currentColor = Theme.primary;
-                event.accepted = true;
-            } else if (event.key === Qt.Key_2) {
-                window.currentColor = "#3b82f6";
-                event.accepted = true;
-            } else if (event.key === Qt.Key_3) {
-                window.currentColor = "#ef4444";
-                event.accepted = true;
-            } else if (event.key === Qt.Key_4) {
-                window.currentColor = "#22c55e";
-                event.accepted = true;
-            } else if (event.key === Qt.Key_Q) {
-                window.currentColor = "#eab308";
-                event.accepted = true;
-            } else if (event.key === Qt.Key_W) {
-                window.currentColor = "#a855f7";
-                event.accepted = true;
-            } else if (event.key === Qt.Key_E) {
-                window.currentColor = "#ffffff";
-                event.accepted = true;
-            } else if (event.key === Qt.Key_R) {
-                window.currentColor = "#000000";
-                event.accepted = true;
-            }
-        } else if (event.key === Qt.Key_V) {
-            window.currentTool = "select";
-            event.accepted = true;
-        } else if (event.key === Qt.Key_1) {
-            window.currentTool = "pen";
-            event.accepted = true;
-        } else if (event.key === Qt.Key_2) {
-            window.currentTool = "line";
-            event.accepted = true;
-        } else if (event.key === Qt.Key_3) {
-            window.currentTool = "arrow";
-            event.accepted = true;
-        } else if (event.key === Qt.Key_4) {
-            window.currentTool = "rect";
-            event.accepted = true;
-        } else if (event.key === Qt.Key_Q) {
-            window.currentTool = "text";
-            event.accepted = true;
-        } else if (event.key === Qt.Key_W) {
-            window.currentTool = "pixelate";
-            event.accepted = true;
-        } else if (event.key === Qt.Key_E) {
-            window.currentTool = "redact";
-            event.accepted = true;
-        } else if (event.key === Qt.Key_R) {
-            window.currentTool = "stamp";
-            event.accepted = true;
-        } else if (event.key === Qt.Key_A) {
-            window.currentTool = "highlighter";
-            event.accepted = true;
-        } else if (event.key === Qt.Key_S) {
-            window.currentTool = "eraser";
-            event.accepted = true;
-        } else if (event.key === Qt.Key_P) {
-            window.currentTool = "crop";
-            event.accepted = true;
-        }
+
+        window.handleShortcutKey(event);
     }
 
     onOpened: {
@@ -367,282 +395,26 @@ DankModal {
                 id: mainLayout
                 anchors.fill: parent
 
-                // 1. Top Glassmorphic Toolbar
-                Rectangle {
+                QuickCaptureToolbar {
                     id: toolbarCard
-                    width: contentRow.width + Theme.spacingM * 2
-                    height: 52
-                    radius: Theme.cornerRadius
-                    color: Theme.withAlpha(Theme.surfaceContainer, 0.95)
-                    border.color: Theme.withAlpha(Theme.outline, 0.15)
-                    border.width: 1
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: parent.top
                     anchors.topMargin: Theme.spacingM
                     z: 100
 
-                    Row {
-                        id: contentRow
-                        anchors.centerIn: parent
-                        spacing: Theme.spacingL
+                    currentTool: window.currentTool
+                    currentColor: window.currentColor
+                    strokeWidth: window.strokeWidth
+                    canUndo: window.strokes.length > 0
 
-                        // Left group: editing tools
-                        Row {
-                            id: leftGroup
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.spacingM
-
-                            // Select & Move Button
-                            DankActionButton {
-                                iconName: "near_me"
-                                buttonSize: 36
-                                iconSize: 18
-                                tooltipText: "Select & Move (V)"
-                                anchors.verticalCenter: parent.verticalCenter
-
-                                backgroundColor: window.currentTool === "select" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                                iconColor: window.currentTool === "select" ? Theme.primary : Theme.surfaceText
-
-                                onClicked: {
-                                    window.currentTool = "select";
-                                }
-                            }
-
-                            // Separator between Select and other tools
-                            Rectangle {
-                                width: 1
-                                height: 24
-                                color: Theme.withAlpha(Theme.outline, 0.2)
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            // Tool buttons
-                            Row {
-                                spacing: Theme.spacingXS
-                                anchors.verticalCenter: parent.verticalCenter
-
-                                Repeater {
-                                    model: [
-                                        { id: "pen", icon: "edit", tooltip: "Freehand Pen (1)" },
-                                        { id: "line", icon: "horizontal_rule", tooltip: "Straight Line (2)" },
-                                        { id: "arrow", icon: "trending_flat", tooltip: "Arrow Vector (3)" },
-                                        { id: "rect", icon: "crop_square", tooltip: "Rectangle Outline (4)" },
-                                        { id: "text", icon: "text_fields", tooltip: "Text Note (Q)" },
-                                        { id: "pixelate", icon: "blur_on", tooltip: "Pixelate / Blur (W)" },
-                                        { id: "redact", icon: "square", tooltip: "Redact / Blackout (E)" },
-                                        { id: "stamp", icon: "looks_one", tooltip: "Number Stamp (R)" },
-                                        { id: "highlighter", icon: "border_color", tooltip: "Highlighter (A)" },
-                                        { id: "eraser", icon: "auto_fix_normal", tooltip: "Eraser (S)" },
-                                        { id: "crop", icon: "crop", tooltip: "Crop / Resize Area (P)" }
-                                    ]
-
-                                    delegate: DankActionButton {
-                                        iconName: modelData.icon
-                                        buttonSize: 36
-                                        iconSize: 18
-                                        tooltipText: modelData.tooltip
-
-                                        backgroundColor: window.currentTool === modelData.id ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                                        iconColor: window.currentTool === modelData.id ? Theme.primary : Theme.surfaceText
-
-                                        onClicked: {
-                                            window.currentTool = modelData.id;
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Divider
-                            Rectangle {
-                                width: 1
-                                height: 24
-                                color: Theme.withAlpha(Theme.outline, 0.2)
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            // Color picker
-                            Row {
-                                spacing: Theme.spacingS
-                                anchors.verticalCenter: parent.verticalCenter
-
-                                Repeater {
-                                    model: [
-                                        Theme.primary,
-                                        "#3b82f6",
-                                        "#ef4444",
-                                        "#22c55e",
-                                        "#eab308",
-                                        "#a855f7",
-                                        "#ffffff",
-                                        "#000000"
-                                    ]
-
-                                    delegate: Rectangle {
-                                        width: 24
-                                        height: 24
-                                        radius: 12
-                                        color: modelData
-                                        border.color: Qt.colorEqual(window.currentColor, modelData) ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
-                                        border.width: Qt.colorEqual(window.currentColor, modelData) ? 2 : 1
-
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: {
-                                                window.currentColor = modelData;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Divider
-                            Rectangle {
-                                width: 1
-                                height: 24
-                                color: Theme.withAlpha(Theme.outline, 0.2)
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            // Size Slider
-                            Row {
-                                spacing: Theme.spacingS
-                                anchors.verticalCenter: parent.verticalCenter
-                                
-                                Text {
-                                    text: window.strokeWidth + "px"
-                                    width: 32
-                                    horizontalAlignment: Text.AlignRight
-                                    color: Theme.surfaceText
-                                    font.pixelSize: 11
-                                    font.bold: true
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-                                
-                                Slider {
-                                    id: sizeSlider
-                                    from: 1
-                                    to: 50
-                                    value: window.strokeWidth
-                                    onMoved: {
-                                        window.strokeWidth = Math.round(value);
-                                    }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: 80
-                                    
-                                    background: Rectangle {
-                                        x: sizeSlider.leftPadding
-                                        y: sizeSlider.topPadding + sizeSlider.availableHeight / 2 - height / 2
-                                        implicitWidth: 80
-                                        implicitHeight: 4
-                                        width: sizeSlider.availableWidth
-                                        height: implicitHeight
-                                        radius: 2
-                                        color: Theme.withAlpha(Theme.outline, 0.3)
-
-                                        Rectangle {
-                                            width: sizeSlider.visualPosition * parent.width
-                                            height: parent.height
-                                            color: Theme.primary
-                                            radius: 2
-                                        }
-                                    }
-
-                                    handle: Rectangle {
-                                        x: sizeSlider.leftPadding + sizeSlider.visualPosition * (sizeSlider.availableWidth - width)
-                                        y: sizeSlider.topPadding + sizeSlider.availableHeight / 2 - height / 2
-                                        implicitWidth: 12
-                                        implicitHeight: 12
-                                        radius: 6
-                                        color: Theme.primary
-                                        border.color: Theme.surface
-                                        border.width: 1
-                                    }
-                                }
-                            }
-
-                            // Divider
-                            Rectangle {
-                                width: 1
-                                height: 24
-                                color: Theme.withAlpha(Theme.outline, 0.2)
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            // Undo
-                            DankActionButton {
-                                anchors.verticalCenter: parent.verticalCenter
-                                iconName: "undo"
-                                buttonSize: 36
-                                iconSize: 18
-                                tooltipText: "Undo (Ctrl+Z)"
-                                enabled: window.strokes.length > 0
-                                iconColor: window.strokes.length > 0 ? Theme.surfaceText : Theme.withAlpha(Theme.surfaceText, 0.3)
-                                onClicked: window.performUndo()
-                            }
-                        }
-
-                        // Right group: save + copy | close
-                        Row {
-                            id: rightGroup
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.spacingXS
-
-                            DankActionButton {
-                                anchors.verticalCenter: parent.verticalCenter
-                                iconName: "save"
-                                buttonSize: 36
-                                iconSize: 18
-                                tooltipText: "Save to File (Ctrl+S)"
-                                onClicked: window.performSaveOnly()
-                            }
-
-                            DankActionButton {
-                                anchors.verticalCenter: parent.verticalCenter
-                                iconName: "content_copy"
-                                buttonSize: 36
-                                iconSize: 18
-                                tooltipText: "Copy to Clipboard (Ctrl+C / Enter)"
-                                backgroundColor: Theme.withAlpha(Theme.primary, 0.1)
-                                iconColor: Theme.primary
-                                onClicked: window.performCopyOnly()
-                            }
-
-                            DankActionButton {
-                                anchors.verticalCenter: parent.verticalCenter
-                                iconName: "assignment_turned_in"
-                                buttonSize: 36
-                                iconSize: 18
-                                tooltipText: "Copy & Save"
-                                backgroundColor: Theme.withAlpha(Theme.primary, 0.15)
-                                iconColor: Theme.primary
-                                onClicked: window.performCopyAndSave()
-                            }
-
-                            // Separator gap before close
-                            Item { width: Theme.spacingL; height: 1 }
-
-                            Rectangle {
-                                width: 1
-                                height: 24
-                                color: Theme.withAlpha(Theme.outline, 0.2)
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            Item { width: Theme.spacingXS; height: 1 }
-
-                            DankActionButton {
-                                anchors.verticalCenter: parent.verticalCenter
-                                iconName: "close"
-                                buttonSize: 36
-                                iconSize: 18
-                                tooltipText: "Discard & Close (Escape)"
-                                backgroundColor: Theme.withAlpha(Theme.error, 0.1)
-                                iconColor: Theme.error
-                                onClicked: window.discardAndClose()
-                            }
-                        }
-                    }
+                    onToolSelected: (tool) => window.currentTool = tool
+                    onColorSelected: (color) => window.currentColor = color
+                    onStrokeWidthSelected: (width) => window.strokeWidth = width
+                    onUndoRequested: window.performUndo()
+                    onSaveRequested: captureActions.performSaveOnly()
+                    onCopyRequested: captureActions.performCopyOnly()
+                    onCopyAndSaveRequested: captureActions.performCopyAndSave()
+                    onCloseRequested: window.discardAndClose()
                 }
 
                 // 2. Centered Canvas Board
@@ -878,6 +650,28 @@ DankModal {
                                 ctx.closePath();
                                 ctx.stroke();
 
+                            } else if (stroke.tool === "ellipse") {
+                                ctx.strokeStyle = stroke.color;
+                                ctx.lineWidth = stroke.width;
+                                ctx.lineCap = "round";
+                                ctx.lineJoin = "round";
+                                const p0 = stroke.points[0];
+                                const p1 = stroke.points[stroke.points.length - 1];
+                                const rx = Math.min(p0.x, p1.x);
+                                const ry = Math.min(p0.y, p1.y);
+                                const rw = Math.abs(p1.x - p0.x);
+                                const rh = Math.abs(p1.y - p0.y);
+
+                                if (rw > 0 && rh > 0) {
+                                    ctx.save();
+                                    ctx.beginPath();
+                                    ctx.translate(rx + rw / 2, ry + rh / 2);
+                                    ctx.scale(rw / 2, rh / 2);
+                                    ctx.arc(0, 0, 1, 0, 2 * Math.PI);
+                                    ctx.restore();
+                                    ctx.stroke();
+                                }
+
                             } else if (stroke.tool === "arrow") {
                                 ctx.strokeStyle = stroke.color;
                                 ctx.fillStyle = stroke.color;
@@ -949,21 +743,25 @@ DankModal {
 
                                     if (rw > 2 && rh > 2) {
                                         ctx.save();
+                                        ctx.beginPath();
+                                        ctx.rect(rx, ry, rw, rh);
+                                        ctx.clip();
                                         ctx.imageSmoothingEnabled = false;
 
-                                        // Pixelate block size factor (minimum 4px for visible block effect)
-                                        const factor = Math.max(4, stroke.width);
-                                        const tempW = Math.max(1, Math.round(rw / factor));
-                                        const tempH = Math.max(1, Math.round(rh / factor));
-
                                         if (window.bgImageItem && window.bgImageItem.status === Image.Ready) {
-                                            // 1. Draw cropped background downscaled onto a tiny region of the canvas
-                                            ctx.drawImage(window.bgImageItem, rx, ry, rw, rh, rx, ry, tempW, tempH);
-                                            // 2. Draw that downscaled canvas region scaled back up to the full bounding box
-                                            ctx.drawImage(drawingCanvas, rx, ry, tempW, tempH, rx, ry, rw, rh);
+                                            const blockSize = Math.max(8, Math.min(36, stroke.width * 3));
+                                            const sampleSize = Math.max(1, Math.round(blockSize / 5));
+                                            for (let y = ry; y < ry + rh; y += blockSize) {
+                                                for (let x = rx; x < rx + rw; x += blockSize) {
+                                                    const bw = Math.min(blockSize, rx + rw - x);
+                                                    const bh = Math.min(blockSize, ry + rh - y);
+                                                    const sx = Math.min(x + Math.floor(bw / 2), rx + rw - 1);
+                                                    const sy = Math.min(y + Math.floor(bh / 2), ry + rh - 1);
+                                                    ctx.drawImage(window.bgImageItem, sx, sy, sampleSize, sampleSize, x, y, bw, bh);
+                                                }
+                                            }
                                         }
 
-                                        // 3. Draw dynamic selection dashed outline if it is the active dragging stroke
                                         if (stroke === window.currentStroke) {
                                             ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
                                             ctx.lineWidth = 1;
@@ -1099,7 +897,7 @@ DankModal {
                                          } else {
                                              window.currentStroke.points.push(absPt);
                                          }
-                                     } else if (window.currentTool === "rect" || window.currentTool === "arrow" || window.currentTool === "line"
+                                     } else if (window.currentTool === "rect" || window.currentTool === "ellipse" || window.currentTool === "arrow" || window.currentTool === "line"
                                               || window.currentTool === "redact" || window.currentTool === "pixelate" || window.currentTool === "highlighter") {
                                          
                                          let finalPt = absPt;
@@ -1114,6 +912,8 @@ DankModal {
                                                  const snappedAngle = Math.round(angle / (Math.PI / 4)) * (Math.PI / 4);
                                                  finalPt = Qt.point(p0.x + L * Math.cos(snappedAngle), p0.y + L * Math.sin(snappedAngle));
                                              }
+                                         } else if ((mouse.modifiers & Qt.ShiftModifier) && window.currentTool === "ellipse") {
+                                             finalPt = window.constrainSquarePoint(window.currentStroke.points[0], absPt);
                                          }
 
                                          if (window.currentStroke.points.length > 1) {
@@ -1424,80 +1224,5 @@ DankModal {
 
     function discardAndClose() {
         window.close();
-    }
-
-    function performSaveOnly() {
-        window.exportAndExecute((tempOut) => {
-            const hasParent = window.parentWidget && window.parentWidget.pluginData;
-            const saveDir = hasParent ? (window.parentWidget.pluginData.saveDirectory || "~/Pictures/Screenshots") : "~/Pictures/Screenshots";
-            const cleanDir = saveDir.replace("~", "$HOME");
-            const filename = "Screenshot_" + Date.now() + ".png";
-            const saveCmd = "mkdir -p " + cleanDir + " && cp " + tempOut + " " + cleanDir + "/" + filename;
-            
-            Proc.runCommand("save-capture-file", ["sh", "-c", saveCmd], (stdout, exitCode) => {
-                if (exitCode === 0) {
-                    if (typeof ToastService !== "undefined" && ToastService) {
-                        ToastService.showInfo("Screenshot saved to " + saveDir + "/" + filename);
-                    }
-                    window.discardAndClose();
-                } else {
-                    if (typeof ToastService !== "undefined" && ToastService) {
-                        ToastService.showError("Failed to save screenshot file.");
-                    }
-                }
-            }, 0, 5000);
-        });
-    }
-
-    function performCopyOnly() {
-        window.exportAndExecute((tempOut) => {
-            const copyCmd = "wl-copy < " + tempOut;
-            Proc.runCommand("copy-capture-clipboard", ["sh", "-c", copyCmd], (stdout, exitCode) => {
-                if (exitCode === 0) {
-                    if (typeof ToastService !== "undefined" && ToastService) {
-                        ToastService.showInfo("Screenshot copied to clipboard.");
-                    }
-                    window.discardAndClose();
-                } else {
-                    if (typeof ToastService !== "undefined" && ToastService) {
-                        ToastService.showError("Failed to copy screenshot to clipboard. Install 'wl-clipboard'.");
-                    }
-                    window.discardAndClose();
-                }
-            }, 0, 5000);
-        });
-    }
-
-    function performCopyAndSave() {
-        window.exportAndExecute((tempOut) => {
-            const copyCmd = "wl-copy < " + tempOut;
-            Proc.runCommand("copy-capture-clipboard", ["sh", "-c", copyCmd], (stdout, exitCode) => {
-                if (exitCode === 0) {
-                    const hasParent = window.parentWidget && window.parentWidget.pluginData;
-                    const saveDir = hasParent ? (window.parentWidget.pluginData.saveDirectory || "~/Pictures/Screenshots") : "~/Pictures/Screenshots";
-                    const cleanDir = saveDir.replace("~", "$HOME");
-                    const filename = "Screenshot_" + Date.now() + ".png";
-                    const saveCmd = "mkdir -p " + cleanDir + " && cp " + tempOut + " " + cleanDir + "/" + filename;
-                    
-                    Proc.runCommand("save-capture-file", ["sh", "-c", saveCmd], (saveOut, saveCode) => {
-                        if (saveCode === 0) {
-                            if (typeof ToastService !== "undefined" && ToastService) {
-                                    ToastService.showInfo("Screenshot copied to clipboard and saved to " + saveDir);
-                            }
-                        } else {
-                            if (typeof ToastService !== "undefined" && ToastService) {
-                                ToastService.showWarning("Screenshot copied to clipboard but failed to save file.");
-                            }
-                        }
-                        window.discardAndClose();
-                    }, 0, 5000);
-                } else {
-                    if (typeof ToastService !== "undefined" && ToastService) {
-                        ToastService.showError("Failed to copy screenshot to clipboard. Install 'wl-clipboard'.");
-                    }
-                    window.discardAndClose();
-                }
-            }, 0, 5000);
-        });
     }
 }
