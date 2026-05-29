@@ -27,7 +27,7 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 ## Usage
 
 1. **Trigger Capture:** Use the Control Center toggle or your configured `Print` key (via IPC).
-2. **Select Region (WIP):** Drag to select a crop area or press `Enter` for full screen.
+2. **Select Area:** Drag to select the screenshot region directly on screen.
 3. **Annotate:**
    - **Switch Tools:** Use the toolbar or keyboard shortcuts (**1-4**, **Q-R**, **A-D**).
    - **Radial Menu:** **Right-click** to open your custom presets circle.
