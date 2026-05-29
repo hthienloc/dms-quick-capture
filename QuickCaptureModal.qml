@@ -180,6 +180,7 @@ DankModal {
     }
 
     function constrainSquarePoint(start, point) {
+        if (!start || !point) return point || Qt.point(0, 0);
         const dx = point.x - start.x;
         const dy = point.y - start.y;
         const size = Math.max(Math.abs(dx), Math.abs(dy));
@@ -831,12 +832,17 @@ DankModal {
                                         if (window.bgImageItem && window.bgImageItem.status === Image.Ready) {
                                             const blockSize = Math.max(8, Math.min(36, stroke.width * 3));
                                             const sampleSize = Math.max(1, Math.round(blockSize / 5));
+                                            const imgW = window.bgImageItem.sourceSize.width;
+                                            const imgH = window.bgImageItem.sourceSize.height;
                                             for (let y = ry; y < ry + rh; y += blockSize) {
                                                 for (let x = rx; x < rx + rw; x += blockSize) {
                                                     const bw = Math.min(blockSize, rx + rw - x);
                                                     const bh = Math.min(blockSize, ry + rh - y);
-                                                    const sx = Math.min(x + Math.floor(bw / 2), rx + rw - 1);
-                                                    const sy = Math.min(y + Math.floor(bh / 2), ry + rh - 1);
+                                                    if (bw <= 0 || bh <= 0) continue;
+                                                    let sx = Math.min(x + Math.floor(bw / 2), rx + rw - 1);
+                                                    let sy = Math.min(y + Math.floor(bh / 2), ry + rh - 1);
+                                                    sx = Math.max(0, Math.min(sx, Math.max(0, imgW - sampleSize)));
+                                                    sy = Math.max(0, Math.min(sy, Math.max(0, imgH - sampleSize)));
                                                     ctx.drawImage(window.bgImageItem, sx, sy, sampleSize, sampleSize, x, y, bw, bh);
                                                 }
                                             }
@@ -985,16 +991,20 @@ DankModal {
                                          if ((mouse.modifiers & Qt.ShiftModifier) && (window.currentTool === "line" || window.currentTool === "arrow" || window.currentTool === "highlighter")) {
                                              // Snapping angle calculation (8 directions / 45 degrees)
                                              const p0 = window.currentStroke.points[0];
-                                             const dx = absPt.x - p0.x;
-                                             const dy = absPt.y - p0.y;
-                                             const L = Math.sqrt(dx * dx + dy * dy);
-                                             if (L > 0) {
-                                                 const angle = Math.atan2(dy, dx);
-                                                 const snappedAngle = Math.round(angle / (Math.PI / 4)) * (Math.PI / 4);
-                                                 finalPt = Qt.point(p0.x + L * Math.cos(snappedAngle), p0.y + L * Math.sin(snappedAngle));
+                                             if (p0) {
+                                                 const dx = absPt.x - p0.x;
+                                                 const dy = absPt.y - p0.y;
+                                                 const L = Math.sqrt(dx * dx + dy * dy);
+                                                 if (L > 0) {
+                                                     const angle = Math.atan2(dy, dx);
+                                                     const snappedAngle = Math.round(angle / (Math.PI / 4)) * (Math.PI / 4);
+                                                     finalPt = Qt.point(p0.x + L * Math.cos(snappedAngle), p0.y + L * Math.sin(snappedAngle));
+                                                 }
                                              }
                                          } else if ((mouse.modifiers & Qt.ShiftModifier) && (window.currentTool === "ellipse" || window.currentTool === "rect" || window.currentTool === "redact" || window.currentTool === "pixelate")) {
-                                             finalPt = window.constrainSquarePoint(window.currentStroke.points[0], absPt);
+                                             if (window.currentStroke.points[0]) {
+                                                 finalPt = window.constrainSquarePoint(window.currentStroke.points[0], absPt);
+                                             }
                                          }
 
                                          if (window.currentStroke.points.length > 1) {
