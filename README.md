@@ -6,14 +6,14 @@ Interactive Wayland-centric screen capture and instant vector annotation plugin 
 
 ## Install
 
-**Required:** This plugin requires [dms-common](https://github.com/hthienloc/dms-common) to be installed.
-
+Use the DMS CLI:
 ```bash
-# 1. Install shared components
-git clone https://github.com/hthienloc/dms-common ~/.config/DankMaterialShell/plugins/dms-common
+dms plugins install quick-capture
+```
 
-# 2. Install this plugin
-git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialShell/plugins/quickCapture
+Or manually:
+```bash
+git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialShell/plugins/quick-capture
 ```
 
 ## Features
@@ -72,7 +72,6 @@ binds {
 
 - DankMaterialShell >= 1.5
 - `wl-clipboard` (required for copying captures to system clipboard)
-- `dms-common`
 
 ## Project Structure
 

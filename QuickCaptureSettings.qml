@@ -2,82 +2,78 @@ import QtQuick
 import qs.Common
 import qs.Widgets
 import qs.Modules.Plugins
-import "../dms-common"
+import "./dms-common"
 
 PluginSettings {
     id: root
     pluginId: "quickCapture"
 
-    PluginHeader {
-        title: "Quick Capture Settings"
-    }
-
     SettingsCard {
-        SectionTitle { text: "Screenshot Mode" }
+        SectionTitle { text: I18n.tr("Screenshot Mode"); icon: "screenshot" }
 
         SelectionSetting {
             settingKey: "captureMode"
-            label: "Capture Mode"
-            description: "Choose whether to capture a selected region or the full screen."
+            label: I18n.tr("Capture Mode")
+            description: I18n.tr("Choose whether to capture a selected region or the full screen.")
             options: [
-                { label: "Interactive Region (WIP)", value: "region" },
-                { label: "Full Screen", value: "full" }
+                { label: I18n.tr("Interactive Region (WIP)"), value: "region" },
+                { label: I18n.tr("Full Screen"), value: "full" }
             ]
             defaultValue: "full"
         }
     }
 
     SettingsCard {
-        SectionTitle { text: "File Export" }
+        SectionTitle { text: I18n.tr("File Export"); icon: "folder" }
 
         StringSetting {
             settingKey: "saveDirectory"
-            label: "Save Directory"
-            description: "Directory path where screen captures are saved."
+            label: I18n.tr("Save Directory")
+            description: I18n.tr("Directory path where screen captures are saved.")
             placeholder: "~/Pictures/Screenshots"
             defaultValue: "~/Pictures/Screenshots"
         }
 
         SelectionSetting {
             settingKey: "doneAction"
-            label: "Action when Enter"
-            description: "Default action when pressing Enter to finish."
+            label: I18n.tr("Action when Enter")
+            description: I18n.tr("Default action when pressing Enter to finish.")
             options: [
-                { label: "Copy to Clipboard only", value: "clipboard" },
-                { label: "Save to File only", value: "file" },
-                { label: "Both Copy and Save", value: "both" }
+                { label: I18n.tr("Copy to Clipboard only"), value: "clipboard" },
+                { label: I18n.tr("Save to File only"), value: "file" },
+                { label: I18n.tr("Both Copy and Save"), value: "both" }
             ]
             defaultValue: "both"
         }
     }
 
     SettingsCard {
-        SectionTitle { text: "Default Tools" }
+        SectionTitle { text: I18n.tr("Default Tools"); icon: "edit" }
 
         SelectionSetting {
             settingKey: "defaultTool"
-            label: "Starting Tool"
-            description: "Default tool selected when launching the annotation overlay."
+            label: I18n.tr("Starting Tool")
+            description: I18n.tr("Default tool selected when launching the annotation overlay.")
             options: [
-                { label: "Freehand Pen", value: "pen" },
-                { label: "Straight Line", value: "line" },
-                { label: "Arrow Vector", value: "arrow" },
-                { label: "Rectangle Outline", value: "rect" },
-                { label: "Ellipse / Circle", value: "ellipse" },
-                { label: "Text Note", value: "text" },
-                { label: "Pixelate", value: "pixelate" },
-                { label: "Redact / Blackout", value: "redact" },
-                { label: "Number Stamp", value: "stamp" },
-                { label: "Highlighter", value: "highlighter" },
-                { label: "Eraser", value: "eraser" },
-                { label: "Crop / Resize", value: "crop" }
+                { label: I18n.tr("Freehand Pen"), value: "pen" },
+                { label: I18n.tr("Straight Line"), value: "line" },
+                { label: I18n.tr("Arrow Vector"), value: "arrow" },
+                { label: I18n.tr("Rectangle Outline"), value: "rect" },
+                { label: I18n.tr("Ellipse / Circle"), value: "ellipse" },
+                { label: I18n.tr("Text Note"), value: "text" },
+                { label: I18n.tr("Pixelate"), value: "pixelate" },
+                { label: I18n.tr("Redact / Blackout"), value: "redact" },
+                { label: I18n.tr("Number Stamp"), value: "stamp" },
+                { label: I18n.tr("Highlighter"), value: "highlighter" },
+                { label: I18n.tr("Eraser"), value: "eraser" },
+                { label: I18n.tr("Crop / Resize"), value: "crop" }
             ]
             defaultValue: "pen"
         }
 
         SliderSetting {
-            label: "Starting Thickness"
-            description: "Default line thickness for drawing tools."
+            label: I18n.tr("Starting Thickness")
+            description: I18n.tr("Default line thickness for drawing tools.")
             settingKey: "defaultThickness"
             defaultValue: 6
             minimum: 1
@@ -86,10 +82,10 @@ PluginSettings {
     }
 
     SettingsCard {
-        SectionTitle { text: "Radial Menu Presets" }
+        SectionTitle { text: I18n.tr("Radial Menu Presets"); icon: "settings" }
         
         InfoText {
-            text: "Configure up to 8 quick-access tool presets. Right-click anywhere during capture to open the radial menu."
+            text: I18n.tr("Configure up to 8 quick-access tool presets. Right-click anywhere during capture to open the radial menu.")
         }
 
         Repeater {
@@ -107,7 +103,7 @@ PluginSettings {
                 }
 
                 StyledText {
-                    text: "Preset Slot " + (index + 1)
+                    text: I18n.tr("Preset Slot ") + (index + 1)
                     font.pixelSize: Theme.fontSizeMedium
                     font.bold: true
                     color: Theme.primary
@@ -116,39 +112,43 @@ PluginSettings {
 
                 SelectionSetting {
                     settingKey: "preset_" + index + "_tool"
-                    label: "Tool"
+                    label: I18n.tr("Tool")
                     options: [
-                        { label: "None / Disabled", value: "none" },
-                        { label: "Freehand Pen", value: "pen" },
-                        { label: "Straight Line", value: "line" },
-                        { label: "Arrow Vector", value: "arrow" },
-                        { label: "Rectangle Outline", value: "rect" },
-                        { label: "Ellipse / Circle", value: "ellipse" },
-                        { label: "Text Note", value: "text" },
-                        { label: "Pixelate", value: "pixelate" },
-                        { label: "Redact / Blackout", value: "redact" },
-                        { label: "Number Stamp", value: "stamp" },
-                        { label: "Highlighter", value: "highlighter" },
-                        { label: "Eraser", value: "eraser" },
-                        { label: "Crop / Resize", value: "crop" }
+                        { label: I18n.tr("None / Disabled"), value: "none" },
+                        { label: I18n.tr("Freehand Pen"), value: "pen" },
+                        { label: I18n.tr("Straight Line"), value: "line" },
+                        { label: I18n.tr("Arrow Vector"), value: "arrow" },
+                        { label: I18n.tr("Rectangle Outline"), value: "rect" },
+                        { label: I18n.tr("Ellipse / Circle"), value: "ellipse" },
+                        { label: I18n.tr("Text Note"), value: "text" },
+                        { label: I18n.tr("Pixelate"), value: "pixelate" },
+                        { label: I18n.tr("Redact / Blackout"), value: "redact" },
+                        { label: I18n.tr("Number Stamp"), value: "stamp" },
+                        { label: I18n.tr("Highlighter"), value: "highlighter" },
+                        { label: I18n.tr("Eraser"), value: "eraser" },
+                        { label: I18n.tr("Crop / Resize"), value: "crop" }
                     ]
                     defaultValue: index === 0 ? "pen" : "none"
                 }
 
                 ColorSetting {
                     settingKey: "preset_" + index + "_color"
-                    label: "Color"
+                    label: I18n.tr("Color")
                     defaultValue: index === 0 ? "#ef4444" : "#3b82f6"
                 }
 
                 SliderSetting {
                     settingKey: "preset_" + index + "_thickness"
-                    label: "Thickness"
+                    label: I18n.tr("Thickness")
                     defaultValue: 6
                     minimum: 1
                     maximum: 20
                 }
             }
         }
+    }
+
+    PluginAbout {
+        repoUrl: "https://github.com/hthienloc/dms-quick-capture"
     }
 }
