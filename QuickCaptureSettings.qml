@@ -1,30 +1,41 @@
+import "./dms-common"
 import QtQuick
 import qs.Common
-import qs.Widgets
 import qs.Modules.Plugins
-import "./dms-common"
+import qs.Widgets
 
 PluginSettings {
     id: root
+
     pluginId: "quickCapture"
 
     SettingsCard {
-        SectionTitle { text: I18n.tr("Screenshot Mode"); icon: "screenshot" }
+        SectionTitle {
+            text: I18n.tr("Screenshot Mode")
+            icon: "screenshot"
+        }
 
         SelectionSetting {
             settingKey: "captureMode"
             label: I18n.tr("Capture Mode")
             description: I18n.tr("Choose whether to capture a selected region or the full screen.")
-            options: [
-                { label: I18n.tr("Interactive Region (WIP)"), value: "region" },
-                { label: I18n.tr("Full Screen"), value: "full" }
-            ]
+            options: [{
+                "label": I18n.tr("Interactive Region"),
+                "value": "region"
+            }, {
+                "label": I18n.tr("Full Screen"),
+                "value": "full"
+            }]
             defaultValue: "full"
         }
+
     }
 
     SettingsCard {
-        SectionTitle { text: I18n.tr("File Export"); icon: "folder" }
+        SectionTitle {
+            text: I18n.tr("File Export")
+            icon: "folder"
+        }
 
         StringSetting {
             settingKey: "saveDirectory"
@@ -38,36 +49,68 @@ PluginSettings {
             settingKey: "doneAction"
             label: I18n.tr("Action when Enter")
             description: I18n.tr("Default action when pressing Enter to finish.")
-            options: [
-                { label: I18n.tr("Copy to Clipboard only"), value: "clipboard" },
-                { label: I18n.tr("Save to File only"), value: "file" },
-                { label: I18n.tr("Both Copy and Save"), value: "both" }
-            ]
+            options: [{
+                "label": I18n.tr("Copy to Clipboard only"),
+                "value": "clipboard"
+            }, {
+                "label": I18n.tr("Save to File only"),
+                "value": "file"
+            }, {
+                "label": I18n.tr("Both Copy and Save"),
+                "value": "both"
+            }]
             defaultValue: "both"
         }
+
     }
 
     SettingsCard {
-        SectionTitle { text: I18n.tr("Default Tools"); icon: "edit" }
+        SectionTitle {
+            text: I18n.tr("Default Tools")
+            icon: "edit"
+        }
 
         SelectionSetting {
             settingKey: "defaultTool"
             label: I18n.tr("Starting Tool")
             description: I18n.tr("Default tool selected when launching the annotation overlay.")
-            options: [
-                { label: I18n.tr("Freehand Pen"), value: "pen" },
-                { label: I18n.tr("Straight Line"), value: "line" },
-                { label: I18n.tr("Arrow Vector"), value: "arrow" },
-                { label: I18n.tr("Rectangle Outline"), value: "rect" },
-                { label: I18n.tr("Ellipse / Circle"), value: "ellipse" },
-                { label: I18n.tr("Text Note"), value: "text" },
-                { label: I18n.tr("Pixelate"), value: "pixelate" },
-                { label: I18n.tr("Redact / Blackout"), value: "redact" },
-                { label: I18n.tr("Number Stamp"), value: "stamp" },
-                { label: I18n.tr("Highlighter"), value: "highlighter" },
-                { label: I18n.tr("Eraser"), value: "eraser" },
-                { label: I18n.tr("Crop / Resize"), value: "crop" }
-            ]
+            options: [{
+                "label": I18n.tr("Freehand Pen"),
+                "value": "pen"
+            }, {
+                "label": I18n.tr("Straight Line"),
+                "value": "line"
+            }, {
+                "label": I18n.tr("Arrow Vector"),
+                "value": "arrow"
+            }, {
+                "label": I18n.tr("Rectangle Outline"),
+                "value": "rect"
+            }, {
+                "label": I18n.tr("Ellipse / Circle"),
+                "value": "ellipse"
+            }, {
+                "label": I18n.tr("Text Note"),
+                "value": "text"
+            }, {
+                "label": I18n.tr("Pixelate"),
+                "value": "pixelate"
+            }, {
+                "label": I18n.tr("Redact / Blackout"),
+                "value": "redact"
+            }, {
+                "label": I18n.tr("Number Stamp"),
+                "value": "stamp"
+            }, {
+                "label": I18n.tr("Highlighter"),
+                "value": "highlighter"
+            }, {
+                "label": I18n.tr("Eraser"),
+                "value": "eraser"
+            }, {
+                "label": I18n.tr("Crop / Resize"),
+                "value": "crop"
+            }]
             defaultValue: "pen"
         }
 
@@ -79,22 +122,26 @@ PluginSettings {
             minimum: 1
             maximum: 20
         }
+
     }
 
     SettingsCard {
-        SectionTitle { text: I18n.tr("Radial Menu Presets"); icon: "settings" }
-        
+        SectionTitle {
+            text: I18n.tr("Radial Menu Presets")
+            icon: "settings"
+        }
+
         InfoText {
             text: I18n.tr("Configure up to 8 quick-access tool presets. Right-click anywhere during capture to open the radial menu.")
         }
 
         Repeater {
             model: 8
-            
+
             Column {
                 width: parent.width
                 spacing: Theme.spacingS
-                
+
                 Rectangle {
                     width: parent.width
                     height: 1
@@ -113,21 +160,46 @@ PluginSettings {
                 SelectionSetting {
                     settingKey: "preset_" + index + "_tool"
                     label: I18n.tr("Tool")
-                    options: [
-                        { label: I18n.tr("None / Disabled"), value: "none" },
-                        { label: I18n.tr("Freehand Pen"), value: "pen" },
-                        { label: I18n.tr("Straight Line"), value: "line" },
-                        { label: I18n.tr("Arrow Vector"), value: "arrow" },
-                        { label: I18n.tr("Rectangle Outline"), value: "rect" },
-                        { label: I18n.tr("Ellipse / Circle"), value: "ellipse" },
-                        { label: I18n.tr("Text Note"), value: "text" },
-                        { label: I18n.tr("Pixelate"), value: "pixelate" },
-                        { label: I18n.tr("Redact / Blackout"), value: "redact" },
-                        { label: I18n.tr("Number Stamp"), value: "stamp" },
-                        { label: I18n.tr("Highlighter"), value: "highlighter" },
-                        { label: I18n.tr("Eraser"), value: "eraser" },
-                        { label: I18n.tr("Crop / Resize"), value: "crop" }
-                    ]
+                    options: [{
+                        "label": I18n.tr("None / Disabled"),
+                        "value": "none"
+                    }, {
+                        "label": I18n.tr("Freehand Pen"),
+                        "value": "pen"
+                    }, {
+                        "label": I18n.tr("Straight Line"),
+                        "value": "line"
+                    }, {
+                        "label": I18n.tr("Arrow Vector"),
+                        "value": "arrow"
+                    }, {
+                        "label": I18n.tr("Rectangle Outline"),
+                        "value": "rect"
+                    }, {
+                        "label": I18n.tr("Ellipse / Circle"),
+                        "value": "ellipse"
+                    }, {
+                        "label": I18n.tr("Text Note"),
+                        "value": "text"
+                    }, {
+                        "label": I18n.tr("Pixelate"),
+                        "value": "pixelate"
+                    }, {
+                        "label": I18n.tr("Redact / Blackout"),
+                        "value": "redact"
+                    }, {
+                        "label": I18n.tr("Number Stamp"),
+                        "value": "stamp"
+                    }, {
+                        "label": I18n.tr("Highlighter"),
+                        "value": "highlighter"
+                    }, {
+                        "label": I18n.tr("Eraser"),
+                        "value": "eraser"
+                    }, {
+                        "label": I18n.tr("Crop / Resize"),
+                        "value": "crop"
+                    }]
                     defaultValue: index === 0 ? "pen" : "none"
                 }
 
@@ -144,11 +216,15 @@ PluginSettings {
                     minimum: 1
                     maximum: 20
                 }
+
             }
+
         }
+
     }
 
     PluginAbout {
         repoUrl: "https://github.com/hthienloc/dms-quick-capture"
     }
+
 }

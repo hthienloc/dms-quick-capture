@@ -416,7 +416,12 @@ DankModal {
     }
 
     onOpened: {
-        window.currentTool = "crop";
+        const captureMode = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.captureMode || "full") : "full";
+        if (captureMode === "region") {
+            window.currentTool = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.defaultTool || "pen") : "pen";
+        } else {
+            window.currentTool = "crop";
+        }
         window.updateRadialPresets();
         // Read initial settings from pluginData if available
         if (window.parentWidget && window.parentWidget.pluginData) {
