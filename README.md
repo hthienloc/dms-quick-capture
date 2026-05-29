@@ -8,12 +8,12 @@ Interactive Wayland-centric screen capture and instant vector annotation plugin 
 
 Use the DMS CLI:
 ```bash
-dms plugins install quick-capture
+dms plugins install quickCapture
 ```
 
 Or manually:
 ```bash
-git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialShell/plugins/quick-capture
+git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialShell/plugins/quickCapture
 ```
 
 ## Features
