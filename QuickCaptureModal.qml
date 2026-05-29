@@ -895,7 +895,7 @@ DankModal {
                             id: drawMouseArea
                             anchors.fill: parent
                             hoverEnabled: true
-                            acceptedButtons: Qt.LeftButton | Qt.RightButton
+                            acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
 
                             function getAbsolutePoint(mx, my) {
                                 if (window.currentTool !== "crop" && window.hasSelection) {
@@ -1038,6 +1038,21 @@ DankModal {
                                 if (mouse.button === Qt.RightButton) {
                                     const mapped = drawMouseArea.mapToItem(radialMenu.parent, mouse.x, mouse.y);
                                     radialMenu.open(mapped.x, mapped.y);
+                                    return;
+                                }
+
+                                if (mouse.button === Qt.MiddleButton) {
+                                    const absPt = getAbsolutePoint(mouse.x, mouse.y);
+                                    const strokeIdx = window.findStrokeAt(absPt.x, absPt.y);
+                                    if (strokeIdx !== -1) {
+                                        const list = [...window.strokes];
+                                        const removed = list.splice(strokeIdx, 1)[0];
+                                        window.strokes = list;
+                                        if (removed && removed.tool === "stamp" && window.stampCounter > 1) {
+                                            window.stampCounter--;
+                                        }
+                                        drawingCanvas.requestPaint();
+                                    }
                                     return;
                                 }
 

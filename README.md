@@ -33,6 +33,7 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
    - **Radial Menu:** **Right-click** to open your custom presets circle.
    - **Thickness:** Use the **Mouse Wheel** to dynamically scale the brush size.
    - **Colors:** Click a color in the toolbar or use **Ctrl + 1-4/Q-R**.
+   - **Quick Erase:** **Middle-click** directly on any drawn element/stroke to instantly erase it.
 4. **Finish:** Press **Enter** to perform your default action (Save, Copy, or Both) or **Esc** to discard.
 
 ## Keyboard Shortcuts
