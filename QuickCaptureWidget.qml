@@ -12,7 +12,7 @@ PluginComponent {
 
     readonly property bool isDaemonInstance: root.parent !== null
     property bool isCapturing: false
-    readonly property string captureMode: (pluginData.captureMode || "full")
+    readonly property string captureMode: (pluginData.captureMode || "region")
 
     function triggerCapture() {
         if (root.isDaemonInstance) {

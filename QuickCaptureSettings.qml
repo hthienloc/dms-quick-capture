@@ -26,7 +26,7 @@ PluginSettings {
                 "label": I18n.tr("Full Screen"),
                 "value": "full"
             }]
-            defaultValue: "full"
+            defaultValue: "region"
         }
 
     }

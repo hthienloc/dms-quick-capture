@@ -416,7 +416,7 @@ DankModal {
     }
 
     onOpened: {
-        const captureMode = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.captureMode || "full") : "full";
+        const captureMode = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.captureMode || "region") : "region";
         if (captureMode === "region") {
             window.currentTool = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.defaultTool || "pen") : "pen";
         } else {
