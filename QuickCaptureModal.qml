@@ -993,7 +993,7 @@ DankModal {
                                                  const snappedAngle = Math.round(angle / (Math.PI / 4)) * (Math.PI / 4);
                                                  finalPt = Qt.point(p0.x + L * Math.cos(snappedAngle), p0.y + L * Math.sin(snappedAngle));
                                              }
-                                         } else if ((mouse.modifiers & Qt.ShiftModifier) && window.currentTool === "ellipse") {
+                                         } else if ((mouse.modifiers & Qt.ShiftModifier) && (window.currentTool === "ellipse" || window.currentTool === "rect" || window.currentTool === "redact" || window.currentTool === "pixelate")) {
                                              finalPt = window.constrainSquarePoint(window.currentStroke.points[0], absPt);
                                          }
 
