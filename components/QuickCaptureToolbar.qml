@@ -147,7 +147,8 @@ Rectangle {
             Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
 
             Grid {
-                columns: 2; spacing: Theme.spacingXS
+                columns: 1; spacing: Theme.spacingXS
+                anchors.horizontalCenter: parent.horizontalCenter
                 Repeater {
                     model: config.toolButtons
                     delegate: DankActionButton {
@@ -162,11 +163,12 @@ Rectangle {
             Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
 
             Grid {
-                columns: 3; spacing: 4
+                columns: 2; spacing: 6
+                anchors.horizontalCenter: parent.horizontalCenter
                 Repeater {
                     model: [Theme.primary].concat(config.accentColors)
                     delegate: Rectangle {
-                        width: 16; height: 16; radius: 8; color: modelData
+                        width: 18; height: 18; radius: 9; color: modelData
                         border.color: Qt.colorEqual(root.currentColor, modelData) ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
                         border.width: 1
                         MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.colorSelected(modelData) }
