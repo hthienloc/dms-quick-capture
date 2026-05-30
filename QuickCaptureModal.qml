@@ -378,7 +378,12 @@ DankModal {
             event.accepted = true;
             return;
         }
-        if ((hasCtrl && token === "C") || event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+        if (hasCtrl && token === "C") {
+            captureActions.performCopyOnly();
+            event.accepted = true;
+            return;
+        }
+        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
             captureActions.performDoneAction();
             event.accepted = true;
             return;
