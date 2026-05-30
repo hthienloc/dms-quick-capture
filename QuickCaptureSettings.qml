@@ -127,6 +127,27 @@ PluginSettings {
 
     SettingsCard {
         SectionTitle {
+            text: I18n.tr("Drawing Styles")
+            icon: "palette"
+        }
+
+        ToggleSetting {
+            settingKey: "roundRect"
+            label: I18n.tr("Round Rectangle Corners")
+            description: I18n.tr("Use rounded corners for the rectangle and redact tools.")
+            defaultValue: true
+        }
+
+        ToggleSetting {
+            settingKey: "roundHighlighter"
+            label: I18n.tr("Round Highlighter Tips")
+            description: I18n.tr("Use rounded tips and joints for the highlighter tool.")
+            defaultValue: false
+        }
+    }
+
+    SettingsCard {
+        SectionTitle {
             text: I18n.tr("Radial Menu Presets")
             icon: "settings"
         }

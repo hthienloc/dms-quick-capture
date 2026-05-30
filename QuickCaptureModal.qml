@@ -148,6 +148,9 @@ DankModal {
     // Crop Selection State
     property rect cropRect: Qt.rect(0, 0, 0, 0)
     property bool hasSelection: false
+
+    readonly property bool roundRect: parentWidget?.pluginData?.roundRect ?? true
+    readonly property bool roundHighlighter: parentWidget?.pluginData?.roundHighlighter ?? false
     property string activeHandle: "none" // "tl", "tr", "bl", "br", "new", "none"
     property point selectStart: Qt.point(0, 0)
     property var exportCallback: null
@@ -701,8 +704,8 @@ DankModal {
                             } else if (stroke.tool === "highlighter") {
                                 ctx.strokeStyle = Qt.rgba(rgb.r, rgb.g, rgb.b, 0.4);
                                 ctx.lineWidth = stroke.width * 4;
-                                ctx.lineCap = "round";
-                                ctx.lineJoin = "round";
+                                ctx.lineCap = window.roundHighlighter ? "round" : "square";
+                                ctx.lineJoin = window.roundHighlighter ? "round" : "miter";
                                 ctx.beginPath();
                                 ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
                                 for (var i = 1; i < stroke.points.length; i++) {
@@ -722,7 +725,7 @@ DankModal {
                                 const rw = Math.abs(p1.x - p0.x);
                                 const rh = Math.abs(p1.y - p0.y);
                                 // Adjust radius to be larger than half the stroke width to prevent sharp inner corners
-                                const baseRadius = Theme.cornerRadius + (stroke.width / 2);
+                                const baseRadius = window.roundRect ? (Theme.cornerRadius + (stroke.width / 2)) : 0;
                                 const radius = Math.min(baseRadius, Math.min(rw, rh) / 2);
 
                                 ctx.beginPath();
@@ -804,7 +807,7 @@ DankModal {
                                 const ry = Math.min(p0.y, p1.y);
                                 const rw = Math.abs(p1.x - p0.x);
                                 const rh = Math.abs(p1.y - p0.y);
-                                const radius = Math.min(Theme.cornerRadius, Math.min(rw, rh) / 2);
+                                const radius = window.roundRect ? Math.min(Theme.cornerRadius, Math.min(rw, rh) / 2) : 0;
 
                                 ctx.fillStyle = stroke.color;
                                 ctx.beginPath();
