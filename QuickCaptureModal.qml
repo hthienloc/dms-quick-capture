@@ -87,7 +87,7 @@ DankModal {
     backgroundOpacity: (parentWidget?.pluginData?.modalOpacity ?? 60) / 100
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
 
-    readonly property int textFontSize: parentWidget?.pluginData?.textFontSize ?? 24
+    property int textFontSize: parentWidget?.pluginData?.textFontSize ?? 24
     readonly property bool textMonospace: parentWidget?.pluginData?.textMonospace ?? false
     readonly property string toolbarPosition: parentWidget?.pluginData?.toolbarPosition ?? "top"
 
@@ -672,7 +672,8 @@ DankModal {
                             // 4. Draw temporary live typing text
                             if (window.isTyping) {
                                 ctx.fillStyle = window.currentColor;
-                                ctx.font = Math.round(window.strokeWidth * 3.5) + "px sans-serif";
+                                const fontName = window.textMonospace ? "monospace" : "sans-serif";
+                                ctx.font = Math.round(window.textFontSize) + "px " + fontName;
                                 ctx.textAlign = "left";
                                 ctx.textBaseline = "top";
                                 ctx.fillText(window.currentTypingText + "|", window.typingCoords.x, window.typingCoords.y);
@@ -1201,7 +1202,11 @@ DankModal {
 
                             onWheel: (wheel) => {
                                 const step = wheel.angleDelta.y > 0 ? 1 : -1;
-                                window.strokeWidth = Math.max(1, Math.min(50, window.strokeWidth + step));
+                                if (window.currentTool === "text") {
+                                    window.textFontSize = Math.max(8, Math.min(100, window.textFontSize + (step * 2)));
+                                } else {
+                                    window.strokeWidth = Math.max(1, Math.min(50, window.strokeWidth + step));
+                                }
                                 window.previewX = wheel.x;
                                 window.previewY = wheel.y;
                                 window.showSizePreview = true;
@@ -1216,16 +1221,27 @@ DankModal {
                             x: window.previewX - (width / 2)
                             y: window.previewY - (height / 2)
                             width: {
+                                if (window.currentTool === "text") return window.textFontSize;
                                 if (window.currentTool === "highlighter") return window.strokeWidth * 4;
                                 if (window.currentTool === "stamp") return window.strokeWidth * 10;
                                 return window.strokeWidth;
                             }
                             height: width
-                            radius: (window.currentTool === "highlighter" || window.currentTool === "pixelate") ? 0 : width / 2
+                            radius: (window.currentTool === "highlighter" || window.currentTool === "pixelate" || window.currentTool === "text") ? 0 : width / 2
                             color: "transparent"
                             border.color: Theme.primary
                             border.width: 1.5
                             z: 20
+
+                            StyledText {
+                                anchors.top: parent.bottom
+                                anchors.topMargin: 4
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: (window.currentTool === "text" ? window.textFontSize : window.strokeWidth) + "px"
+                                color: Theme.primary
+                                font.pixelSize: 10
+                                font.bold: true
+                            }
                         }
                     }
 
