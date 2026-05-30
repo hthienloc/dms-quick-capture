@@ -72,22 +72,6 @@ binds {
 ## Requirements
 
 - DankMaterialShell >= 1.5
-- `wl-clipboard` (required for copying captures to system clipboard)
-
-## Project Structure
-
-```text
-dms-quick-capture/
-  plugin.json
-  QuickCaptureWidget.qml       # DMS entrypoint, IPC, capture lifecycle
-  QuickCaptureModal.qml        # Annotation modal and canvas coordination
-  QuickCaptureSettings.qml     # Settings UI
-  components/
-    QuickCaptureActions.qml    # Export, copy, and save actions
-    QuickCaptureToolbar.qml    # Annotation toolbar UI
-  lib/
-    QuickCaptureConfig.qml     # Tool, color, and shortcut config
-```
 
 ## TODO / Roadmap
 

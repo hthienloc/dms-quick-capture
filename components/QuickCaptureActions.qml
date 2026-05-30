@@ -61,8 +61,16 @@ QtObject {
     }
 
     function copyFileToClipboard(tempOut, callback) {
-        const copyCmd = "wl-copy < " + shellPathExpression(tempOut);
-        Proc.runCommand("copy-capture-clipboard", ["sh", "-c", copyCmd], callback, 0, 5000);
+        // Use native DMS clipboard service to copy the image file.
+        // This removes the dependency on wl-clipboard and ensures it appears in DMS history.
+        DMSService.sendRequest("clipboard.copyFile", { "filePath": tempOut }, function(response) {
+            if (response.error) {
+                console.error("DMS native copy failed:", response.error);
+                callback(response.error, 1);
+            } else {
+                callback("", 0);
+            }
+        });
     }
 
     function saveFile(tempOut, callback) {
@@ -97,7 +105,7 @@ QtObject {
                     notifyInfo("Screenshot copied to clipboard.");
                     root.closeRequested();
                 } else {
-                    notifyError("Failed to copy screenshot to clipboard. Install 'wl-clipboard'.");
+                    notifyError("Failed to copy screenshot to clipboard.");
                     root.closeRequested();
                 }
             });
@@ -117,7 +125,7 @@ QtObject {
                         root.closeRequested();
                     });
                 } else {
-                    notifyError("Failed to copy screenshot to clipboard. Install 'wl-clipboard'.");
+                    notifyError("Failed to copy screenshot to clipboard.");
                     root.closeRequested();
                 }
             });
