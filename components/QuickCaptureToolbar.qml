@@ -31,35 +31,26 @@ Rectangle {
     border.color: Theme.withAlpha(Theme.outline, 0.15)
     border.width: 1
 
-    // Main Layout (Vertical or Horizontal)
-    Column {
-        id: contentLayout
-        anchors.centerIn: parent
-        spacing: Theme.spacingL
-        rotation: root.isVertical ? 0 : -90 // We rotate the whole thing? No, better use Column vs Row
-
-        visible: false // Helper for measuring
-    }
-    
-    // We use a simple conditional wrapper
     Item {
-        anchors.fill: parent
-        
+        id: contentLayout
+        width: isVertical ? verticalItems.width : horizontalItems.width
+        height: isVertical ? verticalItems.height : horizontalItems.height
+        anchors.centerIn: parent
+
         Loader {
             anchors.centerIn: parent
-            sourceComponent: root.isVertical ? verticalItems : horizontalItems
+            sourceComponent: root.isVertical ? verticalLayout : horizontalLayout
         }
     }
 
     Component {
-        id: horizontalItems
+        id: horizontalLayout
         Row {
+            id: horizontalItems
             spacing: Theme.spacingL
             
-            // Left Group
             Row {
-                spacing: Theme.spacingM
-                anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.spacingM; anchors.verticalCenter: parent.verticalCenter
                 DankActionButton {
                     iconName: "near_me"; buttonSize: 36; iconSize: 18; tooltipText: "Select (V)"
                     backgroundColor: root.currentTool === "select" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
@@ -76,14 +67,12 @@ Rectangle {
 
             Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
-            // Tools
             Row {
-                spacing: Theme.spacingXS
-                anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.spacingXS; anchors.verticalCenter: parent.verticalCenter
                 Repeater {
                     model: config.toolButtons
                     delegate: DankActionButton {
-                        iconName: modelData.icon; buttonSize: 32; iconSize: 16; tooltipText: modelData.tooltip
+                        iconName: modelData.icon; buttonSize: 36; iconSize: 18; tooltipText: modelData.tooltip
                         backgroundColor: root.currentTool === modelData.id ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                         iconColor: root.currentTool === modelData.id ? Theme.primary : Theme.surfaceText
                         onClicked: root.toolSelected(modelData.id)
@@ -93,10 +82,8 @@ Rectangle {
 
             Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
-            // Colors
             Row {
-                spacing: Theme.spacingXS
-                anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.spacingS; anchors.verticalCenter: parent.verticalCenter
                 Repeater {
                     model: [Theme.primary].concat(config.accentColors)
                     delegate: Rectangle {
@@ -110,26 +97,47 @@ Rectangle {
 
             Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
-            // Actions
             Row {
-                spacing: Theme.spacingXS
-                anchors.verticalCenter: parent.verticalCenter
-                DankActionButton { iconName: "undo"; buttonSize: 32; enabled: root.canUndo; onClicked: root.undoRequested() }
-                DankActionButton { iconName: "save"; buttonSize: 32; onClicked: root.saveRequested() }
-                DankActionButton { iconName: "content_copy"; buttonSize: 32; onClicked: root.copyRequested() }
-                DankActionButton { iconName: "close"; buttonSize: 32; iconColor: Theme.error; onClicked: root.closeRequested() }
+                spacing: Theme.spacingS; anchors.verticalCenter: parent.verticalCenter
+                Text {
+                    text: root.strokeWidth + "px"; width: 32; horizontalAlignment: Text.AlignRight
+                    color: Theme.surfaceText; font.pixelSize: 11; font.bold: true; anchors.verticalCenter: parent.verticalCenter
+                }
+                Slider {
+                    id: hSlider; from: 1; to: 50; value: root.strokeWidth; width: 80; anchors.verticalCenter: parent.verticalCenter
+                    onMoved: root.strokeWidthSelected(Math.round(value))
+                    background: Rectangle {
+                        implicitWidth: 80; implicitHeight: 4; radius: 2; color: Theme.withAlpha(Theme.outline, 0.3)
+                        Rectangle { width: hSlider.visualPosition * parent.width; height: parent.height; color: Theme.primary; radius: 2 }
+                    }
+                    handle: Rectangle {
+                        implicitWidth: 12; implicitHeight: 12; radius: 6; color: Theme.primary; border.color: Theme.surface; border.width: 1
+                        x: hSlider.visualPosition * (hSlider.availableWidth - width)
+                    }
+                }
+            }
+
+            Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
+
+            Row {
+                spacing: Theme.spacingXS; anchors.verticalCenter: parent.verticalCenter
+                DankActionButton { iconName: "undo"; buttonSize: 36; iconSize: 18; enabled: root.canUndo; onClicked: root.undoRequested() }
+                DankActionButton { iconName: "save"; buttonSize: 36; iconSize: 18; onClicked: root.saveRequested() }
+                DankActionButton { iconName: "content_copy"; buttonSize: 36; iconSize: 18; onClicked: root.copyRequested() }
+                DankActionButton { iconName: "done_all"; buttonSize: 36; iconSize: 18; backgroundColor: Theme.withAlpha(Theme.primary, 0.1); iconColor: Theme.primary; onClicked: root.copyAndSaveRequested() }
+                DankActionButton { iconName: "close"; buttonSize: 36; iconSize: 18; iconColor: Theme.error; onClicked: root.closeRequested() }
             }
         }
     }
 
     Component {
-        id: verticalItems
+        id: verticalLayout
         Column {
+            id: verticalItems
             spacing: Theme.spacingL
             
             Column {
-                spacing: Theme.spacingM
-                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: Theme.spacingM; anchors.horizontalCenter: parent.horizontalCenter
                 DankActionButton {
                     iconName: "near_me"; buttonSize: 36; iconSize: 18
                     backgroundColor: root.currentTool === "select" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
@@ -147,8 +155,7 @@ Rectangle {
             Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
 
             Grid {
-                columns: 1; spacing: Theme.spacingXS
-                anchors.horizontalCenter: parent.horizontalCenter
+                columns: 1; spacing: Theme.spacingXS; anchors.horizontalCenter: parent.horizontalCenter
                 Repeater {
                     model: config.toolButtons
                     delegate: DankActionButton {
@@ -163,8 +170,7 @@ Rectangle {
             Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
 
             Grid {
-                columns: 2; spacing: 6
-                anchors.horizontalCenter: parent.horizontalCenter
+                columns: 2; spacing: 6; anchors.horizontalCenter: parent.horizontalCenter
                 Repeater {
                     model: [Theme.primary].concat(config.accentColors)
                     delegate: Rectangle {
@@ -176,9 +182,32 @@ Rectangle {
                 }
             }
 
+            Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
+
             Column {
-                spacing: Theme.spacingXS
-                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: Theme.spacingS; anchors.horizontalCenter: parent.horizontalCenter
+                Text {
+                    text: root.strokeWidth + "px"; color: Theme.surfaceText; font.pixelSize: 10; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter
+                }
+                Slider {
+                    id: vSlider; from: 1; to: 50; value: root.strokeWidth; width: 44; height: 80; orientation: Qt.Vertical
+                    onMoved: root.strokeWidthSelected(Math.round(value))
+                    background: Rectangle {
+                        implicitWidth: 4; implicitHeight: 80; radius: 2; color: Theme.withAlpha(Theme.outline, 0.3); anchors.horizontalCenter: parent.horizontalCenter
+                        Rectangle { width: parent.width; height: vSlider.visualPosition * parent.height; color: Theme.primary; radius: 2; anchors.bottom: parent.bottom }
+                    }
+                    handle: Rectangle {
+                        implicitWidth: 12; implicitHeight: 12; radius: 6; color: Theme.primary; border.color: Theme.surface; border.width: 1
+                        y: vSlider.visualPosition * (vSlider.availableHeight - height)
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+            }
+
+            Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
+
+            Column {
+                spacing: Theme.spacingXS; anchors.horizontalCenter: parent.horizontalCenter
                 DankActionButton { iconName: "undo"; buttonSize: 36; iconSize: 18; enabled: root.canUndo; onClicked: root.undoRequested() }
                 DankActionButton { iconName: "save"; buttonSize: 36; iconSize: 18; onClicked: root.saveRequested() }
                 DankActionButton { iconName: "content_copy"; buttonSize: 36; iconSize: 18; onClicked: root.copyRequested() }
