@@ -121,10 +121,40 @@ Rectangle {
 
             Row {
                 spacing: Theme.spacingXS; anchors.verticalCenter: parent.verticalCenter
+                
                 DankActionButton { iconName: "undo"; buttonSize: 36; iconSize: 18; enabled: root.canUndo; onClicked: root.undoRequested() }
-                DankActionButton { iconName: "save"; buttonSize: 36; iconSize: 18; onClicked: root.saveRequested() }
-                DankActionButton { iconName: "content_copy"; buttonSize: 36; iconSize: 18; onClicked: root.copyRequested() }
-                DankActionButton { iconName: "done_all"; buttonSize: 36; iconSize: 18; backgroundColor: Theme.withAlpha(Theme.primary, 0.1); iconColor: Theme.primary; onClicked: root.copyAndSaveRequested() }
+                
+                Item {
+                    id: hActionCombo
+                    width: expanded ? (36 * 3 + 8) : 36
+                    height: 36
+                    anchors.verticalCenter: parent.verticalCenter
+                    readonly property bool expanded: hComboMouseArea.containsMouse
+                    Behavior on width { NumberAnimation { duration: 200; easing.type: Easing.OutQuad } }
+                    
+                    Row {
+                        anchors.right: parent.right; spacing: 4
+                        DankActionButton {
+                            iconName: "save"; buttonSize: 36; iconSize: 18; tooltipText: "Save to File (Ctrl+S)"
+                            visible: hActionCombo.expanded; opacity: hActionCombo.expanded ? 1 : 0
+                            Behavior on opacity { NumberAnimation { duration: 150 } }
+                            onClicked: root.saveRequested()
+                        }
+                        DankActionButton {
+                            iconName: "content_copy"; buttonSize: 36; iconSize: 18; tooltipText: "Copy to Clipboard (Ctrl+C)"
+                            visible: hActionCombo.expanded; opacity: hActionCombo.expanded ? 1 : 0
+                            Behavior on opacity { NumberAnimation { duration: 150 } }
+                            onClicked: root.copyRequested()
+                        }
+                        DankActionButton {
+                            iconName: "done_all"; buttonSize: 36; iconSize: 18; tooltipText: "Copy & Save (Enter)"
+                            backgroundColor: Theme.withAlpha(Theme.primary, 0.15); iconColor: Theme.primary
+                            onClicked: root.copyAndSaveRequested()
+                        }
+                    }
+                    MouseArea { id: hComboMouseArea; anchors.fill: parent; hoverEnabled: true; propagateComposedEvents: true; onClicked: m => m.accepted = false }
+                }
+
                 DankActionButton { iconName: "close"; buttonSize: 36; iconSize: 18; iconColor: Theme.error; onClicked: root.closeRequested() }
             }
         }
@@ -209,8 +239,38 @@ Rectangle {
             Column {
                 spacing: Theme.spacingXS; anchors.horizontalCenter: parent.horizontalCenter
                 DankActionButton { iconName: "undo"; buttonSize: 36; iconSize: 18; enabled: root.canUndo; onClicked: root.undoRequested() }
-                DankActionButton { iconName: "save"; buttonSize: 36; iconSize: 18; onClicked: root.saveRequested() }
-                DankActionButton { iconName: "content_copy"; buttonSize: 36; iconSize: 18; onClicked: root.copyRequested() }
+                
+                Item {
+                    id: vActionCombo
+                    width: 36
+                    height: expanded ? (36 * 3 + 8) : 36
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    readonly property bool expanded: vComboMouseArea.containsMouse
+                    Behavior on height { NumberAnimation { duration: 200; easing.type: Easing.OutQuad } }
+                    
+                    Column {
+                        anchors.bottom: parent.bottom; spacing: 4
+                        DankActionButton {
+                            iconName: "save"; buttonSize: 36; iconSize: 18; tooltipText: "Save to File (Ctrl+S)"
+                            visible: vActionCombo.expanded; opacity: vActionCombo.expanded ? 1 : 0
+                            Behavior on opacity { NumberAnimation { duration: 150 } }
+                            onClicked: root.saveRequested()
+                        }
+                        DankActionButton {
+                            iconName: "content_copy"; buttonSize: 36; iconSize: 18; tooltipText: "Copy to Clipboard (Ctrl+C)"
+                            visible: vActionCombo.expanded; opacity: vActionCombo.expanded ? 1 : 0
+                            Behavior on opacity { NumberAnimation { duration: 150 } }
+                            onClicked: root.copyRequested()
+                        }
+                        DankActionButton {
+                            iconName: "done_all"; buttonSize: 36; iconSize: 18; tooltipText: "Copy & Save (Enter)"
+                            backgroundColor: Theme.withAlpha(Theme.primary, 0.15); iconColor: Theme.primary
+                            onClicked: root.copyAndSaveRequested()
+                        }
+                    }
+                    MouseArea { id: vComboMouseArea; anchors.fill: parent; hoverEnabled: true; propagateComposedEvents: true; onClicked: m => m.accepted = false }
+                }
+
                 DankActionButton { iconName: "close"; buttonSize: 36; iconSize: 18; iconColor: Theme.error; onClicked: root.closeRequested() }
             }
         }
