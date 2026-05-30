@@ -11,7 +11,7 @@ PluginSettings {
 
     SettingsCard {
         SectionTitle {
-            text: I18n.tr("Workflow & Capture")
+            text: I18n.tr("Capture")
             icon: "screenshot"
         }
 
@@ -57,7 +57,7 @@ PluginSettings {
 
     SettingsCard {
         SectionTitle {
-            text: I18n.tr("Interface & Layout")
+            text: I18n.tr("Interface")
             icon: "visibility"
         }
 
@@ -87,7 +87,7 @@ PluginSettings {
 
     SettingsCard {
         SectionTitle {
-            text: I18n.tr("Tool Defaults & Styles")
+            text: I18n.tr("Tools")
             icon: "edit"
         }
 
@@ -177,7 +177,7 @@ PluginSettings {
 
     SettingsCard {
         SectionTitle {
-            text: I18n.tr("Radial Menu Presets")
+            text: I18n.tr("Radial Menu")
             icon: "settings"
         }
 
