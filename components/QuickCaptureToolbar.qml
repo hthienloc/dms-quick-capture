@@ -152,7 +152,7 @@ Rectangle {
                 Repeater {
                     model: config.toolButtons
                     delegate: DankActionButton {
-                        iconName: modelData.icon; buttonSize: 28; iconSize: 14
+                        iconName: modelData.icon; buttonSize: 36; iconSize: 18
                         backgroundColor: root.currentTool === modelData.id ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                         iconColor: root.currentTool === modelData.id ? Theme.primary : Theme.surfaceText
                         onClicked: root.toolSelected(modelData.id)
@@ -179,10 +179,10 @@ Rectangle {
             Column {
                 spacing: Theme.spacingXS
                 anchors.horizontalCenter: parent.horizontalCenter
-                DankActionButton { iconName: "undo"; buttonSize: 32; enabled: root.canUndo; onClicked: root.undoRequested() }
-                DankActionButton { iconName: "save"; buttonSize: 32; onClicked: root.saveRequested() }
-                DankActionButton { iconName: "content_copy"; buttonSize: 32; onClicked: root.copyRequested() }
-                DankActionButton { iconName: "close"; buttonSize: 32; iconColor: Theme.error; onClicked: root.closeRequested() }
+                DankActionButton { iconName: "undo"; buttonSize: 36; iconSize: 18; enabled: root.canUndo; onClicked: root.undoRequested() }
+                DankActionButton { iconName: "save"; buttonSize: 36; iconSize: 18; onClicked: root.saveRequested() }
+                DankActionButton { iconName: "content_copy"; buttonSize: 36; iconSize: 18; onClicked: root.copyRequested() }
+                DankActionButton { iconName: "close"; buttonSize: 36; iconSize: 18; iconColor: Theme.error; onClicked: root.closeRequested() }
             }
         }
     }
