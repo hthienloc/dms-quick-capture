@@ -3,6 +3,7 @@ import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import qs.Common
+import qs.Widgets
 import qs.Modals.Common
 import "./dms-common"
 import "components"
