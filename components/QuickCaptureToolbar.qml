@@ -49,6 +49,7 @@ Rectangle {
             id: horizontalItems
             spacing: Theme.spacingL
             
+            // Left Group
             Row {
                 spacing: Theme.spacingM; anchors.verticalCenter: parent.verticalCenter
                 DankActionButton {
@@ -67,6 +68,7 @@ Rectangle {
 
             Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
+            // Tools
             Row {
                 spacing: Theme.spacingXS; anchors.verticalCenter: parent.verticalCenter
                 Repeater {
@@ -82,6 +84,7 @@ Rectangle {
 
             Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
+            // Colors
             Row {
                 spacing: Theme.spacingS; anchors.verticalCenter: parent.verticalCenter
                 Repeater {
@@ -97,64 +100,21 @@ Rectangle {
 
             Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
-            Row {
-                spacing: Theme.spacingS; anchors.verticalCenter: parent.verticalCenter
-                Text {
-                    text: root.strokeWidth + "px"; width: 32; horizontalAlignment: Text.AlignRight
-                    color: Theme.surfaceText; font.pixelSize: 11; font.bold: true; anchors.verticalCenter: parent.verticalCenter
-                }
-                Slider {
-                    id: hSlider; from: 1; to: 50; value: root.strokeWidth; width: 80; anchors.verticalCenter: parent.verticalCenter
-                    onMoved: root.strokeWidthSelected(Math.round(value))
-                    background: Rectangle {
-                        implicitWidth: 80; implicitHeight: 4; radius: 2; color: Theme.withAlpha(Theme.outline, 0.3)
-                        Rectangle { width: hSlider.visualPosition * parent.width; height: parent.height; color: Theme.primary; radius: 2 }
-                    }
-                    handle: Rectangle {
-                        implicitWidth: 12; implicitHeight: 12; radius: 6; color: Theme.primary; border.color: Theme.surface; border.width: 1
-                        x: hSlider.visualPosition * (hSlider.availableWidth - width)
-                    }
-                }
+            // Thickness Text Only
+            Text {
+                text: root.strokeWidth + "px"; width: 32; horizontalAlignment: Text.AlignRight
+                color: Theme.surfaceText; font.pixelSize: 11; font.bold: true; anchors.verticalCenter: parent.verticalCenter
             }
 
             Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
+            // Actions
             Row {
                 spacing: Theme.spacingXS; anchors.verticalCenter: parent.verticalCenter
-                
                 DankActionButton { iconName: "undo"; buttonSize: 36; iconSize: 18; enabled: root.canUndo; onClicked: root.undoRequested() }
-                
-                Item {
-                    id: hActionCombo
-                    width: expanded ? (36 * 3 + 8) : 36
-                    height: 36
-                    anchors.verticalCenter: parent.verticalCenter
-                    readonly property bool expanded: hComboMouseArea.containsMouse
-                    Behavior on width { NumberAnimation { duration: 200; easing.type: Easing.OutQuad } }
-                    
-                    Row {
-                        anchors.right: parent.right; spacing: 4
-                        DankActionButton {
-                            iconName: "save"; buttonSize: 36; iconSize: 18; tooltipText: "Save to File (Ctrl+S)"
-                            visible: hActionCombo.expanded; opacity: hActionCombo.expanded ? 1 : 0
-                            Behavior on opacity { NumberAnimation { duration: 150 } }
-                            onClicked: root.saveRequested()
-                        }
-                        DankActionButton {
-                            iconName: "content_copy"; buttonSize: 36; iconSize: 18; tooltipText: "Copy to Clipboard (Ctrl+C)"
-                            visible: hActionCombo.expanded; opacity: hActionCombo.expanded ? 1 : 0
-                            Behavior on opacity { NumberAnimation { duration: 150 } }
-                            onClicked: root.copyRequested()
-                        }
-                        DankActionButton {
-                            iconName: "done_all"; buttonSize: 36; iconSize: 18; tooltipText: "Copy & Save (Enter)"
-                            backgroundColor: Theme.withAlpha(Theme.primary, 0.15); iconColor: Theme.primary
-                            onClicked: root.copyAndSaveRequested()
-                        }
-                    }
-                    MouseArea { id: hComboMouseArea; anchors.fill: parent; hoverEnabled: true; propagateComposedEvents: true; onClicked: m => m.accepted = false }
-                }
-
+                DankActionButton { iconName: "save"; buttonSize: 36; iconSize: 18; tooltipText: "Save to File (Ctrl+S)"; onClicked: root.saveRequested() }
+                DankActionButton { iconName: "content_copy"; buttonSize: 36; iconSize: 18; tooltipText: "Copy to Clipboard (Ctrl+C)"; onClicked: root.copyRequested() }
+                DankActionButton { iconName: "done_all"; buttonSize: 36; iconSize: 18; tooltipText: "Copy & Save (Enter)"; backgroundColor: Theme.withAlpha(Theme.primary, 0.1); iconColor: Theme.primary; onClicked: root.copyAndSaveRequested() }
                 DankActionButton { iconName: "close"; buttonSize: 36; iconSize: 18; iconColor: Theme.error; onClicked: root.closeRequested() }
             }
         }
@@ -214,24 +174,9 @@ Rectangle {
 
             Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
 
-            Column {
-                spacing: Theme.spacingS; anchors.horizontalCenter: parent.horizontalCenter
-                Text {
-                    text: root.strokeWidth + "px"; color: Theme.surfaceText; font.pixelSize: 10; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter
-                }
-                Slider {
-                    id: vSlider; from: 1; to: 50; value: root.strokeWidth; width: 44; height: 80; orientation: Qt.Vertical
-                    onMoved: root.strokeWidthSelected(Math.round(value))
-                    background: Rectangle {
-                        implicitWidth: 4; implicitHeight: 80; radius: 2; color: Theme.withAlpha(Theme.outline, 0.3); anchors.horizontalCenter: parent.horizontalCenter
-                        Rectangle { width: parent.width; height: vSlider.visualPosition * parent.height; color: Theme.primary; radius: 2; anchors.bottom: parent.bottom }
-                    }
-                    handle: Rectangle {
-                        implicitWidth: 12; implicitHeight: 12; radius: 6; color: Theme.primary; border.color: Theme.surface; border.width: 1
-                        y: vSlider.visualPosition * (vSlider.availableHeight - height)
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-                }
+            // Thickness Text Only
+            Text {
+                text: root.strokeWidth + "px"; color: Theme.surfaceText; font.pixelSize: 10; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter
             }
 
             Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
@@ -239,38 +184,9 @@ Rectangle {
             Column {
                 spacing: Theme.spacingXS; anchors.horizontalCenter: parent.horizontalCenter
                 DankActionButton { iconName: "undo"; buttonSize: 36; iconSize: 18; enabled: root.canUndo; onClicked: root.undoRequested() }
-                
-                Item {
-                    id: vActionCombo
-                    width: 36
-                    height: expanded ? (36 * 3 + 8) : 36
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    readonly property bool expanded: vComboMouseArea.containsMouse
-                    Behavior on height { NumberAnimation { duration: 200; easing.type: Easing.OutQuad } }
-                    
-                    Column {
-                        anchors.bottom: parent.bottom; spacing: 4
-                        DankActionButton {
-                            iconName: "save"; buttonSize: 36; iconSize: 18; tooltipText: "Save to File (Ctrl+S)"
-                            visible: vActionCombo.expanded; opacity: vActionCombo.expanded ? 1 : 0
-                            Behavior on opacity { NumberAnimation { duration: 150 } }
-                            onClicked: root.saveRequested()
-                        }
-                        DankActionButton {
-                            iconName: "content_copy"; buttonSize: 36; iconSize: 18; tooltipText: "Copy to Clipboard (Ctrl+C)"
-                            visible: vActionCombo.expanded; opacity: vActionCombo.expanded ? 1 : 0
-                            Behavior on opacity { NumberAnimation { duration: 150 } }
-                            onClicked: root.copyRequested()
-                        }
-                        DankActionButton {
-                            iconName: "done_all"; buttonSize: 36; iconSize: 18; tooltipText: "Copy & Save (Enter)"
-                            backgroundColor: Theme.withAlpha(Theme.primary, 0.15); iconColor: Theme.primary
-                            onClicked: root.copyAndSaveRequested()
-                        }
-                    }
-                    MouseArea { id: vComboMouseArea; anchors.fill: parent; hoverEnabled: true; propagateComposedEvents: true; onClicked: m => m.accepted = false }
-                }
-
+                DankActionButton { iconName: "save"; buttonSize: 36; iconSize: 18; onClicked: root.saveRequested() }
+                DankActionButton { iconName: "content_copy"; buttonSize: 36; iconSize: 18; onClicked: root.copyRequested() }
+                DankActionButton { iconName: "done_all"; buttonSize: 36; iconSize: 18; backgroundColor: Theme.withAlpha(Theme.primary, 0.1); iconColor: Theme.primary; onClicked: root.copyAndSaveRequested() }
                 DankActionButton { iconName: "close"; buttonSize: 36; iconSize: 18; iconColor: Theme.error; onClicked: root.closeRequested() }
             }
         }
