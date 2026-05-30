@@ -721,7 +721,9 @@ DankModal {
                                 const ry = Math.min(p0.y, p1.y);
                                 const rw = Math.abs(p1.x - p0.x);
                                 const rh = Math.abs(p1.y - p0.y);
-                                const radius = Math.min(Theme.cornerRadius, Math.min(rw, rh) / 2);
+                                // Adjust radius to be larger than half the stroke width to prevent sharp inner corners
+                                const baseRadius = Theme.cornerRadius + (stroke.width / 2);
+                                const radius = Math.min(baseRadius, Math.min(rw, rh) / 2);
 
                                 ctx.beginPath();
                                 ctx.moveTo(rx + radius, ry);
