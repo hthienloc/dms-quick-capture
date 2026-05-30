@@ -11,7 +11,7 @@ PluginSettings {
 
     SettingsCard {
         SectionTitle {
-            text: I18n.tr("Screenshot Mode")
+            text: I18n.tr("Workflow & Capture")
             icon: "screenshot"
         }
 
@@ -27,22 +27,6 @@ PluginSettings {
                 "value": "full"
             }]
             defaultValue: "region"
-        }
-
-    }
-
-    SettingsCard {
-        SectionTitle {
-            text: I18n.tr("File Export")
-            icon: "folder"
-        }
-
-        StringSetting {
-            settingKey: "saveDirectory"
-            label: I18n.tr("Save Directory")
-            description: I18n.tr("Directory path where screen captures are saved.")
-            placeholder: "~/Pictures/Screenshots"
-            defaultValue: "~/Pictures/Screenshots"
         }
 
         SelectionSetting {
@@ -62,22 +46,19 @@ PluginSettings {
             defaultValue: "both"
         }
 
+        StringSetting {
+            settingKey: "saveDirectory"
+            label: I18n.tr("Save Directory")
+            description: I18n.tr("Directory path where screen captures are saved.")
+            placeholder: "~/Pictures/Screenshots"
+            defaultValue: "~/Pictures/Screenshots"
+        }
     }
 
     SettingsCard {
         SectionTitle {
-            text: I18n.tr("Interface & Visuals")
+            text: I18n.tr("Interface & Layout")
             icon: "visibility"
-        }
-
-        SliderSetting {
-            settingKey: "modalOpacity"
-            label: I18n.tr("Backdrop Opacity")
-            description: I18n.tr("Adjust the transparency of the background during capture.")
-            defaultValue: 60
-            minimum: 0
-            maximum: 100
-            unit: "%"
         }
 
         SelectionSetting {
@@ -92,11 +73,21 @@ PluginSettings {
             ]
             defaultValue: "top"
         }
+
+        SliderSetting {
+            settingKey: "modalOpacity"
+            label: I18n.tr("Backdrop Opacity")
+            description: I18n.tr("Adjust the transparency of the background during capture.")
+            defaultValue: 60
+            minimum: 0
+            maximum: 100
+            unit: "%"
+        }
     }
 
     SettingsCard {
         SectionTitle {
-            text: I18n.tr("Default Tools")
+            text: I18n.tr("Tool Defaults & Styles")
             icon: "edit"
         }
 
@@ -167,13 +158,6 @@ PluginSettings {
             label: I18n.tr("Use Monospace Font")
             description: I18n.tr("Use a fixed-width font for the text tool.")
             defaultValue: false
-        }
-    }
-
-    SettingsCard {
-        SectionTitle {
-            text: I18n.tr("Drawing Styles")
-            icon: "palette"
         }
 
         ToggleSetting {
