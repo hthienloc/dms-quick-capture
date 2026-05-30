@@ -66,6 +66,36 @@ PluginSettings {
 
     SettingsCard {
         SectionTitle {
+            text: I18n.tr("Interface & Visuals")
+            icon: "visibility"
+        }
+
+        SliderSetting {
+            settingKey: "modalOpacity"
+            label: I18n.tr("Backdrop Opacity")
+            description: I18n.tr("Adjust the transparency of the background during capture.")
+            defaultValue: 60
+            minimum: 0
+            maximum: 100
+            unit: "%"
+        }
+
+        SelectionSetting {
+            settingKey: "toolbarPosition"
+            label: I18n.tr("Toolbar Position")
+            description: I18n.tr("Where to place the annotation toolbar on the screen.")
+            options: [
+                { "label": I18n.tr("Top"), "value": "top" },
+                { "label": I18n.tr("Bottom"), "value": "bottom" },
+                { "label": I18n.tr("Left"), "value": "left" },
+                { "label": I18n.tr("Right"), "value": "right" }
+            ]
+            defaultValue: "top"
+        }
+    }
+
+    SettingsCard {
+        SectionTitle {
             text: I18n.tr("Default Tools")
             icon: "edit"
         }
@@ -115,14 +145,29 @@ PluginSettings {
         }
 
         SliderSetting {
-            label: I18n.tr("Starting Thickness")
-            description: I18n.tr("Default line thickness for drawing tools.")
+            label: I18n.tr("Default Stroke Thickness")
+            description: I18n.tr("Initial thickness for pen, line, arrow, and shape tools.")
             settingKey: "defaultThickness"
             defaultValue: 6
             minimum: 1
             maximum: 20
         }
 
+        SliderSetting {
+            label: I18n.tr("Text Font Size")
+            description: I18n.tr("Default size for text annotations.")
+            settingKey: "textFontSize"
+            defaultValue: 24
+            minimum: 8
+            maximum: 72
+        }
+
+        ToggleSetting {
+            settingKey: "textMonospace"
+            label: I18n.tr("Use Monospace Font")
+            description: I18n.tr("Use a fixed-width font for the text tool.")
+            defaultValue: false
+        }
     }
 
     SettingsCard {

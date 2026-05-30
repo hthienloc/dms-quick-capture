@@ -13,6 +13,7 @@ Rectangle {
     property color currentColor: Theme.primary
     property int strokeWidth: 8
     property bool canUndo: false
+    property bool isVertical: false
 
     signal toolSelected(string tool)
     signal colorSelected(var color)
@@ -23,244 +24,163 @@ Rectangle {
     signal copyAndSaveRequested()
     signal closeRequested()
 
-    width: contentRow.width + Theme.spacingM * 2
-    height: 52
+    width: isVertical ? 56 : (contentLayout.width + Theme.spacingM * 2)
+    height: isVertical ? (contentLayout.height + Theme.spacingM * 2) : 56
     radius: Theme.cornerRadius
     color: Theme.withAlpha(Theme.surfaceContainer, 0.95)
     border.color: Theme.withAlpha(Theme.outline, 0.15)
     border.width: 1
 
-    Row {
-        id: contentRow
+    // Main Layout (Vertical or Horizontal)
+    Column {
+        id: contentLayout
         anchors.centerIn: parent
         spacing: Theme.spacingL
+        rotation: root.isVertical ? 0 : -90 // We rotate the whole thing? No, better use Column vs Row
 
+        visible: false // Helper for measuring
+    }
+    
+    // We use a simple conditional wrapper
+    Item {
+        anchors.fill: parent
+        
+        Loader {
+            anchors.centerIn: parent
+            sourceComponent: root.isVertical ? verticalItems : horizontalItems
+        }
+    }
+
+    Component {
+        id: horizontalItems
         Row {
-            id: leftGroup
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: Theme.spacingM
-
-            DankActionButton {
-                iconName: "near_me"
-                buttonSize: 36
-                iconSize: 18
-                tooltipText: "Select & Move (V)"
+            spacing: Theme.spacingL
+            
+            // Left Group
+            Row {
+                spacing: Theme.spacingM
                 anchors.verticalCenter: parent.verticalCenter
-
-                backgroundColor: root.currentTool === "select" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                iconColor: root.currentTool === "select" ? Theme.primary : Theme.surfaceText
-
-                onClicked: root.toolSelected("select")
+                DankActionButton {
+                    iconName: "near_me"; buttonSize: 36; iconSize: 18; tooltipText: "Select (V)"
+                    backgroundColor: root.currentTool === "select" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.currentTool === "select" ? Theme.primary : Theme.surfaceText
+                    onClicked: root.toolSelected("select")
+                }
+                DankActionButton {
+                    iconName: "crop"; buttonSize: 36; iconSize: 18; tooltipText: "Crop (P)"
+                    backgroundColor: root.currentTool === "crop" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.currentTool === "crop" ? Theme.primary : Theme.surfaceText
+                    onClicked: root.toolSelected("crop")
+                }
             }
 
-            DankActionButton {
-                iconName: "crop"
-                buttonSize: 36
-                iconSize: 18
-                tooltipText: "Crop / Resize Area (P)"
-                anchors.verticalCenter: parent.verticalCenter
+            Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
-                backgroundColor: root.currentTool === "crop" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                iconColor: root.currentTool === "crop" ? Theme.primary : Theme.surfaceText
-
-                onClicked: root.toolSelected("crop")
-            }
-
-            Rectangle {
-                width: 1
-                height: 24
-                color: Theme.withAlpha(Theme.outline, 0.2)
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
+            // Tools
             Row {
                 spacing: Theme.spacingXS
                 anchors.verticalCenter: parent.verticalCenter
-
                 Repeater {
                     model: config.toolButtons
-
                     delegate: DankActionButton {
-                        iconName: modelData.icon
-                        buttonSize: 36
-                        iconSize: 18
-                        tooltipText: modelData.tooltip
-
+                        iconName: modelData.icon; buttonSize: 32; iconSize: 16; tooltipText: modelData.tooltip
                         backgroundColor: root.currentTool === modelData.id ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                         iconColor: root.currentTool === modelData.id ? Theme.primary : Theme.surfaceText
-
                         onClicked: root.toolSelected(modelData.id)
                     }
                 }
             }
 
-            Rectangle {
-                width: 1
-                height: 24
-                color: Theme.withAlpha(Theme.outline, 0.2)
-                anchors.verticalCenter: parent.verticalCenter
-            }
+            Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
+            // Colors
             Row {
-                spacing: Theme.spacingS
+                spacing: Theme.spacingXS
                 anchors.verticalCenter: parent.verticalCenter
-
                 Repeater {
                     model: [Theme.primary].concat(config.accentColors)
-
                     delegate: Rectangle {
-                        width: 24
-                        height: 24
-                        radius: 12
-                        color: modelData
+                        width: 24; height: 24; radius: 12; color: modelData
                         border.color: Qt.colorEqual(root.currentColor, modelData) ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
                         border.width: Qt.colorEqual(root.currentColor, modelData) ? 2 : 1
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: root.colorSelected(modelData)
-                        }
+                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.colorSelected(modelData) }
                     }
                 }
             }
 
-            Rectangle {
-                width: 1
-                height: 24
-                color: Theme.withAlpha(Theme.outline, 0.2)
-                anchors.verticalCenter: parent.verticalCenter
-            }
+            Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
+            // Actions
             Row {
-                spacing: Theme.spacingS
+                spacing: Theme.spacingXS
                 anchors.verticalCenter: parent.verticalCenter
-
-                Text {
-                    text: root.strokeWidth + "px"
-                    width: 32
-                    horizontalAlignment: Text.AlignRight
-                    color: Theme.surfaceText
-                    font.pixelSize: 11
-                    font.bold: true
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                Slider {
-                    id: sizeSlider
-                    from: 1
-                    to: 50
-                    value: root.strokeWidth
-                    onMoved: root.strokeWidthSelected(Math.round(value))
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 80
-
-                    background: Rectangle {
-                        x: sizeSlider.leftPadding
-                        y: sizeSlider.topPadding + sizeSlider.availableHeight / 2 - height / 2
-                        implicitWidth: 80
-                        implicitHeight: 4
-                        width: sizeSlider.availableWidth
-                        height: implicitHeight
-                        radius: 2
-                        color: Theme.withAlpha(Theme.outline, 0.3)
-
-                        Rectangle {
-                            width: sizeSlider.visualPosition * parent.width
-                            height: parent.height
-                            color: Theme.primary
-                            radius: 2
-                        }
-                    }
-
-                    handle: Rectangle {
-                        x: sizeSlider.leftPadding + sizeSlider.visualPosition * (sizeSlider.availableWidth - width)
-                        y: sizeSlider.topPadding + sizeSlider.availableHeight / 2 - height / 2
-                        implicitWidth: 12
-                        implicitHeight: 12
-                        radius: 6
-                        color: Theme.primary
-                        border.color: Theme.surface
-                        border.width: 1
-                    }
-                }
-            }
-
-            Rectangle {
-                width: 1
-                height: 24
-                color: Theme.withAlpha(Theme.outline, 0.2)
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            DankActionButton {
-                anchors.verticalCenter: parent.verticalCenter
-                iconName: "undo"
-                buttonSize: 36
-                iconSize: 18
-                tooltipText: "Undo (Ctrl+Z)"
-                enabled: root.canUndo
-                iconColor: root.canUndo ? Theme.surfaceText : Theme.withAlpha(Theme.surfaceText, 0.3)
-                onClicked: root.undoRequested()
+                DankActionButton { iconName: "undo"; buttonSize: 32; enabled: root.canUndo; onClicked: root.undoRequested() }
+                DankActionButton { iconName: "save"; buttonSize: 32; onClicked: root.saveRequested() }
+                DankActionButton { iconName: "content_copy"; buttonSize: 32; onClicked: root.copyRequested() }
+                DankActionButton { iconName: "close"; buttonSize: 32; iconColor: Theme.error; onClicked: root.closeRequested() }
             }
         }
+    }
 
-        Row {
-            id: rightGroup
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: Theme.spacingXS
-
-            DankActionButton {
-                anchors.verticalCenter: parent.verticalCenter
-                iconName: "save"
-                buttonSize: 36
-                iconSize: 18
-                tooltipText: "Save to File (Ctrl+S)"
-                onClicked: root.saveRequested()
+    Component {
+        id: verticalItems
+        Column {
+            spacing: Theme.spacingL
+            
+            Column {
+                spacing: Theme.spacingM
+                anchors.horizontalCenter: parent.horizontalCenter
+                DankActionButton {
+                    iconName: "near_me"; buttonSize: 36; iconSize: 18
+                    backgroundColor: root.currentTool === "select" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.currentTool === "select" ? Theme.primary : Theme.surfaceText
+                    onClicked: root.toolSelected("select")
+                }
+                DankActionButton {
+                    iconName: "crop"; buttonSize: 36; iconSize: 18
+                    backgroundColor: root.currentTool === "crop" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.currentTool === "crop" ? Theme.primary : Theme.surfaceText
+                    onClicked: root.toolSelected("crop")
+                }
             }
 
-            DankActionButton {
-                anchors.verticalCenter: parent.verticalCenter
-                iconName: "content_copy"
-                buttonSize: 36
-                iconSize: 18
-                tooltipText: "Copy to Clipboard (Ctrl+C / Enter)"
-                backgroundColor: Theme.withAlpha(Theme.primary, 0.1)
-                iconColor: Theme.primary
-                onClicked: root.copyRequested()
+            Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
+
+            Grid {
+                columns: 2; spacing: Theme.spacingXS
+                Repeater {
+                    model: config.toolButtons
+                    delegate: DankActionButton {
+                        iconName: modelData.icon; buttonSize: 28; iconSize: 14
+                        backgroundColor: root.currentTool === modelData.id ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                        iconColor: root.currentTool === modelData.id ? Theme.primary : Theme.surfaceText
+                        onClicked: root.toolSelected(modelData.id)
+                    }
+                }
             }
 
-            DankActionButton {
-                anchors.verticalCenter: parent.verticalCenter
-                iconName: "assignment_turned_in"
-                buttonSize: 36
-                iconSize: 18
-                tooltipText: "Copy & Save"
-                backgroundColor: Theme.withAlpha(Theme.primary, 0.15)
-                iconColor: Theme.primary
-                onClicked: root.copyAndSaveRequested()
+            Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
+
+            Grid {
+                columns: 3; spacing: 4
+                Repeater {
+                    model: [Theme.primary].concat(config.accentColors)
+                    delegate: Rectangle {
+                        width: 16; height: 16; radius: 8; color: modelData
+                        border.color: Qt.colorEqual(root.currentColor, modelData) ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
+                        border.width: 1
+                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.colorSelected(modelData) }
+                    }
+                }
             }
 
-            Item { width: Theme.spacingL; height: 1 }
-
-            Rectangle {
-                width: 1
-                height: 24
-                color: Theme.withAlpha(Theme.outline, 0.2)
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            Item { width: Theme.spacingXS; height: 1 }
-
-            DankActionButton {
-                anchors.verticalCenter: parent.verticalCenter
-                iconName: "close"
-                buttonSize: 36
-                iconSize: 18
-                tooltipText: "Discard & Close (Escape)"
-                backgroundColor: Theme.withAlpha(Theme.error, 0.1)
-                iconColor: Theme.error
-                onClicked: root.closeRequested()
+            Column {
+                spacing: Theme.spacingXS
+                anchors.horizontalCenter: parent.horizontalCenter
+                DankActionButton { iconName: "undo"; buttonSize: 32; enabled: root.canUndo; onClicked: root.undoRequested() }
+                DankActionButton { iconName: "save"; buttonSize: 32; onClicked: root.saveRequested() }
+                DankActionButton { iconName: "content_copy"; buttonSize: 32; onClicked: root.copyRequested() }
+                DankActionButton { iconName: "close"; buttonSize: 32; iconColor: Theme.error; onClicked: root.closeRequested() }
             }
         }
     }

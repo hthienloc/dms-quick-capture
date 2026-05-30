@@ -84,8 +84,12 @@ DankModal {
         return { r: c.r, g: c.g, b: c.b };
     }
 
-    backgroundOpacity: 0.6
+    backgroundOpacity: (parentWidget?.pluginData?.modalOpacity ?? 60) / 100
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+
+    readonly property int textFontSize: parentWidget?.pluginData?.textFontSize ?? 24
+    readonly property bool textMonospace: parentWidget?.pluginData?.textMonospace ?? false
+    readonly property string toolbarPosition: parentWidget?.pluginData?.toolbarPosition ?? "top"
 
     function openCentered() {
         open();
@@ -486,10 +490,18 @@ DankModal {
 
                 QuickCaptureToolbar {
                     id: toolbarCard
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.top: parent.top
-                    anchors.topMargin: Theme.spacingM
                     z: 100
+
+                    anchors.top: window.toolbarPosition === "bottom" ? undefined : parent.top
+                    anchors.bottom: window.toolbarPosition === "bottom" ? parent.bottom : undefined
+                    anchors.left: window.toolbarPosition === "left" ? parent.left : undefined
+                    anchors.right: window.toolbarPosition === "right" ? parent.right : undefined
+
+                    anchors.horizontalCenter: (window.toolbarPosition === "top" || window.toolbarPosition === "bottom") ? parent.horizontalCenter : undefined
+                    anchors.verticalCenter: (window.toolbarPosition === "left" || window.toolbarPosition === "right") ? parent.verticalCenter : undefined
+
+                    anchors.margins: Theme.spacingM
+                    isVertical: (window.toolbarPosition === "left" || window.toolbarPosition === "right")
 
                     currentTool: window.currentTool
                     currentColor: window.currentColor
@@ -509,14 +521,11 @@ DankModal {
                 // 2. Centered Canvas Board
                 Item {
                     id: boardContainer
-                    anchors.top: toolbarCard.bottom
-                    anchors.topMargin: Theme.spacingM
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: Theme.spacingM
-                    anchors.left: parent.left
-                    anchors.leftMargin: Theme.spacingM
-                    anchors.right: parent.right
-                    anchors.rightMargin: Theme.spacingM
+                    anchors.top: window.toolbarPosition === "top" ? toolbarCard.bottom : parent.top
+                    anchors.bottom: window.toolbarPosition === "bottom" ? toolbarCard.top : parent.bottom
+                    anchors.left: window.toolbarPosition === "left" ? toolbarCard.right : parent.left
+                    anchors.right: window.toolbarPosition === "right" ? toolbarCard.left : parent.right
+                    anchors.margins: Theme.spacingM
 
                     Component.onCompleted: {
                         window.boardContainerItem = boardContainer;
@@ -893,7 +902,8 @@ DankModal {
                             } else if (stroke.tool === "text") {
                                 const pt = stroke.points[0];
                                 ctx.fillStyle = stroke.color;
-                                ctx.font = Math.round(stroke.width * 3.5) + "px sans-serif";
+                                const fontName = stroke.isMonospace ? "monospace" : "sans-serif";
+                                ctx.font = Math.round(stroke.width) + "px " + fontName;
                                 ctx.textAlign = "left";
                                 ctx.textBaseline = "top";
                                 ctx.fillText(stroke.text, pt.x, pt.y);
@@ -1349,7 +1359,8 @@ DankModal {
             window.pushStroke({
                 tool: "text",
                 color: window.currentColor.toString(),
-                width: window.strokeWidth,
+                width: window.textFontSize,
+                isMonospace: window.textMonospace,
                 points: [Qt.point(window.typingCoords.x, window.typingCoords.y)],
                 text: textStr
             });
