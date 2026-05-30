@@ -701,8 +701,8 @@ DankModal {
                             } else if (stroke.tool === "highlighter") {
                                 ctx.strokeStyle = Qt.rgba(rgb.r, rgb.g, rgb.b, 0.4);
                                 ctx.lineWidth = stroke.width * 4;
-                                ctx.lineCap = "square";
-                                ctx.lineJoin = "miter";
+                                ctx.lineCap = "round";
+                                ctx.lineJoin = "round";
                                 ctx.beginPath();
                                 ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
                                 for (var i = 1; i < stroke.points.length; i++) {
