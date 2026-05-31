@@ -1,11 +1,13 @@
 import "./dms-common"
 import QtQuick
+import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Modules.Plugins
 import qs.Services
 import qs.Widgets
+import qs.Modals.FileBrowser
 
 PluginComponent {
     id: root
@@ -73,6 +75,19 @@ PluginComponent {
         modal.close();
     }
 
+    function selectImageAndAnnotate() {
+        if (root.isDaemonInstance) {
+            root.closeControlCenter();
+            fileBrowserModal.open();
+        } else {
+            const daemon = PluginService.pluginInstances["quickCapture"];
+            if (daemon) {
+                root.closeControlCenter();
+                daemon.selectImageAndAnnotate();
+            }
+        }
+    }
+
     function registerDaemonAsWidget() {
         // Register self so Control Center widget instances can delegate capture to the daemon.
         if (!pluginService.pluginInstances[pluginId]) {
@@ -133,9 +148,33 @@ PluginComponent {
         parentWidget: root
     }
 
+    FileBrowserModal {
+        id: fileBrowserModal
+        browserTitle: I18n.tr("Select Image to Annotate")
+        browserIcon: "image"
+        fileExtensions: ["*.png", "*.jpg", "*.jpeg", "*.webp", "*.bmp"]
+        onFileSelected: path => {
+            // Copy selected file to temp location where QuickCaptureModal expects it
+            Proc.runCommand("copy-image", ["cp", "-f", path, "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
+                if (exitCode === 0) {
+                    modal.shouldBeVisible = true;
+                    modal.openCentered();
+                } else {
+                    ToastService.showError("Failed to load image.");
+                }
+            });
+            close();
+        }
+    }
+
     IpcHandler {
         function screenshot() : string {
             root.triggerCapture();
+            return "SUCCESS";
+        }
+
+        function selectFile() : string {
+            root.selectImageAndAnnotate();
             return "SUCCESS";
         }
 

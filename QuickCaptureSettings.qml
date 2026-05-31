@@ -10,15 +10,22 @@ PluginSettings {
     pluginId: "quickCapture"
 
     SettingsCard {
+        id: captureSection
         SectionTitle {
             text: I18n.tr("Capture")
             icon: "screenshot"
+            showReset: captureMode.isDirty || doneAction.isDirty || saveDirectory.isDirty
+            onResetClicked: {
+                captureMode.resetToDefault();
+                doneAction.resetToDefault();
+                saveDirectory.resetToDefault();
+            }
         }
 
-        SelectionSetting {
+        SelectionSettingPlus {
+            id: captureMode
             settingKey: "captureMode"
             label: I18n.tr("Capture Mode")
-            description: I18n.tr("Choose whether to capture a selected region or the full screen.")
             options: [{
                 "label": I18n.tr("Interactive Region"),
                 "value": "region"
@@ -29,10 +36,12 @@ PluginSettings {
             defaultValue: "region"
         }
 
-        SelectionSetting {
+        Separator {}
+
+        SelectionSettingPlus {
+            id: doneAction
             settingKey: "doneAction"
             label: I18n.tr("Action when Enter")
-            description: I18n.tr("Default action when pressing Enter to finish.")
             options: [{
                 "label": I18n.tr("Copy to Clipboard only"),
                 "value": "clipboard"
@@ -46,25 +55,34 @@ PluginSettings {
             defaultValue: "both"
         }
 
-        StringSetting {
+        Separator {}
+
+        StringSettingPlus {
+            id: saveDirectory
             settingKey: "saveDirectory"
             label: I18n.tr("Save Directory")
-            description: I18n.tr("Directory path where screen captures are saved.")
             placeholder: "~/Pictures/Screenshots"
             defaultValue: "~/Pictures/Screenshots"
+            isDirectory: true
         }
     }
 
     SettingsCard {
+        id: interfaceSection
         SectionTitle {
             text: I18n.tr("Interface")
             icon: "visibility"
+            showReset: toolbarPosition.isDirty || modalOpacity.isDirty
+            onResetClicked: {
+                toolbarPosition.resetToDefault();
+                modalOpacity.resetToDefault();
+            }
         }
 
-        SelectionSetting {
+        SelectionSettingPlus {
+            id: toolbarPosition
             settingKey: "toolbarPosition"
             label: I18n.tr("Toolbar Position")
-            description: I18n.tr("Where to place the annotation toolbar on the screen.")
             options: [
                 { "label": I18n.tr("Top"), "value": "top" },
                 { "label": I18n.tr("Bottom"), "value": "bottom" },
@@ -74,27 +92,41 @@ PluginSettings {
             defaultValue: "top"
         }
 
-        SliderSetting {
+        Separator {}
+
+        SliderSettingPlus {
+            id: modalOpacity
             settingKey: "modalOpacity"
             label: I18n.tr("Backdrop Opacity")
-            description: I18n.tr("Adjust the transparency of the background during capture.")
             defaultValue: 60
             minimum: 0
             maximum: 100
             unit: "%"
+            leftLabel: "0"
+            rightLabel: "100"
         }
     }
 
     SettingsCard {
+        id: toolsSection
         SectionTitle {
             text: I18n.tr("Tools")
             icon: "edit"
+            showReset: defaultTool.isDirty || defaultThickness.isDirty || textFontSize.isDirty || textMonospace.isDirty || roundRect.isDirty || roundHighlighter.isDirty
+            onResetClicked: {
+                defaultTool.resetToDefault();
+                defaultThickness.resetToDefault();
+                textFontSize.resetToDefault();
+                textMonospace.resetToDefault();
+                roundRect.resetToDefault();
+                roundHighlighter.resetToDefault();
+            }
         }
 
-        SelectionSetting {
+        SelectionSettingPlus {
+            id: defaultTool
             settingKey: "defaultTool"
             label: I18n.tr("Starting Tool")
-            description: I18n.tr("Default tool selected when launching the annotation overlay.")
             options: [{
                 "label": I18n.tr("Freehand Pen"),
                 "value": "pen"
@@ -135,42 +167,56 @@ PluginSettings {
             defaultValue: "pen"
         }
 
-        SliderSetting {
+        Separator {}
+
+        SliderSettingPlus {
+            id: defaultThickness
             label: I18n.tr("Default Stroke Thickness")
-            description: I18n.tr("Initial thickness for pen, line, arrow, and shape tools.")
             settingKey: "defaultThickness"
             defaultValue: 6
             minimum: 1
             maximum: 20
+            leftLabel: "1"
+            rightLabel: "20"
         }
 
-        SliderSetting {
+        Separator {}
+
+        SliderSettingPlus {
+            id: textFontSize
             label: I18n.tr("Text Font Size")
-            description: I18n.tr("Default size for text annotations.")
             settingKey: "textFontSize"
             defaultValue: 24
             minimum: 8
             maximum: 72
+            leftLabel: "8"
+            rightLabel: "72"
         }
 
-        ToggleSetting {
+        Separator {}
+
+        ToggleSettingPlus {
+            id: textMonospace
             settingKey: "textMonospace"
             label: I18n.tr("Use Monospace Font")
-            description: I18n.tr("Use a fixed-width font for the text tool.")
             defaultValue: false
         }
 
-        ToggleSetting {
+        Separator {}
+
+        ToggleSettingPlus {
+            id: roundRect
             settingKey: "roundRect"
             label: I18n.tr("Round Rectangle Corners")
-            description: I18n.tr("Use rounded corners for the rectangle and redact tools.")
             defaultValue: true
         }
 
-        ToggleSetting {
+        Separator {}
+
+        ToggleSettingPlus {
+            id: roundHighlighter
             settingKey: "roundHighlighter"
             label: I18n.tr("Round Highlighter Tips")
-            description: I18n.tr("Use rounded tips and joints for the highlighter tool.")
             defaultValue: false
         }
     }
@@ -190,24 +236,22 @@ PluginSettings {
 
             Column {
                 width: parent.width
-                spacing: Theme.spacingS
+                spacing: 0
 
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    color: Theme.outline
-                    opacity: index > 0 ? 0.15 : 0
-                }
+                Separator { opacity: 0.1 }
+
+                Item { width: 1; height: Theme.spacingM }
 
                 StyledText {
                     text: I18n.tr("Preset Slot ") + (index + 1)
                     font.pixelSize: Theme.fontSizeMedium
                     font.bold: true
                     color: Theme.primary
-                    topPadding: index > 0 ? Theme.spacingM : 0
                 }
 
-                SelectionSetting {
+                Item { width: 1; height: Theme.spacingS }
+
+                SelectionSettingPlus {
                     settingKey: "preset_" + index + "_tool"
                     label: I18n.tr("Tool")
                     options: [{
@@ -253,24 +297,97 @@ PluginSettings {
                     defaultValue: index === 0 ? "pen" : "none"
                 }
 
-                ColorSetting {
+                Separator {}
+
+                ColorSettingPlus {
                     settingKey: "preset_" + index + "_color"
                     label: I18n.tr("Color")
                     defaultValue: index === 0 ? "#ef4444" : "#3b82f6"
                 }
 
-                SliderSetting {
+                Separator {}
+
+                SliderSettingPlus {
                     settingKey: "preset_" + index + "_thickness"
                     label: I18n.tr("Thickness")
                     defaultValue: 6
                     minimum: 1
                     maximum: 20
+                    leftLabel: "1"
+                    rightLabel: "20"
                 }
+                
+                Item { width: 1; height: Theme.spacingM }
 
             }
 
         }
 
+    }
+
+    SettingsCard {
+        SectionTitle { 
+            id: usageTitle
+            text: I18n.tr("Usage Guide")
+            icon: "menu_book" 
+            collapsible: true
+            settingKey: "usageGuideExpanded"
+        }
+
+        UsageGuide {
+            expanded: usageTitle.isExpanded
+            items: [
+                I18n.tr("Start capture via <b>Control Center</b> or your configured <b>Print</b> key."),
+                I18n.tr("During capture: <b>Right-click</b> to open the custom <b>Radial Menu</b>."),
+                I18n.tr("Use <b>Mouse Wheel</b> to dynamically adjust stroke thickness."),
+                I18n.tr("<b>Middle-click</b> any drawn element to instantly erase it."),
+                I18n.tr("Press <b>Enter</b> to finish and save/copy, or <b>Esc</b> to discard.")
+            ]
+        }
+    }
+
+    SettingsCard {
+        SectionTitle {
+            id: ipcTitle
+            text: I18n.tr("IPC Commands")
+            icon: "terminal"
+            collapsible: true
+            isExpanded: false
+            settingKey: "ipcCommandsExpanded"
+        }
+
+        Column {
+            width: parent.width
+            spacing: Theme.spacingM
+            visible: ipcTitle.isExpanded
+
+            CopyBox {
+                label: I18n.tr("Trigger Screenshot")
+                text: "dms ipc call quickCapture screenshot"
+            }
+
+            CopyBox {
+                label: I18n.tr("Select Image File")
+                text: "dms ipc call quickCapture selectFile"
+            }
+
+            CopyBox {
+                label: I18n.tr("Toggle Annotator")
+                text: "dms ipc call quickCapture toggle"
+            }
+
+            CopyBox {
+                label: I18n.tr("Close Annotator")
+                text: "dms ipc call quickCapture close"
+            }
+
+            Separator { opacity: 0.1 }
+
+            CopyBox {
+                label: I18n.tr("Niri Binding Example")
+                text: "binds {\n    Print { spawn \"dms\" \"ipc\" \"call\" \"quickCapture\" \"screenshot\"; }\n}"
+            }
+        }
     }
 
     PluginAbout {

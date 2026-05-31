@@ -49,48 +49,6 @@ SettingsCard {
     Component.onCompleted: _fetchContributors()
     onRepoUrlChanged:      _fetchContributors()
 
-    // ── Header ─────────────────────────────────────────────────────────────
-    SectionTitle {
-        text: I18n.tr("Contributing")
-        icon: "handshake"
-    }
-
-    // ── GitHub link ─────────────────────────────────────────────────────────
-    Row {
-        width: parent.width
-        spacing: Theme.spacingM
-        visible: root.repoUrl !== ""
-
-        Column {
-            anchors.verticalCenter: parent.verticalCenter
-            width: parent.width - githubBtn.width - parent.spacing
-            spacing: 2
-
-            StyledText {
-                text: I18n.tr("Help us improve")
-                font.bold: true
-                font.pixelSize: Theme.fontSizeSmall
-            }
-            StyledText {
-                width: parent.width
-                text: I18n.tr("Found a bug, want to translate, or have a feature request? Join us on GitHub.")
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceVariantText
-                wrapMode: Text.Wrap
-            }
-        }
-
-        DankButton {
-            id: githubBtn
-            anchors.verticalCenter: parent.verticalCenter
-            text: I18n.tr("GitHub")
-            iconName: "code"
-            backgroundColor: Theme.withAlpha(Theme.primary, 0.1)
-            textColor: Theme.primary
-            onClicked: Quickshell.execDetached(["gio", "open", root.repoUrl])
-        }
-    }
-
     // ── Contributors ────────────────────────────────────────────────────────
     SectionTitle {
         text: I18n.tr("Contributors")
