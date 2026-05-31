@@ -109,7 +109,6 @@ Rectangle {
                 }
                 DankSlider {
                     id: hSlider
-                    value: root.strokeWidth
                     minimum: 1
                     maximum: 50
                     width: 100
@@ -117,6 +116,12 @@ Rectangle {
                     showValue: false
                     onSliderValueChanged: newValue => root.strokeWidthSelected(newValue)
                     anchors.verticalCenter: parent.verticalCenter
+
+                    Binding {
+                        target: hSlider
+                        property: "value"
+                        value: root.strokeWidth
+                    }
                 }
             }
 
