@@ -20,30 +20,39 @@ Column {
 
     width: parent.width
     spacing: 0
+    
+    // Dynamic Opacity for disabled state
+    opacity: enabled ? 1 : 0.5
+    Behavior on opacity { NumberAnimation { duration: Theme.shortDuration } }
 
+    property bool isInitialized: false
     readonly property bool isDirty: Math.round(value) !== Math.round(defaultValue)
 
     function resetToDefault() {
-        console.log(`[SliderSettingPlus] Resetting ${settingKey} to ${defaultValue}`);
+        console.log(`[SliderSettingPlus] Resetting ${settingKey}`);
         value = defaultValue;
-        dankSlider.value = defaultValue; // Force update because DankSlider breaks bindings on interaction
+        dankSlider.value = defaultValue;
     }
 
     function loadValue() {
         const settings = findSettings();
         if (settings && settings.pluginService) {
-            value = settings.loadValue(settingKey, defaultValue);
+            const val = settings.loadValue(settingKey, defaultValue);
+            value = val;
+            dankSlider.value = val;
+            isInitialized = true;
         }
     }
 
     Component.onCompleted: {
-        loadValue();
+        Qt.callLater(loadValue);
     }
 
     onValueChanged: {
+        if (!isInitialized) return;
         const settings = findSettings();
         if (settings) {
-            settings.saveValue(settingKey, value);
+            settings.saveValue(settingKey, Math.round(value));
         }
     }
 
@@ -58,24 +67,26 @@ Column {
         return null;
     }
 
-    // Label Row (matches standard height)
+    // ── Label Row ─────────────────────────────────────────────────────────
     Item {
         width: parent.width
-        height: 36 // Giảm chiều cao tiêu đề
+        height: 36
 
         Row {
             spacing: Theme.spacingXS
             anchors.verticalCenter: parent.verticalCenter
-            width: parent.width
+            anchors.left: parent.left
+            anchors.right: individualReset.visible ? individualReset.left : parent.right
+            anchors.rightMargin: Theme.spacingS
 
             StyledText {
                 text: root.label
-                font.pixelSize: Theme.fontSizeLarge // Tăng cỡ chữ
+                font.pixelSize: Theme.fontSizeLarge
                 font.weight: Font.Medium
                 color: Theme.surfaceText
                 elide: Text.ElideRight
                 maximumLineCount: 1
-                width: Math.min(implicitWidth, parent.width - (infoIcon.visible ? infoIcon.width + parent.spacing : 0))
+                width: Math.min(implicitWidth, parent.width - (infoIcon.visible ? 20 : 0))
             }
 
             DankIcon {
@@ -99,15 +110,14 @@ Column {
         // Individual Reset Button
         Item {
             id: individualReset
-            width: 28
-            height: 28
+            width: 28; height: 28
             visible: root.isDirty
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
 
             Rectangle {
                 anchors.fill: parent
-                radius: height / 2
+                radius: 14
                 color: resetArea.containsMouse ? Theme.primaryHoverLight : "transparent"
             }
 
@@ -116,9 +126,7 @@ Column {
                 size: 16
                 color: Theme.primary
                 anchors.centerIn: parent
-                opacity: parent.visible ? 0.8 : 0
-                
-                Behavior on opacity { NumberAnimation { duration: Appearance.anim.durations.quick } }
+                opacity: 0.8
             }
 
             MouseArea {
@@ -130,12 +138,10 @@ Column {
             }
         }
 
-        DankTooltipV2 {
-            id: sharedTooltip
-        }
+        DankTooltipV2 { id: sharedTooltip }
     }
 
-    // Slider Row
+    // ── Slider Row ────────────────────────────────────────────────────────
     Row {
         width: parent.width
         height: 32
@@ -179,6 +185,6 @@ Column {
         }
     }
 
-    // Extra bottom padding for sliders to separate from next item/line
+    // Extra bottom padding
     Item { width: 1; height: Theme.spacingS }
 }
