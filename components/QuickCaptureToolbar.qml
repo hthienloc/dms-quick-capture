@@ -100,10 +100,44 @@ Rectangle {
 
             Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
-            // Thickness Text Only
-            Text {
-                text: root.strokeWidth + "px"; width: 32; horizontalAlignment: Text.AlignRight
-                color: Theme.surfaceText; font.pixelSize: 11; font.bold: true; anchors.verticalCenter: parent.verticalCenter
+            // Thickness Section
+            Row {
+                spacing: Theme.spacingS; anchors.verticalCenter: parent.verticalCenter
+                Text {
+                    text: root.strokeWidth + "px"; width: 32; horizontalAlignment: Text.AlignRight
+                    color: Theme.surfaceText; font.pixelSize: 11; font.bold: true; anchors.verticalCenter: parent.verticalCenter
+                }
+                Slider {
+                    id: hSlider
+                    from: 1
+                    to: 50
+                    value: root.strokeWidth
+                    width: 80
+                    anchors.verticalCenter: parent.verticalCenter
+                    onMoved: root.strokeWidthSelected(Math.round(value))
+                    
+                    background: Rectangle {
+                        implicitWidth: 80
+                        implicitHeight: 4
+                        radius: 2
+                        color: Theme.withAlpha(Theme.outline, 0.3)
+                        Rectangle {
+                            width: hSlider.visualPosition * parent.width
+                            height: parent.height
+                            color: Theme.primary
+                            radius: 2
+                        }
+                    }
+                    handle: Rectangle {
+                        implicitWidth: 12
+                        implicitHeight: 12
+                        radius: 6
+                        color: Theme.primary
+                        border.color: Theme.surface
+                        border.width: 1
+                        x: hSlider.visualPosition * (hSlider.availableWidth - width)
+                    }
+                }
             }
 
             Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
