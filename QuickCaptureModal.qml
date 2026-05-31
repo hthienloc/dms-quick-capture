@@ -7,12 +7,12 @@ import qs.Widgets
 import qs.Modals.Common
 import "./dms-common"
 import "components"
-import "lib"
+import "core"
 
 DankModal {
     id: window
 
-    QuickCaptureConfig { id: config }
+    CaptureConfig { id: config }
 
     layerNamespace: "dms:plugins:quickCapture"
     keepPopoutsOpen: true

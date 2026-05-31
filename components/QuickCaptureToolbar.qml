@@ -2,12 +2,12 @@ import QtQuick
 import QtQuick.Controls
 import qs.Common
 import qs.Widgets
-import "../lib"
+import "../core"
 
 Rectangle {
     id: root
 
-    QuickCaptureConfig { id: config }
+    CaptureConfig { id: config }
 
     property string currentTool: "crop"
     property color currentColor: Theme.primary

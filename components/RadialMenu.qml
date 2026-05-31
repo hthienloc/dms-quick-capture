@@ -1,14 +1,14 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
-import "../lib"
+import "../core"
 
 Item {
     id: root
     visible: false
     z: 1000
 
-    QuickCaptureConfig { id: config }
+    CaptureConfig { id: config }
 
     property var presets: []
     property int selectedIndex: -1
