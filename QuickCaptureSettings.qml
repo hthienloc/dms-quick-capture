@@ -907,18 +907,18 @@ PluginSettings {
             visible: ipcTitle.isExpanded
 
             CopyBox {
-                label: I18n.tr("Trigger Screenshot")
+                label: I18n.tr("Trigger Screenshot (Default)")
                 text: "dms ipc call quickCapture screenshot"
+            }
+
+            CopyBox {
+                label: I18n.tr("Trigger Screenshot (Specific Mode)")
+                text: "dms ipc call quickCapture screenshotMode region"
             }
 
             CopyBox {
                 label: I18n.tr("Select Image File")
                 text: "dms ipc call quickCapture selectFile"
-            }
-
-            CopyBox {
-                label: I18n.tr("Toggle Annotator")
-                text: "dms ipc call quickCapture toggle"
             }
 
             CopyBox {
