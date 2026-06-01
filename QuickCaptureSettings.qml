@@ -242,7 +242,7 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Capture")
             icon: "screenshot"
-            showReset: captureMode.isDirty || doneAction.isDirty || saveDirectory.isDirty || skipConfirm.isDirty || outputFormat.isDirty || includeCursor.isDirty || jpegQuality.isDirty
+            showReset: captureMode.isDirty || doneAction.isDirty || saveDirectory.isDirty || skipConfirm.isDirty || outputFormat.isDirty || includeCursor.isDirty || jpegQuality.isDirty || showToasts.isDirty
             onResetClicked: {
                 captureMode.resetToDefault();
                 doneAction.resetToDefault();
@@ -251,6 +251,7 @@ PluginSettings {
                 outputFormat.resetToDefault();
                 includeCursor.resetToDefault();
                 jpegQuality.resetToDefault();
+                showToasts.resetToDefault();
             }
         }
 
@@ -300,6 +301,15 @@ PluginSettings {
                 { label: I18n.tr("Copy & Save"), value: "both" }
             ]
             defaultValue: "both"
+        }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            id: showToasts
+            settingKey: "showToasts"
+            label: I18n.tr("Show Toast Notifications")
+            defaultValue: true
         }
 
         Separator {}

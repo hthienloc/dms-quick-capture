@@ -37,7 +37,9 @@ QtObject {
     }
 
     function notifyInfo(message) {
-        if (typeof ToastService !== "undefined" && ToastService) {
+        const hasParent = root.parentWidget && root.parentWidget.pluginData;
+        const show = hasParent ? (root.parentWidget.pluginData.showToasts ?? true) : true;
+        if (show && typeof ToastService !== "undefined" && ToastService) {
             ToastService.showInfo(message);
         }
     }
