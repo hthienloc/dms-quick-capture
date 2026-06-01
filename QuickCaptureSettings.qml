@@ -454,6 +454,15 @@ PluginSettings {
             label: I18n.tr("Round Highlighter Tips")
             defaultValue: false
         }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            id: showCanvasBorder
+            settingKey: "showCanvasBorder"
+            label: I18n.tr("Show Screenshot Border")
+            defaultValue: true
+        }
     }
 
     SettingsCard {

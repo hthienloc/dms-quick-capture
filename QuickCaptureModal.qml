@@ -1273,6 +1273,7 @@ DankModal {
                         border.width: 1.5
                         radius: Theme.cornerRadius
                         z: 10
+                        visible: config.pluginData["showCanvasBorder"] !== undefined ? config.pluginData["showCanvasBorder"] : true
                     }
 
                     Item {
