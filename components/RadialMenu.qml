@@ -205,12 +205,12 @@ Item {
             
             DankIcon {
                 name: {
-                    if (root.selectedIndex === -2) return "check";
+                    if (root.selectedIndex === -2) return "near_me";
                     if (root.selectedIndex >= 0 && root.selectedIndex < root.presets.length) {
                         const tool = config.toolButtons.find(t => t.id === root.presets[root.selectedIndex].tool);
                         return tool ? tool.icon : "check";
                     }
-                    return "photo_camera"; // default idle center icon
+                    return "near_me"; // default idle center icon
                 }
                 size: 24
                 color: {
@@ -230,7 +230,7 @@ Item {
                         const tool = config.toolButtons.find(t => t.id === root.presets[root.selectedIndex].tool);
                         return tool ? tool.tooltip.split(" (")[0] : "";
                     }
-                    return I18n.tr("Capture");
+                    return I18n.tr("Select");
                 }
                 font.pixelSize: 8
                 font.bold: true

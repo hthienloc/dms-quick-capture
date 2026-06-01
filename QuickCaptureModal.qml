@@ -1370,6 +1370,9 @@ DankModal {
                         window.currentColor = preset.color;
                         window.strokeWidth = preset.thickness;
                     }
+                    onCenterClicked: {
+                        window.currentTool = "select";
+                    }
                 }
 
                 Canvas {
