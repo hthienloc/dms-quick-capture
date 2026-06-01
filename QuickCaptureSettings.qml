@@ -743,6 +743,30 @@ PluginSettings {
 
         property int presetActiveIndex: 0
 
+        readonly property var currentPresets: {
+            const data = root.pluginData || {};
+            const list = [];
+            for (let i = 0; i < 8; i++) {
+                const tool = data["preset_" + i + "_tool"] || (
+                    i === 0 ? "pen" :
+                    i === 1 ? "arrow" :
+                    i === 2 ? "rect" :
+                    i === 3 ? "highlighter" :
+                    i === 4 ? "ellipse" :
+                    i === 5 ? "stamp" :
+                    i === 6 ? "redact" :
+                    i === 7 ? "pixelate" : "none"
+                );
+                const color = data["preset_" + i + "_color"] || (
+                    i === 6 ? "#000000" :
+                    i === 7 ? "#ffffff" : "primary"
+                );
+                const thickness = data["preset_" + i + "_thickness"] ?? 6;
+                list.push({ tool: tool, color: color, thickness: thickness });
+            }
+            return list;
+        }
+
         SectionTitle {
             text: I18n.tr("Radial Menu")
             icon: "settings"
@@ -754,38 +778,220 @@ PluginSettings {
 
         Item { width: 1; height: Theme.spacingXS }
 
-        Column {
-            width: parent.width
-            spacing: Theme.spacingS
+        Item { width: 1; height: Theme.spacingXS }
 
-            DankButtonGroup {
-                id: presetSelector1
-                width: parent.width
-                buttonHeight: 32
-                selectionMode: "single"
-                model: [I18n.tr("Preset 1"), I18n.tr("Preset 2"), I18n.tr("Preset 3"), I18n.tr("Preset 4")]
-                currentIndex: radialMenuCard.presetActiveIndex < 4 ? radialMenuCard.presetActiveIndex : -1
-                onSelectionChanged: (index, selected) => {
-                    if (selected) {
-                        radialMenuCard.presetActiveIndex = index
+        // Interactive Radial Menu Simulation
+        Item {
+            id: simulatedRadialMenu
+            width: 240
+            height: 240
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            readonly property real outerRadius: 110
+            readonly property real innerRadius: 40
+            readonly property real midRadius: (innerRadius + outerRadius) / 2
+            readonly property real itemRadius: 22
+            readonly property real centerRadius: 34
+
+            // Segmented Background Canvas
+            Canvas {
+                id: simulatedCanvas
+                anchors.fill: parent
+                antialiasing: true
+
+                onPaint: {
+                    var ctx = getContext("2d");
+                    ctx.clearRect(0, 0, width, height);
+
+                    var centerX = width / 2;
+                    var centerY = height / 2;
+                    var numSectors = 8;
+                    var sectorAngle = 2 * Math.PI / numSectors;
+
+                    for (var i = 0; i < numSectors; i++) {
+                        var startAngle = i * sectorAngle - Math.PI / 2 - sectorAngle / 2;
+                        var endAngle = startAngle + sectorAngle;
+
+                        ctx.beginPath();
+                        ctx.arc(centerX, centerY, simulatedRadialMenu.outerRadius, startAngle, endAngle);
+                        ctx.arc(centerX, centerY, simulatedRadialMenu.innerRadius, endAngle, startAngle, true);
+                        ctx.closePath();
+
+                        // Highlight active segment
+                        if (radialMenuCard.presetActiveIndex === i) {
+                            ctx.fillStyle = Theme.primary;
+                        } else {
+                            ctx.fillStyle = Theme.withAlpha(Theme.surfaceContainerHigh, 0.88);
+                        }
+                        ctx.fill();
+
+                        ctx.strokeStyle = radialMenuCard.presetActiveIndex === i ? Theme.primary : Theme.withAlpha(Theme.outline, 0.15);
+                        ctx.lineWidth = radialMenuCard.presetActiveIndex === i ? 2 : 1;
+                        ctx.stroke();
+                    }
+                }
+
+                // Redraw on active index changes
+                Connections {
+                    target: radialMenuCard
+                    function onPresetActiveIndexChanged() { simulatedCanvas.requestPaint(); }
+                }
+                
+                // Redraw on preset changes (color or tool changed in settings)
+                Connections {
+                    target: root
+                    function onPluginDataChanged() { simulatedCanvas.requestPaint(); }
+                }
+                
+                Component.onCompleted: simulatedCanvas.requestPaint()
+            }
+
+            // Outer circle outline
+            Rectangle {
+                anchors.fill: parent
+                radius: width / 2
+                color: "transparent"
+                border.color: Theme.withAlpha(Theme.outline, 0.25)
+                border.width: 1.5
+            }
+
+            // Outer icons overlay
+            Repeater {
+                model: radialMenuCard.currentPresets
+
+                delegate: Item {
+                    width: simulatedRadialMenu.itemRadius * 2
+                    height: width
+                    
+                    property real angle: (index * 360 / 8) - 90
+                    property real rad: angle * Math.PI / 180
+                    
+                    x: (simulatedRadialMenu.width / 2) + simulatedRadialMenu.midRadius * Math.cos(rad) - simulatedRadialMenu.itemRadius
+                    y: (simulatedRadialMenu.height / 2) + simulatedRadialMenu.midRadius * Math.sin(rad) - simulatedRadialMenu.itemRadius
+
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: 1
+
+                        StyledText {
+                            text: (index + 1)
+                            font.pixelSize: 8
+                            font.bold: true
+                            color: radialMenuCard.presetActiveIndex === index ? Theme.onPrimary : Theme.surfaceVariantText
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            opacity: 0.6
+                        }
+
+                        DankIcon {
+                            name: {
+                                const tool = captureConfig.toolButtons.find(t => t.id === modelData.tool);
+                                return tool ? tool.icon : "help";
+                            }
+                            size: 18
+                            color: {
+                                if (radialMenuCard.presetActiveIndex === index) return Theme.onPrimary;
+                                if (modelData.tool === "none") return Theme.withAlpha(Theme.surfaceVariantText, 0.3);
+                                return modelData.color === "primary" ? Theme.primary : modelData.color;
+                            }
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
                     }
                 }
             }
 
-            DankButtonGroup {
-                id: presetSelector2
-                width: parent.width
-                buttonHeight: 32
-                selectionMode: "single"
-                model: [I18n.tr("Preset 5"), I18n.tr("Preset 6"), I18n.tr("Preset 7"), I18n.tr("Preset 8")]
-                currentIndex: radialMenuCard.presetActiveIndex >= 4 ? (radialMenuCard.presetActiveIndex - 4) : -1
-                onSelectionChanged: (index, selected) => {
-                    if (selected) {
-                        radialMenuCard.presetActiveIndex = index + 4
+            // Center Info Button
+            Rectangle {
+                id: simulatedCenterButton
+                width: simulatedRadialMenu.centerRadius * 2
+                height: width
+                radius: simulatedRadialMenu.centerRadius
+                anchors.centerIn: parent
+                color: Theme.surfaceContainerHighest
+                border.color: Theme.withAlpha(Theme.outline, 0.4)
+                border.width: 1
+
+                Column {
+                    anchors.centerIn: parent
+                    spacing: 1
+                    
+                    DankIcon {
+                        name: {
+                            const p = radialMenuCard.currentPresets[radialMenuCard.presetActiveIndex];
+                            if (p && p.tool !== "none") {
+                                const tool = captureConfig.toolButtons.find(t => t.id === p.tool);
+                                return tool ? tool.icon : "check";
+                            }
+                            return "block";
+                        }
+                        size: 20
+                        color: {
+                            const p = radialMenuCard.currentPresets[radialMenuCard.presetActiveIndex];
+                            if (!p || p.tool === "none") return Theme.surfaceVariantText;
+                            return p.color === "primary" ? Theme.primary : p.color;
+                        }
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    StyledText {
+                        text: I18n.tr("Preset %1").arg(radialMenuCard.presetActiveIndex + 1)
+                        font.pixelSize: 8
+                        font.bold: true
+                        color: Theme.surfaceVariantText
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+            }
+
+            // Mouse Area to click segments
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+
+                onPositionChanged: (mouse) => {
+                    const dx = mouse.x - width / 2;
+                    const dy = mouse.y - height / 2;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < simulatedRadialMenu.innerRadius || dist > simulatedRadialMenu.outerRadius) {
+                        return;
+                    }
+
+                    let angle = Math.atan2(dy, dx) * 180 / Math.PI + 90;
+                    if (angle < 0) angle += 360;
+                    
+                    const numSectors = 8;
+                    const sectorSize = 360 / numSectors;
+                    const idx = Math.floor((angle + sectorSize / 2) % 360 / sectorSize);
+                    
+                    if (idx >= 0 && idx < numSectors && radialMenuCard.presetActiveIndex !== idx) {
+                        radialMenuCard.presetActiveIndex = idx;
+                    }
+                }
+
+                onClicked: (mouse) => {
+                    const dx = mouse.x - width / 2;
+                    const dy = mouse.y - height / 2;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < simulatedRadialMenu.innerRadius || dist > simulatedRadialMenu.outerRadius) {
+                        return;
+                    }
+
+                    let angle = Math.atan2(dy, dx) * 180 / Math.PI + 90;
+                    if (angle < 0) angle += 360;
+                    
+                    const numSectors = 8;
+                    const sectorSize = 360 / numSectors;
+                    const idx = Math.floor((angle + sectorSize / 2) % 360 / sectorSize);
+                    
+                    if (idx >= 0 && idx < numSectors) {
+                        radialMenuCard.presetActiveIndex = idx;
                     }
                 }
             }
         }
+
+        Item { width: 1; height: Theme.spacingS }
 
         Repeater {
             model: 8
