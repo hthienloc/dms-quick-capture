@@ -302,6 +302,11 @@ PluginSettings {
             }
         }
 
+        SubCategoryHeader {
+            text: I18n.tr("Capture Modes")
+            icon: "camera"
+        }
+
         SelectionSettingPlus {
             id: captureMode
             settingKey: "captureMode"
@@ -385,6 +390,11 @@ PluginSettings {
 
         Separator {}
 
+        SubCategoryHeader {
+            text: I18n.tr("Save & Output Actions")
+            icon: "save"
+        }
+
         ButtonGroupSettingPlus {
             id: doneAction
             settingKey: "doneAction"
@@ -395,24 +405,6 @@ PluginSettings {
                 { label: I18n.tr("Copy & Save"), value: "both" }
             ]
             defaultValue: "both"
-        }
-
-        Separator {}
-
-        ToggleSettingPlus {
-            id: showToasts
-            settingKey: "showToasts"
-            label: I18n.tr("Show Toast Notifications")
-            defaultValue: true
-        }
-
-        Separator {}
-
-        ToggleSettingPlus {
-            id: showSystemNotification
-            settingKey: "showSystemNotification"
-            label: I18n.tr("Show System Notification")
-            defaultValue: false
         }
 
         Separator {}
@@ -442,6 +434,34 @@ PluginSettings {
         }
 
         Separator {}
+
+        SubCategoryHeader {
+            text: I18n.tr("Notification Preferences")
+            icon: "notifications"
+        }
+
+        ToggleSettingPlus {
+            id: showToasts
+            settingKey: "showToasts"
+            label: I18n.tr("Show Toast Notifications")
+            defaultValue: true
+        }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            id: showSystemNotification
+            settingKey: "showSystemNotification"
+            label: I18n.tr("Show System Notification")
+            defaultValue: false
+        }
+
+        Separator {}
+
+        SubCategoryHeader {
+            text: I18n.tr("Image Quality & Format")
+            icon: "image"
+        }
 
         ButtonGroupSettingPlus {
             id: outputFormat
