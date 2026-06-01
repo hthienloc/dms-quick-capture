@@ -1270,8 +1270,8 @@ DankModal {
                         transformOrigin: drawingCanvas.transformOrigin
                         color: "transparent"
                         border.color: Theme.primary
-                        border.width: 1.5
-                        radius: Theme.cornerRadius
+                        border.width: 1.5 / drawingCanvas.scale
+                        radius: Theme.cornerRadius / drawingCanvas.scale
                         z: 10
                         visible: config.pluginData["showCanvasBorder"] !== undefined ? config.pluginData["showCanvasBorder"] : true
                     }
