@@ -123,6 +123,96 @@ PluginComponent {
 
     pluginId: "quickCapture"
     pluginService: PluginService
+
+    // Bar Pill Integration
+    horizontalBarPill: Component {
+        Item {
+            implicitWidth: horizontalRow.implicitWidth
+            implicitHeight: Theme.iconSize
+            anchors.verticalCenter: parent.verticalCenter
+            property bool draggingOver: false
+
+            Row {
+                id: horizontalRow
+                spacing: Theme.spacingXS
+                anchors.verticalCenter: parent.verticalCenter
+                scale: draggingOver ? 1.2 : 1.0
+                Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
+
+                DankIcon {
+                    name: "photo_camera"
+                    size: Theme.iconSizeSmall
+                    color: draggingOver ? Theme.primary : (root.isCapturing || modal.shouldBeVisible ? Theme.primary : Theme.surfaceText)
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+
+            DropArea {
+                anchors.fill: parent
+                onEntered: draggingOver = true
+                onExited: draggingOver = false
+                onDropped: (drop) => {
+                    draggingOver = false;
+                    if (drop.hasUrls && drop.urls.length > 0) {
+                        const path = drop.urls[0].toString().replace("file://", "");
+                        Proc.runCommand("copy-image", ["cp", "-f", path, "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
+                            if (exitCode === 0) {
+                                modal.shouldBeVisible = true;
+                                modal.openCentered();
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    verticalBarPill: Component {
+        Item {
+            implicitWidth: Theme.iconSize
+            implicitHeight: verticalCol.implicitHeight
+            anchors.horizontalCenter: parent.horizontalCenter
+            property bool draggingOver: false
+
+            Column {
+                id: verticalCol
+                spacing: 2
+                anchors.horizontalCenter: parent.horizontalCenter
+                scale: draggingOver ? 1.2 : 1.0
+                Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
+
+                DankIcon {
+                    name: "photo_camera"
+                    size: Theme.iconSizeSmall
+                    color: draggingOver ? Theme.primary : (root.isCapturing || modal.shouldBeVisible ? Theme.primary : Theme.surfaceText)
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+            }
+
+            DropArea {
+                anchors.fill: parent
+                onEntered: draggingOver = true
+                onExited: draggingOver = false
+                onDropped: (drop) => {
+                    draggingOver = false;
+                    if (drop.hasUrls && drop.urls.length > 0) {
+                        const path = drop.urls[0].toString().replace("file://", "");
+                        Proc.runCommand("copy-image", ["cp", "-f", path, "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
+                            if (exitCode === 0) {
+                                modal.shouldBeVisible = true;
+                                modal.openCentered();
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    // Bar Pill Interactions
+    pillClickAction: function() { root.triggerCapture(); }
+    pillRightClickAction: function() { root.selectImageAndAnnotate(); }
+
     // Control Center Integration
     ccWidgetIcon: "photo_camera"
     ccWidgetPrimaryText: "Quick Capture"
