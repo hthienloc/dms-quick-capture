@@ -292,11 +292,12 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Interface")
             icon: "visibility"
-            showReset: toolbarPosition.isDirty || modalOpacity.isDirty || showToolbar.isDirty
+            showReset: toolbarPosition.isDirty || modalOpacity.isDirty || showToolbar.isDirty || showCanvasBorder.isDirty
             onResetClicked: {
                 toolbarPosition.resetToDefault();
                 modalOpacity.resetToDefault();
                 showToolbar.resetToDefault();
+                showCanvasBorder.resetToDefault();
             }
         }
 
@@ -339,6 +340,15 @@ PluginSettings {
             unit: "%"
             leftLabel: "0"
             rightLabel: "100"
+        }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            id: showCanvasBorder
+            settingKey: "showCanvasBorder"
+            label: I18n.tr("Show Screenshot Border")
+            defaultValue: true
         }
     }
 
@@ -453,15 +463,6 @@ PluginSettings {
             settingKey: "roundHighlighter"
             label: I18n.tr("Round Highlighter Tips")
             defaultValue: false
-        }
-
-        Separator {}
-
-        ToggleSettingPlus {
-            id: showCanvasBorder
-            settingKey: "showCanvasBorder"
-            label: I18n.tr("Show Screenshot Border")
-            defaultValue: true
         }
     }
 
