@@ -117,7 +117,7 @@ Rectangle {
                 DankSlider {
                     id: hSlider
                     minimum: 1
-                    maximum: 50
+                    maximum: root.currentTool === "text" ? 72 : 50
                     width: 100
                     height: 36
                     showValue: false

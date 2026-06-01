@@ -520,12 +520,18 @@ DankModal {
 
                     currentTool: window.currentTool
                     currentColor: window.currentColor
-                    strokeWidth: window.strokeWidth
+                    strokeWidth: window.currentTool === "text" ? window.textFontSize : window.strokeWidth
                     canUndo: window.strokes.length > 0
 
                     onToolSelected: (tool) => window.currentTool = tool
                     onColorSelected: (color) => window.currentColor = color
-                    onStrokeWidthSelected: (width) => window.strokeWidth = width
+                    onStrokeWidthSelected: (width) => {
+                        if (window.currentTool === "text") {
+                            window.textFontSize = width;
+                        } else {
+                            window.strokeWidth = width;
+                        }
+                    }
                     onUndoRequested: window.performUndo()
                     onSaveRequested: captureActions.performSaveOnly()
                     onCopyRequested: captureActions.performCopyOnly()
