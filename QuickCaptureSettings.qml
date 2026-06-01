@@ -464,10 +464,11 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Toolbar")
             icon: "dock"
-            showReset: showToolbar.isDirty || toolbarPosition.isDirty
+            showReset: showToolbar.isDirty || toolbarPosition.isDirty || showToolbarBorder.isDirty
             onResetClicked: {
                 showToolbar.resetToDefault();
                 toolbarPosition.resetToDefault();
+                showToolbarBorder.resetToDefault();
             }
         }
 
@@ -496,6 +497,20 @@ PluginSettings {
             defaultValue: "top"
             visible: showToolbar.value
             height: visible ? 72 : 0
+        }
+
+        Separator {
+            visible: showToolbar.value
+            height: visible ? 1 : 0
+        }
+
+        ToggleSettingPlus {
+            id: showToolbarBorder
+            settingKey: "showToolbarBorder"
+            label: I18n.tr("Show Toolbar Border")
+            defaultValue: true
+            visible: showToolbar.value
+            height: visible ? 36 : 0
         }
     }
 

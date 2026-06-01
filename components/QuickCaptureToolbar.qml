@@ -34,9 +34,12 @@ Rectangle {
     width: isVertical ? 56 : (contentLayout.width + Theme.spacingM * 2)
     height: isVertical ? (contentLayout.height + Theme.spacingM * 2) : 56
     radius: Theme.cornerRadius
+
+    readonly property bool showBorder: root.pluginData["showToolbarBorder"] ?? true
+
     color: Theme.withAlpha(Theme.surfaceContainer, 0.95)
     border.color: Theme.withAlpha(Theme.outline, 0.15)
-    border.width: 1
+    border.width: showBorder ? 1 : 0
 
     Item {
         id: contentLayout
