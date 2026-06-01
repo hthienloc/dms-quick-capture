@@ -508,7 +508,7 @@ PluginSettings {
             id: showToolbarBorder
             settingKey: "showToolbarBorder"
             label: I18n.tr("Show Toolbar Border")
-            defaultValue: true
+            defaultValue: false
             visible: showToolbar.value
             height: visible ? 36 : 0
         }
