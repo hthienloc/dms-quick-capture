@@ -908,7 +908,7 @@ PluginSettings {
 
             CopyBox {
                 label: I18n.tr("Trigger Screenshot (Default)")
-                text: "dms ipc call quickCapture screenshot"
+                text: "dms ipc call quickCapture screenshot default"
             }
 
             CopyBox {
@@ -930,7 +930,7 @@ PluginSettings {
 
             CopyBox {
                 label: I18n.tr("Niri Binding Example")
-                text: "binds {\n    Print { spawn \"dms\" \"ipc\" \"call\" \"quickCapture\" \"screenshot\"; }\n}"
+                text: "binds {\n    Print { spawn \"dms\" \"ipc\" \"call\" \"quickCapture\" \"screenshot\" \"default\"; }\n}"
             }
         }
     }

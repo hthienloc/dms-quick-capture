@@ -277,8 +277,12 @@ PluginComponent {
     }
 
     IpcHandler {
-        function screenshot() : string {
-            root.triggerCapture("");
+        function screenshot(mode: string) : string {
+            if (mode === "default") {
+                root.triggerCapture("");
+            } else {
+                root.triggerCapture(mode);
+            }
             return "SUCCESS";
         }
 
@@ -290,16 +294,6 @@ PluginComponent {
         function close() : string {
             modal.shouldBeVisible = false;
             modal.close();
-            return "SUCCESS";
-        }
-
-        target: "quickCapture"
-        enabled: root.isDaemonInstance
-    }
-
-    IpcHandler {
-        function screenshot(mode: string) : string {
-            root.triggerCapture(mode);
             return "SUCCESS";
         }
 
