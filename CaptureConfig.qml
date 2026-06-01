@@ -19,13 +19,13 @@ QtObject {
     ]
 
     readonly property var defaultAccentColors: [
-        "#3b82f6",
-        "#ef4444",
-        "#22c55e",
-        "#eab308",
-        "#a855f7",
-        "#ffffff",
-        "#000000"
+        Theme.primary,
+        Theme.error,
+        Theme.success,
+        Theme.warning,
+        Theme.secondary,
+        Theme.surfaceText,
+        Theme.surface
     ]
 
     readonly property var accentColors: {

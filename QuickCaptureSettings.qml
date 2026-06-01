@@ -10,6 +10,10 @@ PluginSettings {
 
     pluginId: "quickCapture"
 
+    CaptureConfig {
+        id: captureConfig
+    }
+
     component ShortcutRow : Item {
         id: rowRoot
         width: parent.width
@@ -483,13 +487,13 @@ PluginSettings {
                 defaultValue: "primary"
             }
 
-            CompactColorSetting { id: c0; settingKey: "toolbar_color_0"; label: I18n.tr("Slot 2"); defaultValue: "#3b82f6" }
-            CompactColorSetting { id: c1; settingKey: "toolbar_color_1"; label: I18n.tr("Slot 3"); defaultValue: "#ef4444" }
-            CompactColorSetting { id: c2; settingKey: "toolbar_color_2"; label: I18n.tr("Slot 4"); defaultValue: "#22c55e" }
-            CompactColorSetting { id: c3; settingKey: "toolbar_color_3"; label: I18n.tr("Slot 5"); defaultValue: "#eab308" }
-            CompactColorSetting { id: c4; settingKey: "toolbar_color_4"; label: I18n.tr("Slot 6"); defaultValue: "#a855f7" }
-            CompactColorSetting { id: c5; settingKey: "toolbar_color_5"; label: I18n.tr("Slot 7"); defaultValue: "#ffffff" }
-            CompactColorSetting { id: c6; settingKey: "toolbar_color_6"; label: I18n.tr("Slot 8"); defaultValue: "#000000" }
+            CompactColorSetting { id: c0; settingKey: "toolbar_color_0"; label: I18n.tr("Slot 2"); defaultValue: captureConfig.defaultAccentColors[0] }
+            CompactColorSetting { id: c1; settingKey: "toolbar_color_1"; label: I18n.tr("Slot 3"); defaultValue: captureConfig.defaultAccentColors[1] }
+            CompactColorSetting { id: c2; settingKey: "toolbar_color_2"; label: I18n.tr("Slot 4"); defaultValue: captureConfig.defaultAccentColors[2] }
+            CompactColorSetting { id: c3; settingKey: "toolbar_color_3"; label: I18n.tr("Slot 5"); defaultValue: captureConfig.defaultAccentColors[3] }
+            CompactColorSetting { id: c4; settingKey: "toolbar_color_4"; label: I18n.tr("Slot 6"); defaultValue: captureConfig.defaultAccentColors[4] }
+            CompactColorSetting { id: c5; settingKey: "toolbar_color_5"; label: I18n.tr("Slot 7"); defaultValue: captureConfig.defaultAccentColors[5] }
+            CompactColorSetting { id: c6; settingKey: "toolbar_color_6"; label: I18n.tr("Slot 8"); defaultValue: captureConfig.defaultAccentColors[6] }
         }
     }
 

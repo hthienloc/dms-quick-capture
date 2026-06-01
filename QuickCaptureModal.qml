@@ -130,7 +130,7 @@ DankModal {
         for (let i = 0; i < 8; i++) {
             const t = window.parentWidget.pluginData["preset_" + i + "_tool"];
             if (t && t !== "none") {
-                const rawColor = window.parentWidget.pluginData["preset_" + i + "_color"] || "#3b82f6";
+                const rawColor = window.parentWidget.pluginData["preset_" + i + "_color"] || Theme.primary;
                 const resolvedColor = rawColor === "primary" ? Theme.primary : rawColor;
                 list.push({
                     tool: t,
