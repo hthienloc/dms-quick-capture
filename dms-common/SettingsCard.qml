@@ -9,6 +9,7 @@ StyledRect {
     radius: Theme.cornerRadius
     color: Theme.surfaceContainer
 
+
     default property alias content: contentColumn.data
     property alias spacing: contentColumn.spacing
 

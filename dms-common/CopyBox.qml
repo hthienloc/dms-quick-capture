@@ -10,6 +10,16 @@ Column {
 
     property string label: ""
     property string text: ""
+    property bool isCopied: false
+
+    Timer {
+        id: copyTimer
+        interval: 1500
+        repeat: false
+        onTriggered: {
+            root.isCopied = false;
+        }
+    }
 
     StyledText {
         width: parent.width
@@ -23,7 +33,7 @@ Column {
     Rectangle {
         width: parent.width
         height: Math.max(40, cmdRow.implicitHeight + 16)
-        color: Theme.surfaceContainer
+        color: Theme.surfaceContainerHigh
         radius: 4
 
         Row {
@@ -43,12 +53,14 @@ Column {
 
             DankButton {
                 width: 24; height: 24
-                iconName: "content_copy"
+                iconName: root.isCopied ? "check" : "content_copy"
                 backgroundColor: "transparent"
-                textColor: Theme.primary
+                textColor: root.isCopied ? Theme.success : Theme.primary
                 anchors.verticalCenter: parent.verticalCenter
                 onClicked: {
                     Proc.runCommand("copy-ipc", ["wl-copy", "--", root.text], function() {
+                        root.isCopied = true;
+                        copyTimer.restart();
                         ToastService.showInfo("Copied to clipboard");
                     });
                 }

@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Dialogs
 import qs.Common
 import qs.Widgets
 
@@ -9,71 +8,73 @@ Item {
     required property string settingKey
     required property string label
     property string description: ""
-    property string placeholder: ""
+    required property var options
     property string defaultValue: ""
     property string value: defaultValue
-    
-    // Features
-    property bool isDirectory: false
-    property bool isFile: false
-    property var fileExtensions: ["*"]
 
     width: parent.width
     implicitHeight: layout.implicitHeight
-    
-    // Dynamic Opacity for disabled state
+
+    // Dynamic Opacity for disabled state (Original DMS feature)
     opacity: enabled ? 1 : 0.5
     Behavior on opacity { NumberAnimation { duration: Theme.shortDuration } }
 
-    property bool isInitialized: false
-    readonly property bool isDirty: value !== defaultValue
+    readonly property bool isDirty: String(value) !== String(defaultValue)
 
     function resetToDefault() {
-        console.log(`[StringSettingPlus] Resetting ${settingKey}`);
+        console.log(`[ButtonGroupSettingPlus] Resetting ${settingKey}`);
         value = defaultValue;
-        textField.text = defaultValue;
-    }
-
-    onValueChanged: {
-        if (!isInitialized) return;
-        const settings = findSettings();
-        if (settings) settings.saveValue(settingKey, value);
     }
 
     function loadValue() {
-        const settings = findSettings();
+        const settings = findSettings()
         if (settings && settings.pluginService) {
-            const loadedValue = settings.loadValue(settingKey, defaultValue);
-            if (textField.activeFocus && isInitialized) return;
-            value = loadedValue;
-            textField.text = loadedValue;
-            isInitialized = true;
+            value = settings.loadValue(settingKey, defaultValue)
         }
     }
 
-    Component.onCompleted: Qt.callLater(loadValue);
+    Component.onCompleted: loadValue()
 
-    function commit() {
-        if (!isInitialized || textField.text === value) return;
-        value = textField.text;
-        const settings = findSettings();
-        if (settings) settings.saveValue(settingKey, value);
+    readonly property var optionLabels: {
+        const labels = []
+        for (let i = 0; i < options.length; i++) {
+            labels.push(options[i].label || options[i])
+        }
+        return labels
+    }
+
+    readonly property var valueToIndex: {
+        const map = {}
+        for (let i = 0; i < options.length; i++) {
+            const opt = options[i]
+            if (typeof opt === 'object') map[opt.value] = i
+            else map[opt] = i
+        }
+        return map
+    }
+
+    readonly property var indexToValue: {
+        const map = {}
+        for (let i = 0; i < options.length; i++) {
+            const opt = options[i]
+            if (typeof opt === 'object') map[i] = opt.value
+            else map[i] = opt
+        }
+        return map
+    }
+
+    onValueChanged: {
+        const settings = findSettings()
+        if (settings) settings.saveValue(settingKey, value)
     }
 
     function findSettings() {
-        let item = parent;
+        let item = parent
         while (item) {
-            if (item.saveValue !== undefined && item.loadValue !== undefined) return item;
-            item = item.parent;
+            if (item.saveValue !== undefined && item.loadValue !== undefined) return item
+            item = item.parent
         }
-        return null;
-    }
-
-    function _cleanPath(url) {
-        let path = url.toString();
-        if (path.startsWith("file://")) path = path.substring(7);
-        if (path.length > 1 && path.endsWith("/")) path = path.substring(0, path.length - 1);
-        return path;
+        return null
     }
 
     HoverHandler {
@@ -164,48 +165,21 @@ Item {
             }
         }
 
-        // ── Input Row (Explicit Width Calculation) ───────────────────────────
-        Row {
+        // ── Button Group (Full Width) ─────────────────────────────────────────
+        DankButtonGroup {
+            id: buttonGroup
             width: parent.width
-            spacing: Theme.spacingS
-
-            DankTextField {
-                id: textField
-                width: parent.width - (pickerBtn.visible ? 42 + Theme.spacingS : 0)
-                placeholderText: root.placeholder
-                onEditingFinished: root.commit()
-                onActiveFocusChanged: if (!activeFocus) root.commit()
-            }
-
-            DankButton {
-                id: pickerBtn
-                visible: root.isDirectory || root.isFile
-                iconName: root.isDirectory ? "folder_open" : "file_open"
-                text: ""
-                width: 42
-                buttonHeight: textField.height
-                backgroundColor: Theme.surfaceContainerHigh
-                textColor: Theme.primary
-                onClicked: {
-                    if (root.isDirectory) folderDialog.open();
-                    else fileDialog.open();
+            buttonHeight: 32
+            selectionMode: "single"
+            model: root.optionLabels
+            currentIndex: root.valueToIndex[root.value] !== undefined ? root.valueToIndex[root.value] : -1
+            onSelectionChanged: (index, selected) => {
+                if (selected) {
+                    root.value = root.indexToValue[index]
                 }
             }
         }
 
         DankTooltipV2 { id: sharedTooltip }
-
-        FolderDialog {
-            id: folderDialog
-            title: I18n.tr("Select Directory")
-            onAccepted: { textField.text = root._cleanPath(selectedFolder); root.commit(); }
-        }
-        
-        FileDialog {
-            id: fileDialog
-            title: I18n.tr("Select File")
-            nameFilters: root.fileExtensions
-            onAccepted: { textField.text = root._cleanPath(selectedFile); root.commit(); }
-        }
     }
 }
