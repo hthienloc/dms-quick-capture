@@ -72,40 +72,6 @@ PluginSettings {
         }
     }
 
-    component SubCategoryHeader : Item {
-        id: subHeaderRoot
-        required property string text
-        property string icon: ""
-
-        width: parent.width
-        height: 32
-
-        Row {
-            anchors.left: parent.left
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 4
-            spacing: Theme.spacingXS
-
-            DankIcon {
-                name: subHeaderRoot.icon
-                size: 14
-                color: Theme.primary
-                visible: subHeaderRoot.icon !== ""
-                anchors.verticalCenter: parent.verticalCenter
-                opacity: 0.8
-            }
-
-            StyledText {
-                text: subHeaderRoot.text
-                font.pixelSize: Theme.fontSizeSmall
-                font.weight: Font.Bold
-                color: Theme.primary
-                anchors.verticalCenter: parent.verticalCenter
-                opacity: 0.85
-            }
-        }
-    }
-
     component CompactColorSetting : Item {
         id: swatchRoot
 
@@ -282,29 +248,17 @@ PluginSettings {
     }
 
     SettingsCard {
-        id: captureSection
+        id: captureModeCard
         SectionTitle {
-            text: I18n.tr("Capture")
-            icon: "screenshot"
-            showReset: captureMode.isDirty || doneAction.isDirty || saveDirectory.isDirty || skipConfirm.isDirty || outputFormat.isDirty || includeCursor.isDirty || jpegQuality.isDirty || showToasts.isDirty || showSystemNotification.isDirty || outputTargetName.isDirty || saveFilenamePattern.isDirty
+            text: I18n.tr("Capture Mode")
+            icon: "camera"
+            showReset: captureMode.isDirty || outputTargetName.isDirty || skipConfirm.isDirty || includeCursor.isDirty
             onResetClicked: {
                 captureMode.resetToDefault();
-                doneAction.resetToDefault();
-                saveDirectory.resetToDefault();
-                skipConfirm.resetToDefault();
-                outputFormat.resetToDefault();
-                includeCursor.resetToDefault();
-                jpegQuality.resetToDefault();
-                showToasts.resetToDefault();
-                showSystemNotification.resetToDefault();
                 outputTargetName.resetToDefault();
-                saveFilenamePattern.resetToDefault();
+                skipConfirm.resetToDefault();
+                includeCursor.resetToDefault();
             }
-        }
-
-        SubCategoryHeader {
-            text: I18n.tr("Capture Modes")
-            icon: "camera"
         }
 
         SelectionSettingPlus {
@@ -387,12 +341,19 @@ PluginSettings {
             label: I18n.tr("Include Cursor")
             defaultValue: false
         }
+    }
 
-        Separator {}
-
-        SubCategoryHeader {
-            text: I18n.tr("Save & Output Actions")
+    SettingsCard {
+        id: saveOptionsCard
+        SectionTitle {
+            text: I18n.tr("Saving")
             icon: "save"
+            showReset: doneAction.isDirty || saveDirectory.isDirty || saveFilenamePattern.isDirty
+            onResetClicked: {
+                doneAction.resetToDefault();
+                saveDirectory.resetToDefault();
+                saveFilenamePattern.resetToDefault();
+            }
         }
 
         ButtonGroupSettingPlus {
@@ -432,12 +393,18 @@ PluginSettings {
             text: I18n.tr("Supports formatting: %Y (Year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)")
             opacity: 0.85
         }
+    }
 
-        Separator {}
-
-        SubCategoryHeader {
-            text: I18n.tr("Notification Preferences")
+    SettingsCard {
+        id: notificationsCard
+        SectionTitle {
+            text: I18n.tr("Notifications")
             icon: "notifications"
+            showReset: showToasts.isDirty || showSystemNotification.isDirty
+            onResetClicked: {
+                showToasts.resetToDefault();
+                showSystemNotification.resetToDefault();
+            }
         }
 
         ToggleSettingPlus {
@@ -455,12 +422,18 @@ PluginSettings {
             label: I18n.tr("Show System Notification")
             defaultValue: false
         }
+    }
 
-        Separator {}
-
-        SubCategoryHeader {
-            text: I18n.tr("Image Quality & Format")
+    SettingsCard {
+        id: imageFormatCard
+        SectionTitle {
+            text: I18n.tr("Format")
             icon: "image"
+            showReset: outputFormat.isDirty || jpegQuality.isDirty
+            onResetClicked: {
+                outputFormat.resetToDefault();
+                jpegQuality.resetToDefault();
+            }
         }
 
         ButtonGroupSettingPlus {
@@ -496,22 +469,15 @@ PluginSettings {
     }
 
     SettingsCard {
-        id: interfaceSection
+        id: toolbarCard
         SectionTitle {
-            text: I18n.tr("Interface")
-            icon: "visibility"
-            showReset: toolbarPosition.isDirty || modalOpacity.isDirty || showToolbar.isDirty || showCanvasBorder.isDirty
-            onResetClicked: {
-                toolbarPosition.resetToDefault();
-                modalOpacity.resetToDefault();
-                showToolbar.resetToDefault();
-                showCanvasBorder.resetToDefault();
-            }
-        }
-
-        SubCategoryHeader {
-            text: I18n.tr("Toolbar Overlay")
+            text: I18n.tr("Toolbar")
             icon: "dock"
+            showReset: showToolbar.isDirty || toolbarPosition.isDirty
+            onResetClicked: {
+                showToolbar.resetToDefault();
+                toolbarPosition.resetToDefault();
+            }
         }
 
         ToggleSettingPlus {
@@ -540,12 +506,18 @@ PluginSettings {
             visible: showToolbar.value
             height: visible ? 72 : 0
         }
+    }
 
-        Separator {}
-
-        SubCategoryHeader {
-            text: I18n.tr("Capture Screen Styles")
+    SettingsCard {
+        id: backdropStylesCard
+        SectionTitle {
+            text: I18n.tr("Styles")
             icon: "aspect_ratio"
+            showReset: modalOpacity.isDirty || showCanvasBorder.isDirty
+            onResetClicked: {
+                modalOpacity.resetToDefault();
+                showCanvasBorder.resetToDefault();
+            }
         }
 
         SliderSettingPlus {
@@ -572,24 +544,15 @@ PluginSettings {
     }
 
     SettingsCard {
-        id: toolsSection
+        id: drawingCard
         SectionTitle {
-            text: I18n.tr("Tools")
-            icon: "edit"
-            showReset: defaultTool.isDirty || defaultThickness.isDirty || textFontSize.isDirty || textMonospace.isDirty || roundRect.isDirty || roundHighlighter.isDirty
+            text: I18n.tr("Drawing")
+            icon: "brush"
+            showReset: defaultTool.isDirty || defaultThickness.isDirty
             onResetClicked: {
                 defaultTool.resetToDefault();
                 defaultThickness.resetToDefault();
-                textFontSize.resetToDefault();
-                textMonospace.resetToDefault();
-                roundRect.resetToDefault();
-                roundHighlighter.resetToDefault();
             }
-        }
-
-        SubCategoryHeader {
-            text: I18n.tr("Drawing Defaults")
-            icon: "brush"
         }
 
         SelectionSettingPlus {
@@ -649,12 +612,18 @@ PluginSettings {
             rightLabel: "20"
             previewType: "thickness"
         }
+    }
 
-        Separator {}
-
-        SubCategoryHeader {
-            text: I18n.tr("Text Annotations")
+    SettingsCard {
+        id: textSettingsCard
+        SectionTitle {
+            text: I18n.tr("Text")
             icon: "format_size"
+            showReset: textFontSize.isDirty || textMonospace.isDirty
+            onResetClicked: {
+                textFontSize.resetToDefault();
+                textMonospace.resetToDefault();
+            }
         }
 
         SliderSettingPlus {
@@ -677,12 +646,18 @@ PluginSettings {
             label: I18n.tr("Use Monospace Font")
             defaultValue: false
         }
+    }
 
-        Separator {}
-
-        SubCategoryHeader {
-            text: I18n.tr("Shape Settings")
+    SettingsCard {
+        id: shapesCard
+        SectionTitle {
+            text: I18n.tr("Shapes")
             icon: "category"
+            showReset: roundRect.isDirty || roundHighlighter.isDirty
+            onResetClicked: {
+                roundRect.resetToDefault();
+                roundHighlighter.resetToDefault();
+            }
         }
 
         ToggleSettingPlus {
@@ -1347,10 +1322,18 @@ PluginSettings {
         }
 
         Separator {}
-
-        SubCategoryHeader {
-            text: I18n.tr("Hover & Trigger Behavior")
+    }
+ 
+    SettingsCard {
+        id: radialBehaviorsCard
+        SectionTitle {
+            text: I18n.tr("Radial Hover")
             icon: "mouse"
+            showReset: radialHoverTrigger.isDirty || radialHoverDelay.isDirty
+            onResetClicked: {
+                radialHoverTrigger.resetToDefault();
+                radialHoverDelay.resetToDefault();
+            }
         }
 
         ToggleSettingPlus {
