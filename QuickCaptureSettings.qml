@@ -242,12 +242,13 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Capture")
             icon: "screenshot"
-            showReset: captureMode.isDirty || doneAction.isDirty || saveDirectory.isDirty || skipConfirm.isDirty
+            showReset: captureMode.isDirty || doneAction.isDirty || saveDirectory.isDirty || skipConfirm.isDirty || outputFormat.isDirty
             onResetClicked: {
                 captureMode.resetToDefault();
                 doneAction.resetToDefault();
                 saveDirectory.resetToDefault();
                 skipConfirm.resetToDefault();
+                outputFormat.resetToDefault();
             }
         }
 
@@ -299,6 +300,20 @@ PluginSettings {
             placeholder: "~/Pictures/Screenshots"
             defaultValue: "~/Pictures/Screenshots"
             isDirectory: true
+        }
+
+        Separator {}
+
+        ButtonGroupSettingPlus {
+            id: outputFormat
+            settingKey: "outputFormat"
+            label: I18n.tr("Output Format")
+            options: [
+                { label: "PNG", value: "png" },
+                { label: "JPEG", value: "jpg" },
+                { label: "PPM", value: "ppm" }
+            ]
+            defaultValue: "png"
         }
     }
 

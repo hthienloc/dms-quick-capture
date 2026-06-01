@@ -1342,7 +1342,8 @@ DankModal {
                             ctx.drawImage(window.activeCanvas, 0, 0);
                         }
 
-                        const tempOut = "/tmp/dms_capture_output.png";
+                        const format = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.outputFormat) || "png";
+                        const tempOut = "/tmp/dms_capture_output." + format;
                         exportCanvas.save(tempOut);
 
                         if (window.exportCallback) {

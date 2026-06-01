@@ -16,7 +16,9 @@ QtObject {
     }
 
     function screenshotFilename() {
-        return "Screenshot_" + Date.now() + ".png";
+        const hasParent = root.parentWidget && root.parentWidget.pluginData;
+        const format = hasParent ? (root.parentWidget.pluginData.outputFormat || "png") : "png";
+        return "Screenshot_" + Date.now() + "." + format;
     }
 
     function escapeDoubleQuoted(value) {
