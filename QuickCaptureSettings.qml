@@ -242,11 +242,12 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Capture")
             icon: "screenshot"
-            showReset: captureMode.isDirty || doneAction.isDirty || saveDirectory.isDirty
+            showReset: captureMode.isDirty || doneAction.isDirty || saveDirectory.isDirty || skipConfirm.isDirty
             onResetClicked: {
                 captureMode.resetToDefault();
                 doneAction.resetToDefault();
                 saveDirectory.resetToDefault();
+                skipConfirm.resetToDefault();
             }
         }
 
@@ -259,6 +260,20 @@ PluginSettings {
                 { label: I18n.tr("Full Screen"), value: "full" }
             ]
             defaultValue: "region"
+        }
+
+        Separator {
+            visible: captureMode.value === "region"
+            height: visible ? 1 : 0
+        }
+
+        ToggleSettingPlus {
+            id: skipConfirm
+            settingKey: "skipConfirm"
+            label: I18n.tr("Skip Confirmation")
+            defaultValue: true
+            visible: captureMode.value === "region"
+            height: visible ? 36 : 0
         }
 
         Separator {}

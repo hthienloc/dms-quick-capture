@@ -47,10 +47,15 @@ PluginComponent {
     }
 
     function screenshotArgs() {
-        if (root.captureMode === "region")
-            return ["dms", "screenshot", "region", "--no-clipboard", "--no-notify", "--dir", "/tmp", "--filename", "dms_capture_bg.png"];
-        else
+        if (root.captureMode === "region") {
+            const args = ["dms", "screenshot", "region", "--no-clipboard", "--no-notify", "--dir", "/tmp", "--filename", "dms_capture_bg.png"];
+            if (pluginData.skipConfirm !== false) {
+                args.push("--no-confirm");
+            }
+            return args;
+        } else {
             return ["dms", "screenshot", "full", "--no-clipboard", "--no-notify", "--dir", "/tmp", "--filename", "dms_capture_bg.png"];
+        }
     }
 
     function startActualCapture() {
