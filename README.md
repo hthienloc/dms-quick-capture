@@ -64,20 +64,23 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 
 ## IPC Commands
 
-Use `dms ipc call quickCapture <command>` to control the screenshot workflow.
+Use `dms ipc call quickCapture <command> [arg]` to control the screenshot workflow.
 
-| Command | Description |
-|---------|-------------|
-| `screenshot` | Trigger interactive region screenshot selection |
-| `selectFile` | Open file browser to select an existing image |
-| `toggle` | Toggle the quick capture annotator window |
-| `close` | Close the quick capture annotator window |
+| Command | Argument | Description |
+|---------|----------|-------------|
+| `screenshot` | - | Trigger capture using the configured default mode |
+| `screenshotMode` | `mode` | Trigger capture in a specific mode (`region`, `full`, `all`, `output`, `window`, `last`) |
+| `selectFile` | - | Open file browser to select an existing image |
+| `close` | - | Close the quick capture annotator window |
 
-### Keybinding example (Niri)
+### Keybinding examples (Niri)
 
 ```kdl
 binds {
+    // Capture interactive region (customized default or fallback)
     Print { spawn "dms" "ipc" "call" "quickCapture" "screenshot"; }
+    // Capture focused window
+    Meta+Print { spawn "dms" "ipc" "call" "quickCapture" "screenshotMode" "window"; }
 }
 ```
 

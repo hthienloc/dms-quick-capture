@@ -15,17 +15,20 @@ PluginComponent {
     readonly property bool isDaemonInstance: root.parent !== null
     property bool isCapturing: false
     readonly property string captureMode: (pluginData.captureMode || "region")
+    property string activeIpcMode: ""
 
-    function triggerCapture() {
+    function triggerCapture(mode) {
         if (root.isDaemonInstance) {
+            root.activeIpcMode = mode || "";
             root.startCaptureAfterDelay();
         } else {
             const daemon = PluginService.pluginInstances["quickCapture"];
             if (daemon) {
                 root.closeControlCenter();
-                daemon.triggerCapture();
+                daemon.triggerCapture(mode);
             } else {
                 // Fallback if daemon is somehow missing
+                root.activeIpcMode = mode || "";
                 root.startCaptureAfterDelay();
             }
         }
@@ -47,15 +50,16 @@ PluginComponent {
     }
 
     function screenshotArgs() {
+        const mode = root.activeIpcMode !== "" ? root.activeIpcMode : root.captureMode;
         const format = (pluginData.outputFormat || "png");
         const cursorVal = pluginData.includeCursor ? "on" : "off";
-        const args = ["dms", "screenshot", root.captureMode, "--no-clipboard", "--dir", "/tmp", "--filename", "dms_capture_bg.png", "--format", format, "--cursor", cursorVal];
+        const args = ["dms", "screenshot", mode, "--no-clipboard", "--dir", "/tmp", "--filename", "dms_capture_bg.png", "--format", format, "--cursor", cursorVal];
 
         if (!pluginData.showSystemNotification) {
             args.push("--no-notify");
         }
 
-        if (root.captureMode === "region" && pluginData.skipConfirm !== false) {
+        if (mode === "region" && pluginData.skipConfirm !== false) {
             args.push("--no-confirm");
         }
 
@@ -73,6 +77,7 @@ PluginComponent {
 
         Proc.runCommand("dms-screenshot", root.screenshotArgs(), (stdout, exitCode) => {
             root.isCapturing = false;
+            root.activeIpcMode = "";
             if (exitCode === 0) {
                 modal.shouldBeVisible = true;
                 modal.openCentered();
@@ -273,7 +278,12 @@ PluginComponent {
 
     IpcHandler {
         function screenshot() : string {
-            root.triggerCapture();
+            root.triggerCapture("");
+            return "SUCCESS";
+        }
+
+        function screenshotMode(mode: string) : string {
+            root.triggerCapture(mode);
             return "SUCCESS";
         }
 
@@ -286,13 +296,6 @@ PluginComponent {
             modal.shouldBeVisible = false;
             modal.close();
             return "SUCCESS";
-        }
-
-        function toggle() : string {
-            if (modal.shouldBeVisible)
-                return close();
-            else
-                return screenshot();
         }
 
         target: "quickCapture"
