@@ -1030,15 +1030,7 @@ PluginSettings {
             }
         }
 
-        Separator {}
 
-        StyledText {
-            text: I18n.tr("Slot Editor")
-            font.pixelSize: Theme.fontSizeSmall
-            font.weight: Font.Bold
-            color: Theme.primary
-            opacity: 0.85
-        }
 
         Repeater {
             model: 8
