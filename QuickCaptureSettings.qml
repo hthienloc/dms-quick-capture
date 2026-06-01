@@ -10,6 +10,68 @@ PluginSettings {
 
     pluginId: "quickCapture"
 
+    component ShortcutRow : Item {
+        id: rowRoot
+        width: parent.width
+        height: 32
+        
+        required property string keyText
+        required property string actionText
+        property bool isHeader: false
+
+        Rectangle {
+            anchors.fill: parent
+            color: rowRoot.isHeader ? Theme.withAlpha(Theme.primary, 0.08) : "transparent"
+            radius: Theme.cornerRadius
+        }
+
+        Row {
+            anchors.fill: parent
+            anchors.leftMargin: Theme.spacingM
+            anchors.rightMargin: Theme.spacingM
+            spacing: Theme.spacingM
+            
+            // Key Badge Column
+            Item {
+                width: 110
+                height: parent.height
+                anchors.verticalCenter: parent.verticalCenter
+
+                Rectangle {
+                    anchors.centerIn: parent
+                    width: Math.max(90, keyLabel.implicitWidth + 12)
+                    height: 22
+                    radius: 6
+                    color: rowRoot.isHeader ? "transparent" : Theme.surfaceContainerHighest
+                    border.color: rowRoot.isHeader ? "transparent" : Theme.outline
+                    border.width: rowRoot.isHeader ? 0 : 1
+                    visible: rowRoot.keyText !== ""
+
+                    StyledText {
+                        id: keyLabel
+                        text: rowRoot.keyText
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.bold: true
+                        isMonospace: true
+                        color: rowRoot.isHeader ? Theme.primary : Theme.surfaceText
+                        anchors.centerIn: parent
+                    }
+                }
+            }
+
+            // Action Text Column
+            StyledText {
+                text: rowRoot.actionText
+                font.pixelSize: Theme.fontSizeMedium
+                font.weight: rowRoot.isHeader ? Font.Bold : Font.Normal
+                color: rowRoot.isHeader ? Theme.primary : Theme.surfaceText
+                anchors.verticalCenter: parent.verticalCenter
+                elide: Text.ElideRight
+                width: parent.width - 130
+            }
+        }
+    }
+
     component CompactColorSetting : Item {
         id: swatchRoot
 
@@ -567,16 +629,71 @@ PluginSettings {
             settingKey: "usageGuideExpanded"
         }
 
-        UsageGuide {
-            expanded: usageTitle.isExpanded
-            items: [
-                I18n.tr("<b>Left-click</b> the bar icon to start a new screenshot."),
-                I18n.tr("<b>Right-click</b> the bar icon to select an existing image for annotation."),
-                I18n.tr("<b>Drop an image</b> onto the bar icon to open it instantly."),
-                I18n.tr("During capture: <b>Right-click</b> to open the custom <b>Radial Menu</b>."),
-                I18n.tr("Use <b>Mouse Wheel</b> to dynamically adjust stroke thickness."),
-                I18n.tr("<b>Middle-click</b> any drawn element to instantly erase it.")
-            ]
+        Column {
+            width: parent.width
+            spacing: Theme.spacingM
+            visible: usageTitle.isExpanded
+
+            StyledText {
+                text: I18n.tr("Bar Interactions")
+                font.pixelSize: Theme.fontSizeLarge
+                font.bold: true
+                color: Theme.primary
+            }
+
+            Column {
+                width: parent.width
+                spacing: 2
+
+                ShortcutRow { keyText: I18n.tr("Action"); actionText: I18n.tr("Interaction / Result"); isHeader: true }
+                ShortcutRow { keyText: I18n.tr("Left Click"); actionText: I18n.tr("Start interactive screenshot capture") }
+                ShortcutRow { keyText: I18n.tr("Right Click"); actionText: I18n.tr("Open file browser to select image") }
+                ShortcutRow { keyText: I18n.tr("Drag Image"); actionText: I18n.tr("Drop image onto icon to annotate") }
+            }
+
+            Separator { opacity: 0.1 }
+
+            StyledText {
+                text: I18n.tr("Annotation Tools")
+                font.pixelSize: Theme.fontSizeLarge
+                font.bold: true
+                color: Theme.primary
+            }
+
+            Column {
+                width: parent.width
+                spacing: 2
+
+                ShortcutRow { keyText: I18n.tr("Key"); actionText: I18n.tr("Selected Tool / Action"); isHeader: true }
+                ShortcutRow { keyText: "V"; actionText: I18n.tr("Select / Move stroke") }
+                ShortcutRow { keyText: "P"; actionText: I18n.tr("Crop / Resize Area") }
+                ShortcutRow { keyText: "1 - 4"; actionText: I18n.tr("Pen, Line, Arrow, Rect") }
+                ShortcutRow { keyText: "Q - R"; actionText: I18n.tr("Ellipse, Text, Pixelate, Redact (Q, W, E, R)") }
+                ShortcutRow { keyText: "A - D"; actionText: I18n.tr("Stamp, Highlighter, Eraser (A, S, D)") }
+            }
+
+            Separator { opacity: 0.1 }
+
+            StyledText {
+                text: I18n.tr("General Shortcuts")
+                font.pixelSize: Theme.fontSizeLarge
+                font.bold: true
+                color: Theme.primary
+            }
+
+            Column {
+                width: parent.width
+                spacing: 2
+
+                ShortcutRow { keyText: I18n.tr("Key"); actionText: I18n.tr("Shortcut Action"); isHeader: true }
+                ShortcutRow { keyText: "Enter"; actionText: I18n.tr("Done (Action based on settings)") }
+                ShortcutRow { keyText: "Esc"; actionText: I18n.tr("Discard & Close") }
+                ShortcutRow { keyText: "Ctrl + Z"; actionText: I18n.tr("Undo last stroke") }
+                ShortcutRow { keyText: "Ctrl + S"; actionText: I18n.tr("Force Save to File") }
+                ShortcutRow { keyText: "Ctrl + C"; actionText: I18n.tr("Force Copy to Clipboard") }
+                ShortcutRow { keyText: "Ctrl + 1..4"; actionText: I18n.tr("Select Color Slots 1 - 4") }
+                ShortcutRow { keyText: "Ctrl + Q..R"; actionText: I18n.tr("Select Color Slots 5 - 8 (Q, W, E, R)") }
+            }
         }
     }
 
