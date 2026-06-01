@@ -2,12 +2,172 @@ import "./dms-common"
 import QtQuick
 import qs.Common
 import qs.Modules.Plugins
+import qs.Services
 import qs.Widgets
 
 PluginSettings {
     id: root
 
     pluginId: "quickCapture"
+
+    component CompactColorSetting : Item {
+        id: swatchRoot
+
+        required property string settingKey
+        required property string label
+        property var defaultValue: Theme.primary
+        property var value: defaultValue
+
+        property bool isInitialized: false
+        readonly property bool isDirty: value.toString() !== defaultValue.toString()
+
+        readonly property color resolvedColor: {
+            if (value === "primary") return Theme.primary;
+            return Qt.color(value);
+        }
+
+        function resetToDefault() {
+            value = defaultValue;
+        }
+
+        function loadValue() {
+            const settings = findSettings();
+            if (settings && settings.pluginService) {
+                const loadedValue = settings.loadValue(settingKey, defaultValue);
+                value = loadedValue;
+                isInitialized = true;
+            }
+        }
+
+        Component.onCompleted: Qt.callLater(loadValue);
+
+        onValueChanged: {
+            if (!isInitialized) return;
+            const settings = findSettings();
+            if (settings) settings.saveValue(settingKey, value);
+        }
+
+        function findSettings() {
+            let item = parent;
+            while (item) {
+                if (item.saveValue !== undefined && item.loadValue !== undefined) return item;
+                item = item.parent;
+            }
+            return null;
+        }
+
+        // Layout sizing
+        width: (parent.width - (parent.columns - 1) * parent.columnSpacing) / parent.columns
+        height: 76
+
+        Column {
+            anchors.fill: parent
+            spacing: Theme.spacingXS
+            
+            // Swatch Container
+            Item {
+                id: swatchContainer
+                width: 44
+                height: 44
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                HoverHandler {
+                    id: hoverHandler
+                }
+
+                // Outer glowing/highlighting ring
+                Rectangle {
+                    anchors.centerIn: parent
+                    width: 52
+                    height: 52
+                    radius: 26
+                    color: hoverHandler.hovered ? Theme.withAlpha(Theme.primary, 0.12) : "transparent"
+                    border.color: Theme.primary
+                    border.width: hoverHandler.hovered ? 1.5 : 0
+                    opacity: hoverHandler.hovered ? 1 : 0
+                    Behavior on opacity { NumberAnimation { duration: 150 } }
+                    Behavior on color { ColorAnimation { duration: 150 } }
+                }
+
+                // Main color circle
+                Rectangle {
+                    anchors.fill: parent
+                    radius: 22
+                    color: swatchRoot.resolvedColor
+                    border.color: Theme.outlineStrong
+                    border.width: 1.5
+                    scale: hoverHandler.hovered ? 1.08 : 1.0
+                    Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutQuad } }
+
+                    // Tiny reset dot if dirty
+                    Rectangle {
+                        width: 14
+                        height: 14
+                        radius: 7
+                        color: Theme.surface
+                        border.color: Theme.outline
+                        border.width: 1
+                        anchors.top: parent.top
+                        anchors.right: parent.right
+                        anchors.topMargin: -2
+                        anchors.rightMargin: -2
+                        visible: swatchRoot.isDirty
+                        
+                        DankIcon {
+                            name: "restart_alt"
+                            size: 10
+                            color: Theme.primary
+                            anchors.centerIn: parent
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: swatchRoot.resetToDefault()
+                        }
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    hoverEnabled: true
+                    onEntered: {
+                        let tooltipText = swatchRoot.value === "primary" ? I18n.tr("Theme Primary Color") : swatchRoot.value.toString().toUpperCase();
+                        sharedTooltip.show(tooltipText, parent);
+                    }
+                    onExited: {
+                        sharedTooltip.hide();
+                    }
+                    onClicked: {
+                        if (typeof PopoutService !== "undefined" && PopoutService && PopoutService.colorPickerModal) {
+                            PopoutService.colorPickerModal.selectedColor = swatchRoot.resolvedColor;
+                            PopoutService.colorPickerModal.pickerTitle = swatchRoot.label;
+                            PopoutService.colorPickerModal.onColorSelectedCallback = function (selectedColor) {
+                                swatchRoot.value = selectedColor.toString();
+                            };
+                            PopoutService.colorPickerModal.show();
+                        }
+                    }
+                }
+            }
+
+            StyledText {
+                text: swatchRoot.label
+                font.pixelSize: Theme.fontSizeSmall
+                font.weight: Font.Medium
+                color: Theme.surfaceText
+                opacity: hoverHandler.hovered ? 1.0 : 0.7
+                anchors.horizontalCenter: parent.horizontalCenter
+                elide: Text.ElideRight
+                maximumLineCount: 1
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+            }
+        }
+
+        DankTooltipV2 { id: sharedTooltip }
+    }
 
     SettingsCard {
         id: captureSection
@@ -22,7 +182,7 @@ PluginSettings {
             }
         }
 
-        SelectionSettingPlus {
+        ButtonGroupSettingPlus {
             id: captureMode
             settingKey: "captureMode"
             label: I18n.tr("Capture Mode")
@@ -35,14 +195,14 @@ PluginSettings {
 
         Separator {}
 
-        SelectionSettingPlus {
+        ButtonGroupSettingPlus {
             id: doneAction
             settingKey: "doneAction"
             label: I18n.tr("Action when Enter")
             options: [
-                { label: I18n.tr("Copy to Clipboard only"), value: "clipboard" },
-                { label: I18n.tr("Save to File only"), value: "file" },
-                { label: I18n.tr("Both Copy and Save"), value: "both" }
+                { label: I18n.tr("Copy"), value: "clipboard" },
+                { label: I18n.tr("Save"), value: "file" },
+                { label: I18n.tr("Copy & Save"), value: "both" }
             ]
             defaultValue: "both"
         }
@@ -71,15 +231,15 @@ PluginSettings {
             }
         }
 
-        SelectionSettingPlus {
+        ButtonGroupSettingPlus {
             id: toolbarPosition
             settingKey: "toolbarPosition"
             label: I18n.tr("Toolbar Position")
             options: [
-                { "label": I18n.tr("Top"), "value": "top" },
-                { "label": I18n.tr("Bottom"), "value": "bottom" },
-                { "label": I18n.tr("Left"), "value": "left" },
-                { "label": I18n.tr("Right"), "value": "right" }
+                { label: I18n.tr("Top"), value: "top" },
+                { label: I18n.tr("Bottom"), value: "bottom" },
+                { label: I18n.tr("Left"), value: "left" },
+                { label: I18n.tr("Right"), value: "right" }
             ]
             defaultValue: "top"
         }
@@ -231,31 +391,36 @@ PluginSettings {
             text: I18n.tr("Customize the 8 color slots available in the annotation toolbar.")
         }
 
-        ColorSettingPlus {
-            id: toolbar_primary
-            settingKey: "toolbar_color_primary"
-            label: I18n.tr("Slot 1 (Default: Primary)")
-            defaultValue: "primary"
+        Item { width: 1; height: Theme.spacingS }
+
+        Grid {
+            width: parent.width
+            columns: 4
+            rowSpacing: Theme.spacingM
+            columnSpacing: Theme.spacingM
+
+            CompactColorSetting {
+                id: toolbar_primary
+                settingKey: "toolbar_color_primary"
+                label: I18n.tr("Slot 1")
+                defaultValue: "primary"
+            }
+
+            CompactColorSetting { id: c0; settingKey: "toolbar_color_0"; label: I18n.tr("Slot 2"); defaultValue: "#3b82f6" }
+            CompactColorSetting { id: c1; settingKey: "toolbar_color_1"; label: I18n.tr("Slot 3"); defaultValue: "#ef4444" }
+            CompactColorSetting { id: c2; settingKey: "toolbar_color_2"; label: I18n.tr("Slot 4"); defaultValue: "#22c55e" }
+            CompactColorSetting { id: c3; settingKey: "toolbar_color_3"; label: I18n.tr("Slot 5"); defaultValue: "#eab308" }
+            CompactColorSetting { id: c4; settingKey: "toolbar_color_4"; label: I18n.tr("Slot 6"); defaultValue: "#a855f7" }
+            CompactColorSetting { id: c5; settingKey: "toolbar_color_5"; label: I18n.tr("Slot 7"); defaultValue: "#ffffff" }
+            CompactColorSetting { id: c6; settingKey: "toolbar_color_6"; label: I18n.tr("Slot 8"); defaultValue: "#000000" }
         }
-
-        Separator {}
-
-        ColorSettingPlus { id: c0; settingKey: "toolbar_color_0"; label: I18n.tr("Slot 2"); defaultValue: "#3b82f6" }
-        Separator {}
-        ColorSettingPlus { id: c1; settingKey: "toolbar_color_1"; label: I18n.tr("Slot 3"); defaultValue: "#ef4444" }
-        Separator {}
-        ColorSettingPlus { id: c2; settingKey: "toolbar_color_2"; label: I18n.tr("Slot 4"); defaultValue: "#22c55e" }
-        Separator {}
-        ColorSettingPlus { id: c3; settingKey: "toolbar_color_3"; label: I18n.tr("Slot 5"); defaultValue: "#eab308" }
-        Separator {}
-        ColorSettingPlus { id: c4; settingKey: "toolbar_color_4"; label: I18n.tr("Slot 6"); defaultValue: "#a855f7" }
-        Separator {}
-        ColorSettingPlus { id: c5; settingKey: "toolbar_color_5"; label: I18n.tr("Slot 7"); defaultValue: "#ffffff" }
-        Separator {}
-        ColorSettingPlus { id: c6; settingKey: "toolbar_color_6"; label: I18n.tr("Slot 8"); defaultValue: "#000000" }
     }
 
     SettingsCard {
+        id: radialMenuCard
+
+        property int presetActiveIndex: 0
+
         SectionTitle {
             text: I18n.tr("Radial Menu")
             icon: "settings"
@@ -265,29 +430,54 @@ PluginSettings {
             text: I18n.tr("Configure up to 8 quick-access tool presets. Right-click anywhere during capture to open the radial menu.")
         }
 
+        Item { width: 1; height: Theme.spacingXS }
+
+        Column {
+            width: parent.width
+            spacing: Theme.spacingS
+
+            DankButtonGroup {
+                id: presetSelector1
+                width: parent.width
+                buttonHeight: 32
+                selectionMode: "single"
+                model: [I18n.tr("Preset 1"), I18n.tr("Preset 2"), I18n.tr("Preset 3"), I18n.tr("Preset 4")]
+                currentIndex: radialMenuCard.presetActiveIndex < 4 ? radialMenuCard.presetActiveIndex : -1
+                onSelectionChanged: (index, selected) => {
+                    if (selected) {
+                        radialMenuCard.presetActiveIndex = index
+                    }
+                }
+            }
+
+            DankButtonGroup {
+                id: presetSelector2
+                width: parent.width
+                buttonHeight: 32
+                selectionMode: "single"
+                model: [I18n.tr("Preset 5"), I18n.tr("Preset 6"), I18n.tr("Preset 7"), I18n.tr("Preset 8")]
+                currentIndex: radialMenuCard.presetActiveIndex >= 4 ? (radialMenuCard.presetActiveIndex - 4) : -1
+                onSelectionChanged: (index, selected) => {
+                    if (selected) {
+                        radialMenuCard.presetActiveIndex = index + 4
+                    }
+                }
+            }
+        }
+
         Repeater {
             model: 8
 
             Column {
                 width: parent.width
-                spacing: 0
+                spacing: Theme.spacingM
+                visible: radialMenuCard.presetActiveIndex === index
 
-                Separator { opacity: 0.1 }
-
-                Item { width: 1; height: Theme.spacingM }
-
-                StyledText {
-                    text: I18n.tr("Preset Slot ") + (index + 1)
-                    font.pixelSize: Theme.fontSizeMedium
-                    font.bold: true
-                    color: Theme.primary
-                }
-
-                Item { width: 1; height: Theme.spacingS }
+                Item { width: 1; height: Theme.spacingXS }
 
                 SelectionSettingPlus {
                     settingKey: "preset_" + index + "_tool"
-                    label: I18n.tr("Tool")
+                    label: I18n.tr("Preset Tool")
                     options: [{
                         "label": I18n.tr("None / Disabled"),
                         "value": "none"
@@ -335,7 +525,7 @@ PluginSettings {
 
                 ColorSettingPlus {
                     settingKey: "preset_" + index + "_color"
-                    label: I18n.tr("Color")
+                    label: I18n.tr("Preset Color")
                     defaultValue: index === 0 ? "#ef4444" : "#3b82f6"
                 }
 
@@ -343,20 +533,15 @@ PluginSettings {
 
                 SliderSettingPlus {
                     settingKey: "preset_" + index + "_thickness"
-                    label: I18n.tr("Thickness")
+                    label: I18n.tr("Preset Thickness")
                     defaultValue: 6
                     minimum: 1
                     maximum: 20
                     leftLabel: "1"
                     rightLabel: "20"
                 }
-                
-                Item { width: 1; height: Theme.spacingM }
-
             }
-
         }
-
     }
 
     SettingsCard {
