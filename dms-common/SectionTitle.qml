@@ -68,7 +68,6 @@ Item {
             color: root.titleColor
             visible: root.icon !== ""
             anchors.verticalCenter: parent.verticalCenter
-            Behavior on color { ColorAnimation { duration: Appearance.anim.durations.quick } }
         }
 
         StyledText {
@@ -79,7 +78,6 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             elide: Text.ElideRight
             horizontalAlignment: Text.AlignHCenter
-            Behavior on color { ColorAnimation { duration: Appearance.anim.durations.quick } }
         }
 
         DankIcon {
