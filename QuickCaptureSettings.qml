@@ -10,10 +10,6 @@ PluginSettings {
 
     pluginId: "quickCapture"
 
-    CaptureConfig {
-        id: captureConfig
-    }
-
     component ShortcutRow : Item {
         id: rowRoot
         width: parent.width
@@ -83,11 +79,14 @@ PluginSettings {
         required property string label
         property var defaultValue: Theme.primary
         property var value: defaultValue
+        property bool readOnly: false
+        property var overrideColor: null
 
         property bool isInitialized: false
         readonly property bool isDirty: value.toString() !== defaultValue.toString()
 
         readonly property color resolvedColor: {
+            if (overrideColor !== null) return Qt.color(overrideColor);
             if (value === "primary") return Theme.primary;
             return Qt.color(value);
         }
@@ -177,7 +176,7 @@ PluginSettings {
                         anchors.right: parent.right
                         anchors.topMargin: -2
                         anchors.rightMargin: -2
-                        visible: swatchRoot.isDirty
+                        visible: swatchRoot.isDirty && !swatchRoot.readOnly
                         
                         DankIcon {
                             name: "restart_alt"
@@ -196,16 +195,19 @@ PluginSettings {
 
                 MouseArea {
                     anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
+                    cursorShape: swatchRoot.readOnly ? Qt.ArrowCursor : Qt.PointingHandCursor
                     hoverEnabled: true
                     onEntered: {
-                        let tooltipText = swatchRoot.value === "primary" ? I18n.tr("Theme Primary Color") : swatchRoot.value.toString().toUpperCase();
+                        let tooltipText = swatchRoot.overrideColor !== null
+                            ? swatchRoot.overrideColor.toString().toUpperCase()
+                            : (swatchRoot.value === "primary" ? I18n.tr("Theme Primary Color") : swatchRoot.value.toString().toUpperCase());
                         sharedTooltip.show(tooltipText, parent);
                     }
                     onExited: {
                         sharedTooltip.hide();
                     }
                     onClicked: {
+                        if (swatchRoot.readOnly) return;
                         if (typeof PopoutService !== "undefined" && PopoutService && PopoutService.colorPickerModal) {
                             PopoutService.colorPickerModal.selectedColor = swatchRoot.resolvedColor;
                             PopoutService.colorPickerModal.pickerTitle = swatchRoot.label;
@@ -491,48 +493,83 @@ PluginSettings {
 
         Item { width: 1; height: Theme.spacingS }
 
-        // Palette Preview Row
-        Row {
-            spacing: Theme.spacingS
-            visible: palettePresetSetting.value !== "custom"
-            anchors.horizontalCenter: parent.horizontalCenter
-            
-            Repeater {
-                model: captureConfig.defaultAccentColors
-                delegate: Rectangle {
-                    width: 24
-                    height: 24
-                    radius: 12
-                    color: modelData
-                    border.color: Theme.outline
-                    border.width: 1
-                }
-            }
-        }
-
-        Item { width: 1; height: Theme.spacingS; visible: palettePresetSetting.value === "custom" }
-
         Grid {
             width: parent.width
             columns: 4
             rowSpacing: Theme.spacingM
             columnSpacing: Theme.spacingM
-            visible: palettePresetSetting.value === "custom"
 
             CompactColorSetting {
                 id: toolbar_primary
                 settingKey: "toolbar_color_primary"
                 label: I18n.tr("Slot 1")
                 defaultValue: "primary"
+                readOnly: palettePresetSetting.value !== "custom"
+                overrideColor: palettePresetSetting.value !== "custom" ? Theme.primary : null
             }
 
-            CompactColorSetting { id: c0; settingKey: "toolbar_color_0"; label: I18n.tr("Slot 2"); defaultValue: captureConfig.defaultAccentColors[0] }
-            CompactColorSetting { id: c1; settingKey: "toolbar_color_1"; label: I18n.tr("Slot 3"); defaultValue: captureConfig.defaultAccentColors[1] }
-            CompactColorSetting { id: c2; settingKey: "toolbar_color_2"; label: I18n.tr("Slot 4"); defaultValue: captureConfig.defaultAccentColors[2] }
-            CompactColorSetting { id: c3; settingKey: "toolbar_color_3"; label: I18n.tr("Slot 5"); defaultValue: captureConfig.defaultAccentColors[3] }
-            CompactColorSetting { id: c4; settingKey: "toolbar_color_4"; label: I18n.tr("Slot 6"); defaultValue: captureConfig.defaultAccentColors[4] }
-            CompactColorSetting { id: c5; settingKey: "toolbar_color_5"; label: I18n.tr("Slot 7"); defaultValue: captureConfig.defaultAccentColors[5] }
-            CompactColorSetting { id: c6; settingKey: "toolbar_color_6"; label: I18n.tr("Slot 8"); defaultValue: captureConfig.defaultAccentColors[6] }
+            CompactColorSetting {
+                id: c0
+                settingKey: "toolbar_color_0"
+                label: I18n.tr("Slot 2")
+                defaultValue: captureConfig.defaultAccentColors[0]
+                readOnly: palettePresetSetting.value !== "custom"
+                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[0] : null
+            }
+
+            CompactColorSetting {
+                id: c1
+                settingKey: "toolbar_color_1"
+                label: I18n.tr("Slot 3")
+                defaultValue: captureConfig.defaultAccentColors[1]
+                readOnly: palettePresetSetting.value !== "custom"
+                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[1] : null
+            }
+
+            CompactColorSetting {
+                id: c2
+                settingKey: "toolbar_color_2"
+                label: I18n.tr("Slot 4")
+                defaultValue: captureConfig.defaultAccentColors[2]
+                readOnly: palettePresetSetting.value !== "custom"
+                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[2] : null
+            }
+
+            CompactColorSetting {
+                id: c3
+                settingKey: "toolbar_color_3"
+                label: I18n.tr("Slot 5")
+                defaultValue: captureConfig.defaultAccentColors[3]
+                readOnly: palettePresetSetting.value !== "custom"
+                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[3] : null
+            }
+
+            CompactColorSetting {
+                id: c4
+                settingKey: "toolbar_color_4"
+                label: I18n.tr("Slot 6")
+                defaultValue: captureConfig.defaultAccentColors[4]
+                readOnly: palettePresetSetting.value !== "custom"
+                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[4] : null
+            }
+
+            CompactColorSetting {
+                id: c5
+                settingKey: "toolbar_color_5"
+                label: I18n.tr("Slot 7")
+                defaultValue: captureConfig.defaultAccentColors[5]
+                readOnly: palettePresetSetting.value !== "custom"
+                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[5] : null
+            }
+
+            CompactColorSetting {
+                id: c6
+                settingKey: "toolbar_color_6"
+                label: I18n.tr("Slot 8")
+                defaultValue: captureConfig.defaultAccentColors[6]
+                readOnly: palettePresetSetting.value !== "custom"
+                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[6] : null
+            }
         }
     }
 
@@ -796,6 +833,21 @@ PluginSettings {
                 label: I18n.tr("Niri Binding Example")
                 text: "binds {\n    Print { spawn \"dms\" \"ipc\" \"call\" \"quickCapture\" \"screenshot\"; }\n}"
             }
+        }
+    }
+
+    CaptureConfig {
+        id: captureConfig
+        pluginData: {
+            "color_palette_preset": palettePresetSetting.value,
+            "toolbar_color_primary": toolbar_primary.value,
+            "toolbar_color_0": c0.value,
+            "toolbar_color_1": c1.value,
+            "toolbar_color_2": c2.value,
+            "toolbar_color_3": c3.value,
+            "toolbar_color_4": c4.value,
+            "toolbar_color_5": c5.value,
+            "toolbar_color_6": c6.value
         }
     }
 
