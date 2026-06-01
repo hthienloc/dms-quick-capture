@@ -282,11 +282,6 @@ PluginComponent {
             return "SUCCESS";
         }
 
-        function screenshotMode(mode: string) : string {
-            root.triggerCapture(mode);
-            return "SUCCESS";
-        }
-
         function selectFile() : string {
             root.selectImageAndAnnotate();
             return "SUCCESS";
@@ -295,6 +290,16 @@ PluginComponent {
         function close() : string {
             modal.shouldBeVisible = false;
             modal.close();
+            return "SUCCESS";
+        }
+
+        target: "quickCapture"
+        enabled: root.isDaemonInstance
+    }
+
+    IpcHandler {
+        function screenshot(mode: string) : string {
+            root.triggerCapture(mode);
             return "SUCCESS";
         }
 

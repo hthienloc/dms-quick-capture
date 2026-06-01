@@ -68,8 +68,7 @@ Use `dms ipc call quickCapture <command> [arg]` to control the screenshot workfl
 
 | Command | Argument | Description |
 |---------|----------|-------------|
-| `screenshot` | - | Trigger capture using the configured default mode |
-| `screenshotMode` | `mode` | Trigger capture in a specific mode (`region`, `full`, `all`, `output`, `window`, `last`) |
+| `screenshot` | `[mode]` | Trigger capture (modes: `region`, `full`, `all`, `output`, `window`, `last`). Falls back to default mode if omitted |
 | `selectFile` | - | Open file browser to select an existing image |
 | `close` | - | Close the quick capture annotator window |
 
@@ -77,10 +76,10 @@ Use `dms ipc call quickCapture <command> [arg]` to control the screenshot workfl
 
 ```kdl
 binds {
-    // Capture interactive region (customized default or fallback)
+    // Capture using default configured mode
     Print { spawn "dms" "ipc" "call" "quickCapture" "screenshot"; }
-    // Capture focused window
-    Meta+Print { spawn "dms" "ipc" "call" "quickCapture" "screenshotMode" "window"; }
+    // Capture specific window mode directly
+    Meta+Print { spawn "dms" "ipc" "call" "quickCapture" "screenshot" "window"; }
 }
 ```
 

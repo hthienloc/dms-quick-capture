@@ -913,7 +913,7 @@ PluginSettings {
 
             CopyBox {
                 label: I18n.tr("Trigger Screenshot (Specific Mode)")
-                text: "dms ipc call quickCapture screenshotMode region"
+                text: "dms ipc call quickCapture screenshot region"
             }
 
             CopyBox {
