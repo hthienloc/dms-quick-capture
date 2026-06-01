@@ -469,16 +469,55 @@ PluginSettings {
         }
 
         InfoText {
-            text: I18n.tr("Customize the 8 color slots available in the annotation toolbar.")
+            text: I18n.tr("Select a color palette preset or customize the color slots individually.")
         }
 
         Item { width: 1; height: Theme.spacingS }
+
+        SelectionSettingPlus {
+            id: palettePresetSetting
+            settingKey: "color_palette_preset"
+            label: I18n.tr("Palette Preset")
+            defaultValue: "adaptive"
+            options: [
+                { "label": I18n.tr("Adaptive (DMS Theme)"), "value": "adaptive" },
+                { "label": I18n.tr("Classic (Tailwind)"), "value": "classic" },
+                { "label": I18n.tr("Nord (Pastel Cold)"), "value": "nord" },
+                { "label": I18n.tr("Gruvbox (Warm Retro)"), "value": "gruvbox" },
+                { "label": I18n.tr("Dracula (High Contrast Dark)"), "value": "dracula" },
+                { "label": I18n.tr("Custom Colors"), "value": "custom" }
+            ]
+        }
+
+        Item { width: 1; height: Theme.spacingS }
+
+        // Palette Preview Row
+        Row {
+            spacing: Theme.spacingS
+            visible: palettePresetSetting.value !== "custom"
+            anchors.horizontalCenter: parent.horizontalCenter
+            
+            Repeater {
+                model: captureConfig.defaultAccentColors
+                delegate: Rectangle {
+                    width: 24
+                    height: 24
+                    radius: 12
+                    color: modelData
+                    border.color: Theme.outline
+                    border.width: 1
+                }
+            }
+        }
+
+        Item { width: 1; height: Theme.spacingS; visible: palettePresetSetting.value === "custom" }
 
         Grid {
             width: parent.width
             columns: 4
             rowSpacing: Theme.spacingM
             columnSpacing: Theme.spacingM
+            visible: palettePresetSetting.value === "custom"
 
             CompactColorSetting {
                 id: toolbar_primary

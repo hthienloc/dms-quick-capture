@@ -18,7 +18,49 @@ QtObject {
         { id: "eraser", icon: "auto_fix_normal", tooltip: qsTr("Eraser (D)") }
     ]
 
-    readonly property var defaultAccentColors: [
+    readonly property string selectedPreset: pluginData["color_palette_preset"] || "adaptive"
+
+    readonly property var classicColors: [
+        "#3b82f6",
+        "#ef4444",
+        "#22c55e",
+        "#eab308",
+        "#a855f7",
+        "#ffffff",
+        "#000000"
+    ]
+
+    readonly property var nordColors: [
+        "#88c0d0",
+        "#bf616a",
+        "#a3be8c",
+        "#ebcb8b",
+        "#b48ead",
+        "#e5e9f0",
+        "#2e3440"
+    ]
+
+    readonly property var gruvboxColors: [
+        "#458588",
+        "#cc241d",
+        "#98971a",
+        "#d79921",
+        "#b16286",
+        "#ebdbb2",
+        "#282828"
+    ]
+
+    readonly property var draculaColors: [
+        "#8be9fd",
+        "#ff5555",
+        "#50fa7b",
+        "#f1fa8c",
+        "#ff79c6",
+        "#f8f8f2",
+        "#282a36"
+    ]
+
+    readonly property var adaptiveColors: [
         Theme.info,
         Theme.error,
         Theme.success,
@@ -28,10 +70,27 @@ QtObject {
         Theme.surface
     ]
 
+    readonly property var defaultAccentColors: {
+        switch (selectedPreset) {
+            case "classic": return classicColors;
+            case "nord": return nordColors;
+            case "gruvbox": return gruvboxColors;
+            case "dracula": return draculaColors;
+            case "adaptive":
+            default:
+                return adaptiveColors;
+        }
+    }
+
     readonly property var accentColors: {
         const list = [];
+        const isCustom = selectedPreset === "custom";
         for (let i = 0; i < 7; i++) {
-            list.push(pluginData["toolbar_color_" + i] || defaultAccentColors[i]);
+            if (isCustom) {
+                list.push(pluginData["toolbar_color_" + i] || adaptiveColors[i]);
+            } else {
+                list.push(defaultAccentColors[i]);
+            }
         }
         return list;
     }
