@@ -19,7 +19,7 @@ QtObject {
     ]
 
     readonly property var defaultAccentColors: [
-        Theme.primary,
+        Theme.info,
         Theme.error,
         Theme.success,
         Theme.warning,
