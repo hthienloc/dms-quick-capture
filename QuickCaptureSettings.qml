@@ -1039,11 +1039,14 @@ PluginSettings {
             }
         }
 
-        Item { width: 1; height: Theme.spacingS }
+        Separator {}
 
-        SubCategoryHeader {
-            text: I18n.tr("Preset Slots Configuration")
-            icon: "list_alt"
+        StyledText {
+            text: I18n.tr("Slot Editor")
+            font.pixelSize: Theme.fontSizeSmall
+            font.weight: Font.Bold
+            color: Theme.primary
+            opacity: 0.85
         }
 
         Repeater {
