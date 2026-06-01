@@ -195,7 +195,7 @@ PluginSettings {
 
                 MouseArea {
                     anchors.fill: parent
-                    cursorShape: swatchRoot.readOnly ? Qt.ArrowCursor : Qt.PointingHandCursor
+                    cursorShape: Qt.PointingHandCursor
                     hoverEnabled: true
                     onEntered: {
                         let tooltipText = swatchRoot.overrideColor !== null
@@ -207,7 +207,17 @@ PluginSettings {
                         sharedTooltip.hide();
                     }
                     onClicked: {
-                        if (swatchRoot.readOnly) return;
+                        if (swatchRoot.readOnly) {
+                            let colorStr = swatchRoot.overrideColor !== null
+                                ? swatchRoot.overrideColor.toString()
+                                : swatchRoot.value.toString();
+                            Proc.runCommand("copy-color", ["wl-copy", "--", colorStr], function() {
+                                if (typeof ToastService !== "undefined" && ToastService) {
+                                    ToastService.showInfo(I18n.tr("Copied:") + " " + colorStr.toUpperCase());
+                                }
+                            });
+                            return;
+                        }
                         if (typeof PopoutService !== "undefined" && PopoutService && PopoutService.colorPickerModal) {
                             PopoutService.colorPickerModal.selectedColor = swatchRoot.resolvedColor;
                             PopoutService.colorPickerModal.pickerTitle = swatchRoot.label;
