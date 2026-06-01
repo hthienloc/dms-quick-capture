@@ -1269,8 +1269,8 @@ DankModal {
                         scale: drawingCanvas.scale
                         transformOrigin: drawingCanvas.transformOrigin
                         color: "transparent"
-                        border.color: window.isScreenshotDark ? "rgba(255, 255, 255, 0.4)" : "rgba(0, 0, 0, 0.4)"
-                        border.width: 1
+                        border.color: Theme.primary
+                        border.width: 1.5
                         radius: Theme.cornerRadius
                         z: 10
                     }
