@@ -252,7 +252,7 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Capture")
             icon: "screenshot"
-            showReset: captureMode.isDirty || doneAction.isDirty || saveDirectory.isDirty || skipConfirm.isDirty || outputFormat.isDirty || includeCursor.isDirty || jpegQuality.isDirty || showToasts.isDirty || showSystemNotification.isDirty || outputTargetName.isDirty
+            showReset: captureMode.isDirty || doneAction.isDirty || saveDirectory.isDirty || skipConfirm.isDirty || outputFormat.isDirty || includeCursor.isDirty || jpegQuality.isDirty || showToasts.isDirty || showSystemNotification.isDirty || outputTargetName.isDirty || saveFilenamePattern.isDirty
             onResetClicked: {
                 captureMode.resetToDefault();
                 doneAction.resetToDefault();
@@ -264,6 +264,7 @@ PluginSettings {
                 showToasts.resetToDefault();
                 showSystemNotification.resetToDefault();
                 outputTargetName.resetToDefault();
+                saveFilenamePattern.resetToDefault();
             }
         }
 
@@ -390,6 +391,23 @@ PluginSettings {
             defaultValue: "~/Pictures/Screenshots"
             isDirectory: true
         }
+
+        Separator {}
+
+        StringSettingPlus {
+            id: saveFilenamePattern
+            settingKey: "saveFilenamePattern"
+            label: I18n.tr("Save Filename Pattern")
+            placeholder: "Screenshot_%Y-%m-%d_%H-%M-%S"
+            defaultValue: "Screenshot_%Y-%m-%d_%H-%M-%S"
+        }
+
+        InfoText {
+            text: I18n.tr("Supports formatting: %Y (Year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)")
+            opacity: 0.85
+        }
+
+        Separator {}
 
         ButtonGroupSettingPlus {
             id: outputFormat
