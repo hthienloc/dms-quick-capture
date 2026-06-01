@@ -242,13 +242,15 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Capture")
             icon: "screenshot"
-            showReset: captureMode.isDirty || doneAction.isDirty || saveDirectory.isDirty || skipConfirm.isDirty || outputFormat.isDirty
+            showReset: captureMode.isDirty || doneAction.isDirty || saveDirectory.isDirty || skipConfirm.isDirty || outputFormat.isDirty || includeCursor.isDirty || jpegQuality.isDirty
             onResetClicked: {
                 captureMode.resetToDefault();
                 doneAction.resetToDefault();
                 saveDirectory.resetToDefault();
                 skipConfirm.resetToDefault();
                 outputFormat.resetToDefault();
+                includeCursor.resetToDefault();
+                jpegQuality.resetToDefault();
             }
         }
 
@@ -279,6 +281,15 @@ PluginSettings {
 
         Separator {}
 
+        ToggleSettingPlus {
+            id: includeCursor
+            settingKey: "includeCursor"
+            label: I18n.tr("Include Cursor")
+            defaultValue: false
+        }
+
+        Separator {}
+
         ButtonGroupSettingPlus {
             id: doneAction
             settingKey: "doneAction"
@@ -302,8 +313,6 @@ PluginSettings {
             isDirectory: true
         }
 
-        Separator {}
-
         ButtonGroupSettingPlus {
             id: outputFormat
             settingKey: "outputFormat"
@@ -314,6 +323,25 @@ PluginSettings {
                 { label: "PPM", value: "ppm" }
             ]
             defaultValue: "png"
+        }
+
+        Separator {
+            visible: outputFormat.value === "jpg"
+            height: visible ? 1 : 0
+        }
+
+        SliderSettingPlus {
+            id: jpegQuality
+            settingKey: "jpegQuality"
+            label: I18n.tr("JPEG Quality")
+            defaultValue: 90
+            minimum: 1
+            maximum: 100
+            unit: "%"
+            leftLabel: "1"
+            rightLabel: "100"
+            visible: outputFormat.value === "jpg"
+            height: visible ? implicitHeight : 0
         }
     }
 

@@ -48,15 +48,19 @@ PluginComponent {
 
     function screenshotArgs() {
         const format = (pluginData.outputFormat || "png");
-        if (root.captureMode === "region") {
-            const args = ["dms", "screenshot", "region", "--no-clipboard", "--no-notify", "--dir", "/tmp", "--filename", "dms_capture_bg.png", "--format", format];
-            if (pluginData.skipConfirm !== false) {
-                args.push("--no-confirm");
-            }
-            return args;
-        } else {
-            return ["dms", "screenshot", "full", "--no-clipboard", "--no-notify", "--dir", "/tmp", "--filename", "dms_capture_bg.png", "--format", format];
+        const cursorVal = pluginData.includeCursor ? "on" : "off";
+        const args = ["dms", "screenshot", root.captureMode, "--no-clipboard", "--no-notify", "--dir", "/tmp", "--filename", "dms_capture_bg.png", "--format", format, "--cursor", cursorVal];
+
+        if (root.captureMode === "region" && pluginData.skipConfirm !== false) {
+            args.push("--no-confirm");
         }
+
+        if (format === "jpg") {
+            const quality = pluginData.jpegQuality ?? 90;
+            args.push("--quality", String(quality));
+        }
+
+        return args;
     }
 
     function startActualCapture() {
