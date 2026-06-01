@@ -266,15 +266,46 @@ PluginSettings {
             }
         }
 
-        ButtonGroupSettingPlus {
+        SelectionSettingPlus {
             id: captureMode
             settingKey: "captureMode"
             label: I18n.tr("Capture Mode")
             options: [
                 { label: I18n.tr("Interactive Region"), value: "region" },
-                { label: I18n.tr("Full Screen"), value: "full" }
+                { label: I18n.tr("Full Screen"), value: "full" },
+                { label: I18n.tr("All Combined Outputs"), value: "all" },
+                { label: I18n.tr("Focused Window"), value: "window" },
+                { label: I18n.tr("Last Selected Region"), value: "last" }
             ]
             defaultValue: "region"
+        }
+
+        Item {
+            width: parent.width
+            height: visible ? warningRow.implicitHeight + 4 : 0
+            visible: captureMode.value === "window"
+
+            Row {
+                id: warningRow
+                width: parent.width
+                spacing: Theme.spacingS
+                anchors.verticalCenter: parent.verticalCenter
+
+                DankIcon {
+                    name: "warning"
+                    size: 16
+                    color: Theme.warning
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                StyledText {
+                    width: parent.width - 24
+                    text: I18n.tr("Note: Window capture mode requires Hyprland or DWL compositors.")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.warning
+                    wrapMode: Text.Wrap
+                }
+            }
         }
 
         Separator {
