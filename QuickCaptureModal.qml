@@ -72,6 +72,7 @@ DankModal {
     property var strokes: []
     property var currentStroke: null
     property var selectedStroke: null
+    property int preGrabStrokeWidth: 8
     property point pressCoords: Qt.point(0, 0)
     property var originalPoints: []
 
@@ -1096,6 +1097,8 @@ DankModal {
                                     const strokeIdx = window.findStrokeAt(absPt.x, absPt.y);
                                     if (strokeIdx !== -1) {
                                         const stroke = window.strokes[strokeIdx];
+                                        window.preGrabStrokeWidth = window.strokeWidth;
+                                        window.strokeWidth = stroke.width;
                                         window.selectedStroke = stroke;
                                         window.pressCoords = absPt;
                                         const orig = [];
@@ -1189,6 +1192,7 @@ DankModal {
                             onReleased: (mouse) => {
                                 if (window.currentTool === "select") {
                                     window.selectedStroke = null;
+                                    window.strokeWidth = window.preGrabStrokeWidth;
                                     window.originalPoints = [];
                                     drawingCanvas.requestPaint();
                                     return;
