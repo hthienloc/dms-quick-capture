@@ -252,7 +252,7 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Capture")
             icon: "screenshot"
-            showReset: captureMode.isDirty || doneAction.isDirty || saveDirectory.isDirty || skipConfirm.isDirty || outputFormat.isDirty || includeCursor.isDirty || jpegQuality.isDirty || showToasts.isDirty
+            showReset: captureMode.isDirty || doneAction.isDirty || saveDirectory.isDirty || skipConfirm.isDirty || outputFormat.isDirty || includeCursor.isDirty || jpegQuality.isDirty || showToasts.isDirty || showSystemNotification.isDirty
             onResetClicked: {
                 captureMode.resetToDefault();
                 doneAction.resetToDefault();
@@ -262,6 +262,7 @@ PluginSettings {
                 includeCursor.resetToDefault();
                 jpegQuality.resetToDefault();
                 showToasts.resetToDefault();
+                showSystemNotification.resetToDefault();
             }
         }
 
@@ -320,6 +321,15 @@ PluginSettings {
             settingKey: "showToasts"
             label: I18n.tr("Show Toast Notifications")
             defaultValue: true
+        }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            id: showSystemNotification
+            settingKey: "showSystemNotification"
+            label: I18n.tr("Show System Notification")
+            defaultValue: false
         }
 
         Separator {}

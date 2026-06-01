@@ -49,7 +49,11 @@ PluginComponent {
     function screenshotArgs() {
         const format = (pluginData.outputFormat || "png");
         const cursorVal = pluginData.includeCursor ? "on" : "off";
-        const args = ["dms", "screenshot", root.captureMode, "--no-clipboard", "--no-notify", "--dir", "/tmp", "--filename", "dms_capture_bg.png", "--format", format, "--cursor", cursorVal];
+        const args = ["dms", "screenshot", root.captureMode, "--no-clipboard", "--dir", "/tmp", "--filename", "dms_capture_bg.png", "--format", format, "--cursor", cursorVal];
+
+        if (!pluginData.showSystemNotification) {
+            args.push("--no-notify");
+        }
 
         if (root.captureMode === "region" && pluginData.skipConfirm !== false) {
             args.push("--no-confirm");
