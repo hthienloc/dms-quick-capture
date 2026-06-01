@@ -93,6 +93,11 @@ DankModal {
     property int textFontSize: parentWidget?.pluginData?.textFontSize ?? 24
     readonly property bool textMonospace: parentWidget?.pluginData?.textMonospace ?? false
     readonly property string toolbarPosition: parentWidget?.pluginData?.toolbarPosition ?? "top"
+    readonly property bool configShowToolbar: parentWidget?.pluginData?.showToolbar ?? true
+    property bool toolbarVisible: true
+    onConfigShowToolbarChanged: {
+        window.toolbarVisible = window.configShowToolbar;
+    }
 
     function openCentered() {
         open();
@@ -441,6 +446,7 @@ DankModal {
             window.currentTool = "crop";
         }
         window.updateRadialPresets();
+        window.toolbarVisible = window.configShowToolbar;
         // Read initial settings from pluginData if available
         if (window.parentWidget && window.parentWidget.pluginData) {
             window.strokeWidth = window.parentWidget.pluginData.defaultThickness || 8;
@@ -496,6 +502,7 @@ DankModal {
                 QuickCaptureToolbar {
                     id: toolbarCard
                     z: 100
+                    visible: window.toolbarVisible
                     pluginData: window.parentWidget?.pluginData || ({})
 
                     anchors.top: window.toolbarPosition === "bottom" ? undefined : parent.top
@@ -527,10 +534,10 @@ DankModal {
                 // 2. Centered Canvas Board
                 Item {
                     id: boardContainer
-                    anchors.top: window.toolbarPosition === "top" ? toolbarCard.bottom : parent.top
-                    anchors.bottom: window.toolbarPosition === "bottom" ? toolbarCard.top : parent.bottom
-                    anchors.left: window.toolbarPosition === "left" ? toolbarCard.right : parent.left
-                    anchors.right: window.toolbarPosition === "right" ? toolbarCard.left : parent.right
+                    anchors.top: (window.toolbarVisible && window.toolbarPosition === "top") ? toolbarCard.bottom : parent.top
+                    anchors.bottom: (window.toolbarVisible && window.toolbarPosition === "bottom") ? toolbarCard.top : parent.bottom
+                    anchors.left: (window.toolbarVisible && window.toolbarPosition === "left") ? toolbarCard.right : parent.left
+                    anchors.right: (window.toolbarVisible && window.toolbarPosition === "right") ? toolbarCard.left : parent.right
                     anchors.margins: Theme.spacingM
 
                     Component.onCompleted: {

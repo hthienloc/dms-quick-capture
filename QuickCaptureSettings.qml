@@ -286,11 +286,24 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Interface")
             icon: "visibility"
-            showReset: toolbarPosition.isDirty || modalOpacity.isDirty
+            showReset: toolbarPosition.isDirty || modalOpacity.isDirty || showToolbar.isDirty
             onResetClicked: {
                 toolbarPosition.resetToDefault();
                 modalOpacity.resetToDefault();
+                showToolbar.resetToDefault();
             }
+        }
+
+        ToggleSettingPlus {
+            id: showToolbar
+            settingKey: "showToolbar"
+            label: I18n.tr("Show Toolbar")
+            defaultValue: true
+        }
+
+        Separator {
+            visible: showToolbar.value
+            height: visible ? 1 : 0
         }
 
         ButtonGroupSettingPlus {
@@ -304,6 +317,8 @@ PluginSettings {
                 { label: I18n.tr("Right"), value: "right" }
             ]
             defaultValue: "top"
+            visible: showToolbar.value
+            height: visible ? 72 : 0
         }
 
         Separator {}
