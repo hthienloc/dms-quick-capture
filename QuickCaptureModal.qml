@@ -133,7 +133,7 @@ DankModal {
             const t = window.parentWidget.pluginData["preset_" + i + "_tool"];
             if (t && t !== "none") {
                 const rawColor = window.parentWidget.pluginData["preset_" + i + "_color"] || Theme.primary;
-                const resolvedColor = rawColor === "primary" ? Theme.primary : rawColor;
+                const resolvedColor = captureConfig.resolveColor(rawColor);
                 list.push({
                     tool: t,
                     color: resolvedColor,

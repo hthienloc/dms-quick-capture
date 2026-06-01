@@ -72,6 +72,40 @@ PluginSettings {
         }
     }
 
+    component SubCategoryHeader : Item {
+        id: subHeaderRoot
+        required property string text
+        property string icon: ""
+
+        width: parent.width
+        height: 32
+
+        Row {
+            anchors.left: parent.left
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 4
+            spacing: Theme.spacingXS
+
+            DankIcon {
+                name: subHeaderRoot.icon
+                size: 14
+                color: Theme.primary
+                visible: subHeaderRoot.icon !== ""
+                anchors.verticalCenter: parent.verticalCenter
+                opacity: 0.8
+            }
+
+            StyledText {
+                text: subHeaderRoot.text
+                font.pixelSize: Theme.fontSizeSmall
+                font.weight: Font.Bold
+                color: Theme.primary
+                anchors.verticalCenter: parent.verticalCenter
+                opacity: 0.85
+            }
+        }
+    }
+
     component CompactColorSetting : Item {
         id: swatchRoot
 
@@ -455,6 +489,11 @@ PluginSettings {
             }
         }
 
+        SubCategoryHeader {
+            text: I18n.tr("Toolbar Overlay")
+            icon: "dock"
+        }
+
         ToggleSettingPlus {
             id: showToolbar
             settingKey: "showToolbar"
@@ -483,6 +522,11 @@ PluginSettings {
         }
 
         Separator {}
+
+        SubCategoryHeader {
+            text: I18n.tr("Capture Screen Styles")
+            icon: "aspect_ratio"
+        }
 
         SliderSettingPlus {
             id: modalOpacity
@@ -521,6 +565,11 @@ PluginSettings {
                 roundRect.resetToDefault();
                 roundHighlighter.resetToDefault();
             }
+        }
+
+        SubCategoryHeader {
+            text: I18n.tr("Drawing Defaults")
+            icon: "brush"
         }
 
         SelectionSettingPlus {
@@ -583,6 +632,11 @@ PluginSettings {
 
         Separator {}
 
+        SubCategoryHeader {
+            text: I18n.tr("Text Annotations")
+            icon: "format_size"
+        }
+
         SliderSettingPlus {
             id: textFontSize
             label: I18n.tr("Text Font Size")
@@ -605,6 +659,11 @@ PluginSettings {
         }
 
         Separator {}
+
+        SubCategoryHeader {
+            text: I18n.tr("Shape Settings")
+            icon: "category"
+        }
 
         ToggleSettingPlus {
             id: roundRect
@@ -885,7 +944,7 @@ PluginSettings {
                             color: {
                                 if (radialMenuCard.presetActiveIndex === index) return Theme.onPrimary;
                                 if (modelData.tool === "none") return Theme.withAlpha(Theme.surfaceVariantText, 0.3);
-                                return modelData.color === "primary" ? Theme.primary : modelData.color;
+                                return captureConfig.resolveColor(modelData.color);
                             }
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
@@ -921,7 +980,7 @@ PluginSettings {
                         color: {
                             const p = radialMenuCard.currentPresets[radialMenuCard.presetActiveIndex];
                             if (!p || p.tool === "none") return Theme.surfaceVariantText;
-                            return p.color === "primary" ? Theme.primary : p.color;
+                            return captureConfig.resolveColor(p.color);
                         }
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
@@ -987,13 +1046,20 @@ PluginSettings {
 
         Item { width: 1; height: Theme.spacingS }
 
+        SubCategoryHeader {
+            text: I18n.tr("Preset Slots Configuration")
+            icon: "list_alt"
+        }
+
         Repeater {
             model: 8
 
             Column {
+                id: presetDelegate
                 width: parent.width
                 spacing: Theme.spacingM
                 visible: radialMenuCard.presetActiveIndex === index
+                readonly property int presetIndex: index
 
                 Item { width: 1; height: Theme.spacingXS }
 
@@ -1059,18 +1125,184 @@ PluginSettings {
 
                 Separator {}
 
-                ColorSettingPlus {
-                    id: presetColorSetting
-                    settingKey: "preset_" + index + "_color"
-                    label: I18n.tr("Preset Color")
-                    onValueChanged: {
-                        radialMenuCard.activePresetColors[index] = value;
-                        radialMenuCard.activePresetColors = [...radialMenuCard.activePresetColors];
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacingS
+
+                    StyledText {
+                        text: I18n.tr("Preset Color")
+                        font.pixelSize: Theme.fontSizeLarge
+                        font.weight: Font.Medium
+                        color: Theme.surfaceText
                     }
-                    defaultValue: {
-                        if (index === 6) return "#000000"; // Black
-                        if (index === 7) return "#ffffff"; // White
-                        return "primary";
+
+                    // Row containing 8 Slots + Separator + Custom Swatch & Optional Color Bar
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingS
+
+                        // 1. 8 Slots
+                        Row {
+                            spacing: Theme.spacingXS
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            Repeater {
+                                model: 8
+                                delegate: Rectangle {
+                                    width: 28
+                                    height: 28
+                                    radius: 14
+                                    color: {
+                                        if (index === 0) return toolbar_primary.resolvedColor;
+                                        if (index === 1) return c0.resolvedColor;
+                                        if (index === 2) return c1.resolvedColor;
+                                        if (index === 3) return c2.resolvedColor;
+                                        if (index === 4) return c3.resolvedColor;
+                                        if (index === 5) return c4.resolvedColor;
+                                        if (index === 6) return c5.resolvedColor;
+                                        if (index === 7) return c6.resolvedColor;
+                                        return "transparent";
+                                    }
+
+                                    property bool isSelected: presetColorSetting.value === "slot_" + (index + 1)
+                                    border.width: isSelected ? 2 : 1
+                                    border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.outline, 0.4)
+                                    scale: hoverArea.containsMouse ? 1.1 : 1.0
+                                    Behavior on scale { NumberAnimation { duration: 100 } }
+
+                                    DankIcon {
+                                        anchors.centerIn: parent
+                                        name: "check"
+                                        size: 14
+                                        color: (parent.color.r * 0.299 + parent.color.g * 0.587 + parent.color.b * 0.114) > 0.6 ? "#000000" : "#ffffff"
+                                        visible: parent.isSelected
+                                    }
+
+                                    MouseArea {
+                                        id: hoverArea
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            presetColorSetting.value = "slot_" + (index + 1);
+                                            radialMenuCard.activePresetColors[presetIndex] = presetColorSetting.value;
+                                            radialMenuCard.activePresetColors = [...radialMenuCard.activePresetColors];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Small separator bar
+                        Rectangle {
+                            width: 1
+                            height: 20
+                            color: Theme.withAlpha(Theme.outline, 0.2)
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        // 2. Custom Option and Bar Row
+                        Row {
+                            spacing: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            // Custom button swatch
+                            Rectangle {
+                                id: customSwatch
+                                width: 28
+                                height: 28
+                                radius: 14
+                                property bool isSelected: !presetColorSetting.value.startsWith("slot_")
+                                color: isSelected ? captureConfig.resolveColor(presetColorSetting.value) : Theme.surfaceContainerHighest
+                                border.width: isSelected ? 2 : 1
+                                border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.outline, 0.4)
+                                scale: customHover.containsMouse ? 1.1 : 1.0
+                                Behavior on scale { NumberAnimation { duration: 100 } }
+
+                                DankIcon {
+                                    anchors.centerIn: parent
+                                    name: "palette"
+                                    size: 14
+                                    color: {
+                                        if (!parent.isSelected) return Theme.surfaceText;
+                                        return (parent.color.r * 0.299 + parent.color.g * 0.587 + parent.color.b * 0.114) > 0.6 ? "#000000" : "#ffffff";
+                                    }
+                                }
+
+                                MouseArea {
+                                    id: customHover
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        if (!parent.isSelected) {
+                                            presetColorSetting.value = "primary";
+                                            radialMenuCard.activePresetColors[presetIndex] = presetColorSetting.value;
+                                            radialMenuCard.activePresetColors = [...radialMenuCard.activePresetColors];
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Dynamic Custom Color Bar directly to the right
+                            Rectangle {
+                                id: customColorBar
+                                width: 110
+                                height: 28
+                                radius: 14
+                                visible: !presetColorSetting.value.startsWith("slot_")
+                                color: captureConfig.resolveColor(presetColorSetting.value)
+                                border.color: Theme.withAlpha(Theme.surfaceText, 0.15)
+                                border.width: 1
+
+                                StyledText {
+                                    anchors.centerIn: parent
+                                    text: presetColorSetting.value === "primary" ? I18n.tr("PRIMARY") : presetColorSetting.value.toString().toUpperCase()
+                                    font.pixelSize: Theme.fontSizeSmall - 1
+                                    font.weight: Font.Bold
+                                    isMonospace: true
+                                    color: (parent.color.r * 0.299 + parent.color.g * 0.587 + parent.color.b * 0.114) > 0.6 ? "#000000" : "#ffffff"
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        if (typeof PopoutService !== "undefined" && PopoutService && PopoutService.colorPickerModal) {
+                                            PopoutService.colorPickerModal.selectedColor = captureConfig.resolveColor(presetColorSetting.value);
+                                            PopoutService.colorPickerModal.pickerTitle = I18n.tr("Preset Color");
+                                            PopoutService.colorPickerModal.onColorSelectedCallback = function (selectedColor) {
+                                                presetColorSetting.value = selectedColor.toString();
+                                                radialMenuCard.activePresetColors[presetIndex] = presetColorSetting.value;
+                                                radialMenuCard.activePresetColors = [...radialMenuCard.activePresetColors];
+                                            };
+                                            PopoutService.colorPickerModal.show();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Hidden headless ColorSettingPlus to load/save settings automatically
+                    Item {
+                        width: 0; height: 0
+                        visible: false
+
+                        ColorSettingPlus {
+                            id: presetColorSetting
+                            settingKey: "preset_" + presetIndex + "_color"
+                            label: ""
+                            onValueChanged: {
+                                radialMenuCard.activePresetColors[presetIndex] = value;
+                                radialMenuCard.activePresetColors = [...radialMenuCard.activePresetColors];
+                            }
+                            defaultValue: {
+                                if (presetIndex === 6) return "#000000"; // Black
+                                if (presetIndex === 7) return "#ffffff"; // White
+                                return "primary";
+                            }
+                        }
                     }
                 }
 
@@ -1095,6 +1327,11 @@ PluginSettings {
         }
 
         Separator {}
+
+        SubCategoryHeader {
+            text: I18n.tr("Hover & Trigger Behavior")
+            icon: "mouse"
+        }
 
         ToggleSettingPlus {
             id: radialHoverTrigger

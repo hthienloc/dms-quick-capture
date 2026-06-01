@@ -140,4 +140,22 @@ QtObject {
         }
         return null;
     }
+
+    function resolveColor(rawColor) {
+        if (!rawColor) return Theme.primary;
+        let resolved = rawColor;
+        if (rawColor === "primary") {
+            resolved = Theme.primary;
+        } else if (rawColor.startsWith("slot_")) {
+            const parts = rawColor.split("_");
+            const slotIdx = parseInt(parts[1]) - 1;
+            if (slotIdx === 0) {
+                const primaryColor = pluginData["toolbar_color_primary"] || "primary";
+                resolved = primaryColor === "primary" ? Theme.primary : primaryColor;
+            } else if (slotIdx >= 1 && slotIdx <= 7) {
+                resolved = accentColors[slotIdx - 1];
+            }
+        }
+        return Qt.color(resolved);
+    }
 }
