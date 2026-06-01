@@ -145,6 +145,64 @@ PluginComponent {
         }
     }
 
+    function handleDrop(drop) {
+        let urlStr = "";
+        if (drop.hasUrls && drop.urls.length > 0) {
+            urlStr = drop.urls[0].toString();
+        } else if (drop.hasText) {
+            const trimmed = drop.text.trim();
+            if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+                urlStr = trimmed;
+            }
+        }
+
+        if (urlStr === "") {
+            if (typeof ToastService !== "undefined" && ToastService) {
+                ToastService.showWarning("No valid image file or URL found in drop.");
+            }
+            return;
+        }
+
+        if (urlStr.startsWith("http://") || urlStr.startsWith("https://")) {
+            if (typeof ToastService !== "undefined" && ToastService) {
+                ToastService.showInfo("Downloading image from web...");
+            }
+            Proc.runCommand("download-image", ["curl", "-s", "-L", "-o", "/tmp/dms_capture_bg.png", urlStr], (stdout, exitCode) => {
+                if (exitCode === 0) {
+                    modal.shouldBeVisible = true;
+                    modal.openCentered();
+                } else {
+                    if (typeof ToastService !== "undefined" && ToastService) {
+                        ToastService.showError("Failed to download dropped image.");
+                    }
+                }
+            });
+        } else if (urlStr.startsWith("file://")) {
+            const path = urlStr.substring(7);
+            Proc.runCommand("copy-image", ["cp", "-f", path, "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
+                if (exitCode === 0) {
+                    modal.shouldBeVisible = true;
+                    modal.openCentered();
+                } else {
+                    if (typeof ToastService !== "undefined" && ToastService) {
+                        ToastService.showError("Failed to copy local image.");
+                    }
+                }
+            });
+        } else {
+            Proc.runCommand("copy-image", ["cp", "-f", urlStr, "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
+                if (exitCode === 0) {
+                    modal.shouldBeVisible = true;
+                    modal.openCentered();
+                } else {
+                    if (typeof ToastService !== "undefined" && ToastService) {
+                        ToastService.showError("Failed to copy local image.");
+                    }
+                }
+            });
+        }
+    }
+
     pluginId: "quickCapture"
     pluginService: PluginService
 
@@ -177,15 +235,7 @@ PluginComponent {
                 onExited: draggingOver = false
                 onDropped: (drop) => {
                     draggingOver = false;
-                    if (drop.hasUrls && drop.urls.length > 0) {
-                        const path = drop.urls[0].toString().replace("file://", "");
-                        Proc.runCommand("copy-image", ["cp", "-f", path, "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
-                            if (exitCode === 0) {
-                                modal.shouldBeVisible = true;
-                                modal.openCentered();
-                            }
-                        });
-                    }
+                    root.handleDrop(drop);
                 }
             }
         }
@@ -219,15 +269,7 @@ PluginComponent {
                 onExited: draggingOver = false
                 onDropped: (drop) => {
                     draggingOver = false;
-                    if (drop.hasUrls && drop.urls.length > 0) {
-                        const path = drop.urls[0].toString().replace("file://", "");
-                        Proc.runCommand("copy-image", ["cp", "-f", path, "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
-                            if (exitCode === 0) {
-                                modal.shouldBeVisible = true;
-                                modal.openCentered();
-                            }
-                        });
-                    }
+                    root.handleDrop(drop);
                 }
             }
         }
