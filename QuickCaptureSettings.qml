@@ -348,11 +348,13 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Saving")
             icon: "save"
-            showReset: doneAction.isDirty || saveDirectory.isDirty || saveFilenamePattern.isDirty
+            showReset: doneAction.isDirty || saveDirectory.isDirty || saveFilenamePattern.isDirty || outputFormat.isDirty || jpegQuality.isDirty
             onResetClicked: {
                 doneAction.resetToDefault();
                 saveDirectory.resetToDefault();
                 saveFilenamePattern.resetToDefault();
+                outputFormat.resetToDefault();
+                jpegQuality.resetToDefault();
             }
         }
 
@@ -393,48 +395,8 @@ PluginSettings {
             text: I18n.tr("Supports formatting: %Y (Year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)")
             opacity: 0.85
         }
-    }
-
-    SettingsCard {
-        id: notificationsCard
-        SectionTitle {
-            text: I18n.tr("Notifications")
-            icon: "notifications"
-            showReset: showToasts.isDirty || showSystemNotification.isDirty
-            onResetClicked: {
-                showToasts.resetToDefault();
-                showSystemNotification.resetToDefault();
-            }
-        }
-
-        ToggleSettingPlus {
-            id: showToasts
-            settingKey: "showToasts"
-            label: I18n.tr("Show Toast Notifications")
-            defaultValue: true
-        }
 
         Separator {}
-
-        ToggleSettingPlus {
-            id: showSystemNotification
-            settingKey: "showSystemNotification"
-            label: I18n.tr("Show System Notification")
-            defaultValue: false
-        }
-    }
-
-    SettingsCard {
-        id: imageFormatCard
-        SectionTitle {
-            text: I18n.tr("Format")
-            icon: "image"
-            showReset: outputFormat.isDirty || jpegQuality.isDirty
-            onResetClicked: {
-                outputFormat.resetToDefault();
-                jpegQuality.resetToDefault();
-            }
-        }
 
         ButtonGroupSettingPlus {
             id: outputFormat
@@ -465,6 +427,35 @@ PluginSettings {
             rightLabel: "100"
             visible: outputFormat.value === "jpg"
             height: visible ? implicitHeight : 0
+        }
+    }
+
+    SettingsCard {
+        id: notificationsCard
+        SectionTitle {
+            text: I18n.tr("Notifications")
+            icon: "notifications"
+            showReset: showToasts.isDirty || showSystemNotification.isDirty
+            onResetClicked: {
+                showToasts.resetToDefault();
+                showSystemNotification.resetToDefault();
+            }
+        }
+
+        ToggleSettingPlus {
+            id: showToasts
+            settingKey: "showToasts"
+            label: I18n.tr("Show Toast Notifications")
+            defaultValue: true
+        }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            id: showSystemNotification
+            settingKey: "showSystemNotification"
+            label: I18n.tr("Show System Notification")
+            defaultValue: false
         }
     }
 
@@ -628,7 +619,7 @@ PluginSettings {
 
         SliderSettingPlus {
             id: textFontSize
-            label: I18n.tr("Text Font Size")
+            label: I18n.tr("Default Text Font Size")
             settingKey: "textFontSize"
             defaultValue: 24
             minimum: 8
