@@ -978,8 +978,33 @@ PluginSettings {
             }
 
             CopyBox {
-                label: I18n.tr("Trigger Screenshot (Specific Mode)")
+                label: I18n.tr("Trigger Screenshot (Interactive Region)")
                 text: "dms ipc call quickCapture screenshot region"
+            }
+
+            CopyBox {
+                label: I18n.tr("Trigger Screenshot (Full Screen)")
+                text: "dms ipc call quickCapture screenshot full"
+            }
+
+            CopyBox {
+                label: I18n.tr("Trigger Screenshot (All Combined Outputs)")
+                text: "dms ipc call quickCapture screenshot all"
+            }
+
+            CopyBox {
+                label: I18n.tr("Trigger Screenshot (Specific Output)")
+                text: "dms ipc call quickCapture screenshot output"
+            }
+
+            CopyBox {
+                label: I18n.tr("Trigger Screenshot (Focused Window)")
+                text: "dms ipc call quickCapture screenshot window"
+            }
+
+            CopyBox {
+                label: I18n.tr("Trigger Screenshot (Last Selected Region)")
+                text: "dms ipc call quickCapture screenshot last"
             }
 
             CopyBox {
