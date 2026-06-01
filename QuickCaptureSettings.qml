@@ -494,6 +494,7 @@ PluginSettings {
             unit: "%"
             leftLabel: "0"
             rightLabel: "100"
+            previewType: "opacity"
         }
 
         Separator {}
@@ -577,6 +578,7 @@ PluginSettings {
             maximum: 20
             leftLabel: "1"
             rightLabel: "20"
+            previewType: "thickness"
         }
 
         Separator {}
@@ -590,6 +592,7 @@ PluginSettings {
             maximum: 72
             leftLabel: "8"
             rightLabel: "72"
+            previewType: "fontSize"
         }
 
         Separator {}
@@ -1057,6 +1060,7 @@ PluginSettings {
                 Separator {}
 
                 ColorSettingPlus {
+                    id: presetColorSetting
                     settingKey: "preset_" + index + "_color"
                     label: I18n.tr("Preset Color")
                     onValueChanged: {
@@ -1084,6 +1088,8 @@ PluginSettings {
                     maximum: 20
                     leftLabel: "1"
                     rightLabel: "20"
+                    previewType: "thickness"
+                    previewColor: presetColorSetting.value
                 }
             }
         }

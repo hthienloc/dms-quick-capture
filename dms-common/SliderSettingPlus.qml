@@ -23,6 +23,14 @@ Item {
     
     // Dynamic Opacity for disabled state
     opacity: enabled ? 1 : 0.5
+
+    property string previewType: "" // "", "thickness", "opacity", "fontSize"
+    property var previewColor: Theme.primary
+
+    readonly property color resolvedPreviewColor: {
+        if (typeof previewColor === "string" && previewColor === "primary") return Theme.primary;
+        return previewColor;
+    }
     Behavior on opacity { NumberAnimation { duration: Theme.shortDuration } }
 
     property bool isInitialized: false
@@ -176,7 +184,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
             }
 
-            DankSlider {
+            DankSliderPlus {
                 id: dankSlider
                 width: parent.width - (leftLbl.implicitWidth + rightLbl.implicitWidth + (root.leftLabel !== "" ? parent.spacing : 0) + (root.rightLabel !== "" ? parent.spacing : 0))
                 height: 32
@@ -188,6 +196,8 @@ Item {
                 unit: root.unit
                 wheelEnabled: false
                 thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
+                previewType: root.previewType
+                previewColor: root.resolvedPreviewColor
                 onSliderValueChanged: newValue => {
                     root.value = newValue;
                 }
