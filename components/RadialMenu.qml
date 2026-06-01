@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
-import "../core"
+import ".."
 
 Item {
     id: root

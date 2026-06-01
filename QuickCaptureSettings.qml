@@ -26,13 +26,10 @@ PluginSettings {
             id: captureMode
             settingKey: "captureMode"
             label: I18n.tr("Capture Mode")
-            options: [{
-                "label": I18n.tr("Interactive Region"),
-                "value": "region"
-            }, {
-                "label": I18n.tr("Full Screen"),
-                "value": "full"
-            }]
+            options: [
+                { label: I18n.tr("Interactive Region"), value: "region" },
+                { label: I18n.tr("Full Screen"), value: "full" }
+            ]
             defaultValue: "region"
         }
 
@@ -42,16 +39,11 @@ PluginSettings {
             id: doneAction
             settingKey: "doneAction"
             label: I18n.tr("Action when Enter")
-            options: [{
-                "label": I18n.tr("Copy to Clipboard only"),
-                "value": "clipboard"
-            }, {
-                "label": I18n.tr("Save to File only"),
-                "value": "file"
-            }, {
-                "label": I18n.tr("Both Copy and Save"),
-                "value": "both"
-            }]
+            options: [
+                { label: I18n.tr("Copy to Clipboard only"), value: "clipboard" },
+                { label: I18n.tr("Save to File only"), value: "file" },
+                { label: I18n.tr("Both Copy and Save"), value: "both" }
+            ]
             defaultValue: "both"
         }
 
@@ -379,11 +371,12 @@ PluginSettings {
         UsageGuide {
             expanded: usageTitle.isExpanded
             items: [
-                I18n.tr("Start capture via <b>Control Center</b> or your configured <b>Print</b> key."),
+                I18n.tr("<b>Left-click</b> the bar icon to start a new screenshot."),
+                I18n.tr("<b>Right-click</b> the bar icon to select an existing image for annotation."),
+                I18n.tr("<b>Drop an image</b> onto the bar icon to open it instantly."),
                 I18n.tr("During capture: <b>Right-click</b> to open the custom <b>Radial Menu</b>."),
                 I18n.tr("Use <b>Mouse Wheel</b> to dynamically adjust stroke thickness."),
-                I18n.tr("<b>Middle-click</b> any drawn element to instantly erase it."),
-                I18n.tr("Press <b>Enter</b> to finish and save/copy, or <b>Esc</b> to discard.")
+                I18n.tr("<b>Middle-click</b> any drawn element to instantly erase it.")
             ]
         }
     }

@@ -9,8 +9,8 @@ Column {
     required property string settingKey
     required property string label
     property string description: ""
-    property color defaultValue: Theme.primary
-    property color value: defaultValue
+    property var defaultValue: Theme.primary
+    property var value: defaultValue
 
     width: parent.width
     spacing: Theme.spacingXS
@@ -21,6 +21,11 @@ Column {
 
     property bool isInitialized: false
     readonly property bool isDirty: value.toString() !== defaultValue.toString()
+
+    readonly property color resolvedColor: {
+        if (value === "primary") return Theme.primary;
+        return Qt.color(value);
+    }
 
     function resetToDefault() {
         console.log(`[ColorSettingPlus] Resetting ${settingKey}`);
@@ -126,7 +131,7 @@ Column {
         width: parent.width
         height: 32
         radius: Theme.cornerRadius
-        color: root.value
+        color: root.resolvedColor
         border.color: Theme.outlineStrong
         border.width: 2
         
@@ -139,16 +144,16 @@ Column {
             DankIcon {
                 name: "palette"
                 size: 14
-                color: root.value.hslLightness > 0.6 ? "#000000" : "#ffffff"
+                color: root.resolvedColor.hslLightness > 0.6 ? "#000000" : "#ffffff"
                 opacity: 0.7
             }
 
             StyledText {
-                text: root.value.toString().toUpperCase()
+                text: root.value === "primary" ? I18n.tr("PRIMARY") : root.value.toString().toUpperCase()
                 font.pixelSize: Theme.fontSizeSmall
                 font.weight: Font.Bold
                 isMonospace: true
-                color: root.value.hslLightness > 0.6 ? "#000000" : "#ffffff"
+                color: root.resolvedColor.hslLightness > 0.6 ? "#000000" : "#ffffff"
             }
         }
 
@@ -156,11 +161,11 @@ Column {
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
             onClicked: {
-                if (PopoutService && PopoutService.colorPickerModal) {
-                    PopoutService.colorPickerModal.selectedColor = root.value;
+                if (typeof PopoutService !== "undefined" && PopoutService && PopoutService.colorPickerModal) {
+                    PopoutService.colorPickerModal.selectedColor = root.resolvedColor;
                     PopoutService.colorPickerModal.pickerTitle = root.label;
                     PopoutService.colorPickerModal.onColorSelectedCallback = function (selectedColor) {
-                        root.value = selectedColor;
+                        root.value = selectedColor.toString();
                     };
                     PopoutService.colorPickerModal.show();
                 }

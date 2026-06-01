@@ -26,15 +26,24 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 
 ## Usage
 
-1. **Trigger Capture:** Use the Control Center toggle or your configured `Print` key (via IPC).
-2. **Select Area:** Drag to select the screenshot region directly on screen.
+### Bar Interactions
+
+| Action | Result |
+|--------|--------|
+| **Left Click** | Trigger interactive screenshot capture |
+| **Right Click** | Open file browser to select an existing image |
+| **Drop Image** | Drag any image file onto the icon to annotate it |
+
+### Capture Workflow
+
+1. **Trigger:** Use the bar icon, Control Center, or your `Print` key.
+2. **Select Area:** Drag to select the screenshot region.
 3. **Annotate:**
-   - **Switch Tools:** Use the toolbar or keyboard shortcuts (**1-4**, **Q-R**, **A-D**).
-   - **Radial Menu:** **Right-click** to open your custom presets circle.
-   - **Thickness:** Use the **Mouse Wheel** to dynamically scale the brush size.
-   - **Colors:** Click a color in the toolbar or use **Ctrl + 1-4/Q-R**.
-   - **Quick Erase:** **Middle-click** directly on any drawn element/stroke to instantly erase it.
-4. **Finish:** Press **Enter** to perform your default action (Save, Copy, or Both) or **Esc** to discard.
+   - **Switch Tools:** Use keyboard shortcuts (**1-4**, **Q-R**, **A-D**).
+   - **Radial Menu:** **Right-click** to open custom presets.
+   - **Thickness:** Use the **Mouse Wheel** to scale the brush size.
+   - **Quick Erase:** **Middle-click** on any element to erase it.
+4. **Finish:** Press **Enter** to save/copy or **Esc** to discard.
 
 ## Keyboard Shortcuts
 
@@ -57,7 +66,8 @@ Use `dms ipc call quickCapture <command>` to control the screenshot workflow.
 
 | Command | Description |
 |---------|-------------|
-| `screenshot` | Trigger interactive region screenshot selection and open annotator |
+| `screenshot` | Trigger interactive region screenshot selection |
+| `selectFile` | Open file browser to select an existing image |
 | `toggle` | Toggle the quick capture annotator window |
 | `close` | Close the quick capture annotator window |
 

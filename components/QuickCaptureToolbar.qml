@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import qs.Common
 import qs.Widgets
-import "../core"
+import ".."
 
 Rectangle {
     id: root
