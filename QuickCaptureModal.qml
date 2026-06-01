@@ -1158,10 +1158,12 @@ DankModal {
                                             break;
                                         }
                                     }
-                                    if (found !== -1) {
-                                        window.strokes.splice(found, 1);
-                                        drawingCanvas.requestPaint();
-                                    }
+                                     if (found !== -1) {
+                                         const list = [...window.strokes];
+                                         list.splice(found, 1);
+                                         window.strokes = list;
+                                         drawingCanvas.requestPaint();
+                                     }
                                     return;
                                 }
 
