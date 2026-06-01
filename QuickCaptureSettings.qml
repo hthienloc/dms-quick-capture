@@ -252,7 +252,7 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Capture")
             icon: "screenshot"
-            showReset: captureMode.isDirty || doneAction.isDirty || saveDirectory.isDirty || skipConfirm.isDirty || outputFormat.isDirty || includeCursor.isDirty || jpegQuality.isDirty || showToasts.isDirty || showSystemNotification.isDirty
+            showReset: captureMode.isDirty || doneAction.isDirty || saveDirectory.isDirty || skipConfirm.isDirty || outputFormat.isDirty || includeCursor.isDirty || jpegQuality.isDirty || showToasts.isDirty || showSystemNotification.isDirty || outputTargetName.isDirty
             onResetClicked: {
                 captureMode.resetToDefault();
                 doneAction.resetToDefault();
@@ -263,6 +263,7 @@ PluginSettings {
                 jpegQuality.resetToDefault();
                 showToasts.resetToDefault();
                 showSystemNotification.resetToDefault();
+                outputTargetName.resetToDefault();
             }
         }
 
@@ -274,10 +275,26 @@ PluginSettings {
                 { label: I18n.tr("Interactive Region"), value: "region" },
                 { label: I18n.tr("Full Screen"), value: "full" },
                 { label: I18n.tr("All Combined Outputs"), value: "all" },
+                { label: I18n.tr("Specific Output"), value: "output" },
                 { label: I18n.tr("Focused Window"), value: "window" },
                 { label: I18n.tr("Last Selected Region"), value: "last" }
             ]
             defaultValue: "region"
+        }
+
+        Separator {
+            visible: captureMode.value === "output"
+            height: visible ? 1 : 0
+        }
+
+        StringSettingPlus {
+            id: outputTargetName
+            settingKey: "outputTargetName"
+            label: I18n.tr("Target Output Name")
+            placeholder: "e.g. DP-1"
+            defaultValue: "DP-1"
+            visible: captureMode.value === "output"
+            height: visible ? implicitHeight : 0
         }
 
         Item {

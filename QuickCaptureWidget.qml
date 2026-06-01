@@ -63,6 +63,11 @@ PluginComponent {
             args.push("--no-confirm");
         }
 
+        if (mode === "output") {
+            const outName = pluginData.outputTargetName || "DP-1";
+            args.push("--output", outName);
+        }
+
         if (format === "jpg") {
             const quality = pluginData.jpegQuality ?? 90;
             args.push("--quality", String(quality));
