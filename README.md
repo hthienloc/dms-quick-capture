@@ -59,6 +59,8 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 | `Ctrl + Z` | Undo last stroke |
 | `Ctrl + S` | Force Save to File |
 | `Ctrl + C` | Force Copy to Clipboard |
+| `Ctrl + 1` - `4` | Select Color Slots 1 - 4 |
+| `Ctrl + Q` - `R` | Select Color Slots 5 - 8 (Q, W, E, R) |
 
 ## IPC Commands
 
