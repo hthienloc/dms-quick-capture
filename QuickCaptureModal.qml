@@ -92,7 +92,7 @@ DankModal {
     backgroundOpacity: (parentWidget?.pluginData?.modalOpacity ?? 60) / 100
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
 
-    property int textFontSize: parentWidget?.pluginData?.textFontSize ?? 24
+    property int textFontSize: parentWidget?.pluginData?.textFontSize ?? 36
     readonly property bool textMonospace: parentWidget?.pluginData?.textMonospace ?? false
     readonly property string toolbarPosition: parentWidget?.pluginData?.toolbarPosition ?? "top"
     readonly property bool configShowToolbar: parentWidget?.pluginData?.showToolbar ?? true

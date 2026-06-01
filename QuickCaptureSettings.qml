@@ -621,7 +621,7 @@ PluginSettings {
             id: textFontSize
             label: I18n.tr("Default Text Font Size")
             settingKey: "textFontSize"
-            defaultValue: 24
+            defaultValue: 36
             minimum: 8
             maximum: 72
             leftLabel: "8"
