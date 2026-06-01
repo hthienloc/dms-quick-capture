@@ -993,6 +993,34 @@ PluginSettings {
 
         Item { width: 1; height: Theme.spacingS }
 
+        ToggleSettingPlus {
+            id: radialHoverTrigger
+            settingKey: "radialHoverTrigger"
+            label: I18n.tr("Trigger on Hover")
+            description: I18n.tr("Select a tool preset automatically by hovering over it, without needing to release the mouse click.")
+            defaultValue: false
+        }
+
+        Separator {
+            visible: radialHoverTrigger.value
+            height: visible ? 1 : 0
+        }
+
+        SliderSettingPlus {
+            id: radialHoverDelay
+            settingKey: "radialHoverDelay"
+            label: I18n.tr("Hover Trigger Delay")
+            defaultValue: 300
+            minimum: 100
+            maximum: 1000
+            leftLabel: "100ms"
+            rightLabel: "1000ms"
+            visible: radialHoverTrigger.value
+            height: visible ? implicitHeight : 0
+        }
+
+        Separator {}
+
         Repeater {
             model: 8
 

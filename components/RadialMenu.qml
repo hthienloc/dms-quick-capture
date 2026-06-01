@@ -12,6 +12,10 @@ Item {
     property var presets: []
     property int selectedIndex: -1
     
+    // Hover Trigger Config
+    property bool hoverTrigger: false
+    property int hoverDelay: 300
+    
     // Premium geometry config
     readonly property real outerRadius: 130
     readonly property real innerRadius: 50
@@ -57,8 +61,35 @@ Item {
     width: outerRadius * 2
     height: width
 
-    onSelectedIndexChanged: radialCanvas.requestPaint()
+    onSelectedIndexChanged: {
+        radialCanvas.requestPaint();
+        if (root.hoverTrigger) {
+            hoverTimer.stop();
+            if (root.selectedIndex >= 0 && root.selectedIndex < root.presets.length) {
+                hoverTimer.start();
+            }
+        }
+    }
+    
     onPresetsChanged: radialCanvas.requestPaint()
+
+    onVisibleStateChanged: {
+        if (!visibleState) {
+            hoverTimer.stop();
+        }
+    }
+
+    Timer {
+        id: hoverTimer
+        interval: root.hoverDelay
+        repeat: false
+        onTriggered: {
+            if (root.selectedIndex >= 0 && root.selectedIndex < root.presets.length) {
+                root.presetSelected(root.presets[root.selectedIndex]);
+                root.close();
+            }
+        }
+    }
 
     // Premium Segmented Background Canvas
     Canvas {

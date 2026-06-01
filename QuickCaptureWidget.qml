@@ -16,6 +16,7 @@ PluginComponent {
     property bool isCapturing: false
     readonly property string captureMode: (pluginData.captureMode || "region")
     property string activeIpcMode: ""
+    property string resolvedDmsPath: "dms"
 
     function triggerCapture(mode) {
         if (root.isDaemonInstance) {
@@ -53,7 +54,7 @@ PluginComponent {
         const mode = root.activeIpcMode !== "" ? root.activeIpcMode : root.captureMode;
         const format = (pluginData.outputFormat || "png");
         const cursorVal = pluginData.includeCursor ? "on" : "off";
-        const args = ["dms", "screenshot", mode, "--no-clipboard", "--dir", "/tmp", "--filename", "dms_capture_bg.png", "--format", format, "--cursor", cursorVal];
+        const args = [root.resolvedDmsPath, "screenshot", mode, "--no-clipboard", "--dir", "/tmp", "--filename", "dms_capture_bg.png", "--format", format, "--cursor", cursorVal];
 
         if (!pluginData.showSystemNotification) {
             args.push("--no-notify");
@@ -80,16 +81,27 @@ PluginComponent {
         // 0ms debounce (execute instantly)
         // 60 seconds timeout
 
-        Proc.runCommand("dms-screenshot", root.screenshotArgs(), (stdout, exitCode) => {
-            root.isCapturing = false;
-            root.activeIpcMode = "";
+        Proc.runCommand("screenshot-trigger", root.screenshotArgs(), (stdout, exitCode) => {
             if (exitCode === 0) {
+                root.isCapturing = false;
+                root.activeIpcMode = "";
+                root.resolvedDmsPath = "dms"; // reset to default path on success
                 modal.shouldBeVisible = true;
                 modal.openCentered();
             } else {
-                if (typeof ToastService !== "undefined" && ToastService)
-                    ToastService.showError("Screenshot canceled or failed.");
-
+                if (root.resolvedDmsPath === "dms") {
+                    root.resolvedDmsPath = "/usr/local/bin/dms";
+                    root.startActualCapture();
+                } else if (root.resolvedDmsPath === "/usr/local/bin/dms") {
+                    root.resolvedDmsPath = "/usr/bin/dms";
+                    root.startActualCapture();
+                } else {
+                    root.isCapturing = false;
+                    root.activeIpcMode = "";
+                    root.resolvedDmsPath = "dms"; // reset to default path for next attempts
+                    if (typeof ToastService !== "undefined" && ToastService)
+                        ToastService.showError("Screenshot canceled or failed.");
+                }
             }
         }, 0, 60000);
     }
