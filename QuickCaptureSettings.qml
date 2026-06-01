@@ -743,25 +743,16 @@ PluginSettings {
 
         property int presetActiveIndex: 0
 
+        property var activePresetTools: ["pen", "arrow", "rect", "highlighter", "ellipse", "stamp", "redact", "pixelate"]
+        property var activePresetColors: ["primary", "primary", "primary", "primary", "primary", "primary", "#000000", "#ffffff"]
+        property var activePresetThicknesses: [6, 6, 6, 6, 6, 6, 6, 6]
+
         readonly property var currentPresets: {
-            const data = root.pluginData || {};
             const list = [];
             for (let i = 0; i < 8; i++) {
-                const tool = data["preset_" + i + "_tool"] || (
-                    i === 0 ? "pen" :
-                    i === 1 ? "arrow" :
-                    i === 2 ? "rect" :
-                    i === 3 ? "highlighter" :
-                    i === 4 ? "ellipse" :
-                    i === 5 ? "stamp" :
-                    i === 6 ? "redact" :
-                    i === 7 ? "pixelate" : "none"
-                );
-                const color = data["preset_" + i + "_color"] || (
-                    i === 6 ? "#000000" :
-                    i === 7 ? "#ffffff" : "primary"
-                );
-                const thickness = data["preset_" + i + "_thickness"] ?? 6;
+                const tool = radialMenuCard.activePresetTools[i] || "none";
+                const color = radialMenuCard.activePresetColors[i] || "primary";
+                const thickness = radialMenuCard.activePresetThicknesses[i] ?? 6;
                 list.push({ tool: tool, color: color, thickness: thickness });
             }
             return list;
@@ -839,8 +830,8 @@ PluginSettings {
                 
                 // Redraw on preset changes (color or tool changed in settings)
                 Connections {
-                    target: root
-                    function onPluginDataChanged() { simulatedCanvas.requestPaint(); }
+                    target: radialMenuCard
+                    function onCurrentPresetsChanged() { simulatedCanvas.requestPaint(); }
                 }
                 
                 Component.onCompleted: simulatedCanvas.requestPaint()
@@ -1006,6 +997,10 @@ PluginSettings {
                 SelectionSettingPlus {
                     settingKey: "preset_" + index + "_tool"
                     label: I18n.tr("Preset Tool")
+                    onValueChanged: {
+                        radialMenuCard.activePresetTools[index] = value;
+                        radialMenuCard.activePresetTools = [...radialMenuCard.activePresetTools];
+                    }
                     options: [{
                         "label": I18n.tr("None / Disabled"),
                         "value": "none"
@@ -1064,6 +1059,10 @@ PluginSettings {
                 ColorSettingPlus {
                     settingKey: "preset_" + index + "_color"
                     label: I18n.tr("Preset Color")
+                    onValueChanged: {
+                        radialMenuCard.activePresetColors[index] = value;
+                        radialMenuCard.activePresetColors = [...radialMenuCard.activePresetColors];
+                    }
                     defaultValue: {
                         if (index === 6) return "#000000"; // Black
                         if (index === 7) return "#ffffff"; // White
@@ -1076,6 +1075,10 @@ PluginSettings {
                 SliderSettingPlus {
                     settingKey: "preset_" + index + "_thickness"
                     label: I18n.tr("Preset Thickness")
+                    onValueChanged: {
+                        radialMenuCard.activePresetThicknesses[index] = value;
+                        radialMenuCard.activePresetThicknesses = [...radialMenuCard.activePresetThicknesses];
+                    }
                     defaultValue: 6
                     minimum: 1
                     maximum: 20
