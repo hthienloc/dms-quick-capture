@@ -12,7 +12,10 @@ import "core"
 DankModal {
     id: window
 
-    CaptureConfig { id: config }
+    CaptureConfig { 
+        id: config 
+        pluginData: window.parentWidget?.pluginData || ({})
+    }
 
     layerNamespace: "dms:plugins:quickCapture"
     keepPopoutsOpen: true
@@ -492,6 +495,7 @@ DankModal {
                 QuickCaptureToolbar {
                     id: toolbarCard
                     z: 100
+                    pluginData: window.parentWidget?.pluginData || ({})
 
                     anchors.top: window.toolbarPosition === "bottom" ? undefined : parent.top
                     anchors.bottom: window.toolbarPosition === "bottom" ? parent.bottom : undefined

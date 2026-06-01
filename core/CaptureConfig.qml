@@ -2,6 +2,8 @@ import QtQuick
 import qs.Common
 
 QtObject {
+    property var pluginData: ({})
+
     readonly property var toolButtons: [
         { id: "pen", icon: "edit", tooltip: qsTr("Freehand Pen (1)") },
         { id: "line", icon: "horizontal_rule", tooltip: qsTr("Straight Line (2)") },
@@ -16,7 +18,7 @@ QtObject {
         { id: "eraser", icon: "auto_fix_normal", tooltip: qsTr("Eraser (D)") }
     ]
 
-    readonly property var accentColors: [
+    readonly property var defaultAccentColors: [
         "#3b82f6",
         "#ef4444",
         "#22c55e",
@@ -25,6 +27,14 @@ QtObject {
         "#ffffff",
         "#000000"
     ]
+
+    readonly property var accentColors: {
+        const list = [];
+        for (let i = 0; i < 7; i++) {
+            list.push(pluginData["toolbar_color_" + i] || defaultAccentColors[i]);
+        }
+        return list;
+    }
 
     readonly property var toolShortcuts: [
         { key: "V", tool: "select" },
@@ -43,17 +53,18 @@ QtObject {
     ]
 
     readonly property var colorShortcuts: [
-        { key: "1", color: "primary" },
-        { key: "2", color: "#3b82f6" },
-        { key: "3", color: "#ef4444" },
-        { key: "4", color: "#22c55e" },
-        { key: "Q", color: "#eab308" },
-        { key: "W", color: "#a855f7" },
-        { key: "E", color: "#ffffff" },
-        { key: "R", color: "#000000" }
+        { key: "1", color: pluginData["toolbar_color_primary"] || "primary" },
+        { key: "2", color: accentColors[0] },
+        { key: "3", color: accentColors[1] },
+        { key: "4", color: accentColors[2] },
+        { key: "Q", color: accentColors[3] },
+        { key: "W", color: accentColors[4] },
+        { key: "E", color: accentColors[5] },
+        { key: "R", color: accentColors[6] }
     ]
 
     function findByKey(items, key) {
+        if (!items) return null;
         for (var i = 0; i < items.length; i++) {
             if (items[i].key === key) return items[i];
         }

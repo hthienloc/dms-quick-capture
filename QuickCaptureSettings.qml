@@ -222,6 +222,48 @@ PluginSettings {
     }
 
     SettingsCard {
+        id: toolbarPaletteSection
+        SectionTitle {
+            text: I18n.tr("Toolbar Palette")
+            icon: "palette"
+            showReset: toolbar_primary.isDirty || c0.isDirty || c1.isDirty || c2.isDirty || c3.isDirty || c4.isDirty || c5.isDirty || c6.isDirty
+            onResetClicked: {
+                toolbar_primary.resetToDefault();
+                c0.resetToDefault(); c1.resetToDefault(); c2.resetToDefault();
+                c3.resetToDefault(); c4.resetToDefault(); c5.resetToDefault();
+                c6.resetToDefault();
+            }
+        }
+
+        InfoText {
+            text: I18n.tr("Customize the 8 color slots available in the annotation toolbar.")
+        }
+
+        ColorSettingPlus {
+            id: toolbar_primary
+            settingKey: "toolbar_color_primary"
+            label: I18n.tr("Slot 1 (Default: Primary)")
+            defaultValue: "primary"
+        }
+
+        Separator {}
+
+        ColorSettingPlus { id: c0; settingKey: "toolbar_color_0"; label: I18n.tr("Slot 2"); defaultValue: "#3b82f6" }
+        Separator {}
+        ColorSettingPlus { id: c1; settingKey: "toolbar_color_1"; label: I18n.tr("Slot 3"); defaultValue: "#ef4444" }
+        Separator {}
+        ColorSettingPlus { id: c2; settingKey: "toolbar_color_2"; label: I18n.tr("Slot 4"); defaultValue: "#22c55e" }
+        Separator {}
+        ColorSettingPlus { id: c3; settingKey: "toolbar_color_3"; label: I18n.tr("Slot 5"); defaultValue: "#eab308" }
+        Separator {}
+        ColorSettingPlus { id: c4; settingKey: "toolbar_color_4"; label: I18n.tr("Slot 6"); defaultValue: "#a855f7" }
+        Separator {}
+        ColorSettingPlus { id: c5; settingKey: "toolbar_color_5"; label: I18n.tr("Slot 7"); defaultValue: "#ffffff" }
+        Separator {}
+        ColorSettingPlus { id: c6; settingKey: "toolbar_color_6"; label: I18n.tr("Slot 8"); defaultValue: "#000000" }
+    }
+
+    SettingsCard {
         SectionTitle {
             text: I18n.tr("Radial Menu")
             icon: "settings"

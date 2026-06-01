@@ -7,13 +7,20 @@ import "../core"
 Rectangle {
     id: root
 
-    CaptureConfig { id: config }
+    property var pluginData: ({})
+    CaptureConfig { id: config; pluginData: root.pluginData }
 
     property string currentTool: "crop"
     property color currentColor: Theme.primary
     property int strokeWidth: 8
     property bool canUndo: false
     property bool isVertical: false
+
+    readonly property var toolbarPalette: {
+        const p1 = root.pluginData["toolbar_color_primary"] || "primary";
+        const slot1 = p1 === "primary" ? Theme.primary : p1;
+        return [slot1].concat(config.accentColors);
+    }
 
     signal toolSelected(string tool)
     signal colorSelected(var color)
@@ -88,7 +95,7 @@ Rectangle {
             Row {
                 spacing: Theme.spacingS; anchors.verticalCenter: parent.verticalCenter
                 Repeater {
-                    model: [Theme.primary].concat(config.accentColors)
+                    model: root.toolbarPalette
                     delegate: Rectangle {
                         width: 24; height: 24; radius: 12; color: modelData
                         border.color: Qt.colorEqual(root.currentColor, modelData) ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
@@ -181,7 +188,7 @@ Rectangle {
             Grid {
                 columns: 2; spacing: 6; anchors.horizontalCenter: parent.horizontalCenter
                 Repeater {
-                    model: [Theme.primary].concat(config.accentColors)
+                    model: root.toolbarPalette
                     delegate: Rectangle {
                         width: 18; height: 18; radius: 9; color: modelData
                         border.color: Qt.colorEqual(root.currentColor, modelData) ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
