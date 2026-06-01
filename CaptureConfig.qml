@@ -60,6 +60,16 @@ QtObject {
         "#282a36"
     ]
 
+    readonly property var catppuccinColors: [
+        "#89b4fa",
+        "#f38ba8",
+        "#a6e3a1",
+        "#f9e2af",
+        "#cba6f7",
+        "#cdd6f4",
+        "#1e1e2e"
+    ]
+
     readonly property var adaptiveColors: [
         Theme.info,
         Theme.error,
@@ -76,6 +86,7 @@ QtObject {
             case "nord": return nordColors;
             case "gruvbox": return gruvboxColors;
             case "dracula": return draculaColors;
+            case "catppuccin": return catppuccinColors;
             case "adaptive":
             default:
                 return adaptiveColors;

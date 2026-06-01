@@ -487,6 +487,7 @@ PluginSettings {
                 { "label": I18n.tr("Nord (Pastel Cold)"), "value": "nord" },
                 { "label": I18n.tr("Gruvbox (Warm Retro)"), "value": "gruvbox" },
                 { "label": I18n.tr("Dracula (High Contrast Dark)"), "value": "dracula" },
+                { "label": I18n.tr("Catppuccin (Mocha Pastel)"), "value": "catppuccin" },
                 { "label": I18n.tr("Custom Colors"), "value": "custom" }
             ]
         }
