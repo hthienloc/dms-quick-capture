@@ -518,7 +518,17 @@ PluginSettings {
                         "label": I18n.tr("Crop / Resize"),
                         "value": "crop"
                     }]
-                    defaultValue: index === 0 ? "pen" : "none"
+                    defaultValue: {
+                        if (index === 0) return "pen";
+                        if (index === 1) return "arrow";
+                        if (index === 2) return "rect";
+                        if (index === 3) return "highlighter";
+                        if (index === 4) return "ellipse";
+                        if (index === 5) return "stamp";
+                        if (index === 6) return "redact";
+                        if (index === 7) return "pixelate";
+                        return "none";
+                    }
                 }
 
                 Separator {}
@@ -526,7 +536,11 @@ PluginSettings {
                 ColorSettingPlus {
                     settingKey: "preset_" + index + "_color"
                     label: I18n.tr("Preset Color")
-                    defaultValue: index === 0 ? "#ef4444" : "#3b82f6"
+                    defaultValue: {
+                        if (index === 6) return "#000000"; // Black
+                        if (index === 7) return "#ffffff"; // White
+                        return "primary";
+                    }
                 }
 
                 Separator {}
