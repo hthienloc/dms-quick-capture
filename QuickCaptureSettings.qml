@@ -750,10 +750,16 @@ PluginSettings {
             settingKey: "textInputMode"
             label: I18n.tr("Input Mode")
             options: [
-                { label: I18n.tr("Direct (Default)"), value: "inline" },
-                { label: I18n.tr("Popup Input (IME)"), value: "popup" }
+                { label: I18n.tr("Direct"), value: "inline" },
+                { label: I18n.tr("Popup Input"), value: "popup" }
             ]
             defaultValue: "inline"
+        }
+
+        InfoText {
+            text: I18n.tr("This mode does not support IME. If you use CJK or Vietnamese languages, please switch to Popup Input.")
+            visible: textInputMode.value === "inline"
+            opacity: 0.85
         }
     }
 
