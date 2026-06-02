@@ -741,6 +741,46 @@ PluginSettings {
         }
 
         Separator {
+            visible: enableWatermark.value
+            height: visible ? 1 : 0
+        }
+
+        SelectionSettingPlus {
+            id: watermarkPosition
+            settingKey: "watermarkPosition"
+            label: I18n.tr("Position")
+            options: [
+                { label: I18n.tr("Top Left"), value: "top_left" },
+                { label: I18n.tr("Top Right"), value: "top_right" },
+                { label: I18n.tr("Bottom Left"), value: "bottom_left" },
+                { label: I18n.tr("Bottom Right"), value: "bottom_right" },
+                { label: I18n.tr("Center"), value: "center" }
+            ]
+            defaultValue: "bottom_right"
+            visible: enableWatermark.value
+            height: visible ? implicitHeight : 0
+        }
+
+        Separator {
+            visible: enableWatermark.value
+            height: visible ? 1 : 0
+        }
+
+        SliderSettingPlus {
+            id: watermarkOpacity
+            settingKey: "watermarkOpacity"
+            label: I18n.tr("Opacity")
+            defaultValue: 20
+            minimum: 5
+            maximum: 100
+            unit: "%"
+            leftLabel: "5"
+            rightLabel: "100"
+            visible: enableWatermark.value
+            height: visible ? implicitHeight : 0
+        }
+
+        Separator {
             visible: enableWatermark.value && (watermarkType.value === "text" || watermarkType.value === "hybrid")
             height: visible ? 1 : 0
         }
@@ -782,7 +822,7 @@ PluginSettings {
         }
 
         Separator {
-            visible: enableWatermark.value && (watermarkType.value === "image" || watermarkType.value === "hybrid")
+            visible: enableWatermark.value && (watermarkType.value === "hybrid")
             height: visible ? 1 : 0
         }
 
@@ -799,61 +839,21 @@ PluginSettings {
         }
 
         Separator {
-            visible: enableWatermark.value
-            height: visible ? 1 : 0
-        }
-
-        SelectionSettingPlus {
-            id: watermarkPosition
-            settingKey: "watermarkPosition"
-            label: I18n.tr("Position")
-            options: [
-                { label: I18n.tr("Top Left"), value: "top_left" },
-                { label: I18n.tr("Top Right"), value: "top_right" },
-                { label: I18n.tr("Bottom Left"), value: "bottom_left" },
-                { label: I18n.tr("Bottom Right"), value: "bottom_right" },
-                { label: I18n.tr("Center"), value: "center" }
-            ]
-            defaultValue: "bottom_right"
-            visible: enableWatermark.value
-            height: visible ? implicitHeight : 0
-        }
-
-        Separator {
-            visible: enableWatermark.value
+            visible: enableWatermark.value && (watermarkType.value === "image" || watermarkType.value === "hybrid")
             height: visible ? 1 : 0
         }
 
         SliderSettingPlus {
             id: watermarkSize
             settingKey: "watermarkSize"
-            label: I18n.tr("Size")
+            label: I18n.tr("Image Size")
             defaultValue: 5
             minimum: 5
             maximum: 50
             unit: "%"
             leftLabel: "5"
             rightLabel: "50"
-            visible: enableWatermark.value
-            height: visible ? implicitHeight : 0
-        }
-
-        Separator {
-            visible: enableWatermark.value
-            height: visible ? 1 : 0
-        }
-
-        SliderSettingPlus {
-            id: watermarkOpacity
-            settingKey: "watermarkOpacity"
-            label: I18n.tr("Opacity")
-            defaultValue: 20
-            minimum: 5
-            maximum: 100
-            unit: "%"
-            leftLabel: "5"
-            rightLabel: "100"
-            visible: enableWatermark.value
+            visible: enableWatermark.value && (watermarkType.value === "image" || watermarkType.value === "hybrid")
             height: visible ? implicitHeight : 0
         }
 
