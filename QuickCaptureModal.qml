@@ -1687,7 +1687,7 @@ DankModal {
                             onWheel: (wheel) => {
                                 const step = wheel.angleDelta.y > 0 ? 1 : -1;
                                 if (window.enableMagnifier && window.isZoomPressed) {
-                                    magnifier.zoomFactor = Math.max(1.5, Math.min(8.0, magnifier.zoomFactor + (step * 0.5)));
+                                    magnifier.zoomFactor = Math.max(1.5, Math.min(4.0, magnifier.zoomFactor + (step * 0.5)));
                                     wheel.accepted = true;
                                     return;
                                 }
@@ -1872,20 +1872,70 @@ DankModal {
                         color: "black"
                         visible: window.enableMagnifier && window.isZoomPressed && drawMouseArea.containsMouse
                         z: 200
+                        enabled: false
 
-                        x: Math.max(0, Math.min(boardContainer.width - width, window.boardCursorX + 20))
-                        y: Math.max(0, Math.min(boardContainer.height - height, window.boardCursorY - height - 20))
+                        x: drawingCanvas.mapToItem(boardContainer, window.cursorX, window.cursorY).x - (width / 2)
+                        y: drawingCanvas.mapToItem(boardContainer, window.cursorX, window.cursorY).y - (height / 2)
 
-                        property real zoomFactor: 3.0
+                        property real zoomFactor: 1.5
 
                         clip: true
 
-                        Image {
-                            source: window.bgImageSource
-                            width: drawingCanvas.width * magnifier.zoomFactor
-                            height: drawingCanvas.height * magnifier.zoomFactor
-                            x: -window.cursorX * magnifier.zoomFactor + magnifier.width / 2
-                            y: -window.cursorY * magnifier.zoomFactor + magnifier.height / 2
+                        Canvas {
+                            id: magnifierCanvas
+                            anchors.fill: parent
+
+                            Connections {
+                                target: drawingCanvas
+                                function onPaint() { magnifierCanvas.requestPaint(); }
+                            }
+
+                            Connections {
+                                target: window
+                                function onCursorXChanged() { magnifierCanvas.requestPaint(); }
+                                function onCursorYChanged() { magnifierCanvas.requestPaint(); }
+                            }
+
+                            Connections {
+                                target: magnifier
+                                function onZoomFactorChanged() { magnifierCanvas.requestPaint(); }
+                            }
+
+                            onPaint: {
+                                var ctx = magnifierCanvas.getContext("2d");
+                                ctx.clearRect(0, 0, magnifierCanvas.width, magnifierCanvas.height);
+
+                                ctx.save();
+
+                                // Clip to circle shape to match the parent circle magnifier
+                                ctx.beginPath();
+                                ctx.arc(magnifierCanvas.width / 2, magnifierCanvas.height / 2, magnifierCanvas.width / 2 - 2, 0, 2 * Math.PI);
+                                ctx.clip();
+
+                                // Translate center of magnifier to (0,0)
+                                ctx.translate(magnifierCanvas.width / 2, magnifierCanvas.height / 2);
+                                // Scale zoom factor
+                                ctx.scale(magnifier.zoomFactor, magnifier.zoomFactor);
+                                // Translate cursor to (0,0)
+                                ctx.translate(-window.cursorX, -window.cursorY);
+
+                                // 1. Draw background image
+                                if (staticBgImage.status === Image.Ready || staticBgImage.width > 0) {
+                                    ctx.drawImage(staticBgImage, 0, 0, drawingCanvas.width, drawingCanvas.height);
+                                }
+
+                                // 2. Draw annotations
+                                if (window.showAnnotations) {
+                                    for (var i = 0; i < window.strokes.length; i++) {
+                                        drawingCanvas.drawStroke(ctx, window.strokes[i]);
+                                    }
+                                    if (window.currentStroke) {
+                                        drawingCanvas.drawStroke(ctx, window.currentStroke);
+                                    }
+                                }
+
+                                ctx.restore();
+                            }
                         }
 
                         Rectangle {
@@ -1899,26 +1949,6 @@ DankModal {
                             width: 1.5
                             height: 16
                             color: Theme.primary
-                        }
-
-                        Rectangle {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.bottom: parent.bottom
-                            anchors.bottomMargin: 8
-                            width: 36
-                            height: 14
-                            radius: 4
-                            color: Theme.withAlpha(Theme.surfaceContainer, 0.75)
-                            border.color: Theme.withAlpha(Theme.outline, 0.25)
-                            border.width: 0.5
-
-                            StyledText {
-                                anchors.centerIn: parent
-                                text: magnifier.zoomFactor + "x"
-                                font.pixelSize: 8
-                                font.bold: true
-                                color: Theme.primary
-                            }
                         }
                     }
                 }
