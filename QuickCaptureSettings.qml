@@ -554,10 +554,11 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Drawing")
             icon: "brush"
-            showReset: defaultTool.isDirty || defaultThickness.isDirty
+            showReset: defaultTool.isDirty || defaultThickness.isDirty || enableMagnifier.isDirty
             onResetClicked: {
                 defaultTool.resetToDefault();
                 defaultThickness.resetToDefault();
+                enableMagnifier.resetToDefault();
             }
         }
 
@@ -617,6 +618,16 @@ PluginSettings {
             leftLabel: "1"
             rightLabel: "20"
             previewType: "thickness"
+        }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            id: enableMagnifier
+            settingKey: "enableMagnifier"
+            label: I18n.tr("Enable Magnifying Glass")
+            description: I18n.tr("Hold Ctrl to activate the zoom loupe during capture or drawing.")
+            defaultValue: false
         }
     }
 

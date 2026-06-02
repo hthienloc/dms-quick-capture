@@ -121,6 +121,7 @@ DankModal {
     readonly property bool textMonospace: parentWidget?.pluginData?.textMonospace ?? false
     readonly property string toolbarPosition: parentWidget?.pluginData?.toolbarPosition ?? "top"
     readonly property bool configShowToolbar: parentWidget?.pluginData?.showToolbar ?? true
+    readonly property bool enableMagnifier: parentWidget?.pluginData?.enableMagnifier ?? false
     property bool toolbarVisible: true
     onConfigShowToolbarChanged: {
         window.toolbarVisible = window.configShowToolbar;
@@ -1267,7 +1268,7 @@ DankModal {
 
                             onWheel: (wheel) => {
                                 const step = wheel.angleDelta.y > 0 ? 1 : -1;
-                                if (wheel.modifiers & Qt.ControlModifier) {
+                                if (window.enableMagnifier && (wheel.modifiers & Qt.ControlModifier)) {
                                     magnifier.zoomFactor = Math.max(1.5, Math.min(8.0, magnifier.zoomFactor + (step * 0.5)));
                                     wheel.accepted = true;
                                     return;
@@ -1365,7 +1366,7 @@ DankModal {
                         border.color: Theme.primary
                         border.width: 2
                         color: "black"
-                        visible: window.isCtrlPressed && drawMouseArea.containsMouse
+                        visible: window.enableMagnifier && window.isCtrlPressed && drawMouseArea.containsMouse
                         z: 200
 
                         x: Math.max(0, Math.min(boardContainer.width - width, window.boardCursorX + 20))
