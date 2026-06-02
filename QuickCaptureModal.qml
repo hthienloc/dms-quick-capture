@@ -79,6 +79,7 @@ DankModal {
     // State Variables
     property string currentTool: "crop" // crop, select, pen, line, arrow, rect, ellipse, text, pixelate, redact, stamp, highlighter, eraser
     property string lastActiveTool: "pen"
+    readonly property real dpr: Screen.devicePixelRatio || 1.0
     onCurrentToolChanged: {
         if (currentTool !== "text" && window.isTyping) {
             window.commitTypingText();
@@ -373,11 +374,11 @@ DankModal {
             return;
         }
         if (window.hasSelection) {
-            window.exportCanvasItem.width = window.cropRect.width;
-            window.exportCanvasItem.height = window.cropRect.height;
+            window.exportCanvasItem.width = window.cropRect.width / window.dpr;
+            window.exportCanvasItem.height = window.cropRect.height / window.dpr;
         } else if (window.activeCanvas) {
-            window.exportCanvasItem.width = window.activeCanvas.width;
-            window.exportCanvasItem.height = window.activeCanvas.height;
+            window.exportCanvasItem.width = window.activeCanvas.width / window.dpr;
+            window.exportCanvasItem.height = window.activeCanvas.height / window.dpr;
         }
         window.exportCanvasItem.requestPaint();
     }
@@ -1564,6 +1565,8 @@ DankModal {
                     onPaint: {
                         var ctx = exportCanvas.getContext("2d");
                         ctx.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
+                        ctx.save();
+                        ctx.scale(1 / window.dpr, 1 / window.dpr);
                         
                         // 1. Draw the background image first
                         if (bgImage.status === Image.Ready) {
@@ -1697,6 +1700,7 @@ DankModal {
                             ctx.restore();
                         }
 
+                        ctx.restore();
                         const format = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.outputFormat) || "png";
                         const tempOut = "/tmp/dms_capture_output." + format;
                         exportCanvas.save(tempOut);
