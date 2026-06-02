@@ -543,7 +543,12 @@ DankModal {
                     window.strokeWidth = pasted.width;
                     window.currentColor = pasted.color;
                     window.selectedStroke = pasted;
-                    window.pressCoords = Qt.point(0, 0);
+                    
+                    const mx = window.cursorX;
+                    const my = window.cursorY;
+                    const absPt = window.currentTool !== "crop" && window.hasSelection ? Qt.point(mx + window.cropRect.x, my + window.cropRect.y) : Qt.point(mx, my);
+                    window.pressCoords = absPt;
+                    
                     window.originalPoints = newPoints;
                 }
                 
