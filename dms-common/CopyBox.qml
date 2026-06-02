@@ -12,6 +12,14 @@ Column {
     property string text: ""
     property bool isCopied: false
 
+    function triggerCopy() {
+        Proc.runCommand("copy-ipc", ["dms", "cl", "copy", root.text], function() {
+            root.isCopied = true;
+            copyTimer.restart();
+            ToastService.showInfo("Copied to clipboard");
+        });
+    }
+
     Timer {
         id: copyTimer
         interval: 1500
@@ -31,10 +39,15 @@ Column {
     }
 
     Rectangle {
+        id: bgRect
         width: parent.width
         height: Math.max(40, cmdRow.implicitHeight + 16)
         color: Theme.surfaceContainerHigh
+        border.color: copyMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.7) : Theme.withAlpha(Theme.primary, 0.0)
+        border.width: 1
         radius: 4
+
+        Behavior on border.color { ColorAnimation { duration: 150 } }
 
         Row {
             id: cmdRow
@@ -57,14 +70,17 @@ Column {
                 backgroundColor: "transparent"
                 textColor: root.isCopied ? Theme.success : Theme.primary
                 anchors.verticalCenter: parent.verticalCenter
-                onClicked: {
-                    Proc.runCommand("copy-ipc", ["dms", "cl", "copy", root.text], function() {
-                        root.isCopied = true;
-                        copyTimer.restart();
-                        ToastService.showInfo("Copied to clipboard");
-                    });
-                }
+                onClicked: root.triggerCopy()
             }
+        }
+
+        MouseArea {
+            id: copyMouseArea
+            anchors.fill: parent
+            hoverEnabled: true
+            z: 1
+            cursorShape: Qt.PointingHandCursor
+            onClicked: root.triggerCopy()
         }
     }
 }
