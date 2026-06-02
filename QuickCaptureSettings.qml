@@ -754,6 +754,13 @@ PluginSettings {
             height: visible ? implicitHeight : 0
         }
 
+        InfoText {
+            text: I18n.tr("Supports formatting: {user} (Username), %Y (Year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)")
+            opacity: 0.85
+            visible: enableWatermark.value && (watermarkType.value === "text" || watermarkType.value === "hybrid")
+            height: visible ? implicitHeight : 0
+        }
+
         Separator {
             visible: enableWatermark.value && (watermarkType.value === "image" || watermarkType.value === "hybrid")
             height: visible ? 1 : 0
@@ -801,7 +808,7 @@ PluginSettings {
             id: watermarkSize
             settingKey: "watermarkSize"
             label: I18n.tr("Size")
-            defaultValue: 15
+            defaultValue: 5
             minimum: 5
             maximum: 50
             unit: "%"

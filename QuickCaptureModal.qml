@@ -1562,10 +1562,10 @@ DankModal {
                         // 3. Overlay custom watermark if enabled
                         const enableWatermark = window.parentWidget?.pluginData?.enableWatermark ?? false;
                         if (enableWatermark) {
-                            const watermarkType = window.parentWidget?.pluginData?.watermarkType || "text";
-                            const watermarkOpacity = (window.parentWidget?.pluginData?.watermarkOpacity ?? 30) / 100.0;
-                            const watermarkPosition = window.parentWidget?.pluginData?.watermarkPosition || "bottom_right";
-                            const watermarkSize = (window.parentWidget?.pluginData?.watermarkSize ?? 15) / 100.0;
+                             const watermarkType = window.parentWidget?.pluginData?.watermarkType || "text";
+                             const watermarkOpacity = (window.parentWidget?.pluginData?.watermarkOpacity ?? 20) / 100.0;
+                             const watermarkPosition = window.parentWidget?.pluginData?.watermarkPosition || "bottom_right";
+                             const watermarkSize = (window.parentWidget?.pluginData?.watermarkSize ?? 5) / 100.0;
 
                             ctx.save();
                             ctx.globalAlpha = watermarkOpacity;
