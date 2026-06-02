@@ -172,19 +172,19 @@ DankModal {
     readonly property bool textMonospace: parentWidget?.pluginData?.textMonospace ?? false
     
     // Rich Text Options
-    property bool textBold: false
+    property bool textBold: parentWidget?.pluginData?.textBold ?? false
     onTextBoldChanged: {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
-    property bool textItalic: false
+    property bool textItalic: parentWidget?.pluginData?.textItalic ?? false
     onTextItalicChanged: {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
-    property bool textUnderline: false
+    property bool textUnderline: parentWidget?.pluginData?.textUnderline ?? false
     onTextUnderlineChanged: {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
-    property string textFontFamily: textMonospace ? "monospace" : "sans-serif"
+    property string textFontFamily: parentWidget?.pluginData?.textFontFamily ?? (textMonospace ? "monospace" : "sans-serif")
     onTextFontFamilyChanged: {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
@@ -720,31 +720,6 @@ DankModal {
                         }
                     }
                     
-                    textBold: window.textBold
-                    onTextBoldChanged: {
-                        if (window.textBold !== textBold) {
-                            window.textBold = textBold;
-                        }
-                    }
-                    textItalic: window.textItalic
-                    onTextItalicChanged: {
-                        if (window.textItalic !== textItalic) {
-                            window.textItalic = textItalic;
-                        }
-                    }
-                    textUnderline: window.textUnderline
-                    onTextUnderlineChanged: {
-                        if (window.textUnderline !== textUnderline) {
-                            window.textUnderline = textUnderline;
-                        }
-                    }
-                    textFontFamily: window.textFontFamily
-                    onTextFontFamilyChanged: {
-                        if (window.textFontFamily !== textFontFamily) {
-                            window.textFontFamily = textFontFamily;
-                        }
-                    }
-
                     currentTool: window.currentTool
                     currentColor: window.currentColor
                     strokeWidth: window.currentTool === "text" ? window.textFontSize : window.strokeWidth

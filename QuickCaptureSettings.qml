@@ -638,10 +638,14 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Text")
             icon: "format_size"
-            showReset: textFontSize.isDirty || textMonospace.isDirty
+            showReset: textFontSize.isDirty || textMonospace.isDirty || textFontFamily.isDirty || textBold.isDirty || textItalic.isDirty || textUnderline.isDirty
             onResetClicked: {
                 textFontSize.resetToDefault();
                 textMonospace.resetToDefault();
+                textFontFamily.resetToDefault();
+                textBold.resetToDefault();
+                textItalic.resetToDefault();
+                textUnderline.resetToDefault();
             }
         }
 
@@ -663,6 +667,47 @@ PluginSettings {
             id: textMonospace
             settingKey: "textMonospace"
             label: I18n.tr("Use Monospace Font")
+            defaultValue: false
+        }
+
+        Separator {}
+
+        SelectionSettingPlus {
+            id: textFontFamily
+            settingKey: "textFontFamily"
+            label: I18n.tr("Default Font Family")
+            options: [
+                { label: I18n.tr("Sans-Serif (Standard)"), value: "sans-serif" },
+                { label: I18n.tr("Monospace"), value: "monospace" },
+                { label: I18n.tr("Serif"), value: "serif" }
+            ]
+            defaultValue: "sans-serif"
+        }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            id: textBold
+            settingKey: "textBold"
+            label: I18n.tr("Default Bold Text")
+            defaultValue: false
+        }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            id: textItalic
+            settingKey: "textItalic"
+            label: I18n.tr("Default Italic Text")
+            defaultValue: false
+        }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            id: textUnderline
+            settingKey: "textUnderline"
+            label: I18n.tr("Default Underline Text")
             defaultValue: false
         }
     }
