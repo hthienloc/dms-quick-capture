@@ -1934,6 +1934,11 @@ PluginSettings {
             }
 
             CopyBox {
+                label: I18n.tr("Edit Image from Clipboard")
+                text: "dms ipc call quickCapture fromClipboard"
+            }
+
+            CopyBox {
                 label: I18n.tr("Close Annotator")
                 text: "dms ipc call quickCapture close"
             }

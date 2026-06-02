@@ -124,6 +124,59 @@ PluginComponent {
         }
     }
 
+    function fromClipboard() {
+        if (root.isDaemonInstance) {
+            root.closeControlCenter();
+            const checkCmd = "if wl-paste -t image/png > /tmp/dms_capture_bg.png 2>/dev/null || xclip -selection clipboard -t image/png -o > /tmp/dms_capture_bg.png 2>/dev/null; then echo \"IMAGE\"; else TEXT=$(wl-paste -n 2>/dev/null || xclip -selection clipboard -o 2>/dev/null); if [ -n \"$TEXT\" ]; then echo \"TEXT:$TEXT\"; else echo \"EMPTY\"; fi; fi";
+            Proc.runCommand("smart-paste", ["sh", "-c", checkCmd], (stdout, exitCode) => {
+                const output = stdout.trim();
+                if (output === "IMAGE") {
+                    root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
+                } else if (output.startsWith("TEXT:")) {
+                    let text = output.substring(5).trim();
+                    if (text.startsWith("file://")) {
+                        text = text.substring(7);
+                    }
+                    if (text.startsWith("http://") || text.startsWith("https://")) {
+                        root.isDownloading = true;
+                        Proc.runCommand("download-image", ["curl", "-s", "-L", "-o", "/tmp/dms_capture_bg.png", text], (stdout, exitCode) => {
+                            root.isDownloading = false;
+                            if (exitCode === 0) {
+                                root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
+                            } else {
+                                if (typeof ToastService !== "undefined" && ToastService) {
+                                    ToastService.showError("Failed to download image from URL.");
+                                }
+                            }
+                        });
+                    } else if (text.startsWith("/") || text.length > 0) {
+                        Proc.runCommand("copy-image", ["cp", "-f", text, "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
+                            if (exitCode === 0) {
+                                root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
+                            } else {
+                                if (typeof ToastService !== "undefined" && ToastService) {
+                                    ToastService.showError("Failed to copy image from local path.");
+                                }
+                            }
+                        });
+                    } else {
+                        if (typeof ToastService !== "undefined" && ToastService)
+                            ToastService.showError("Clipboard text is not a valid URL or path.");
+                    }
+                } else {
+                    if (typeof ToastService !== "undefined" && ToastService)
+                        ToastService.showError("No valid image, URL, or path in clipboard.");
+                }
+            });
+        } else {
+            const daemon = PluginService.pluginInstances["quickCapture"];
+            if (daemon) {
+                root.closeControlCenter();
+                daemon.fromClipboard();
+            }
+        }
+    }
+
     function registerDaemonAsWidget() {
         // Register self so Control Center widget instances can delegate capture to the daemon.
         if (!pluginService.pluginInstances[pluginId]) {
@@ -320,7 +373,7 @@ PluginComponent {
 
     // Bar Pill Interactions
     pillClickAction: function() { root.triggerCapture(); }
-    pillRightClickAction: function() { root.selectImageAndAnnotate(); }
+    pillRightClickAction: function() { root.fromClipboard(); }
 
     // Control Center Integration
     ccWidgetIcon: "photo_camera"
@@ -378,6 +431,11 @@ PluginComponent {
 
         function selectFile() : string {
             root.selectImageAndAnnotate();
+            return "SUCCESS";
+        }
+
+        function fromClipboard() : string {
+            root.fromClipboard();
             return "SUCCESS";
         }
 
