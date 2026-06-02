@@ -138,6 +138,11 @@ DankModal {
     readonly property real boardCursorY: boardContainerItem ? (boardContainerItem.height / 2 + (cursorY - drawingCanvas.height / 2) * fitScale) : 0
 
     property bool showAnnotations: true
+    onShowAnnotationsChanged: {
+        if (window.activeCanvas) {
+            window.activeCanvas.requestPaint();
+        }
+    }
     property var copiedStroke: null
 
     property var strokes: []
@@ -692,8 +697,8 @@ DankModal {
 
                     showAnnotations: window.showAnnotations
                     onShowAnnotationsChanged: {
-                        if (window.showAnnotations !== showAnnotations) {
-                            window.showAnnotations = showAnnotations;
+                        if (window.showAnnotations !== toolbarCard.showAnnotations) {
+                            window.showAnnotations = toolbarCard.showAnnotations;
                         }
                     }
 
