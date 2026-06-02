@@ -872,7 +872,7 @@ PluginSettings {
         }
 
         InfoText {
-            text: I18n.tr("Supports formatting: {user} (Username), %Y (Year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)")
+            text: I18n.tr("Supports formatting: {user} (Username), \\n (New Line), %Y (Year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)")
             opacity: 0.85
             visible: enableWatermark.value && (watermarkType.value === "text" || watermarkType.value === "hybrid")
             height: visible ? implicitHeight : 0
