@@ -750,6 +750,8 @@ PluginSettings {
             label: I18n.tr("Watermark Image")
             placeholder: "~/Pictures/watermark.png"
             defaultValue: ""
+            isFile: true
+            fileExtensions: ["Image files (*.png *.jpg *.jpeg *.svg *.webp)", "All files (*)"]
             visible: enableWatermark.value && watermarkType.value === "image"
             height: visible ? implicitHeight : 0
         }
