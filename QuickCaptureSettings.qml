@@ -892,10 +892,10 @@ PluginSettings {
             settingKey: "watermarkTextSize"
             label: I18n.tr("Text Size")
             defaultValue: 5
-            minimum: 5
+            minimum: 1
             maximum: 50
             unit: "%"
-            leftLabel: "5"
+            leftLabel: "1"
             rightLabel: "50"
             visible: enableWatermark.value && (watermarkType.value === "text" || watermarkType.value === "hybrid")
             height: visible ? implicitHeight : 0
