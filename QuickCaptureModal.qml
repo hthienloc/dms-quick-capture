@@ -946,6 +946,145 @@ DankModal {
                             }
 
                             ctx.restore();
+
+                            // 5. Draw Watermark Preview in Editor
+                            const enableWatermark = window.parentWidget?.pluginData?.enableWatermark ?? false;
+                            if (enableWatermark && window.currentTool !== "crop") {
+                                const watermarkType = window.parentWidget?.pluginData?.watermarkType || "text";
+                                const watermarkOpacity = (window.parentWidget?.pluginData?.watermarkOpacity ?? 20) / 100.0;
+                                const watermarkPosition = window.parentWidget?.pluginData?.watermarkPosition || "bottom_right";
+                                const watermarkSize = (window.parentWidget?.pluginData?.watermarkSize ?? 5) / 100.0;
+                                const watermarkTextSize = (window.parentWidget?.pluginData?.watermarkTextSize ?? 5) / 100.0;
+
+                                ctx.save();
+                                ctx.globalAlpha = watermarkOpacity;
+                                if (watermarkType === "text" || watermarkType === "hybrid") {
+                                    const rawText = window.parentWidget?.pluginData?.watermarkText || "© {user}";
+                                    const textStr = config.formatWatermarkText(rawText);
+                                    const lines = textStr.split("\n");
+                                    const fontSize = Math.round(Math.max(12, drawingCanvas.height * watermarkTextSize));
+                                    ctx.font = "bold " + fontSize + "px sans-serif";
+                                    ctx.fillStyle = "#ffffff";
+                                    ctx.shadowColor = "#000000";
+                                    ctx.shadowOffsetX = 1;
+                                    ctx.shadowOffsetY = 1;
+                                    ctx.shadowBlur = 2;
+
+                                    const lineHeight = fontSize * 1.25;
+                                    let maxTextWidth = 0;
+                                    for (let i = 0; i < lines.length; i++) {
+                                        const w = ctx.measureText(lines[i]).width;
+                                        if (w > maxTextWidth) maxTextWidth = w;
+                                    }
+
+                                    const totalTextHeight = lines.length * lineHeight;
+                                    const margin = 20;
+                                    const spacing = Math.round(fontSize * 0.4);
+
+                                    const hasImage = (watermarkType === "hybrid" && watermarkImageLoader.status === Image.Ready);
+                                    let targetW = 0;
+                                    let targetH = 0;
+                                    if (hasImage) {
+                                        const imgW = watermarkImageLoader.sourceSize.width;
+                                        const imgH = watermarkImageLoader.sourceSize.height;
+                                        const maxW = drawingCanvas.width * watermarkSize;
+                                        const maxH = drawingCanvas.height * watermarkSize;
+                                        const scale = Math.min(maxW / imgW, maxH / imgH, 1.0);
+                                        targetW = imgW * scale;
+                                        targetH = imgH * scale;
+                                    }
+
+                                    const totalW = (hasImage ? targetW + spacing : 0) + maxTextWidth;
+                                    const totalH = Math.max(targetH, totalTextHeight);
+
+                                    let tx = margin;
+                                    let ty = fontSize + margin;
+
+                                    if (watermarkPosition === "bottom_right") {
+                                        tx = drawingCanvas.width - totalW - margin;
+                                        ty = drawingCanvas.height - (lines.length - 1) * lineHeight - margin;
+                                    } else if (watermarkPosition === "bottom_left") {
+                                        tx = margin;
+                                        ty = drawingCanvas.height - (lines.length - 1) * lineHeight - margin;
+                                    } else if (watermarkPosition === "top_right") {
+                                        tx = drawingCanvas.width - totalW - margin;
+                                        ty = fontSize + margin;
+                                    } else if (watermarkPosition === "top_left") {
+                                        tx = margin;
+                                        ty = fontSize + margin;
+                                    } else if (watermarkPosition === "center") {
+                                        tx = (drawingCanvas.width - totalW) / 2;
+                                        ty = (drawingCanvas.height - totalH) / 2 + fontSize + (totalH - totalTextHeight) / 2;
+                                    } else if (watermarkPosition === "top") {
+                                        tx = (drawingCanvas.width - totalW) / 2;
+                                        ty = fontSize + margin;
+                                    } else if (watermarkPosition === "bottom") {
+                                        tx = (drawingCanvas.width - totalW) / 2;
+                                        ty = drawingCanvas.height - (lines.length - 1) * lineHeight - margin;
+                                    } else if (watermarkPosition === "left") {
+                                        tx = margin;
+                                        ty = (drawingCanvas.height - totalH) / 2 + fontSize + (totalH - totalTextHeight) / 2;
+                                    } else if (watermarkPosition === "right") {
+                                        tx = drawingCanvas.width - totalW - margin;
+                                        ty = (drawingCanvas.height - totalH) / 2 + fontSize + (totalH - totalTextHeight) / 2;
+                                    }
+
+                                    if (hasImage) {
+                                        const iy = ty - fontSize + (totalTextHeight - targetH) / 2;
+                                        ctx.drawImage(watermarkImageLoader, tx, iy, targetW, targetH);
+                                    }
+
+                                    const textX = tx + (hasImage ? targetW + spacing : 0);
+                                    for (let i = 0; i < lines.length; i++) {
+                                        ctx.fillText(lines[i], textX, ty + i * lineHeight);
+                                    }
+
+                                } else if (watermarkType === "image" && watermarkImageLoader.status === Image.Ready) {
+                                    const imgW = watermarkImageLoader.sourceSize.width;
+                                    const imgH = watermarkImageLoader.sourceSize.height;
+                                    const maxW = drawingCanvas.width * watermarkSize;
+                                    const maxH = drawingCanvas.height * watermarkSize;
+                                    const scale = Math.min(maxW / imgW, maxH / imgH, 1.0);
+                                    const targetW = imgW * scale;
+                                    const targetH = imgH * scale;
+
+                                    const margin = 20;
+                                    let ix = margin;
+                                    let iy = margin;
+
+                                    if (watermarkPosition === "bottom_right") {
+                                        ix = drawingCanvas.width - targetW - margin;
+                                        iy = drawingCanvas.height - targetH - margin;
+                                    } else if (watermarkPosition === "bottom_left") {
+                                        ix = margin;
+                                        iy = drawingCanvas.height - targetH - margin;
+                                    } else if (watermarkPosition === "top_right") {
+                                        ix = drawingCanvas.width - targetW - margin;
+                                        iy = margin;
+                                    } else if (watermarkPosition === "top_left") {
+                                        ix = margin;
+                                        iy = margin;
+                                    } else if (watermarkPosition === "center") {
+                                        ix = (drawingCanvas.width - targetW) / 2;
+                                        iy = (drawingCanvas.height - targetH) / 2;
+                                    } else if (watermarkPosition === "top") {
+                                        ix = (drawingCanvas.width - targetW) / 2;
+                                        iy = margin;
+                                    } else if (watermarkPosition === "bottom") {
+                                        ix = (drawingCanvas.width - targetW) / 2;
+                                        iy = drawingCanvas.height - targetH - margin;
+                                    } else if (watermarkPosition === "left") {
+                                        ix = margin;
+                                        iy = (drawingCanvas.height - targetH) / 2;
+                                    } else if (watermarkPosition === "right") {
+                                        ix = drawingCanvas.width - targetW - margin;
+                                        iy = (drawingCanvas.height - targetH) / 2;
+                                    }
+
+                                    ctx.drawImage(watermarkImageLoader, ix, iy, targetW, targetH);
+                                }
+                                ctx.restore();
+                            }
                         }
 
                         function drawStroke(ctx, stroke) {
