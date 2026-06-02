@@ -1716,10 +1716,11 @@ PluginSettings {
             settingKey: "radialMenuOpacity"
             label: I18n.tr("Radial Menu Opacity")
             defaultValue: 100
-            minimum: 20
+            minimum: 0
             maximum: 100
-            leftLabel: "20%"
-            rightLabel: "100%"
+            leftLabel: "0"
+            rightLabel: "100"
+            unit: "%"
         }
     }
 
