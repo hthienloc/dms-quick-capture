@@ -69,6 +69,12 @@ DankModal {
     property real previewY: 0
     property bool showSizePreview: false
 
+    property bool isCtrlPressed: false
+    property real cursorX: 0
+    property real cursorY: 0
+    readonly property real boardCursorX: boardContainerItem ? (boardContainerItem.width / 2 + (cursorX - drawingCanvas.width / 2) * fitScale) : 0
+    readonly property real boardCursorY: boardContainerItem ? (boardContainerItem.height / 2 + (cursorY - drawingCanvas.height / 2) * fitScale) : 0
+
     property var strokes: []
     property var currentStroke: null
     property var selectedStroke: null
@@ -432,12 +438,21 @@ DankModal {
 
     // Keyboard Shortcuts Support
     modalFocusScope.Keys.onPressed: (event) => {
+        if (event.key === Qt.Key_Control) {
+            window.isCtrlPressed = true;
+        }
         if (window.isTyping) {
             window.handleTypingKey(event);
             return;
         }
 
         window.handleShortcutKey(event);
+    }
+
+    modalFocusScope.Keys.onReleased: (event) => {
+        if (event.key === Qt.Key_Control) {
+            window.isCtrlPressed = false;
+        }
     }
 
     onOpened: {
@@ -950,6 +965,8 @@ DankModal {
                             property string hoveredHandle: "none"
                             property int hoveredStrokeIdx: -1
                             onPositionChanged: (mouse) => {
+                                window.cursorX = mouse.x;
+                                window.cursorY = mouse.y;
                                 hoveredHandle = window.getHoveredHandle(mouse.x, mouse.y);
 
                                 const absPt = getAbsolutePoint(mouse.x, mouse.y);
@@ -1231,6 +1248,11 @@ DankModal {
 
                             onWheel: (wheel) => {
                                 const step = wheel.angleDelta.y > 0 ? 1 : -1;
+                                if (wheel.modifiers & Qt.ControlModifier) {
+                                    magnifier.zoomFactor = Math.max(1.5, Math.min(8.0, magnifier.zoomFactor + (step * 0.5)));
+                                    wheel.accepted = true;
+                                    return;
+                                }
                                 if (window.currentTool === "text") {
                                     window.textFontSize = Math.max(8, Math.min(100, window.textFontSize + (step * 2)));
                                 } else {
@@ -1313,6 +1335,66 @@ DankModal {
                         repeat: false
                         onTriggered: {
                             window.showSizePreview = false;
+                        }
+                    }
+
+                    Rectangle {
+                        id: magnifier
+                        width: 140
+                        height: 140
+                        radius: 70
+                        border.color: Theme.primary
+                        border.width: 2
+                        color: "black"
+                        visible: window.isCtrlPressed && drawMouseArea.containsMouse
+                        z: 200
+
+                        x: Math.max(0, Math.min(boardContainer.width - width, window.boardCursorX + 20))
+                        y: Math.max(0, Math.min(boardContainer.height - height, window.boardCursorY - height - 20))
+
+                        property real zoomFactor: 3.0
+
+                        clip: true
+
+                        Image {
+                            source: window.bgImageSource
+                            width: drawingCanvas.width * magnifier.zoomFactor
+                            height: drawingCanvas.height * magnifier.zoomFactor
+                            x: -window.cursorX * magnifier.zoomFactor + magnifier.width / 2
+                            y: -window.cursorY * magnifier.zoomFactor + magnifier.height / 2
+                        }
+
+                        Rectangle {
+                            anchors.centerIn: parent
+                            width: 16
+                            height: 1.5
+                            color: Theme.primary
+                        }
+                        Rectangle {
+                            anchors.centerIn: parent
+                            width: 1.5
+                            height: 16
+                            color: Theme.primary
+                        }
+
+                        Rectangle {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.bottom: parent.bottom
+                            anchors.bottomMargin: 8
+                            width: 36
+                            height: 14
+                            radius: 4
+                            color: Theme.withAlpha(Theme.surfaceContainer, 0.75)
+                            border.color: Theme.withAlpha(Theme.outline, 0.25)
+                            border.width: 0.5
+
+                            StyledText {
+                                anchors.centerIn: parent
+                                text: magnifier.zoomFactor + "x"
+                                font.pixelSize: 8
+                                font.bold: true
+                                color: Theme.primary
+                            }
                         }
                     }
                 }
