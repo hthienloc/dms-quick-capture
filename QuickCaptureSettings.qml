@@ -638,10 +638,9 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Text")
             icon: "format_size"
-            showReset: textFontSize.isDirty || textMonospace.isDirty || textFontFamily.isDirty || textBold.isDirty || textItalic.isDirty || textUnderline.isDirty
+            showReset: textFontSize.isDirty || textFontFamily.isDirty || textBold.isDirty || textItalic.isDirty || textUnderline.isDirty
             onResetClicked: {
                 textFontSize.resetToDefault();
-                textMonospace.resetToDefault();
                 textFontFamily.resetToDefault();
                 textBold.resetToDefault();
                 textItalic.resetToDefault();
@@ -663,21 +662,12 @@ PluginSettings {
 
         Separator {}
 
-        ToggleSettingPlus {
-            id: textMonospace
-            settingKey: "textMonospace"
-            label: I18n.tr("Use Monospace Font")
-            defaultValue: false
-        }
-
-        Separator {}
-
-        SelectionSettingPlus {
+        ButtonGroupSettingPlus {
             id: textFontFamily
             settingKey: "textFontFamily"
             label: I18n.tr("Default Font Family")
             options: [
-                { label: I18n.tr("Sans-Serif (Standard)"), value: "sans-serif" },
+                { label: I18n.tr("Sans-Serif"), value: "sans-serif" },
                 { label: I18n.tr("Monospace"), value: "monospace" },
                 { label: I18n.tr("Serif"), value: "serif" }
             ]
