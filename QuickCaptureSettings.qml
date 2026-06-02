@@ -10,6 +10,8 @@ PluginSettings {
 
     pluginId: "quickCapture"
 
+    property int radialMenuOpacityValue: 100
+
     component ShortcutRow : Item {
         id: rowRoot
         width: parent.width
@@ -1187,7 +1189,7 @@ PluginSettings {
             width: 240
             height: 240
             anchors.horizontalCenter: parent.horizontalCenter
-            opacity: radialMenuOpacity.value / 100
+            opacity: root.radialMenuOpacityValue / 100
 
             readonly property real outerRadius: 110
             readonly property real innerRadius: 40
@@ -1721,6 +1723,12 @@ PluginSettings {
             leftLabel: "0"
             rightLabel: "100"
             unit: "%"
+
+            Binding {
+                target: root
+                property: "radialMenuOpacityValue"
+                value: radialMenuOpacity.value
+            }
         }
     }
 
