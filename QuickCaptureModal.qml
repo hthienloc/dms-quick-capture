@@ -523,8 +523,27 @@ DankModal {
 
         if (token === "V" && !hasCtrl) {
             if (window.copiedStroke) {
-                const offset = 25;
-                const newPoints = window.copiedStroke.points.map(p => Qt.point(p.x + offset, p.y + offset));
+                const mx = window.cursorX;
+                const my = window.cursorY;
+                const absPt = window.currentTool !== "crop" && window.hasSelection ? Qt.point(mx + window.cropRect.x, my + window.cropRect.y) : Qt.point(mx, my);
+
+                // Calculate the bounding box center of the copied stroke
+                let minX = Infinity, maxX = -Infinity;
+                let minY = Infinity, maxY = -Infinity;
+                for (let i = 0; i < window.copiedStroke.points.length; i++) {
+                    const p = window.copiedStroke.points[i];
+                    if (p.x < minX) minX = p.x;
+                    if (p.x > maxX) maxX = p.x;
+                    if (p.y < minY) minY = p.y;
+                    if (p.y > maxY) maxY = p.y;
+                }
+                const centerX = (minX + maxX) / 2;
+                const centerY = (minY + maxY) / 2;
+
+                // Shift points so the pasted stroke is centered exactly at the current cursor position
+                const dx = absPt.x - (isFinite(centerX) ? centerX : 0);
+                const dy = absPt.y - (isFinite(centerY) ? centerY : 0);
+                const newPoints = window.copiedStroke.points.map(p => Qt.point(p.x + dx, p.y + dy));
                 
                 const pasted = {
                     tool: window.copiedStroke.tool,
@@ -534,7 +553,6 @@ DankModal {
                     counter: window.copiedStroke.counter
                 };
                 
-                window.copiedStroke.points = newPoints;
                 window.pushStroke(pasted);
                 
                 if (window.currentTool === "select") {
@@ -543,12 +561,7 @@ DankModal {
                     window.strokeWidth = pasted.width;
                     window.currentColor = pasted.color;
                     window.selectedStroke = pasted;
-                    
-                    const mx = window.cursorX;
-                    const my = window.cursorY;
-                    const absPt = window.currentTool !== "crop" && window.hasSelection ? Qt.point(mx + window.cropRect.x, my + window.cropRect.y) : Qt.point(mx, my);
                     window.pressCoords = absPt;
-                    
                     window.originalPoints = newPoints;
                 }
                 
