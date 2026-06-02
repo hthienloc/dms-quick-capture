@@ -170,6 +170,24 @@ DankModal {
 
     property int textFontSize: parentWidget?.pluginData?.textFontSize ?? 36
     readonly property bool textMonospace: parentWidget?.pluginData?.textMonospace ?? false
+    
+    // Rich Text Options
+    property bool textBold: false
+    onTextBoldChanged: {
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
+    }
+    property bool textItalic: false
+    onTextItalicChanged: {
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
+    }
+    property bool textUnderline: false
+    onTextUnderlineChanged: {
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
+    }
+    property string textFontFamily: textMonospace ? "monospace" : "sans-serif"
+    onTextFontFamilyChanged: {
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
+    }
     readonly property string toolbarPosition: parentWidget?.pluginData?.toolbarPosition ?? "top"
     readonly property bool configShowToolbar: parentWidget?.pluginData?.showToolbar ?? true
     readonly property bool enableMagnifier: parentWidget?.pluginData?.enableMagnifier ?? false
@@ -701,6 +719,31 @@ DankModal {
                             window.showAnnotations = toolbarCard.showAnnotations;
                         }
                     }
+                    
+                    textBold: window.textBold
+                    onTextBoldChanged: {
+                        if (window.textBold !== textBold) {
+                            window.textBold = textBold;
+                        }
+                    }
+                    textItalic: window.textItalic
+                    onTextItalicChanged: {
+                        if (window.textItalic !== textItalic) {
+                            window.textItalic = textItalic;
+                        }
+                    }
+                    textUnderline: window.textUnderline
+                    onTextUnderlineChanged: {
+                        if (window.textUnderline !== textUnderline) {
+                            window.textUnderline = textUnderline;
+                        }
+                    }
+                    textFontFamily: window.textFontFamily
+                    onTextFontFamilyChanged: {
+                        if (window.textFontFamily !== textFontFamily) {
+                            window.textFontFamily = textFontFamily;
+                        }
+                    }
 
                     currentTool: window.currentTool
                     currentColor: window.currentColor
@@ -878,11 +921,25 @@ DankModal {
                                 // 4. Draw temporary live typing text
                                 if (window.isTyping) {
                                     ctx.fillStyle = window.currentColor;
-                                    const fontName = window.textMonospace ? "monospace" : "sans-serif";
-                                    ctx.font = Math.round(window.textFontSize) + "px " + fontName;
+                                    
+                                    let styleStr = "";
+                                    if (window.textItalic) styleStr += "italic ";
+                                    if (window.textBold) styleStr += "bold ";
+                                    
+                                    ctx.font = styleStr + Math.round(window.textFontSize) + "px " + window.textFontFamily;
                                     ctx.textAlign = "left";
                                     ctx.textBaseline = "top";
                                     ctx.fillText(window.currentTypingText + "|", window.typingCoords.x, window.typingCoords.y);
+
+                                    if (window.textUnderline) {
+                                        const textWidth = ctx.measureText(window.currentTypingText + "|").width;
+                                        ctx.strokeStyle = window.currentColor;
+                                        ctx.lineWidth = Math.max(1.5, Math.round(window.textFontSize * 0.08));
+                                        ctx.beginPath();
+                                        ctx.moveTo(window.typingCoords.x, window.typingCoords.y + window.textFontSize * 1.05);
+                                        ctx.lineTo(window.typingCoords.x + textWidth, window.typingCoords.y + window.textFontSize * 1.05);
+                                        ctx.stroke();
+                                    }
                                 }
                             }
 
@@ -1106,15 +1163,29 @@ DankModal {
                                 ctx.textAlign = "left";
                                 const textW = ctx.measureText(text).width;
                                 ctx.fillText(text, pt.x - textW / 2, pt.y + Math.round(fontSize * 0.1));
-
                             } else if (stroke.tool === "text") {
                                 const pt = stroke.points[0];
                                 ctx.fillStyle = stroke.color;
-                                const fontName = stroke.isMonospace ? "monospace" : "sans-serif";
-                                ctx.font = Math.round(stroke.width) + "px " + fontName;
+                                
+                                let styleStr = "";
+                                if (stroke.isItalic) styleStr += "italic ";
+                                if (stroke.isBold) styleStr += "bold ";
+                                const fFamily = stroke.fontFamily || (stroke.isMonospace ? "monospace" : "sans-serif");
+                                
+                                ctx.font = styleStr + Math.round(stroke.width) + "px " + fFamily;
                                 ctx.textAlign = "left";
                                 ctx.textBaseline = "top";
                                 ctx.fillText(stroke.text, pt.x, pt.y);
+
+                                if (stroke.isUnderline) {
+                                    const textWidth = ctx.measureText(stroke.text).width;
+                                    ctx.strokeStyle = stroke.color;
+                                    ctx.lineWidth = Math.max(1.5, Math.round(stroke.width * 0.08));
+                                    ctx.beginPath();
+                                    ctx.moveTo(pt.x, pt.y + stroke.width * 1.05);
+                                    ctx.lineTo(pt.x + textWidth, pt.y + stroke.width * 1.05);
+                                    ctx.stroke();
+                                }
                             }
                         }
 
@@ -1785,7 +1856,11 @@ DankModal {
                 tool: "text",
                 color: window.currentColor.toString(),
                 width: window.textFontSize,
-                isMonospace: window.textMonospace,
+                isMonospace: window.textFontFamily === "monospace",
+                fontFamily: window.textFontFamily,
+                isBold: window.textBold,
+                isItalic: window.textItalic,
+                isUnderline: window.textUnderline,
                 points: [Qt.point(window.typingCoords.x, window.typingCoords.y)],
                 text: textStr
             });

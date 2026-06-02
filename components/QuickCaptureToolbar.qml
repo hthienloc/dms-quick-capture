@@ -16,6 +16,10 @@ Rectangle {
     property bool canUndo: false
     property bool isVertical: false
     property bool showAnnotations: true
+    property bool textBold: false
+    property bool textItalic: false
+    property bool textUnderline: false
+    property string textFontFamily: "sans-serif"
 
     readonly property var toolbarPalette: {
         const p1 = root.pluginData["toolbar_color_primary"] || "primary";
@@ -147,6 +151,51 @@ Rectangle {
 
             Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
+            // Text Settings (Bold, Italic, Underline, Font)
+            Row {
+                visible: root.currentTool === "text"
+                spacing: Theme.spacingXS; anchors.verticalCenter: parent.verticalCenter
+                Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
+                
+                DankActionButton {
+                    iconName: "format_bold"
+                    buttonSize: 30; iconSize: 16
+                    backgroundColor: root.textBold ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.textBold ? Theme.primary : Theme.surfaceText
+                    onClicked: root.textBold = !root.textBold
+                }
+                DankActionButton {
+                    iconName: "format_italic"
+                    buttonSize: 30; iconSize: 16
+                    backgroundColor: root.textItalic ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.textItalic ? Theme.primary : Theme.surfaceText
+                    onClicked: root.textItalic = !root.textItalic
+                }
+                DankActionButton {
+                    iconName: "format_underlined"
+                    buttonSize: 30; iconSize: 16
+                    backgroundColor: root.textUnderline ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.textUnderline ? Theme.primary : Theme.surfaceText
+                    onClicked: root.textUnderline = !root.textUnderline
+                }
+                DankActionButton {
+                    iconName: "format_size"
+                    buttonSize: 30; iconSize: 16
+                    tooltipText: "Font Family: " + root.textFontFamily
+                    onClicked: {
+                        if (root.textFontFamily === "sans-serif") {
+                            root.textFontFamily = "monospace";
+                        } else if (root.textFontFamily === "monospace") {
+                            root.textFontFamily = "serif";
+                        } else {
+                            root.textFontFamily = "sans-serif";
+                        }
+                    }
+                }
+            }
+
+            Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
+
             // Actions
             Row {
                 spacing: Theme.spacingXS; anchors.verticalCenter: parent.verticalCenter
@@ -228,6 +277,52 @@ Rectangle {
 
             Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
 
+            // Text Settings (Bold, Italic, Underline, Font)
+            Column {
+                visible: root.currentTool === "text"
+                spacing: Theme.spacingXS; anchors.horizontalCenter: parent.horizontalCenter
+                Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
+                
+                DankActionButton {
+                    iconName: "format_bold"
+                    buttonSize: 30; iconSize: 16
+                    backgroundColor: root.textBold ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.textBold ? Theme.primary : Theme.surfaceText
+                    onClicked: root.textBold = !root.textBold
+                }
+                DankActionButton {
+                    iconName: "format_italic"
+                    buttonSize: 30; iconSize: 16
+                    backgroundColor: root.textItalic ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.textItalic ? Theme.primary : Theme.surfaceText
+                    onClicked: root.textItalic = !root.textItalic
+                }
+                DankActionButton {
+                    iconName: "format_underlined"
+                    buttonSize: 30; iconSize: 16
+                    backgroundColor: root.textUnderline ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.textUnderline ? Theme.primary : Theme.surfaceText
+                    onClicked: root.textUnderline = !root.textUnderline
+                }
+                DankActionButton {
+                    iconName: "format_size"
+                    buttonSize: 30; iconSize: 16
+                    tooltipText: "Font Family: " + root.textFontFamily
+                    onClicked: {
+                        if (root.textFontFamily === "sans-serif") {
+                            root.textFontFamily = "monospace";
+                        } else if (root.textFontFamily === "monospace") {
+                            root.textFontFamily = "serif";
+                        } else {
+                            root.textFontFamily = "sans-serif";
+                        }
+                    }
+                }
+            }
+
+            Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
+
+            // Actions
             Column {
                 spacing: Theme.spacingXS; anchors.horizontalCenter: parent.horizontalCenter
                 DankActionButton { iconName: "undo"; buttonSize: 36; iconSize: 18; enabled: root.canUndo; opacity: enabled ? 1.0 : 0.4; onClicked: root.undoRequested() }
