@@ -94,6 +94,9 @@ DankModal {
     readonly property real boardCursorX: boardContainerItem ? (boardContainerItem.width / 2 + (cursorX - drawingCanvas.width / 2) * fitScale) : 0
     readonly property real boardCursorY: boardContainerItem ? (boardContainerItem.height / 2 + (cursorY - drawingCanvas.height / 2) * fitScale) : 0
 
+    property bool showAnnotations: true
+    property var copiedStroke: null
+
     property var strokes: []
     property var currentStroke: null
     property var selectedStroke: null
@@ -438,6 +441,60 @@ DankModal {
             event.accepted = true;
             return;
         }
+
+        if (token === "X" && !hasCtrl) {
+            window.showAnnotations = !window.showAnnotations;
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+            event.accepted = true;
+            return;
+        }
+
+        if (token === "C" && !hasCtrl) {
+            if (window.selectedStroke) {
+                window.copiedStroke = {
+                    tool: window.selectedStroke.tool,
+                    color: window.selectedStroke.color.toString(),
+                    width: window.selectedStroke.width,
+                    points: window.selectedStroke.points.map(p => Qt.point(p.x, p.y)),
+                    counter: window.selectedStroke.counter
+                };
+                event.accepted = true;
+                return;
+            }
+        }
+
+        if (token === "V" && !hasCtrl) {
+            if (window.copiedStroke) {
+                const offset = 25;
+                const newPoints = window.copiedStroke.points.map(p => Qt.point(p.x + offset, p.y + offset));
+                
+                const pasted = {
+                    tool: window.copiedStroke.tool,
+                    color: window.copiedStroke.color,
+                    width: window.copiedStroke.width,
+                    points: newPoints,
+                    counter: window.copiedStroke.counter
+                };
+                
+                window.copiedStroke.points = newPoints;
+                window.pushStroke(pasted);
+                
+                if (window.currentTool === "select") {
+                    window.preGrabStrokeWidth = window.strokeWidth;
+                    window.preGrabColor = window.currentColor;
+                    window.strokeWidth = pasted.width;
+                    window.currentColor = pasted.color;
+                    window.selectedStroke = pasted;
+                    window.pressCoords = Qt.point(0, 0);
+                    window.originalPoints = newPoints;
+                }
+                
+                if (window.activeCanvas) window.activeCanvas.requestPaint();
+                event.accepted = true;
+                return;
+            }
+        }
+
         if (hasCtrl) {
             const colorShortcut = config.findByKey(config.colorShortcuts, token);
             if (colorShortcut) {
@@ -720,23 +777,25 @@ DankModal {
                                 ctx.clip();
                             }
 
-                            for (var i = 0; i < window.strokes.length; i++) {
-                                drawStroke(ctx, window.strokes[i]);
-                            }
+                            if (window.showAnnotations) {
+                                for (var i = 0; i < window.strokes.length; i++) {
+                                    drawStroke(ctx, window.strokes[i]);
+                                }
 
-                            // 3. Draw current dragging stroke
-                            if (window.currentStroke) {
-                                drawStroke(ctx, window.currentStroke);
-                            }
+                                // 3. Draw current dragging stroke
+                                if (window.currentStroke) {
+                                    drawStroke(ctx, window.currentStroke);
+                                }
 
-                            // 4. Draw temporary live typing text
-                            if (window.isTyping) {
-                                ctx.fillStyle = window.currentColor;
-                                const fontName = window.textMonospace ? "monospace" : "sans-serif";
-                                ctx.font = Math.round(window.textFontSize) + "px " + fontName;
-                                ctx.textAlign = "left";
-                                ctx.textBaseline = "top";
-                                ctx.fillText(window.currentTypingText + "|", window.typingCoords.x, window.typingCoords.y);
+                                // 4. Draw temporary live typing text
+                                if (window.isTyping) {
+                                    ctx.fillStyle = window.currentColor;
+                                    const fontName = window.textMonospace ? "monospace" : "sans-serif";
+                                    ctx.font = Math.round(window.textFontSize) + "px " + fontName;
+                                    ctx.textAlign = "left";
+                                    ctx.textBaseline = "top";
+                                    ctx.fillText(window.currentTypingText + "|", window.typingCoords.x, window.typingCoords.y);
+                                }
                             }
 
                             ctx.restore();

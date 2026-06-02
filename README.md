@@ -54,7 +54,10 @@ To pin your captured and annotated screenshots as borderless, floating desktop w
 
 | Key | Tool / Action |
 |-----|---------------|
-| `V` | Select / Move stroke |
+| `Z` | Select / Move stroke |
+| `X` | Toggle Hide/Show Annotations |
+| `C` | Copy held vector (in Select mode) |
+| `V` | Paste copied vector |
 | `1` - `4` | Pen, Line, Arrow, Rect |
 | `Q` - `R` | Ellipse, Text, Pixelate, Redact |
 | `A` - `D` | Stamp, Highlighter, Eraser |
