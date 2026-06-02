@@ -1666,11 +1666,8 @@ PluginSettings {
                     rightLabel: "20"
                     previewType: "thickness"
                     previewColor: presetColorSetting.value
-                }
             }
         }
-
-        Separator {}
     }
  
     SettingsCard {
