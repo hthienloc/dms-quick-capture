@@ -624,9 +624,17 @@ DankModal {
                 return;
             }
             window.isTabPressed = true;
-            if (window.currentTool !== "select") {
-                window.toolBeforeTab = window.currentTool;
-                window.currentTool = "select";
+            if (config.tabBehavior === "hold") {
+                if (window.currentTool !== "select") {
+                    window.toolBeforeTab = window.currentTool;
+                    window.currentTool = "select";
+                }
+            } else {
+                if (window.currentTool === "select") {
+                    window.currentTool = (window.lastActiveTool === "select" || window.lastActiveTool === "crop") ? "pen" : window.lastActiveTool;
+                } else {
+                    window.currentTool = "select";
+                }
             }
             event.accepted = true;
             return;
@@ -659,9 +667,11 @@ DankModal {
                 return;
             }
             window.isTabPressed = false;
-            if (window.toolBeforeTab !== "") {
-                window.currentTool = window.toolBeforeTab;
-                window.toolBeforeTab = "";
+            if (config.tabBehavior === "hold") {
+                if (window.toolBeforeTab !== "") {
+                    window.currentTool = window.toolBeforeTab;
+                    window.toolBeforeTab = "";
+                }
             }
             event.accepted = true;
             return;

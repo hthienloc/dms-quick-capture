@@ -672,6 +672,19 @@ PluginSettings {
             description: I18n.tr("Hold Z to activate the zoom loupe during capture or drawing.")
             defaultValue: false
         }
+
+        Separator {}
+
+        ButtonGroupSettingPlus {
+            id: tabBehavior
+            settingKey: "tabBehavior"
+            label: I18n.tr("Tab Key Behavior (Select)")
+            defaultValue: "toggle"
+            options: [
+                { "label": I18n.tr("Toggle Select"), "value": "toggle" },
+                { "label": I18n.tr("Hold Select"), "value": "hold" }
+            ]
+        }
     }
 
     SettingsCard {
@@ -2132,6 +2145,7 @@ PluginSettings {
         pluginData: {
             "color_palette_preset": palettePresetSetting.value,
             "catppuccin_variant": catppuccinVariantSetting.value,
+            "tabBehavior": tabBehavior.value,
             "toolbar_color_primary": toolbar_primary.value,
             "toolbar_color_0": c0.value,
             "toolbar_color_1": c1.value,
