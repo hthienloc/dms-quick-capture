@@ -2,7 +2,7 @@ import QtQuick
 import qs.Common
 import qs.Widgets
 
-Item {
+Row {
     id: root
 
     required property string settingKey
@@ -12,11 +12,8 @@ Item {
     property bool value: defaultValue
 
     width: parent.width
-    height: 36
-    
-    // Dynamic Opacity for disabled state
-    opacity: enabled ? 1 : 0.5
-    Behavior on opacity { NumberAnimation { duration: Theme.shortDuration } }
+    height: 36 // Giảm chiều cao
+    spacing: Theme.spacingM
 
     property bool isInitialized: false
     readonly property bool isDirty: value !== defaultValue
@@ -59,89 +56,54 @@ Item {
         return null;
     }
 
-    HoverHandler {
-        id: rootHoverHandler
-    }
+    Column {
+        width: parent.width - toggle.width - parent.spacing
+        spacing: Theme.spacingXS
+        anchors.verticalCenter: parent.verticalCenter
 
-    Rectangle {
-        id: highlightBg
-        anchors.fill: parent
-        anchors.leftMargin: -12
-        anchors.rightMargin: -12
-        anchors.topMargin: -6
-        anchors.bottomMargin: -6
-        radius: Theme.cornerRadius
-        color: rootHoverHandler.hovered ? Theme.withAlpha(Theme.primary, 0.08) : "transparent"
-        Behavior on color { ColorAnimation { duration: 150 } }
-    }
-
-    MouseArea {
-        id: clickArea
-        anchors.fill: parent
-        anchors.leftMargin: -12
-        anchors.rightMargin: -12
-        anchors.topMargin: -6
-        anchors.bottomMargin: -6
-        cursorShape: Qt.PointingHandCursor
-        onClicked: {
-            root.value = !root.value;
-        }
-    }
-
-    Row {
-        id: contentRow
-        anchors.fill: parent
-        spacing: Theme.spacingM
-
-        Column {
-            width: parent.width - toggle.width - parent.spacing
+        Row {
             spacing: Theme.spacingXS
-            anchors.verticalCenter: parent.verticalCenter
+            width: parent.width
 
-            Row {
-                spacing: Theme.spacingXS
-                width: parent.width
+            StyledText {
+                text: root.label
+                font.pixelSize: Theme.fontSizeLarge
+                font.weight: Font.Medium
+                color: Theme.surfaceText
+                elide: Text.ElideRight
+                maximumLineCount: 1
+                width: Math.min(implicitWidth, parent.width - (infoIcon.visible ? infoIcon.width + parent.spacing : 0))
+            }
 
-                StyledText {
-                    text: root.label
-                    font.pixelSize: Theme.fontSizeLarge
-                    font.weight: Font.Medium
-                    color: Theme.surfaceText
-                    elide: Text.ElideRight
-                    maximumLineCount: 1
-                    width: Math.min(implicitWidth, parent.width - (infoIcon.visible ? infoIcon.width + parent.spacing : 0))
-                }
+            DankIcon {
+                id: infoIcon
+                name: "info"
+                size: 16
+                color: Theme.primary
+                visible: root.description !== ""
+                anchors.verticalCenter: parent.verticalCenter
+                opacity: 0.6
 
-                DankIcon {
-                    id: infoIcon
-                    name: "info"
-                    size: 16
-                    color: Theme.primary
-                    visible: root.description !== ""
-                    anchors.verticalCenter: parent.verticalCenter
-                    opacity: 0.6
-
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        onEntered: sharedTooltip.show(root.description, infoIcon)
-                        onExited: sharedTooltip.hide()
-                    }
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onEntered: sharedTooltip.show(root.description, infoIcon)
+                    onExited: sharedTooltip.hide()
                 }
             }
         }
+    }
 
-        DankTooltipV2 {
-            id: sharedTooltip
-        }
+    DankTooltipV2 {
+        id: sharedTooltip
+    }
 
-        DankToggle {
-            id: toggle
-            anchors.verticalCenter: parent.verticalCenter
-            checked: root.value
-            onToggled: isChecked => {
-                root.value = isChecked;
-            }
+    DankToggle {
+        id: toggle
+        anchors.verticalCenter: parent.verticalCenter
+        checked: root.value
+        onToggled: isChecked => {
+            root.value = isChecked;
         }
     }
 }

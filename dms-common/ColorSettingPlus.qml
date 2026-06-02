@@ -3,7 +3,7 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 
-Item {
+Column {
     id: root
 
     required property string settingKey
@@ -13,7 +13,7 @@ Item {
     property var value: defaultValue
 
     width: parent.width
-    implicitHeight: layout.implicitHeight
+    spacing: Theme.spacingXS
     
     // Dynamic Opacity for disabled state
     opacity: enabled ? 1 : 0.5
@@ -58,142 +58,120 @@ Item {
         return null;
     }
 
-    HoverHandler {
-        id: rootHoverHandler
-    }
+    // ── Label Row ─────────────────────────────────────────────────────────
+    Item {
+        width: parent.width
+        height: 32
 
-    Rectangle {
-        id: highlightBg
-        anchors.fill: parent
-        anchors.leftMargin: -12
-        anchors.rightMargin: -12
-        anchors.topMargin: -6
-        anchors.bottomMargin: -6
-        radius: Theme.cornerRadius
-        color: rootHoverHandler.hovered ? Theme.withAlpha(Theme.primary, 0.08) : "transparent"
-        Behavior on color { ColorAnimation { duration: 150 } }
-    }
+        Row {
+            anchors.left: parent.left
+            anchors.right: individualReset.visible ? individualReset.left : parent.right
+            anchors.rightMargin: Theme.spacingS
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: Theme.spacingXS
 
-    Column {
-        id: layout
-        anchors.fill: parent
-        spacing: Theme.spacingXS
-
-        // ── Label Row ─────────────────────────────────────────────────────────
-        Item {
-            width: parent.width
-            height: 32
-
-            Row {
-                anchors.left: parent.left
-                anchors.right: individualReset.visible ? individualReset.left : parent.right
-                anchors.rightMargin: Theme.spacingS
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacingXS
-
-                StyledText {
-                    text: root.label
-                    font.pixelSize: Theme.fontSizeLarge
-                    font.weight: Font.Medium
-                    color: Theme.surfaceText
-                    elide: Text.ElideRight
-                    maximumLineCount: 1
-                    width: Math.min(implicitWidth, parent.width - (infoIcon.visible ? 20 : 0))
-                }
-
-                DankIcon {
-                    id: infoIcon
-                    name: "info"
-                    size: 16
-                    color: Theme.primary
-                    visible: root.description !== ""
-                    anchors.verticalCenter: parent.verticalCenter
-                    opacity: 0.6
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        onEntered: sharedTooltip.show(root.description, infoIcon)
-                        onExited: sharedTooltip.hide()
-                    }
-                }
+            StyledText {
+                text: root.label
+                font.pixelSize: Theme.fontSizeLarge
+                font.weight: Font.Medium
+                color: Theme.surfaceText
+                elide: Text.ElideRight
+                maximumLineCount: 1
+                width: Math.min(implicitWidth, parent.width - (infoIcon.visible ? 20 : 0))
             }
 
-            Item {
-                id: individualReset
-                width: 28; height: 28
-                visible: root.isDirty
-                anchors.right: parent.right
+            DankIcon {
+                id: infoIcon
+                name: "info"
+                size: 16
+                color: Theme.primary
+                visible: root.description !== ""
                 anchors.verticalCenter: parent.verticalCenter
-                Rectangle {
-                    anchors.fill: parent
-                    radius: 14
-                    color: resetArea.containsMouse ? Theme.primaryHoverLight : "transparent"
-                }
-                DankIcon {
-                    name: "restart_alt"
-                    size: 16
-                    color: Theme.primary
-                    anchors.centerIn: parent
-                    opacity: 0.8
-                }
+                opacity: 0.6
                 MouseArea {
-                    id: resetArea
                     anchors.fill: parent
                     hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.resetToDefault()
+                    onEntered: sharedTooltip.show(root.description, infoIcon)
+                    onExited: sharedTooltip.hide()
                 }
             }
         }
 
-        // ── Color Preview (Full Width + Hex Label) ────────────────────────────
-        Rectangle {
-            id: colorPreview
-            width: parent.width
-            height: 32
-            radius: Theme.cornerRadius
-            color: root.resolvedColor
-            border.color: Theme.outlineStrong
-            border.width: 2
-            
-            Behavior on color { ColorAnimation { duration: Theme.shortDuration } }
-
-            Row {
-                anchors.centerIn: parent
-                spacing: Theme.spacingS
-                
-                DankIcon {
-                    name: "palette"
-                    size: 14
-                    color: root.resolvedColor.hslLightness > 0.6 ? "#000000" : "#ffffff"
-                    opacity: 0.7
-                }
-
-                StyledText {
-                    text: root.value === "primary" ? I18n.tr("PRIMARY") : root.value.toString().toUpperCase()
-                    font.pixelSize: Theme.fontSizeSmall
-                    font.weight: Font.Bold
-                    isMonospace: true
-                    color: root.resolvedColor.hslLightness > 0.6 ? "#000000" : "#ffffff"
-                }
-            }
-
-            MouseArea {
+        Item {
+            id: individualReset
+            width: 28; height: 28
+            visible: root.isDirty
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            Rectangle {
                 anchors.fill: parent
+                radius: 14
+                color: resetArea.containsMouse ? Theme.primaryHoverLight : "transparent"
+            }
+            DankIcon {
+                name: "restart_alt"
+                size: 16
+                color: Theme.primary
+                anchors.centerIn: parent
+                opacity: 0.8
+            }
+            MouseArea {
+                id: resetArea
+                anchors.fill: parent
+                hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    if (typeof PopoutService !== "undefined" && PopoutService && PopoutService.colorPickerModal) {
-                        PopoutService.colorPickerModal.selectedColor = root.resolvedColor;
-                        PopoutService.colorPickerModal.pickerTitle = root.label;
-                        PopoutService.colorPickerModal.onColorSelectedCallback = function (selectedColor) {
-                            root.value = selectedColor.toString();
-                        };
-                        PopoutService.colorPickerModal.show();
-                    }
-                }
+                onClicked: root.resetToDefault()
+            }
+        }
+    }
+
+    // ── Color Preview (Full Width + Hex Label) ────────────────────────────
+    Rectangle {
+        id: colorPreview
+        width: parent.width
+        height: 32
+        radius: Theme.cornerRadius
+        color: root.resolvedColor
+        border.color: Theme.outlineStrong
+        border.width: 2
+        
+        Behavior on color { ColorAnimation { duration: Theme.shortDuration } }
+
+        Row {
+            anchors.centerIn: parent
+            spacing: Theme.spacingS
+            
+            DankIcon {
+                name: "palette"
+                size: 14
+                color: root.resolvedColor.hslLightness > 0.6 ? "#000000" : "#ffffff"
+                opacity: 0.7
+            }
+
+            StyledText {
+                text: root.value === "primary" ? I18n.tr("PRIMARY") : root.value.toString().toUpperCase()
+                font.pixelSize: Theme.fontSizeSmall
+                font.weight: Font.Bold
+                isMonospace: true
+                color: root.resolvedColor.hslLightness > 0.6 ? "#000000" : "#ffffff"
             }
         }
 
-        DankTooltipV2 { id: sharedTooltip }
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            onClicked: {
+                if (typeof PopoutService !== "undefined" && PopoutService && PopoutService.colorPickerModal) {
+                    PopoutService.colorPickerModal.selectedColor = root.resolvedColor;
+                    PopoutService.colorPickerModal.pickerTitle = root.label;
+                    PopoutService.colorPickerModal.onColorSelectedCallback = function (selectedColor) {
+                        root.value = selectedColor.toString();
+                    };
+                    PopoutService.colorPickerModal.show();
+                }
+            }
+        }
     }
+
+    DankTooltipV2 { id: sharedTooltip }
 }
