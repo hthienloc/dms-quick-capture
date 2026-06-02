@@ -37,10 +37,10 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 1. **Trigger:** Use the bar icon, Control Center, or your `Print` key.
 2. **Select Area:** Drag to select the screenshot region.
 3. **Annotate:**
-   - **Switch Tools:** Use keyboard shortcuts (**1-4**, **Q-R**, **A-D**).
+   - **Switch Tools:** Use keyboard shortcuts (**1-4**, **Q-R**, **A-D**, or **Tab** to switch/toggle Select tool).
    - **Radial Menu:** **Right-click** to open custom presets.
    - **Thickness:** Use the **Mouse Wheel** to scale the brush size.
-   - **Magnifying Glass:** Hold **Tab** to activate the magnifying loupe, and use **Tab + Mouse Wheel** to adjust the zoom factor.
+   - **Magnifying Glass:** Hold **Z** to activate the magnifying loupe, and use **Z + Mouse Wheel** to adjust the zoom factor.
    - **Quick Erase:** **Middle-click** on any element to erase it.
    - **Shift Constraint:** Hold **Shift** while drawing to modify vector output:
      - **Pen**: Draws straight lines instead of freeform drawings.
@@ -116,7 +116,7 @@ binds {
 - [x] Dynamic high-contrast canvas boundary and auto-adapting backdrop luminance for dark captures.
 - [x] Disjoint Copy vs Save toolbar pipelines separating clipboard and filesystem actions.
 - [x] Fix and fully enable the **Click-to-Type Text** annotation tool to reliably capture active keyboard input and support native inline text overlay typing.
-- [x] Magnifying Glass (Loupe) for pixel-perfect placement and crop alignment (hold Tab to activate, Tab + mouse wheel to adjust zoom).
+- [x] Magnifying Glass (Loupe) for pixel-perfect placement and crop alignment (hold Z to activate, Z + mouse wheel to adjust zoom).
 - [x] Custom Text/Image Watermark or signature overlay stamp with adjustable opacity.
 - [x] Support picture-in-picture screenshot pinning (pin-to-desktop) documentation.
 
