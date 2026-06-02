@@ -45,6 +45,7 @@ Item {
         const settings = findSettings();
         if (settings && settings.pluginService) {
             const loadedValue = settings.loadValue(settingKey, defaultValue);
+            if (isInitialized && loadedValue === value) return;
             if (textField.activeFocus && isInitialized) return;
             value = loadedValue;
             textField.text = loadedValue;
