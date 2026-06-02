@@ -679,13 +679,14 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Text")
             icon: "format_size"
-            showReset: textFontSize.isDirty || textFontFamily.isDirty || textBold.isDirty || textItalic.isDirty || textUnderline.isDirty
+            showReset: textFontSize.isDirty || textFontFamily.isDirty || textBold.isDirty || textItalic.isDirty || textUnderline.isDirty || textInputMode.isDirty
             onResetClicked: {
                 textFontSize.resetToDefault();
                 textFontFamily.resetToDefault();
                 textBold.resetToDefault();
                 textItalic.resetToDefault();
                 textUnderline.resetToDefault();
+                textInputMode.resetToDefault();
             }
         }
 
@@ -741,6 +742,20 @@ PluginSettings {
             label: I18n.tr("Default Underline Text")
             defaultValue: false
         }
+
+        Separator {}
+
+        ButtonGroupSettingPlus {
+            id: textInputMode
+            settingKey: "textInputMode"
+            label: I18n.tr("Input Mode")
+            options: [
+                { label: I18n.tr("Direct (Default)"), value: "inline" },
+                { label: I18n.tr("Popup Input (IME)"), value: "popup" }
+            ]
+            defaultValue: "inline"
+        }
+    }
     }
 
     SettingsCard {

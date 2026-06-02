@@ -188,6 +188,7 @@ DankModal {
     onTextFontFamilyChanged: {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
+    readonly property string textInputMode: parentWidget?.pluginData?.textInputMode ?? "inline"
     readonly property string toolbarPosition: parentWidget?.pluginData?.toolbarPosition ?? "top"
     readonly property bool configShowToolbar: parentWidget?.pluginData?.showToolbar ?? true
     readonly property bool enableMagnifier: parentWidget?.pluginData?.enableMagnifier ?? false
@@ -620,7 +621,11 @@ DankModal {
             return;
         }
         if (window.isTyping) {
-            window.handleTypingKey(event);
+            if (window.textInputMode === "inline") {
+                window.handleTypingKey(event);
+            } else {
+                event.accepted = true;
+            }
             return;
         }
 
@@ -1540,6 +1545,9 @@ DankModal {
                                     window.typingCoords = getAbsolutePoint(mouse.x, mouse.y);
                                     window.currentTypingText = "";
                                     window.isTyping = true;
+                                    if (window.textInputMode === "popup") {
+                                        textInputDialog.open();
+                                    }
                                     if (window.activeCanvas) window.activeCanvas.requestPaint();
                                     return;
                                 }
@@ -1708,8 +1716,94 @@ DankModal {
                             color: "black"
                         }
                     }
+                    Popup {
+                        id: textInputDialog
+                        width: 320
+                        height: 160
+                        padding: 0
+                        modal: false
+                        focus: true
+                        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+                        anchors.centerIn: parent
 
+                        background: Rectangle {
+                            color: "transparent"
+                        }
 
+                        onOpened: {
+                            Qt.callLater(() => {
+                                textInputField.text = "";
+                                textInputField.forceActiveFocus();
+                            });
+                        }
+
+                        onClosed: {
+                            if (window.isTyping) {
+                                window.isTyping = false;
+                                window.currentTypingText = "";
+                                if (window.activeCanvas) window.activeCanvas.requestPaint();
+                                modalFocusScope.forceActiveFocus();
+                            }
+                        }
+
+                        contentItem: Rectangle {
+                            color: Theme.surfaceContainer
+                            radius: Theme.cornerRadius
+                            border.color: Theme.withAlpha(Theme.outline, 0.15)
+                            border.width: 1
+
+                            Column {
+                                anchors.fill: parent
+                                anchors.margins: Theme.spacingM
+                                spacing: Theme.spacingM
+
+                                StyledText {
+                                    text: I18n.tr("Add Text Note")
+                                    font.bold: true
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    color: Theme.surfaceText
+                                }
+
+                                DankTextField {
+                                    id: textInputField
+                                    width: parent.width
+                                    placeholderText: I18n.tr("Type note...")
+                                    focus: true
+                                    onAccepted: {
+                                        window.currentTypingText = textInputField.text;
+                                        textInputDialog.close();
+                                        window.commitTypingText();
+                                    }
+                                }
+
+                                Row {
+                                    width: parent.width
+                                    spacing: Theme.spacingS
+                                    layoutDirection: Qt.RightToLeft
+
+                                    DankButton {
+                                        text: I18n.tr("Add")
+                                        backgroundColor: Theme.primary
+                                        textColor: Theme.primaryText
+                                        onClicked: {
+                                            window.currentTypingText = textInputField.text;
+                                            textInputDialog.close();
+                                            window.commitTypingText();
+                                        }
+                                    }
+
+                                    DankButton {
+                                        text: I18n.tr("Cancel")
+                                        backgroundColor: Theme.surfaceContainerHigh
+                                        textColor: Theme.surfaceText
+                                        onClicked: {
+                                            textInputDialog.close();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     Timer {
                         id: previewTimer
