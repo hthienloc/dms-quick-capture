@@ -1283,9 +1283,24 @@ PluginSettings {
                 { "label": I18n.tr("Nord (Pastel Cold)"), "value": "nord" },
                 { "label": I18n.tr("Gruvbox (Warm Retro)"), "value": "gruvbox" },
                 { "label": I18n.tr("Dracula (High Contrast Dark)"), "value": "dracula" },
-                { "label": I18n.tr("Catppuccin (Mocha Pastel)"), "value": "catppuccin" },
+                { "label": I18n.tr("Catppuccin"), "value": "catppuccin" },
                 { "label": I18n.tr("Custom Colors"), "value": "custom" }
             ]
+        }
+
+        ButtonGroupSettingPlus {
+            id: catppuccinVariantSetting
+            settingKey: "catppuccin_variant"
+            label: ""
+            defaultValue: "mocha"
+            options: [
+                { "label": "Latte", "value": "latte" },
+                { "label": "Frappé", "value": "frappe" },
+                { "label": "Macchiato", "value": "macchiato" },
+                { "label": "Mocha", "value": "mocha" }
+            ]
+            visible: palettePresetSetting.value === "catppuccin"
+            height: visible ? implicitHeight : 0
         }
 
         Item { width: 1; height: Theme.spacingS }
@@ -1926,8 +1941,9 @@ PluginSettings {
             defaultValue: 300
             minimum: 100
             maximum: 1000
-            leftLabel: "100ms"
-            rightLabel: "1000ms"
+            leftLabel: "100"
+            rightLabel: "1000"
+            unit: "ms"
             visible: radialHoverTrigger.value
             height: visible ? implicitHeight : 0
         }
@@ -2115,6 +2131,7 @@ PluginSettings {
         id: captureConfig
         pluginData: {
             "color_palette_preset": palettePresetSetting.value,
+            "catppuccin_variant": catppuccinVariantSetting.value,
             "toolbar_color_primary": toolbar_primary.value,
             "toolbar_color_0": c0.value,
             "toolbar_color_1": c1.value,

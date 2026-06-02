@@ -61,7 +61,7 @@ QtObject {
         "#282a36"
     ]
 
-    readonly property var catppuccinColors: [
+    readonly property var catppuccinMochaColors: [
         "#89b4fa",
         "#f38ba8",
         "#a6e3a1",
@@ -70,6 +70,38 @@ QtObject {
         "#cdd6f4",
         "#1e1e2e"
     ]
+
+    readonly property var catppuccinMacchiatoColors: [
+        "#8aadf4",
+        "#ed8796",
+        "#a6da95",
+        "#eed49f",
+        "#c6a0f6",
+        "#cad3f5",
+        "#24273a"
+    ]
+
+    readonly property var catppuccinFrappeColors: [
+        "#8caaee",
+        "#e78284",
+        "#a6d189",
+        "#e5c890",
+        "#ca9ee6",
+        "#c6d0f5",
+        "#303446"
+    ]
+
+    readonly property var catppuccinLatteColors: [
+        "#1e66f5",
+        "#d20f39",
+        "#40a02b",
+        "#df8e1d",
+        "#8839ef",
+        "#4c4f69",
+        "#eff1f5"
+    ]
+
+    readonly property string selectedCatppuccinVariant: pluginData["catppuccin_variant"] || "mocha"
 
     readonly property var adaptiveColors: [
         Theme.info,
@@ -87,7 +119,16 @@ QtObject {
             case "nord": return nordColors;
             case "gruvbox": return gruvboxColors;
             case "dracula": return draculaColors;
-            case "catppuccin": return catppuccinColors;
+            case "catppuccin": {
+                switch (selectedCatppuccinVariant) {
+                    case "latte": return catppuccinLatteColors;
+                    case "frappe": return catppuccinFrappeColors;
+                    case "macchiato": return catppuccinMacchiatoColors;
+                    case "mocha":
+                    default:
+                        return catppuccinMochaColors;
+                }
+            }
             case "adaptive":
             default:
                 return adaptiveColors;
