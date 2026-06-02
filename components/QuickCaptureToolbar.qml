@@ -43,11 +43,12 @@ Rectangle {
 
     Item {
         id: contentLayout
-        width: isVertical ? verticalItems.width : horizontalItems.width
-        height: isVertical ? verticalItems.height : horizontalItems.height
+        width: toolbarLoader.item ? toolbarLoader.item.width : 0
+        height: toolbarLoader.item ? toolbarLoader.item.height : 0
         anchors.centerIn: parent
 
         Loader {
+            id: toolbarLoader
             anchors.centerIn: parent
             sourceComponent: root.isVertical ? verticalLayout : horizontalLayout
         }
