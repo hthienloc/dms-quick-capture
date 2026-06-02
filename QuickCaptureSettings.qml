@@ -688,7 +688,7 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Watermark")
             icon: "branding_watermark"
-            showReset: enableWatermark.isDirty || watermarkType.isDirty || watermarkText.isDirty || watermarkImage.isDirty || watermarkPosition.isDirty || watermarkOpacity.isDirty
+            showReset: enableWatermark.isDirty || watermarkType.isDirty || watermarkText.isDirty || watermarkImage.isDirty || watermarkPosition.isDirty || watermarkOpacity.isDirty || watermarkSize.isDirty
             onResetClicked: {
                 enableWatermark.resetToDefault();
                 watermarkType.resetToDefault();
@@ -696,6 +696,7 @@ PluginSettings {
                 watermarkImage.resetToDefault();
                 watermarkPosition.resetToDefault();
                 watermarkOpacity.resetToDefault();
+                watermarkSize.resetToDefault();
             }
         }
 
@@ -773,6 +774,25 @@ PluginSettings {
                 { label: I18n.tr("Center"), value: "center" }
             ]
             defaultValue: "bottom_right"
+            visible: enableWatermark.value
+            height: visible ? implicitHeight : 0
+        }
+
+        Separator {
+            visible: enableWatermark.value
+            height: visible ? 1 : 0
+        }
+
+        SliderSettingPlus {
+            id: watermarkSize
+            settingKey: "watermarkSize"
+            label: I18n.tr("Size")
+            defaultValue: 15
+            minimum: 5
+            maximum: 50
+            unit: "%"
+            leftLabel: "5%"
+            rightLabel: "50%"
             visible: enableWatermark.value
             height: visible ? implicitHeight : 0
         }
@@ -955,7 +975,7 @@ PluginSettings {
                         id: previewTextItem
                         visible: watermarkType.value === "text"
                         text: watermarkText.value || "Screenshot"
-                        font.pixelSize: Theme.fontSizeLarge
+                        font.pixelSize: Math.max(10, Math.round(watermarkPreviewArea.height * (watermarkSize.value / 100.0)))
                         font.bold: true
                         color: "#ffffff"
                         style: Text.Outline
@@ -970,8 +990,8 @@ PluginSettings {
                             if (previewWatermarkImageLoader.status !== Image.Ready) return 0;
                             const w = previewWatermarkImageLoader.sourceSize.width;
                             const h = previewWatermarkImageLoader.sourceSize.height;
-                            const maxW = watermarkPreviewArea.width * 0.25;
-                            const maxH = watermarkPreviewArea.height * 0.25;
+                            const maxW = watermarkPreviewArea.width * (watermarkSize.value / 100.0);
+                            const maxH = watermarkPreviewArea.height * (watermarkSize.value / 100.0);
                             const scale = Math.min(maxW / w, maxH / h, 1.0);
                             return w * scale;
                         }
@@ -979,8 +999,8 @@ PluginSettings {
                             if (previewWatermarkImageLoader.status !== Image.Ready) return 0;
                             const w = previewWatermarkImageLoader.sourceSize.width;
                             const h = previewWatermarkImageLoader.sourceSize.height;
-                            const maxW = watermarkPreviewArea.width * 0.25;
-                            const maxH = watermarkPreviewArea.height * 0.25;
+                            const maxW = watermarkPreviewArea.width * (watermarkSize.value / 100.0);
+                            const maxH = watermarkPreviewArea.height * (watermarkSize.value / 100.0);
                             const scale = Math.min(maxW / w, maxH / h, 1.0);
                             return h * scale;
                         }

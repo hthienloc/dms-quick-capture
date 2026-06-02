@@ -1459,13 +1459,14 @@ DankModal {
                             const watermarkType = window.parentWidget?.pluginData?.watermarkType || "text";
                             const watermarkOpacity = (window.parentWidget?.pluginData?.watermarkOpacity ?? 30) / 100.0;
                             const watermarkPosition = window.parentWidget?.pluginData?.watermarkPosition || "bottom_right";
+                            const watermarkSize = (window.parentWidget?.pluginData?.watermarkSize ?? 15) / 100.0;
 
                             ctx.save();
                             ctx.globalAlpha = watermarkOpacity;
 
                             if (watermarkType === "text") {
                                 const textStr = window.parentWidget?.pluginData?.watermarkText || "Screenshot";
-                                const fontSize = Math.round(Math.max(12, exportCanvas.height * 0.035));
+                                const fontSize = Math.round(Math.max(12, exportCanvas.height * watermarkSize));
                                 ctx.font = "bold " + fontSize + "px sans-serif";
                                 ctx.fillStyle = "#ffffff";
                                 ctx.shadowColor = "#000000";
@@ -1500,8 +1501,8 @@ DankModal {
                             } else if (watermarkType === "image" && watermarkImageLoader.status === Image.Ready) {
                                 const imgW = watermarkImageLoader.sourceSize.width;
                                 const imgH = watermarkImageLoader.sourceSize.height;
-                                const maxW = exportCanvas.width * 0.18;
-                                const maxH = exportCanvas.height * 0.18;
+                                const maxW = exportCanvas.width * watermarkSize;
+                                const maxH = exportCanvas.height * watermarkSize;
                                 const scale = Math.min(maxW / imgW, maxH / imgH, 1.0);
                                 const targetW = imgW * scale;
                                 const targetH = imgH * scale;
