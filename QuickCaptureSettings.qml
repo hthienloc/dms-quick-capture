@@ -756,7 +756,6 @@ PluginSettings {
             defaultValue: "inline"
         }
     }
-    }
 
     SettingsCard {
         id: shapesCard
