@@ -1054,7 +1054,6 @@ PluginSettings {
                             source: previewWatermarkImageLoader.source
                             
                             height: {
-                                if (watermarkType.value === "hybrid") return previewTextItem.font.pixelSize;
                                 if (previewWatermarkImageLoader.status !== Image.Ready) return 0;
                                 const w = previewWatermarkImageLoader.sourceSize.width;
                                 const h = previewWatermarkImageLoader.sourceSize.height;
