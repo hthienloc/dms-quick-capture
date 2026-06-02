@@ -88,7 +88,7 @@ DankModal {
     property real previewY: 0
     property bool showSizePreview: false
 
-    property bool isCtrlPressed: false
+    property bool isTabPressed: false
     property real cursorX: 0
     property real cursorY: 0
     readonly property real boardCursorX: boardContainerItem ? (boardContainerItem.width / 2 + (cursorX - drawingCanvas.width / 2) * fitScale) : 0
@@ -458,8 +458,10 @@ DankModal {
 
     // Keyboard Shortcuts Support
     modalFocusScope.Keys.onPressed: (event) => {
-        if (event.key === Qt.Key_Control) {
-            window.isCtrlPressed = true;
+        if (event.key === Qt.Key_Tab) {
+            window.isTabPressed = true;
+            event.accepted = true;
+            return;
         }
         if (window.isTyping) {
             window.handleTypingKey(event);
@@ -470,8 +472,10 @@ DankModal {
     }
 
     modalFocusScope.Keys.onReleased: (event) => {
-        if (event.key === Qt.Key_Control) {
-            window.isCtrlPressed = false;
+        if (event.key === Qt.Key_Tab) {
+            window.isTabPressed = false;
+            event.accepted = true;
+            return;
         }
     }
 
@@ -1268,7 +1272,7 @@ DankModal {
 
                             onWheel: (wheel) => {
                                 const step = wheel.angleDelta.y > 0 ? 1 : -1;
-                                if (window.enableMagnifier && (wheel.modifiers & Qt.ControlModifier)) {
+                                if (window.enableMagnifier && window.isTabPressed) {
                                     magnifier.zoomFactor = Math.max(1.5, Math.min(8.0, magnifier.zoomFactor + (step * 0.5)));
                                     wheel.accepted = true;
                                     return;
@@ -1366,7 +1370,7 @@ DankModal {
                         border.color: Theme.primary
                         border.width: 2
                         color: "black"
-                        visible: window.enableMagnifier && window.isCtrlPressed && drawMouseArea.containsMouse
+                        visible: window.enableMagnifier && window.isTabPressed && drawMouseArea.containsMouse
                         z: 200
 
                         x: Math.max(0, Math.min(boardContainer.width - width, window.boardCursorX + 20))

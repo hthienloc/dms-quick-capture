@@ -42,7 +42,7 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
    - **Switch Tools:** Use keyboard shortcuts (**1-4**, **Q-R**, **A-D**).
    - **Radial Menu:** **Right-click** to open custom presets.
    - **Thickness:** Use the **Mouse Wheel** to scale the brush size.
-   - **Magnifying Glass:** Hold **Ctrl** to activate the magnifying loupe, and use **Ctrl + Mouse Wheel** to adjust the zoom factor.
+   - **Magnifying Glass:** Hold **Tab** to activate the magnifying loupe, and use **Tab + Mouse Wheel** to adjust the zoom factor.
    - **Quick Erase:** **Middle-click** on any element to erase it.
 4. **Finish:** Press **Enter** to save/copy or **Esc** to discard.
 
@@ -99,7 +99,7 @@ binds {
 - [x] Dynamic high-contrast canvas boundary and auto-adapting backdrop luminance for dark captures.
 - [x] Disjoint Copy vs Save toolbar pipelines separating clipboard and filesystem actions.
 - [x] Fix and fully enable the **Click-to-Type Text** annotation tool to reliably capture active keyboard input and support native inline text overlay typing.
-- [x] Magnifying Glass (Loupe) for pixel-perfect placement and crop alignment (hold Ctrl to activate, Ctrl + mouse wheel to adjust zoom).
+- [x] Magnifying Glass (Loupe) for pixel-perfect placement and crop alignment (hold Tab to activate, Tab + mouse wheel to adjust zoom).
 - [x] Custom Text/Image Watermark or signature overlay stamp with adjustable opacity.
 - [x] Support picture-in-picture screenshot pinning (pin-to-desktop) documentation.
 
