@@ -830,7 +830,11 @@ PluginSettings {
                 { label: I18n.tr("Top Right"), value: "top_right" },
                 { label: I18n.tr("Bottom Left"), value: "bottom_left" },
                 { label: I18n.tr("Bottom Right"), value: "bottom_right" },
-                { label: I18n.tr("Center"), value: "center" }
+                { label: I18n.tr("Center"), value: "center" },
+                { label: I18n.tr("Top"), value: "top" },
+                { label: I18n.tr("Bottom"), value: "bottom" },
+                { label: I18n.tr("Left"), value: "left" },
+                { label: I18n.tr("Right"), value: "right" }
             ]
             defaultValue: "bottom_right"
             visible: enableWatermark.value
@@ -1115,6 +1119,58 @@ PluginSettings {
                                 anchors.right: undefined
                                 anchors.top: undefined
                                 anchors.bottom: undefined
+                            }
+                        },
+                        State {
+                            name: "top"
+                            when: watermarkPosition.value === "top"
+                            AnchorChanges {
+                                target: previewWatermarkContainer
+                                anchors.horizontalCenter: watermarkPreviewArea.horizontalCenter
+                                anchors.top: watermarkPreviewArea.top
+                                anchors.left: undefined
+                                anchors.right: undefined
+                                anchors.bottom: undefined
+                                anchors.verticalCenter: undefined
+                            }
+                        },
+                        State {
+                            name: "bottom"
+                            when: watermarkPosition.value === "bottom"
+                            AnchorChanges {
+                                target: previewWatermarkContainer
+                                anchors.horizontalCenter: watermarkPreviewArea.horizontalCenter
+                                anchors.bottom: watermarkPreviewArea.bottom
+                                anchors.left: undefined
+                                anchors.right: undefined
+                                anchors.top: undefined
+                                anchors.verticalCenter: undefined
+                            }
+                        },
+                        State {
+                            name: "left"
+                            when: watermarkPosition.value === "left"
+                            AnchorChanges {
+                                target: previewWatermarkContainer
+                                anchors.left: watermarkPreviewArea.left
+                                anchors.verticalCenter: watermarkPreviewArea.verticalCenter
+                                anchors.right: undefined
+                                anchors.top: undefined
+                                anchors.bottom: undefined
+                                anchors.horizontalCenter: undefined
+                            }
+                        },
+                        State {
+                            name: "right"
+                            when: watermarkPosition.value === "right"
+                            AnchorChanges {
+                                target: previewWatermarkContainer
+                                anchors.right: watermarkPreviewArea.right
+                                anchors.verticalCenter: watermarkPreviewArea.verticalCenter
+                                anchors.left: undefined
+                                anchors.top: undefined
+                                anchors.bottom: undefined
+                                anchors.horizontalCenter: undefined
                             }
                         }
                     ]

@@ -1748,7 +1748,19 @@ DankModal {
                                       ty = fontSize + margin;
                                   } else if (watermarkPosition === "center") {
                                       tx = (exportCanvas.width - totalW) / 2;
-                                      ty = (exportCanvas.height - totalH) / 2 + fontSize;
+                                      ty = (exportCanvas.height - totalH) / 2 + fontSize + (totalH - totalTextHeight) / 2;
+                                  } else if (watermarkPosition === "top") {
+                                      tx = (exportCanvas.width - totalW) / 2;
+                                      ty = fontSize + margin;
+                                  } else if (watermarkPosition === "bottom") {
+                                      tx = (exportCanvas.width - totalW) / 2;
+                                      ty = exportCanvas.height - (lines.length - 1) * lineHeight - margin;
+                                  } else if (watermarkPosition === "left") {
+                                      tx = margin;
+                                      ty = (exportCanvas.height - totalH) / 2 + fontSize + (totalH - totalTextHeight) / 2;
+                                  } else if (watermarkPosition === "right") {
+                                      tx = exportCanvas.width - totalW - margin;
+                                      ty = (exportCanvas.height - totalH) / 2 + fontSize + (totalH - totalTextHeight) / 2;
                                   }
 
                                   if (hasImage) {
@@ -1788,6 +1800,18 @@ DankModal {
                                      iy = margin;
                                  } else if (watermarkPosition === "center") {
                                      ix = (exportCanvas.width - targetW) / 2;
+                                     iy = (exportCanvas.height - targetH) / 2;
+                                 } else if (watermarkPosition === "top") {
+                                     ix = (exportCanvas.width - targetW) / 2;
+                                     iy = margin;
+                                 } else if (watermarkPosition === "bottom") {
+                                     ix = (exportCanvas.width - targetW) / 2;
+                                     iy = exportCanvas.height - targetH - margin;
+                                 } else if (watermarkPosition === "left") {
+                                     ix = margin;
+                                     iy = (exportCanvas.height - targetH) / 2;
+                                 } else if (watermarkPosition === "right") {
+                                     ix = exportCanvas.width - targetW - margin;
                                      iy = (exportCanvas.height - targetH) / 2;
                                  }
 
