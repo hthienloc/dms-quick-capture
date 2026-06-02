@@ -15,6 +15,7 @@ Rectangle {
     property int strokeWidth: 8
     property bool canUndo: false
     property bool isVertical: false
+    property bool showAnnotations: true
 
     readonly property var toolbarPalette: {
         const p1 = root.pluginData["toolbar_color_primary"] || "primary";
@@ -64,10 +65,18 @@ Rectangle {
             Row {
                 spacing: Theme.spacingM; anchors.verticalCenter: parent.verticalCenter
                 DankActionButton {
-                    iconName: "near_me"; buttonSize: 36; iconSize: 18; tooltipText: "Select (V)"
+                    iconName: "near_me"; buttonSize: 36; iconSize: 18; tooltipText: "Select (Z)"
                     backgroundColor: root.currentTool === "select" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                     iconColor: root.currentTool === "select" ? Theme.primary : Theme.surfaceText
                     onClicked: root.toolSelected("select")
+                }
+                DankActionButton {
+                    iconName: root.showAnnotations ? "visibility" : "visibility_off"
+                    buttonSize: 36; iconSize: 18
+                    tooltipText: root.showAnnotations ? "Hide Annotations (X)" : "Show Annotations (X)"
+                    iconColor: root.showAnnotations ? Theme.primary : Theme.surfaceText
+                    backgroundColor: "transparent"
+                    onClicked: root.showAnnotations = !root.showAnnotations
                 }
                 DankActionButton {
                     iconName: "crop"; buttonSize: 36; iconSize: 18; tooltipText: "Crop (P)"
@@ -159,13 +168,21 @@ Rectangle {
             Column {
                 spacing: Theme.spacingM; anchors.horizontalCenter: parent.horizontalCenter
                 DankActionButton {
-                    iconName: "near_me"; buttonSize: 36; iconSize: 18
+                    iconName: "near_me"; buttonSize: 36; iconSize: 18; tooltipText: "Select (Z)"
                     backgroundColor: root.currentTool === "select" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                     iconColor: root.currentTool === "select" ? Theme.primary : Theme.surfaceText
                     onClicked: root.toolSelected("select")
                 }
                 DankActionButton {
-                    iconName: "crop"; buttonSize: 36; iconSize: 18
+                    iconName: root.showAnnotations ? "visibility" : "visibility_off"
+                    buttonSize: 36; iconSize: 18
+                    tooltipText: root.showAnnotations ? "Hide Annotations (X)" : "Show Annotations (X)"
+                    iconColor: root.showAnnotations ? Theme.primary : Theme.surfaceText
+                    backgroundColor: "transparent"
+                    onClicked: root.showAnnotations = !root.showAnnotations
+                }
+                DankActionButton {
+                    iconName: "crop"; buttonSize: 36; iconSize: 18; tooltipText: "Crop (P)"
                     backgroundColor: root.currentTool === "crop" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                     iconColor: root.currentTool === "crop" ? Theme.primary : Theme.surfaceText
                     onClicked: root.toolSelected("crop")

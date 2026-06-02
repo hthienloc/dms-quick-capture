@@ -614,6 +614,13 @@ DankModal {
                     anchors.margins: Theme.spacingM
                     isVertical: (window.toolbarPosition === "left" || window.toolbarPosition === "right")
 
+                    showAnnotations: window.showAnnotations
+                    onShowAnnotationsChanged: {
+                        if (window.showAnnotations !== showAnnotations) {
+                            window.showAnnotations = showAnnotations;
+                        }
+                    }
+
                     currentTool: window.currentTool
                     currentColor: window.currentColor
                     strokeWidth: window.currentTool === "text" ? window.textFontSize : window.strokeWidth
