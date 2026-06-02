@@ -58,7 +58,7 @@ Column {
                 textColor: root.isCopied ? Theme.success : Theme.primary
                 anchors.verticalCenter: parent.verticalCenter
                 onClicked: {
-                    Proc.runCommand("copy-ipc", ["wl-copy", "--", root.text], function() {
+                    Proc.runCommand("copy-ipc", ["dms", "cl", "copy", root.text], function() {
                         root.isCopied = true;
                         copyTimer.restart();
                         ToastService.showInfo("Copied to clipboard");
