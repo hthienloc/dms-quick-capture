@@ -644,7 +644,8 @@ DankModal {
 
         const defaultToolMode = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.defaultToolMode || "custom") : "custom";
         if (defaultToolMode === "preset") {
-            const presetIdx = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.defaultPresetIndex ?? 0) : 0;
+            const presetIdxRaw = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.defaultPresetIndex ?? "0") : "0";
+            const presetIdx = parseInt(presetIdxRaw, 10);
             const t = window.parentWidget && window.parentWidget.pluginData ? window.parentWidget.pluginData["preset_" + presetIdx + "_tool"] : undefined;
             if (t && t !== "none") {
                 startTool = t;

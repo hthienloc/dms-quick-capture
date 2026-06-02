@@ -584,16 +584,16 @@ PluginSettings {
             settingKey: "defaultPresetIndex"
             label: I18n.tr("Starting Preset")
             options: [
-                { "label": I18n.tr("Preset 1"), "value": 0 },
-                { "label": I18n.tr("Preset 2"), "value": 1 },
-                { "label": I18n.tr("Preset 3"), "value": 2 },
-                { "label": I18n.tr("Preset 4"), "value": 3 },
-                { "label": I18n.tr("Preset 5"), "value": 4 },
-                { "label": I18n.tr("Preset 6"), "value": 5 },
-                { "label": I18n.tr("Preset 7"), "value": 6 },
-                { "label": I18n.tr("Preset 8"), "value": 7 }
+                { "label": I18n.tr("Preset 1"), "value": "0" },
+                { "label": I18n.tr("Preset 2"), "value": "1" },
+                { "label": I18n.tr("Preset 3"), "value": "2" },
+                { "label": I18n.tr("Preset 4"), "value": "3" },
+                { "label": I18n.tr("Preset 5"), "value": "4" },
+                { "label": I18n.tr("Preset 6"), "value": "5" },
+                { "label": I18n.tr("Preset 7"), "value": "6" },
+                { "label": I18n.tr("Preset 8"), "value": "7" }
             ]
-            defaultValue: 0
+            defaultValue: "0"
             visible: defaultToolMode.value === "preset"
         }
 
