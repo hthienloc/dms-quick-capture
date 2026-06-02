@@ -149,7 +149,7 @@ QtObject {
     }
 
     readonly property var toolShortcuts: [
-        { key: "Z", tool: "select" },
+        { key: "Tab", tool: "select" },
         { key: "1", tool: "pen" },
         { key: "2", tool: "line" },
         { key: "3", tool: "arrow" },

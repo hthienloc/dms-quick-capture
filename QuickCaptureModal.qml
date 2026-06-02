@@ -133,6 +133,8 @@ DankModal {
     property bool showSizePreview: false
 
     property bool isTabPressed: false
+    property bool isZoomPressed: false
+    property string toolBeforeTab: ""
     property real cursorX: 0
     property real cursorY: 0
     readonly property real boardCursorX: boardContainerItem ? (boardContainerItem.width / 2 + (cursorX - drawingCanvas.width / 2) * fitScale) : 0
@@ -617,7 +619,24 @@ DankModal {
     // Keyboard Shortcuts Support
     modalFocusScope.Keys.onPressed: (event) => {
         if (event.key === Qt.Key_Tab) {
+            if (event.isAutoRepeat) {
+                event.accepted = true;
+                return;
+            }
             window.isTabPressed = true;
+            if (window.currentTool !== "select") {
+                window.toolBeforeTab = window.currentTool;
+                window.currentTool = "select";
+            }
+            event.accepted = true;
+            return;
+        }
+        if (event.key === Qt.Key_Z && !(event.modifiers & Qt.ControlModifier)) {
+            if (event.isAutoRepeat) {
+                event.accepted = true;
+                return;
+            }
+            window.isZoomPressed = true;
             event.accepted = true;
             return;
         }
@@ -635,7 +654,24 @@ DankModal {
 
     modalFocusScope.Keys.onReleased: (event) => {
         if (event.key === Qt.Key_Tab) {
+            if (event.isAutoRepeat) {
+                event.accepted = true;
+                return;
+            }
             window.isTabPressed = false;
+            if (window.toolBeforeTab !== "") {
+                window.currentTool = window.toolBeforeTab;
+                window.toolBeforeTab = "";
+            }
+            event.accepted = true;
+            return;
+        }
+        if (event.key === Qt.Key_Z && !(event.modifiers & Qt.ControlModifier)) {
+            if (event.isAutoRepeat) {
+                event.accepted = true;
+                return;
+            }
+            window.isZoomPressed = false;
             event.accepted = true;
             return;
         }
@@ -1640,7 +1676,7 @@ DankModal {
 
                             onWheel: (wheel) => {
                                 const step = wheel.angleDelta.y > 0 ? 1 : -1;
-                                if (window.enableMagnifier && window.isTabPressed) {
+                                if (window.enableMagnifier && window.isZoomPressed) {
                                     magnifier.zoomFactor = Math.max(1.5, Math.min(8.0, magnifier.zoomFactor + (step * 0.5)));
                                     wheel.accepted = true;
                                     return;
@@ -1824,7 +1860,7 @@ DankModal {
                         border.color: Theme.primary
                         border.width: 2
                         color: "black"
-                        visible: window.enableMagnifier && window.isTabPressed && drawMouseArea.containsMouse
+                        visible: window.enableMagnifier && window.isZoomPressed && drawMouseArea.containsMouse
                         z: 200
 
                         x: Math.max(0, Math.min(boardContainer.width - width, window.boardCursorX + 20))

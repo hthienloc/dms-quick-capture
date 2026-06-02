@@ -669,7 +669,7 @@ PluginSettings {
             id: enableMagnifier
             settingKey: "enableMagnifier"
             label: I18n.tr("Enable Magnifying Glass")
-            description: I18n.tr("Hold Tab to activate the zoom loupe during capture or drawing.")
+            description: I18n.tr("Hold Z to activate the zoom loupe during capture or drawing.")
             defaultValue: false
         }
     }

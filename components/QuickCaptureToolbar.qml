@@ -65,7 +65,7 @@ Rectangle {
             Row {
                 spacing: Theme.spacingM; anchors.verticalCenter: parent.verticalCenter
                 DankActionButton {
-                    iconName: "near_me"; buttonSize: 36; iconSize: 18; tooltipText: "Select (Z)"
+                    iconName: "near_me"; buttonSize: 36; iconSize: 18; tooltipText: "Select (Tab)"
                     backgroundColor: root.currentTool === "select" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                     iconColor: root.currentTool === "select" ? Theme.primary : Theme.surfaceText
                     onClicked: root.toolSelected("select")
@@ -168,7 +168,7 @@ Rectangle {
             Column {
                 spacing: Theme.spacingM; anchors.horizontalCenter: parent.horizontalCenter
                 DankActionButton {
-                    iconName: "near_me"; buttonSize: 36; iconSize: 18; tooltipText: "Select (Z)"
+                    iconName: "near_me"; buttonSize: 36; iconSize: 18; tooltipText: "Select (Tab)"
                     backgroundColor: root.currentTool === "select" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                     iconColor: root.currentTool === "select" ? Theme.primary : Theme.surfaceText
                     onClicked: root.toolSelected("select")
