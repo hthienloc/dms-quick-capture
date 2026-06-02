@@ -18,19 +18,54 @@ DankModal {
 
     Image {
         id: watermarkImageLoader
+        
+        property int pathIndex: 0
+        property var fallbackPaths: []
+        
         source: {
             const rawPath = window.parentWidget?.pluginData?.watermarkImage || "";
-            if (!rawPath) return "";
-            let p = rawPath.trim();
-            if (p.indexOf("~/") === 0) {
-                const home = Quickshell.env("HOME") || "";
-                p = home + p.substring(1);
+            if (rawPath) {
+                let p = rawPath.trim();
+                if (p.indexOf("~/") === 0) {
+                    const home = Quickshell.env("HOME") || "";
+                    p = home + p.substring(1);
+                }
+                if (p.indexOf("/") === 0) {
+                    p = "file://" + p;
+                }
+                return p;
             }
-            if (p.indexOf("/") === 0) {
-                p = "file://" + p;
+            
+            if (fallbackPaths.length > 0 && pathIndex < fallbackPaths.length) {
+                return fallbackPaths[pathIndex];
             }
-            return p;
+            return "";
         }
+        
+        onStatusChanged: {
+            if (status === Image.Error && (!window.parentWidget?.pluginData?.watermarkImage)) {
+                if (pathIndex < fallbackPaths.length - 1) {
+                    pathIndex++;
+                }
+            }
+        }
+        
+        Component.onCompleted: {
+            const username = Quickshell.env("USER") || Quickshell.env("USERNAME") || "";
+            const home = Quickshell.env("HOME") || "";
+            const list = [];
+            if (home) {
+                list.push("file://" + home + "/.face");
+                list.push("file://" + home + "/.face.icon");
+            }
+            if (username) {
+                list.push("file:///var/lib/AccountsService/icons/" + username);
+            }
+            list.push("image://icon/user-info");
+            list.push("image://icon/avatar-default");
+            fallbackPaths = list;
+        }
+        
         visible: false
         cache: true
     }
@@ -1534,10 +1569,10 @@ DankModal {
 
                             ctx.save();
                             ctx.globalAlpha = watermarkOpacity;
-
                             if (watermarkType === "text") {
-                                const textStr = window.parentWidget?.pluginData?.watermarkText || "Screenshot";
-                                const fontSize = Math.round(Math.max(12, exportCanvas.height * watermarkSize));
+                                 const rawText = window.parentWidget?.pluginData?.watermarkText || "© {user}";
+                                 const textStr = config.formatWatermarkText(rawText);
+                                 const fontSize = Math.round(Math.max(12, exportCanvas.height * watermarkSize));
                                 ctx.font = "bold " + fontSize + "px sans-serif";
                                 ctx.fillStyle = "#ffffff";
                                 ctx.shadowColor = "#000000";

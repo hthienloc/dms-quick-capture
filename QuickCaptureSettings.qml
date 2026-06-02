@@ -747,8 +747,8 @@ PluginSettings {
             id: watermarkText
             settingKey: "watermarkText"
             label: I18n.tr("Watermark Text")
-            placeholder: "Screenshot"
-            defaultValue: "Screenshot"
+            placeholder: "© {user}"
+            defaultValue: "© {user}"
             visible: enableWatermark.value && watermarkType.value === "text"
             height: visible ? implicitHeight : 0
         }
@@ -885,19 +885,54 @@ PluginSettings {
                 // Offscreen image loader to resolve the watermark image path
                 Image {
                     id: previewWatermarkImageLoader
+                    
+                    property int pathIndex: 0
+                    property var fallbackPaths: []
+                    
                     source: {
                         const rawPath = watermarkImage.value || "";
-                        if (!rawPath) return "";
-                        let p = rawPath.trim();
-                        if (p.indexOf("~/") === 0) {
-                            const home = Quickshell.env("HOME") || "";
-                            p = home + p.substring(1);
+                        if (rawPath) {
+                            let p = rawPath.trim();
+                            if (p.indexOf("~/") === 0) {
+                                const home = Quickshell.env("HOME") || "";
+                                p = home + p.substring(1);
+                            }
+                            if (p.indexOf("/") === 0) {
+                                p = "file://" + p;
+                            }
+                            return p;
                         }
-                        if (p.indexOf("/") === 0) {
-                            p = "file://" + p;
+                        
+                        if (fallbackPaths.length > 0 && pathIndex < fallbackPaths.length) {
+                            return fallbackPaths[pathIndex];
                         }
-                        return p;
+                        return "";
                     }
+                    
+                    onStatusChanged: {
+                        if (status === Image.Error && (!watermarkImage.value)) {
+                            if (pathIndex < fallbackPaths.length - 1) {
+                                pathIndex++;
+                            }
+                        }
+                    }
+                    
+                    Component.onCompleted: {
+                        const username = Quickshell.env("USER") || Quickshell.env("USERNAME") || "";
+                        const home = Quickshell.env("HOME") || "";
+                        const list = [];
+                        if (home) {
+                            list.push("file://" + home + "/.face");
+                            list.push("file://" + home + "/.face.icon");
+                        }
+                        if (username) {
+                            list.push("file:///var/lib/AccountsService/icons/" + username);
+                        }
+                        list.push("image://icon/user-info");
+                        list.push("image://icon/avatar-default");
+                        fallbackPaths = list;
+                    }
+                    
                     visible: false
                     cache: true
                 }
@@ -987,7 +1022,7 @@ PluginSettings {
                     StyledText {
                         id: previewTextItem
                         visible: watermarkType.value === "text"
-                        text: watermarkText.value || "Screenshot"
+                        text: captureConfig.formatWatermarkText(watermarkText.value || "© {user}")
                         font.pixelSize: Math.max(10, Math.round(watermarkPreviewArea.height * (watermarkSize.value / 100.0)))
                         font.bold: true
                         color: "#ffffff"
