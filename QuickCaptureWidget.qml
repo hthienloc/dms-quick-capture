@@ -157,6 +157,41 @@ PluginComponent {
         }
     }
 
+    property bool isDownloading: false
+
+    function validateAndOpenCapturedImage(path) {
+        Proc.runCommand("validate-image", ["file", "-b", path], function(stdout, exitCode) {
+            const output = stdout.toLowerCase();
+            if (exitCode !== 0 || output.includes("empty") || !output.includes("image")) {
+                if (typeof ToastService !== "undefined" && ToastService) {
+                    ToastService.showError("Invalid or corrupted image file.");
+                }
+                return;
+            }
+
+            let w = 0, h = 0;
+            let re = /(\d+)\s*x\s*(\d+)/g;
+            let match;
+            while ((match = re.exec(stdout)) !== null) {
+                w = parseInt(match[1]);
+                h = parseInt(match[2]);
+            }
+
+            if (w > 0 && h > 0) {
+                const minSize = 16;
+                if (w < minSize || h < minSize) {
+                    if (typeof ToastService !== "undefined" && ToastService) {
+                        ToastService.showError("Image is too small (" + w + "x" + h + "). Minimum: " + minSize + "px");
+                    }
+                    return;
+                }
+            }
+
+            modal.shouldBeVisible = true;
+            modal.openCentered();
+        });
+    }
+
     function handleDrop(drop) {
         let urlStr = "";
         if (drop.hasUrls && drop.urls.length > 0) {
@@ -176,13 +211,11 @@ PluginComponent {
         }
 
         if (urlStr.startsWith("http://") || urlStr.startsWith("https://")) {
-            if (typeof ToastService !== "undefined" && ToastService) {
-                ToastService.showInfo("Downloading image from web...");
-            }
+            root.isDownloading = true;
             Proc.runCommand("download-image", ["curl", "-s", "-L", "-o", "/tmp/dms_capture_bg.png", urlStr], (stdout, exitCode) => {
+                root.isDownloading = false;
                 if (exitCode === 0) {
-                    modal.shouldBeVisible = true;
-                    modal.openCentered();
+                    validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
                 } else {
                     if (typeof ToastService !== "undefined" && ToastService) {
                         ToastService.showError("Failed to download dropped image.");
@@ -193,8 +226,7 @@ PluginComponent {
             const path = urlStr.substring(7);
             Proc.runCommand("copy-image", ["cp", "-f", path, "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
                 if (exitCode === 0) {
-                    modal.shouldBeVisible = true;
-                    modal.openCentered();
+                    validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
                 } else {
                     if (typeof ToastService !== "undefined" && ToastService) {
                         ToastService.showError("Failed to copy local image.");
@@ -204,8 +236,7 @@ PluginComponent {
         } else {
             Proc.runCommand("copy-image", ["cp", "-f", urlStr, "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
                 if (exitCode === 0) {
-                    modal.shouldBeVisible = true;
-                    modal.openCentered();
+                    validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
                 } else {
                     if (typeof ToastService !== "undefined" && ToastService) {
                         ToastService.showError("Failed to copy local image.");
@@ -234,9 +265,9 @@ PluginComponent {
                 Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
 
                 DankIcon {
-                    name: "photo_camera"
+                    name: root.isDownloading ? "download" : "photo_camera"
                     size: Theme.iconSizeSmall
-                    color: draggingOver ? Theme.primary : (root.isCapturing || modal.shouldBeVisible ? Theme.primary : Theme.surfaceText)
+                    color: draggingOver ? Theme.primary : (root.isCapturing || modal.shouldBeVisible || root.isDownloading ? Theme.primary : Theme.surfaceText)
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
@@ -268,9 +299,9 @@ PluginComponent {
                 Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
 
                 DankIcon {
-                    name: "photo_camera"
+                    name: root.isDownloading ? "download" : "photo_camera"
                     size: Theme.iconSizeSmall
-                    color: draggingOver ? Theme.primary : (root.isCapturing || modal.shouldBeVisible ? Theme.primary : Theme.surfaceText)
+                    color: draggingOver ? Theme.primary : (root.isCapturing || modal.shouldBeVisible || root.isDownloading ? Theme.primary : Theme.surfaceText)
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
             }
