@@ -793,6 +793,208 @@ PluginSettings {
             visible: enableWatermark.value
             height: visible ? implicitHeight : 0
         }
+
+        Separator {
+            visible: enableWatermark.value
+            height: visible ? 1 : 0
+        }
+
+        // Live Preview of the watermark overlay
+        Column {
+            width: parent.width
+            spacing: Theme.spacingS
+            visible: enableWatermark.value
+            height: visible ? implicitHeight : 0
+
+            StyledText {
+                text: I18n.tr("Live Preview")
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceVariantText
+                font.bold: true
+            }
+
+            StyledRect {
+                id: watermarkPreviewArea
+                width: parent.width
+                height: 160
+                radius: Theme.cornerRadiusSmall
+                color: Theme.surfaceContainerLow
+                clip: true
+
+                // A dark checkered/gradient backdrop representing a mock captured screenshot
+                Rectangle {
+                    anchors.fill: parent
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: "#2E3440" }
+                        GradientStop { position: 1.0; color: "#1A1C23" }
+                    }
+                }
+
+                // Grid pattern to help visualize transparent opacity
+                Grid {
+                    anchors.fill: parent
+                    columns: 8
+                    rows: 4
+                    spacing: 0
+                    opacity: 0.1
+                    Repeater {
+                        model: 32
+                        Rectangle {
+                            width: watermarkPreviewArea.width / 8
+                            height: 40
+                            color: index % 2 === 0 ? "transparent" : "#ffffff"
+                        }
+                    }
+                }
+
+                // Offscreen image loader to resolve the watermark image path
+                Image {
+                    id: previewWatermarkImageLoader
+                    source: {
+                        const rawPath = watermarkImage.value || "";
+                        if (!rawPath) return "";
+                        let p = rawPath.trim();
+                        if (p.indexOf("~/") === 0) {
+                            const home = Quickshell.env("HOME") || "";
+                            p = home + p.substring(1);
+                        }
+                        if (p.indexOf("/") === 0) {
+                            p = "file://" + p;
+                        }
+                        return p;
+                    }
+                    visible: false
+                    cache: true
+                }
+
+                // Watermark container layout with QML States for anchor alignment
+                Item {
+                    id: previewWatermarkContainer
+                    anchors.margins: 16
+
+                    width: watermarkType.value === "text" 
+                        ? previewTextItem.implicitWidth 
+                        : previewImageItem.implicitWidth
+                    height: watermarkType.value === "text" 
+                        ? previewTextItem.implicitHeight 
+                        : previewImageItem.implicitHeight
+
+                    opacity: watermarkOpacity.value / 100.0
+
+                    states: [
+                        State {
+                            name: "top_left"
+                            when: watermarkPosition.value === "top_left"
+                            AnchorChanges {
+                                target: previewWatermarkContainer
+                                anchors.left: watermarkPreviewArea.left
+                                anchors.top: watermarkPreviewArea.top
+                                anchors.right: undefined
+                                anchors.bottom: undefined
+                                anchors.horizontalCenter: undefined
+                                anchors.verticalCenter: undefined
+                            }
+                        },
+                        State {
+                            name: "top_right"
+                            when: watermarkPosition.value === "top_right"
+                            AnchorChanges {
+                                target: previewWatermarkContainer
+                                anchors.right: watermarkPreviewArea.right
+                                anchors.top: watermarkPreviewArea.top
+                                anchors.left: undefined
+                                anchors.bottom: undefined
+                                anchors.horizontalCenter: undefined
+                                anchors.verticalCenter: undefined
+                            }
+                        },
+                        State {
+                            name: "bottom_left"
+                            when: watermarkPosition.value === "bottom_left"
+                            AnchorChanges {
+                                target: previewWatermarkContainer
+                                anchors.left: watermarkPreviewArea.left
+                                anchors.bottom: watermarkPreviewArea.bottom
+                                anchors.right: undefined
+                                anchors.top: undefined
+                                anchors.horizontalCenter: undefined
+                                anchors.verticalCenter: undefined
+                            }
+                        },
+                        State {
+                            name: "bottom_right"
+                            when: watermarkPosition.value === "bottom_right" || !watermarkPosition.value
+                            AnchorChanges {
+                                target: previewWatermarkContainer
+                                anchors.right: watermarkPreviewArea.right
+                                anchors.bottom: watermarkPreviewArea.bottom
+                                anchors.left: undefined
+                                anchors.top: undefined
+                                anchors.horizontalCenter: undefined
+                                anchors.verticalCenter: undefined
+                            }
+                        },
+                        State {
+                            name: "center"
+                            when: watermarkPosition.value === "center"
+                            AnchorChanges {
+                                target: previewWatermarkContainer
+                                anchors.horizontalCenter: watermarkPreviewArea.horizontalCenter
+                                anchors.verticalCenter: watermarkPreviewArea.verticalCenter
+                                anchors.left: undefined
+                                anchors.right: undefined
+                                anchors.top: undefined
+                                anchors.bottom: undefined
+                            }
+                        }
+                    ]
+
+                    StyledText {
+                        id: previewTextItem
+                        visible: watermarkType.value === "text"
+                        text: watermarkText.value || "Screenshot"
+                        font.pixelSize: Theme.fontSizeLarge
+                        font.bold: true
+                        color: "#ffffff"
+                        style: Text.Outline
+                        styleColor: "#000000"
+                    }
+
+                    Image {
+                        id: previewImageItem
+                        visible: watermarkType.value === "image" && previewWatermarkImageLoader.status === Image.Ready
+                        source: previewWatermarkImageLoader.source
+                        width: {
+                            if (previewWatermarkImageLoader.status !== Image.Ready) return 0;
+                            const w = previewWatermarkImageLoader.sourceSize.width;
+                            const h = previewWatermarkImageLoader.sourceSize.height;
+                            const maxW = watermarkPreviewArea.width * 0.25;
+                            const maxH = watermarkPreviewArea.height * 0.25;
+                            const scale = Math.min(maxW / w, maxH / h, 1.0);
+                            return w * scale;
+                        }
+                        height: {
+                            if (previewWatermarkImageLoader.status !== Image.Ready) return 0;
+                            const w = previewWatermarkImageLoader.sourceSize.width;
+                            const h = previewWatermarkImageLoader.sourceSize.height;
+                            const maxW = watermarkPreviewArea.width * 0.25;
+                            const maxH = watermarkPreviewArea.height * 0.25;
+                            const scale = Math.min(maxW / w, maxH / h, 1.0);
+                            return h * scale;
+                        }
+                        fillMode: Image.PreserveAspectFit
+                    }
+
+                    StyledText {
+                        visible: watermarkType.value === "image" && previewWatermarkImageLoader.status !== Image.Ready
+                        text: watermarkImage.value ? I18n.tr("Image Error") : I18n.tr("No Image Specified")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: "#ff6b6b"
+                        font.italic: true
+                    }
+                }
+            }
+        }
     }
 
     SettingsCard {
