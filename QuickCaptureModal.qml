@@ -1562,71 +1562,85 @@ DankModal {
                         // 3. Overlay custom watermark if enabled
                         const enableWatermark = window.parentWidget?.pluginData?.enableWatermark ?? false;
                         if (enableWatermark) {
-                             const watermarkType = window.parentWidget?.pluginData?.watermarkType || "text";
-                             const watermarkOpacity = (window.parentWidget?.pluginData?.watermarkOpacity ?? 20) / 100.0;
-                             const watermarkPosition = window.parentWidget?.pluginData?.watermarkPosition || "bottom_right";
-                             const watermarkSize = (window.parentWidget?.pluginData?.watermarkSize ?? 5) / 100.0;
+                              const watermarkType = window.parentWidget?.pluginData?.watermarkType || "text";
+                              const watermarkOpacity = (window.parentWidget?.pluginData?.watermarkOpacity ?? 20) / 100.0;
+                              const watermarkPosition = window.parentWidget?.pluginData?.watermarkPosition || "bottom_right";
+                              const watermarkSize = (window.parentWidget?.pluginData?.watermarkSize ?? 5) / 100.0;
+                              const watermarkTextSize = (window.parentWidget?.pluginData?.watermarkTextSize ?? 5) / 100.0;
 
-                            ctx.save();
-                            ctx.globalAlpha = watermarkOpacity;
-                            if (watermarkType === "text" || watermarkType === "hybrid") {
-                                 const rawText = window.parentWidget?.pluginData?.watermarkText || "© {user}";
-                                 const textStr = config.formatWatermarkText(rawText);
-                                 const fontSize = Math.round(Math.max(12, exportCanvas.height * watermarkSize));
-                                 ctx.font = "bold " + fontSize + "px sans-serif";
-                                 ctx.fillStyle = "#ffffff";
-                                 ctx.shadowColor = "#000000";
-                                 ctx.shadowOffsetX = 1;
-                                 ctx.shadowOffsetY = 1;
-                                 ctx.shadowBlur = 2;
+                             ctx.save();
+                             ctx.globalAlpha = watermarkOpacity;
+                             if (watermarkType === "text" || watermarkType === "hybrid") {
+                                  const rawText = window.parentWidget?.pluginData?.watermarkText || "© {user}";
+                                  const textStr = config.formatWatermarkText(rawText);
+                                  const lines = textStr.split("\n");
+                                  const fontSize = Math.round(Math.max(12, exportCanvas.height * watermarkTextSize));
+                                  ctx.font = "bold " + fontSize + "px sans-serif";
+                                  ctx.fillStyle = "#ffffff";
+                                  ctx.shadowColor = "#000000";
+                                  ctx.shadowOffsetX = 1;
+                                  ctx.shadowOffsetY = 1;
+                                  ctx.shadowBlur = 2;
 
-                                 const textWidth = ctx.measureText(textStr).width;
-                                 const margin = 20;
-                                 const spacing = Math.round(fontSize * 0.4);
+                                  const lineHeight = fontSize * 1.25;
+                                  let maxTextWidth = 0;
+                                  for (let i = 0; i < lines.length; i++) {
+                                      const w = ctx.measureText(lines[i]).width;
+                                      if (w > maxTextWidth) maxTextWidth = w;
+                                  }
 
-                                 // Check if we have image for hybrid
-                                 const hasImage = (watermarkType === "hybrid" && watermarkImageLoader.status === Image.Ready);
-                                 let targetW = 0;
-                                 let targetH = 0;
-                                 if (hasImage) {
-                                     const imgW = watermarkImageLoader.sourceSize.width;
-                                     const imgH = watermarkImageLoader.sourceSize.height;
-                                     targetH = fontSize;
-                                     targetW = (imgW / imgH) * targetH;
-                                 }
+                                  const totalTextHeight = lines.length * lineHeight;
+                                  const margin = 20;
+                                  const spacing = Math.round(fontSize * 0.4);
 
-                                 const totalW = (hasImage ? targetW + spacing : 0) + textWidth;
-                                 const totalH = Math.max(targetH, fontSize);
+                                  // Check if we have image for hybrid
+                                  const hasImage = (watermarkType === "hybrid" && watermarkImageLoader.status === Image.Ready);
+                                  let targetW = 0;
+                                  let targetH = 0;
+                                  if (hasImage) {
+                                      const imgW = watermarkImageLoader.sourceSize.width;
+                                      const imgH = watermarkImageLoader.sourceSize.height;
+                                      const maxW = exportCanvas.width * watermarkSize;
+                                      const maxH = exportCanvas.height * watermarkSize;
+                                      const scale = Math.min(maxW / imgW, maxH / imgH, 1.0);
+                                      targetW = imgW * scale;
+                                      targetH = imgH * scale;
+                                  }
 
-                                 let tx = margin;
-                                 let ty = fontSize + margin;
+                                  const totalW = (hasImage ? targetW + spacing : 0) + maxTextWidth;
+                                  const totalH = Math.max(targetH, totalTextHeight);
 
-                                 if (watermarkPosition === "bottom_right") {
-                                     tx = exportCanvas.width - totalW - margin;
-                                     ty = exportCanvas.height - margin;
-                                 } else if (watermarkPosition === "bottom_left") {
-                                     tx = margin;
-                                     ty = exportCanvas.height - margin;
-                                 } else if (watermarkPosition === "top_right") {
-                                     tx = exportCanvas.width - totalW - margin;
-                                     ty = fontSize + margin;
-                                 } else if (watermarkPosition === "top_left") {
-                                     tx = margin;
-                                     ty = fontSize + margin;
-                                 } else if (watermarkPosition === "center") {
-                                     tx = (exportCanvas.width - totalW) / 2;
-                                     ty = (exportCanvas.height - totalH) / 2 + fontSize;
-                                 }
+                                  let tx = margin;
+                                  let ty = fontSize + margin;
 
-                                 if (hasImage) {
-                                     const iy = ty - targetH + Math.round(fontSize * 0.05); // slight adjustment for text descenders
-                                     ctx.drawImage(watermarkImageLoader, tx, iy, targetW, targetH);
-                                 }
+                                  if (watermarkPosition === "bottom_right") {
+                                      tx = exportCanvas.width - totalW - margin;
+                                      ty = exportCanvas.height - (lines.length - 1) * lineHeight - margin;
+                                  } else if (watermarkPosition === "bottom_left") {
+                                      tx = margin;
+                                      ty = exportCanvas.height - (lines.length - 1) * lineHeight - margin;
+                                  } else if (watermarkPosition === "top_right") {
+                                      tx = exportCanvas.width - totalW - margin;
+                                      ty = fontSize + margin;
+                                  } else if (watermarkPosition === "top_left") {
+                                      tx = margin;
+                                      ty = fontSize + margin;
+                                  } else if (watermarkPosition === "center") {
+                                      tx = (exportCanvas.width - totalW) / 2;
+                                      ty = (exportCanvas.height - totalH) / 2 + fontSize;
+                                  }
 
-                                 const textX = tx + (hasImage ? targetW + spacing : 0);
-                                 ctx.fillText(textStr, textX, ty);
+                                  if (hasImage) {
+                                      const iy = ty - fontSize + (totalTextHeight - targetH) / 2;
+                                      ctx.drawImage(watermarkImageLoader, tx, iy, targetW, targetH);
+                                  }
 
-                            } else if (watermarkType === "image" && watermarkImageLoader.status === Image.Ready) {
+                                  const textX = tx + (hasImage ? targetW + spacing : 0);
+                                  for (let i = 0; i < lines.length; i++) {
+                                      ctx.fillText(lines[i], textX, ty + i * lineHeight);
+                                  }
+
+                             } else if (watermarkType === "image" && watermarkImageLoader.status === Image.Ready) {
                                  const imgW = watermarkImageLoader.sourceSize.width;
                                  const imgH = watermarkImageLoader.sourceSize.height;
                                  const maxW = exportCanvas.width * watermarkSize;

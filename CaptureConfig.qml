@@ -178,6 +178,9 @@ QtObject {
         const ss = pad(now.getSeconds());
 
         return pattern
+            .replace(/\\n/g, "\n")
+            .replace(/\{nl\}/gi, "\n")
+            .replace(/\{newline\}/gi, "\n")
             .replace(/\{user\}/gi, username)
             .replace(/\{username\}/gi, username)
             .replace(/%Y/g, yyyy)

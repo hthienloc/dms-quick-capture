@@ -701,7 +701,7 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Watermark")
             icon: "branding_watermark"
-            showReset: enableWatermark.isDirty || watermarkType.isDirty || watermarkText.isDirty || watermarkImage.isDirty || watermarkPosition.isDirty || watermarkOpacity.isDirty || watermarkSize.isDirty
+            showReset: enableWatermark.isDirty || watermarkType.isDirty || watermarkText.isDirty || watermarkImage.isDirty || watermarkPosition.isDirty || watermarkOpacity.isDirty || watermarkSize.isDirty || watermarkTextSize.isDirty
             onResetClicked: {
                 enableWatermark.resetToDefault();
                 watermarkType.resetToDefault();
@@ -710,6 +710,7 @@ PluginSettings {
                 watermarkPosition.resetToDefault();
                 watermarkOpacity.resetToDefault();
                 watermarkSize.resetToDefault();
+                watermarkTextSize.resetToDefault();
             }
         }
 
@@ -757,6 +758,25 @@ PluginSettings {
         InfoText {
             text: I18n.tr("Supports formatting: {user} (Username), %Y (Year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)")
             opacity: 0.85
+            visible: enableWatermark.value && (watermarkType.value === "text" || watermarkType.value === "hybrid")
+            height: visible ? implicitHeight : 0
+        }
+
+        Separator {
+            visible: enableWatermark.value && (watermarkType.value === "text" || watermarkType.value === "hybrid")
+            height: visible ? 1 : 0
+        }
+
+        SliderSettingPlus {
+            id: watermarkTextSize
+            settingKey: "watermarkTextSize"
+            label: I18n.tr("Text Size")
+            defaultValue: 5
+            minimum: 5
+            maximum: 50
+            unit: "%"
+            leftLabel: "5"
+            rightLabel: "50"
             visible: enableWatermark.value && (watermarkType.value === "text" || watermarkType.value === "hybrid")
             height: visible ? implicitHeight : 0
         }
@@ -1068,7 +1088,7 @@ PluginSettings {
                             id: previewTextItem
                             visible: watermarkType.value === "text" || watermarkType.value === "hybrid"
                             text: captureConfig.formatWatermarkText(watermarkText.text || "© {user}")
-                            font.pixelSize: Math.max(10, Math.round(watermarkPreviewArea.height * (watermarkSize.value / 100.0)))
+                            font.pixelSize: Math.max(10, Math.round(watermarkPreviewArea.height * (watermarkTextSize.value / 100.0)))
                             font.bold: true
                             color: "#ffffff"
                             style: Text.Outline
