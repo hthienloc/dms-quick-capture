@@ -28,3 +28,5 @@ StatusDisplay 1.0 StatusDisplay.qml
 StatusDot 1.0 StatusDot.qml
 TagChip 1.0 TagChip.qml
 WatermarkText 1.0 WatermarkText.qml
+ButtonGroupSettingPlus 1.0 ButtonGroupSettingPlus.qml
+DankSliderPlus 1.0 DankSliderPlus.qml
