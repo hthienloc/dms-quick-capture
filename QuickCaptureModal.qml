@@ -16,6 +16,25 @@ DankModal {
         pluginData: window.parentWidget?.pluginData || ({})
     }
 
+    Image {
+        id: watermarkImageLoader
+        source: {
+            const rawPath = window.parentWidget?.pluginData?.watermarkImage || "";
+            if (!rawPath) return "";
+            let p = rawPath.trim();
+            if (p.indexOf("~/") === 0) {
+                const home = Quickshell.env("HOME") || "";
+                p = home + p.substring(1);
+            }
+            if (p.indexOf("/") === 0) {
+                p = "file://" + p;
+            }
+            return p;
+        }
+        visible: false
+        cache: true
+    }
+
     layerNamespace: "dms:plugins:quickCapture"
     keepPopoutsOpen: true
 
@@ -1432,6 +1451,85 @@ DankModal {
                         // 2. Overlay the annotations (drawingCanvas)
                         if (window.activeCanvas) {
                             ctx.drawImage(window.activeCanvas, 0, 0);
+                        }
+
+                        // 3. Overlay custom watermark if enabled
+                        const enableWatermark = window.parentWidget?.pluginData?.enableWatermark ?? false;
+                        if (enableWatermark) {
+                            const watermarkType = window.parentWidget?.pluginData?.watermarkType || "text";
+                            const watermarkOpacity = (window.parentWidget?.pluginData?.watermarkOpacity ?? 30) / 100.0;
+                            const watermarkPosition = window.parentWidget?.pluginData?.watermarkPosition || "bottom_right";
+
+                            ctx.save();
+                            ctx.globalAlpha = watermarkOpacity;
+
+                            if (watermarkType === "text") {
+                                const textStr = window.parentWidget?.pluginData?.watermarkText || "Screenshot";
+                                const fontSize = Math.round(Math.max(12, exportCanvas.height * 0.035));
+                                ctx.font = "bold " + fontSize + "px sans-serif";
+                                ctx.fillStyle = "#ffffff";
+                                ctx.shadowColor = "#000000";
+                                ctx.shadowOffsetX = 1;
+                                ctx.shadowOffsetY = 1;
+                                ctx.shadowBlur = 2;
+
+                                const textWidth = ctx.measureText(textStr).width;
+                                const margin = 20;
+
+                                let tx = margin;
+                                let ty = fontSize + margin;
+
+                                if (watermarkPosition === "bottom_right") {
+                                    tx = exportCanvas.width - textWidth - margin;
+                                    ty = exportCanvas.height - margin;
+                                } else if (watermarkPosition === "bottom_left") {
+                                    tx = margin;
+                                    ty = exportCanvas.height - margin;
+                                } else if (watermarkPosition === "top_right") {
+                                    tx = exportCanvas.width - textWidth - margin;
+                                    ty = fontSize + margin;
+                                } else if (watermarkPosition === "top_left") {
+                                    tx = margin;
+                                    ty = fontSize + margin;
+                                } else if (watermarkPosition === "center") {
+                                    tx = (exportCanvas.width - textWidth) / 2;
+                                    ty = (exportCanvas.height + fontSize) / 2;
+                                }
+
+                                ctx.fillText(textStr, tx, ty);
+                            } else if (watermarkType === "image" && watermarkImageLoader.status === Image.Ready) {
+                                const imgW = watermarkImageLoader.sourceSize.width;
+                                const imgH = watermarkImageLoader.sourceSize.height;
+                                const maxW = exportCanvas.width * 0.18;
+                                const maxH = exportCanvas.height * 0.18;
+                                const scale = Math.min(maxW / imgW, maxH / imgH, 1.0);
+                                const targetW = imgW * scale;
+                                const targetH = imgH * scale;
+
+                                const margin = 20;
+                                let ix = margin;
+                                let iy = margin;
+
+                                if (watermarkPosition === "bottom_right") {
+                                    ix = exportCanvas.width - targetW - margin;
+                                    iy = exportCanvas.height - targetH - margin;
+                                } else if (watermarkPosition === "bottom_left") {
+                                    ix = margin;
+                                    iy = exportCanvas.height - targetH - margin;
+                                } else if (watermarkPosition === "top_right") {
+                                    ix = exportCanvas.width - targetW - margin;
+                                    iy = margin;
+                                } else if (watermarkPosition === "top_left") {
+                                    ix = margin;
+                                    iy = margin;
+                                } else if (watermarkPosition === "center") {
+                                    ix = (exportCanvas.width - targetW) / 2;
+                                    iy = (exportCanvas.height - targetH) / 2;
+                                }
+
+                                ctx.drawImage(watermarkImageLoader, ix, iy, targetW, targetH);
+                            }
+                            ctx.restore();
                         }
 
                         const format = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.outputFormat) || "png";

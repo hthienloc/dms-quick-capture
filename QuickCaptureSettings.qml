@@ -684,6 +684,118 @@ PluginSettings {
     }
 
     SettingsCard {
+        id: watermarkCard
+        SectionTitle {
+            text: I18n.tr("Watermark")
+            icon: "branding_watermark"
+            showReset: enableWatermark.isDirty || watermarkType.isDirty || watermarkText.isDirty || watermarkImage.isDirty || watermarkPosition.isDirty || watermarkOpacity.isDirty
+            onResetClicked: {
+                enableWatermark.resetToDefault();
+                watermarkType.resetToDefault();
+                watermarkText.resetToDefault();
+                watermarkImage.resetToDefault();
+                watermarkPosition.resetToDefault();
+                watermarkOpacity.resetToDefault();
+            }
+        }
+
+        ToggleSettingPlus {
+            id: enableWatermark
+            settingKey: "enableWatermark"
+            label: I18n.tr("Enable Watermark")
+            defaultValue: false
+        }
+
+        Separator {
+            visible: enableWatermark.value
+            height: visible ? 1 : 0
+        }
+
+        ButtonGroupSettingPlus {
+            id: watermarkType
+            settingKey: "watermarkType"
+            label: I18n.tr("Watermark Type")
+            options: [
+                { label: I18n.tr("Text"), value: "text" },
+                { label: I18n.tr("Image"), value: "image" }
+            ]
+            defaultValue: "text"
+            visible: enableWatermark.value
+            height: visible ? implicitHeight : 0
+        }
+
+        Separator {
+            visible: enableWatermark.value && watermarkType.value === "text"
+            height: visible ? 1 : 0
+        }
+
+        StringSettingPlus {
+            id: watermarkText
+            settingKey: "watermarkText"
+            label: I18n.tr("Watermark Text")
+            placeholder: "Screenshot"
+            defaultValue: "Screenshot"
+            visible: enableWatermark.value && watermarkType.value === "text"
+            height: visible ? implicitHeight : 0
+        }
+
+        Separator {
+            visible: enableWatermark.value && watermarkType.value === "image"
+            height: visible ? 1 : 0
+        }
+
+        StringSettingPlus {
+            id: watermarkImage
+            settingKey: "watermarkImage"
+            label: I18n.tr("Watermark Image")
+            placeholder: "~/Pictures/watermark.png"
+            defaultValue: ""
+            visible: enableWatermark.value && watermarkType.value === "image"
+            height: visible ? implicitHeight : 0
+        }
+
+        Separator {
+            visible: enableWatermark.value
+            height: visible ? 1 : 0
+        }
+
+        SelectionSettingPlus {
+            id: watermarkPosition
+            settingKey: "watermarkPosition"
+            label: I18n.tr("Position")
+            options: [
+                { label: I18n.tr("Top Left"), value: "top_left" },
+                { label: I18n.tr("Top Right"), value: "top_right" },
+                { label: I18n.tr("Bottom Left"), value: "bottom_left" },
+                { label: I18n.tr("Bottom Right"), value: "bottom_right" },
+                { label: I18n.tr("Center"), value: "center" }
+            ]
+            defaultValue: "bottom_right"
+            visible: enableWatermark.value
+            height: visible ? implicitHeight : 0
+        }
+
+        Separator {
+            visible: enableWatermark.value
+            height: visible ? 1 : 0
+        }
+
+        SliderSettingPlus {
+            id: watermarkOpacity
+            settingKey: "watermarkOpacity"
+            label: I18n.tr("Opacity")
+            defaultValue: 30
+            minimum: 10
+            maximum: 100
+            unit: "%"
+            leftLabel: "10%"
+            rightLabel: "100%"
+            visible: enableWatermark.value
+            height: visible ? implicitHeight : 0
+        }
+    }
+
+    SettingsCard {
         id: toolbarPaletteSection
         SectionTitle {
             text: I18n.tr("Toolbar Palette")

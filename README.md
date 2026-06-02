@@ -100,8 +100,8 @@ binds {
 - [x] Disjoint Copy vs Save toolbar pipelines separating clipboard and filesystem actions.
 - [x] Fix and fully enable the **Click-to-Type Text** annotation tool to reliably capture active keyboard input and support native inline text overlay typing.
 - [x] Magnifying Glass (Loupe) for pixel-perfect placement and crop alignment (hold Ctrl to activate, Ctrl + mouse wheel to adjust zoom).
-- [ ] Custom Text/Image Watermark or signature overlay stamp with adjustable opacity.
-- [ ] Support picture-in-picture screenshot pinning (pin-to-desktop) documentation.
+- [x] Custom Text/Image Watermark or signature overlay stamp with adjustable opacity.
+- [x] Support picture-in-picture screenshot pinning (pin-to-desktop) documentation.
 
 ## License
 
