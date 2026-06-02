@@ -731,7 +731,8 @@ PluginSettings {
             label: I18n.tr("Watermark Type")
             options: [
                 { label: I18n.tr("Text"), value: "text" },
-                { label: I18n.tr("Image"), value: "image" }
+                { label: I18n.tr("Image"), value: "image" },
+                { label: I18n.tr("Hybrid"), value: "hybrid" }
             ]
             defaultValue: "text"
             visible: enableWatermark.value
@@ -739,7 +740,7 @@ PluginSettings {
         }
 
         Separator {
-            visible: enableWatermark.value && watermarkType.value === "text"
+            visible: enableWatermark.value && (watermarkType.value === "text" || watermarkType.value === "hybrid")
             height: visible ? 1 : 0
         }
 
@@ -749,12 +750,12 @@ PluginSettings {
             label: I18n.tr("Watermark Text")
             placeholder: "© {user}"
             defaultValue: "© {user}"
-            visible: enableWatermark.value && watermarkType.value === "text"
+            visible: enableWatermark.value && (watermarkType.value === "text" || watermarkType.value === "hybrid")
             height: visible ? implicitHeight : 0
         }
 
         Separator {
-            visible: enableWatermark.value && watermarkType.value === "image"
+            visible: enableWatermark.value && (watermarkType.value === "image" || watermarkType.value === "hybrid")
             height: visible ? 1 : 0
         }
 
@@ -766,7 +767,7 @@ PluginSettings {
             defaultValue: ""
             isFile: true
             fileExtensions: ["Image files (*.png *.jpg *.jpeg *.svg *.webp)", "All files (*)"]
-            visible: enableWatermark.value && watermarkType.value === "image"
+            visible: enableWatermark.value && (watermarkType.value === "image" || watermarkType.value === "hybrid")
             height: visible ? implicitHeight : 0
         }
 
@@ -804,8 +805,8 @@ PluginSettings {
             minimum: 5
             maximum: 50
             unit: "%"
-            leftLabel: "5%"
-            rightLabel: "50%"
+            leftLabel: "5"
+            rightLabel: "50"
             visible: enableWatermark.value
             height: visible ? implicitHeight : 0
         }
@@ -819,12 +820,12 @@ PluginSettings {
             id: watermarkOpacity
             settingKey: "watermarkOpacity"
             label: I18n.tr("Opacity")
-            defaultValue: 30
-            minimum: 10
+            defaultValue: 20
+            minimum: 5
             maximum: 100
             unit: "%"
-            leftLabel: "10%"
-            rightLabel: "100%"
+            leftLabel: "5"
+            rightLabel: "100"
             visible: enableWatermark.value
             height: visible ? implicitHeight : 0
         }
@@ -942,12 +943,8 @@ PluginSettings {
                     id: previewWatermarkContainer
                     anchors.margins: 16
 
-                    width: watermarkType.value === "text" 
-                        ? previewTextItem.implicitWidth 
-                        : previewImageItem.implicitWidth
-                    height: watermarkType.value === "text" 
-                        ? previewTextItem.implicitHeight 
-                        : previewImageItem.implicitHeight
+                    width: previewHybridLayout.implicitWidth
+                    height: previewHybridLayout.implicitHeight
 
                     opacity: watermarkOpacity.value / 100.0
 
@@ -1019,48 +1016,58 @@ PluginSettings {
                         }
                     ]
 
-                    StyledText {
-                        id: previewTextItem
-                        visible: watermarkType.value === "text"
-                        text: captureConfig.formatWatermarkText(watermarkText.value || "© {user}")
-                        font.pixelSize: Math.max(10, Math.round(watermarkPreviewArea.height * (watermarkSize.value / 100.0)))
-                        font.bold: true
-                        color: "#ffffff"
-                        style: Text.Outline
-                        styleColor: "#000000"
-                    }
+                    Row {
+                        id: previewHybridLayout
+                        spacing: Math.round(previewTextItem.font.pixelSize * 0.4)
+                        anchors.verticalCenter: parent.verticalCenter
 
-                    Image {
-                        id: previewImageItem
-                        visible: watermarkType.value === "image" && previewWatermarkImageLoader.status === Image.Ready
-                        source: previewWatermarkImageLoader.source
-                        width: {
-                            if (previewWatermarkImageLoader.status !== Image.Ready) return 0;
-                            const w = previewWatermarkImageLoader.sourceSize.width;
-                            const h = previewWatermarkImageLoader.sourceSize.height;
-                            const maxW = watermarkPreviewArea.width * (watermarkSize.value / 100.0);
-                            const maxH = watermarkPreviewArea.height * (watermarkSize.value / 100.0);
-                            const scale = Math.min(maxW / w, maxH / h, 1.0);
-                            return w * scale;
+                        Image {
+                            id: previewImageItem
+                            visible: (watermarkType.value === "image" || watermarkType.value === "hybrid") && previewWatermarkImageLoader.status === Image.Ready
+                            source: previewWatermarkImageLoader.source
+                            
+                            height: {
+                                if (watermarkType.value === "hybrid") return previewTextItem.font.pixelSize;
+                                if (previewWatermarkImageLoader.status !== Image.Ready) return 0;
+                                const w = previewWatermarkImageLoader.sourceSize.width;
+                                const h = previewWatermarkImageLoader.sourceSize.height;
+                                const maxW = watermarkPreviewArea.width * (watermarkSize.value / 100.0);
+                                const maxH = watermarkPreviewArea.height * (watermarkSize.value / 100.0);
+                                const scale = Math.min(maxW / w, maxH / h, 1.0);
+                                return h * scale;
+                            }
+                            
+                            width: {
+                                if (previewWatermarkImageLoader.status !== Image.Ready) return 0;
+                                const w = previewWatermarkImageLoader.sourceSize.width;
+                                const h = previewWatermarkImageLoader.sourceSize.height;
+                                return (w / h) * height;
+                            }
+                            
+                            fillMode: Image.PreserveAspectFit
+                            anchors.verticalCenter: parent.verticalCenter
                         }
-                        height: {
-                            if (previewWatermarkImageLoader.status !== Image.Ready) return 0;
-                            const w = previewWatermarkImageLoader.sourceSize.width;
-                            const h = previewWatermarkImageLoader.sourceSize.height;
-                            const maxW = watermarkPreviewArea.width * (watermarkSize.value / 100.0);
-                            const maxH = watermarkPreviewArea.height * (watermarkSize.value / 100.0);
-                            const scale = Math.min(maxW / w, maxH / h, 1.0);
-                            return h * scale;
-                        }
-                        fillMode: Image.PreserveAspectFit
-                    }
 
-                    StyledText {
-                        visible: watermarkType.value === "image" && previewWatermarkImageLoader.status !== Image.Ready
-                        text: watermarkImage.value ? I18n.tr("Image Error") : I18n.tr("No Image Specified")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: "#ff6b6b"
-                        font.italic: true
+                        StyledText {
+                            visible: (watermarkType.value === "image" || watermarkType.value === "hybrid") && previewWatermarkImageLoader.status !== Image.Ready
+                            text: watermarkImage.value ? I18n.tr("Image Error") : I18n.tr("No Image Specified")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: "#ff6b6b"
+                            font.italic: true
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            id: previewTextItem
+                            visible: watermarkType.value === "text" || watermarkType.value === "hybrid"
+                            text: captureConfig.formatWatermarkText(watermarkText.value || "© {user}")
+                            font.pixelSize: Math.max(10, Math.round(watermarkPreviewArea.height * (watermarkSize.value / 100.0)))
+                            font.bold: true
+                            color: "#ffffff"
+                            style: Text.Outline
+                            styleColor: "#000000"
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
                     }
                 }
             }

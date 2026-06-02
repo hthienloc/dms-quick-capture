@@ -1569,72 +1569,94 @@ DankModal {
 
                             ctx.save();
                             ctx.globalAlpha = watermarkOpacity;
-                            if (watermarkType === "text") {
+                            if (watermarkType === "text" || watermarkType === "hybrid") {
                                  const rawText = window.parentWidget?.pluginData?.watermarkText || "© {user}";
                                  const textStr = config.formatWatermarkText(rawText);
                                  const fontSize = Math.round(Math.max(12, exportCanvas.height * watermarkSize));
-                                ctx.font = "bold " + fontSize + "px sans-serif";
-                                ctx.fillStyle = "#ffffff";
-                                ctx.shadowColor = "#000000";
-                                ctx.shadowOffsetX = 1;
-                                ctx.shadowOffsetY = 1;
-                                ctx.shadowBlur = 2;
+                                 ctx.font = "bold " + fontSize + "px sans-serif";
+                                 ctx.fillStyle = "#ffffff";
+                                 ctx.shadowColor = "#000000";
+                                 ctx.shadowOffsetX = 1;
+                                 ctx.shadowOffsetY = 1;
+                                 ctx.shadowBlur = 2;
 
-                                const textWidth = ctx.measureText(textStr).width;
-                                const margin = 20;
+                                 const textWidth = ctx.measureText(textStr).width;
+                                 const margin = 20;
+                                 const spacing = Math.round(fontSize * 0.4);
 
-                                let tx = margin;
-                                let ty = fontSize + margin;
+                                 // Check if we have image for hybrid
+                                 const hasImage = (watermarkType === "hybrid" && watermarkImageLoader.status === Image.Ready);
+                                 let targetW = 0;
+                                 let targetH = 0;
+                                 if (hasImage) {
+                                     const imgW = watermarkImageLoader.sourceSize.width;
+                                     const imgH = watermarkImageLoader.sourceSize.height;
+                                     targetH = fontSize;
+                                     targetW = (imgW / imgH) * targetH;
+                                 }
 
-                                if (watermarkPosition === "bottom_right") {
-                                    tx = exportCanvas.width - textWidth - margin;
-                                    ty = exportCanvas.height - margin;
-                                } else if (watermarkPosition === "bottom_left") {
-                                    tx = margin;
-                                    ty = exportCanvas.height - margin;
-                                } else if (watermarkPosition === "top_right") {
-                                    tx = exportCanvas.width - textWidth - margin;
-                                    ty = fontSize + margin;
-                                } else if (watermarkPosition === "top_left") {
-                                    tx = margin;
-                                    ty = fontSize + margin;
-                                } else if (watermarkPosition === "center") {
-                                    tx = (exportCanvas.width - textWidth) / 2;
-                                    ty = (exportCanvas.height + fontSize) / 2;
-                                }
+                                 const totalW = (hasImage ? targetW + spacing : 0) + textWidth;
+                                 const totalH = Math.max(targetH, fontSize);
 
-                                ctx.fillText(textStr, tx, ty);
+                                 let tx = margin;
+                                 let ty = fontSize + margin;
+
+                                 if (watermarkPosition === "bottom_right") {
+                                     tx = exportCanvas.width - totalW - margin;
+                                     ty = exportCanvas.height - margin;
+                                 } else if (watermarkPosition === "bottom_left") {
+                                     tx = margin;
+                                     ty = exportCanvas.height - margin;
+                                 } else if (watermarkPosition === "top_right") {
+                                     tx = exportCanvas.width - totalW - margin;
+                                     ty = fontSize + margin;
+                                 } else if (watermarkPosition === "top_left") {
+                                     tx = margin;
+                                     ty = fontSize + margin;
+                                 } else if (watermarkPosition === "center") {
+                                     tx = (exportCanvas.width - totalW) / 2;
+                                     ty = (exportCanvas.height - totalH) / 2 + fontSize;
+                                 }
+
+                                 if (hasImage) {
+                                     const iy = ty - targetH + Math.round(fontSize * 0.05); // slight adjustment for text descenders
+                                     ctx.drawImage(watermarkImageLoader, tx, iy, targetW, targetH);
+                                 }
+
+                                 const textX = tx + (hasImage ? targetW + spacing : 0);
+                                 ctx.fillText(textStr, textX, ty);
+
                             } else if (watermarkType === "image" && watermarkImageLoader.status === Image.Ready) {
-                                const imgW = watermarkImageLoader.sourceSize.width;
-                                const imgH = watermarkImageLoader.sourceSize.height;
-                                const maxW = exportCanvas.width * watermarkSize;
-                                const maxH = exportCanvas.height * watermarkSize;
-                                const scale = Math.min(maxW / imgW, maxH / imgH, 1.0);
-                                const targetW = imgW * scale;
-                                const targetH = imgH * scale;
+                                 const imgW = watermarkImageLoader.sourceSize.width;
+                                 const imgH = watermarkImageLoader.sourceSize.height;
+                                 const maxW = exportCanvas.width * watermarkSize;
+                                 const maxH = exportCanvas.height * watermarkSize;
+                                 const scale = Math.min(maxW / imgW, maxH / imgH, 1.0);
+                                 const targetW = imgW * scale;
+                                 const targetH = imgH * scale;
 
-                                const margin = 20;
-                                let ix = margin;
-                                let iy = margin;
+                                 const margin = 20;
+                                 let ix = margin;
+                                 let iy = margin;
 
-                                if (watermarkPosition === "bottom_right") {
-                                    ix = exportCanvas.width - targetW - margin;
-                                    iy = exportCanvas.height - targetH - margin;
-                                } else if (watermarkPosition === "bottom_left") {
-                                    ix = margin;
-                                    iy = exportCanvas.height - targetH - margin;
-                                } else if (watermarkPosition === "top_right") {
-                                    ix = exportCanvas.width - targetW - margin;
-                                    iy = margin;
-                                } else if (watermarkPosition === "top_left") {
-                                    ix = margin;
-                                    iy = margin;
-                                } else if (watermarkPosition === "center") {
-                                    ix = (exportCanvas.width - targetW) / 2;
-                                    iy = (exportCanvas.height - targetH) / 2;
-                                }
+                                 if (watermarkPosition === "bottom_right") {
+                                     ix = exportCanvas.width - targetW - margin;
+                                     iy = exportCanvas.height - targetH - margin;
+                                 } else if (watermarkPosition === "bottom_left") {
+                                     ix = margin;
+                                     iy = exportCanvas.height - targetH - margin;
+                                 } else if (watermarkPosition === "top_right") {
+                                     ix = exportCanvas.width - targetW - margin;
+                                     iy = margin;
+                                 } else if (watermarkPosition === "top_left") {
+                                     ix = margin;
+                                     iy = margin;
+                                 } else if (watermarkPosition === "center") {
+                                     ix = (exportCanvas.width - targetW) / 2;
+                                     iy = (exportCanvas.height - targetH) / 2;
+                                 }
 
-                                ctx.drawImage(watermarkImageLoader, ix, iy, targetW, targetH);
+                                 ctx.drawImage(watermarkImageLoader, ix, iy, targetW, targetH);
                             }
                             ctx.restore();
                         }
