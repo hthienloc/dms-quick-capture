@@ -194,7 +194,7 @@ DankModal {
     readonly property string textInputMode: parentWidget?.pluginData?.textInputMode ?? "inline"
     readonly property string toolbarPosition: parentWidget?.pluginData?.toolbarPosition ?? "top"
     readonly property bool configShowToolbar: parentWidget?.pluginData?.showToolbar ?? true
-    readonly property bool enableMagnifier: parentWidget?.pluginData?.enableMagnifier ?? false
+    readonly property bool enableMagnifier: true
     property bool toolbarVisible: true
     onConfigShowToolbarChanged: {
         window.toolbarVisible = window.configShowToolbar;
