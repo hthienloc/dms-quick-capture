@@ -184,4 +184,19 @@ QtObject {
             root.performCopyAndSave();
         }
     }
+
+    function performFloatAction() {
+        withExport((tempOut) => {
+            const cmd = "cp -f -- " + shellPathExpression(tempOut) + " /tmp/dms_capture_bg.png" +
+                        " && dms ipc call floaty floatFromUrl file:///tmp/dms_capture_bg.png";
+            Proc.runCommand("float-capture", ["sh", "-c", cmd], (stdout, exitCode) => {
+                if (exitCode === 0) {
+                    notifyInfo("Image floated successfully.");
+                    root.closeRequested();
+                } else {
+                    notifyError("Failed to float image (make sure dms-floaty is running).");
+                }
+            });
+        });
+    }
 }

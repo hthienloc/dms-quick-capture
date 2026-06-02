@@ -119,8 +119,7 @@ QtObject {
         { key: "R", tool: "redact" },
         { key: "A", tool: "stamp" },
         { key: "S", tool: "highlighter" },
-        { key: "D", tool: "eraser" },
-        { key: "P", tool: "crop" }
+        { key: "D", tool: "eraser" }
     ]
 
     readonly property var colorShortcuts: [

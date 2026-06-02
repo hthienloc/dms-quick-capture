@@ -79,7 +79,7 @@ Rectangle {
                     onClicked: root.showAnnotations = !root.showAnnotations
                 }
                 DankActionButton {
-                    iconName: "crop"; buttonSize: 36; iconSize: 18; tooltipText: "Crop (P)"
+                    iconName: "crop"; buttonSize: 36; iconSize: 18; tooltipText: "Crop (Ctrl+X)"
                     backgroundColor: root.currentTool === "crop" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                     iconColor: root.currentTool === "crop" ? Theme.primary : Theme.surfaceText
                     onClicked: root.toolSelected("crop")
@@ -182,7 +182,7 @@ Rectangle {
                     onClicked: root.showAnnotations = !root.showAnnotations
                 }
                 DankActionButton {
-                    iconName: "crop"; buttonSize: 36; iconSize: 18; tooltipText: "Crop (P)"
+                    iconName: "crop"; buttonSize: 36; iconSize: 18; tooltipText: "Crop (Ctrl+X)"
                     backgroundColor: root.currentTool === "crop" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                     iconColor: root.currentTool === "crop" ? Theme.primary : Theme.surfaceText
                     onClicked: root.toolSelected("crop")

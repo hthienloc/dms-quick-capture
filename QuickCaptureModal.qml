@@ -78,9 +78,16 @@ DankModal {
 
     // State Variables
     property string currentTool: "crop" // crop, select, pen, line, arrow, rect, ellipse, text, pixelate, redact, stamp, highlighter, eraser
+    property string lastActiveTool: "pen"
     onCurrentToolChanged: {
         if (currentTool !== "text" && window.isTyping) {
             window.commitTypingText();
+        }
+        if (currentTool !== "crop") {
+            lastActiveTool = currentTool;
+        }
+        if (window.activeCanvas) {
+            window.activeCanvas.requestPaint();
         }
     }
     property color currentColor: Theme.primary
@@ -476,6 +483,21 @@ DankModal {
             event.accepted = true;
             return;
         }
+        if (hasCtrl && token === "A") {
+            captureActions.performCopyAndSave();
+            event.accepted = true;
+            return;
+        }
+        if (hasCtrl && token === "F") {
+            captureActions.performFloatAction();
+            event.accepted = true;
+            return;
+        }
+        if (hasCtrl && token === "X") {
+            window.currentTool = window.currentTool === "crop" ? window.lastActiveTool : "crop";
+            event.accepted = true;
+            return;
+        }
 
         if (token === "X" && !hasCtrl) {
             window.showAnnotations = !window.showAnnotations;
@@ -661,7 +683,7 @@ DankModal {
                     strokeWidth: window.currentTool === "text" ? window.textFontSize : window.strokeWidth
                     canUndo: window.strokes.length > 0
 
-                    onToolSelected: (tool) => window.currentTool = tool
+                    onToolSelected: (tool) => window.currentTool = (tool === "crop" && window.currentTool === "crop") ? window.lastActiveTool : tool
                     onColorSelected: (color) => window.currentColor = color
                     onStrokeWidthSelected: (width) => {
                         if (window.currentTool === "text") {
@@ -803,7 +825,7 @@ DankModal {
                                     ctx.restore();
                                 } else {
                                     // Dim full canvas slightly before selection
-                                    ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
+                                    ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
                                     ctx.fillRect(0, 0, drawingCanvas.width, drawingCanvas.height);
                                 }
                             }

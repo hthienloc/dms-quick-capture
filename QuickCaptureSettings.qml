@@ -1847,7 +1847,6 @@ PluginSettings {
 
                 ShortcutRow { keyText: I18n.tr("Key"); actionText: I18n.tr("Selected Tool / Action"); isHeader: true }
                 ShortcutRow { keyText: "V"; actionText: I18n.tr("Select / Move stroke") }
-                ShortcutRow { keyText: "P"; actionText: I18n.tr("Crop / Resize Area") }
                 ShortcutRow { keyText: "1 - 4"; actionText: I18n.tr("Pen, Line, Arrow, Rect") }
                 ShortcutRow { keyText: "Q - R"; actionText: I18n.tr("Ellipse, Text, Pixelate, Redact (Q, W, E, R)") }
                 ShortcutRow { keyText: "A - D"; actionText: I18n.tr("Stamp, Highlighter, Eraser (A, S, D)") }
@@ -1872,6 +1871,9 @@ PluginSettings {
                 ShortcutRow { keyText: "Ctrl + Z"; actionText: I18n.tr("Undo last stroke") }
                 ShortcutRow { keyText: "Ctrl + S"; actionText: I18n.tr("Force Save to File") }
                 ShortcutRow { keyText: "Ctrl + C"; actionText: I18n.tr("Force Copy to Clipboard") }
+                ShortcutRow { keyText: "Ctrl + A"; actionText: I18n.tr("Force Copy & Save") }
+                ShortcutRow { keyText: "Ctrl + F"; actionText: I18n.tr("Float Image") }
+                ShortcutRow { keyText: "Ctrl + X"; actionText: I18n.tr("Crop / Resize Area") }
                 ShortcutRow { keyText: "Ctrl + 1..4"; actionText: I18n.tr("Select Color Slots 1 - 4") }
                 ShortcutRow { keyText: "Ctrl + Q..R"; actionText: I18n.tr("Select Color Slots 5 - 8 (Q, W, E, R)") }
             }
@@ -1936,6 +1938,11 @@ PluginSettings {
             CopyBox {
                 label: I18n.tr("Edit Image from Clipboard")
                 text: "dms ipc call quickCapture fromClipboard"
+            }
+
+            CopyBox {
+                label: I18n.tr("Open Specific Image Path")
+                text: "dms ipc call quickCapture openImage /path/to/image.png"
             }
 
             CopyBox {

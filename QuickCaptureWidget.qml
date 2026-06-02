@@ -439,6 +439,30 @@ PluginComponent {
             return "SUCCESS";
         }
 
+        function openImage(path: string) : string {
+            if (path.startsWith("file://")) {
+                path = path.substring(7);
+            }
+            if (path === "/tmp/dms_capture_bg.png") {
+                root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
+            } else if (path.startsWith("http://") || path.startsWith("https://")) {
+                root.isDownloading = true;
+                Proc.runCommand("download-image", ["curl", "-s", "-L", "-o", "/tmp/dms_capture_bg.png", path], (stdout, exitCode) => {
+                    root.isDownloading = false;
+                    if (exitCode === 0) {
+                        root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
+                    }
+                });
+            } else {
+                Proc.runCommand("copy-image", ["cp", "-f", path, "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
+                    if (exitCode === 0) {
+                        root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
+                    }
+                });
+            }
+            return "SUCCESS";
+        }
+
         function close() : string {
             modal.shouldBeVisible = false;
             modal.close();
