@@ -781,7 +781,7 @@ PluginSettings {
         }
 
         Separator {
-            visible: enableWatermark.value && (watermarkType.value === "text" || watermarkType.value === "hybrid")
+            visible: enableWatermark.value
             height: visible ? 1 : 0
         }
 
