@@ -1623,6 +1623,7 @@ DankModal {
                     presets: window.radialPresets
                     hoverTrigger: window.parentWidget?.pluginData?.radialHoverTrigger ?? false
                     hoverDelay: window.parentWidget?.pluginData?.radialHoverDelay ?? 300
+                    menuOpacity: (window.parentWidget?.pluginData?.radialMenuOpacity ?? 100) / 100
                     onPresetSelected: (preset) => {
                         window.currentTool = preset.tool;
                         window.currentColor = preset.color;

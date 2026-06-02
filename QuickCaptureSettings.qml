@@ -1187,6 +1187,7 @@ PluginSettings {
             width: 240
             height: 240
             anchors.horizontalCenter: parent.horizontalCenter
+            opacity: radialMenuOpacity.value / 100
 
             readonly property real outerRadius: 110
             readonly property real innerRadius: 40
@@ -1675,12 +1676,13 @@ PluginSettings {
     SettingsCard {
         id: radialBehaviorsCard
         SectionTitle {
-            text: I18n.tr("Radial Hover")
+            text: I18n.tr("Radial Menu Settings")
             icon: "mouse"
-            showReset: radialHoverTrigger.isDirty || radialHoverDelay.isDirty
+            showReset: radialHoverTrigger.isDirty || radialHoverDelay.isDirty || radialMenuOpacity.isDirty
             onResetClicked: {
                 radialHoverTrigger.resetToDefault();
                 radialHoverDelay.resetToDefault();
+                radialMenuOpacity.resetToDefault();
             }
         }
 
@@ -1708,6 +1710,19 @@ PluginSettings {
             rightLabel: "1000ms"
             visible: radialHoverTrigger.value
             height: visible ? implicitHeight : 0
+        }
+
+        Separator {}
+
+        SliderSettingPlus {
+            id: radialMenuOpacity
+            settingKey: "radialMenuOpacity"
+            label: I18n.tr("Radial Menu Opacity")
+            defaultValue: 100
+            minimum: 20
+            maximum: 100
+            leftLabel: "20%"
+            rightLabel: "100%"
         }
     }
 

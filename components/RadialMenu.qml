@@ -15,6 +15,7 @@ Item {
     // Hover Trigger Config
     property bool hoverTrigger: false
     property int hoverDelay: 300
+    property real menuOpacity: 1.0
     
     // Premium geometry config
     readonly property real outerRadius: 130
@@ -35,7 +36,7 @@ Item {
         State {
             name: "visible"
             when: root.visibleState
-            PropertyChanges { target: root; opacity: 1; scale: 1.0 }
+            PropertyChanges { target: root; opacity: root.menuOpacity; scale: 1.0 }
         }
     ]
 
