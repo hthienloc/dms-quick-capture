@@ -636,18 +636,44 @@ DankModal {
     }
 
     onOpened: {
+        window.updateRadialPresets();
+
+        let startTool = "pen";
+        let startThickness = 6;
+        let startColor = Theme.primary;
+
+        const defaultToolMode = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.defaultToolMode || "custom") : "custom";
+        if (defaultToolMode === "preset") {
+            const presetIdx = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.defaultPresetIndex ?? 0) : 0;
+            const t = window.parentWidget && window.parentWidget.pluginData ? window.parentWidget.pluginData["preset_" + presetIdx + "_tool"] : undefined;
+            if (t && t !== "none") {
+                startTool = t;
+                const rawColor = window.parentWidget.pluginData["preset_" + presetIdx + "_color"] || Theme.primary;
+                startColor = config.resolveColor(rawColor);
+                startThickness = window.parentWidget.pluginData["preset_" + presetIdx + "_thickness"] || 6;
+            } else {
+                if (window.parentWidget && window.parentWidget.pluginData) {
+                    startTool = window.parentWidget.pluginData.defaultTool || "pen";
+                    startThickness = window.parentWidget.pluginData.defaultThickness || 6;
+                }
+            }
+        } else {
+            if (window.parentWidget && window.parentWidget.pluginData) {
+                startTool = window.parentWidget.pluginData.defaultTool || "pen";
+                startThickness = window.parentWidget.pluginData.defaultThickness || 6;
+            }
+        }
+
         const captureMode = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.captureMode || "region") : "region";
         if (captureMode === "region") {
-            window.currentTool = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.defaultTool || "pen") : "pen";
+            window.currentTool = startTool;
         } else {
             window.currentTool = "crop";
         }
-        window.updateRadialPresets();
         window.toolbarVisible = window.configShowToolbar;
-        // Read initial settings from pluginData if available
-        if (window.parentWidget && window.parentWidget.pluginData) {
-            window.strokeWidth = window.parentWidget.pluginData.defaultThickness || 8;
-        }
+        window.strokeWidth = startThickness;
+        window.currentColor = startColor;
+
         window.strokes = [];
         window.stampCounter = 1;
         window.bgImageSource = "";

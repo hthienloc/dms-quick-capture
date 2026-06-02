@@ -556,12 +556,49 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Drawing")
             icon: "brush"
-            showReset: defaultTool.isDirty || defaultThickness.isDirty || enableMagnifier.isDirty
+            showReset: defaultToolMode.isDirty || defaultPresetIndex.isDirty || defaultTool.isDirty || defaultThickness.isDirty || enableMagnifier.isDirty
             onResetClicked: {
+                defaultToolMode.resetToDefault();
+                defaultPresetIndex.resetToDefault();
                 defaultTool.resetToDefault();
                 defaultThickness.resetToDefault();
                 enableMagnifier.resetToDefault();
             }
+        }
+
+        ButtonGroupSettingPlus {
+            id: defaultToolMode
+            settingKey: "defaultToolMode"
+            label: I18n.tr("Starting Tool Mode")
+            options: [
+                { label: I18n.tr("Radial Preset"), value: "preset" },
+                { label: I18n.tr("Custom Tool"), value: "custom" }
+            ]
+            defaultValue: "custom"
+        }
+
+        Separator {}
+
+        SelectionSettingPlus {
+            id: defaultPresetIndex
+            settingKey: "defaultPresetIndex"
+            label: I18n.tr("Starting Preset")
+            options: [
+                { "label": I18n.tr("Preset 1"), "value": 0 },
+                { "label": I18n.tr("Preset 2"), "value": 1 },
+                { "label": I18n.tr("Preset 3"), "value": 2 },
+                { "label": I18n.tr("Preset 4"), "value": 3 },
+                { "label": I18n.tr("Preset 5"), "value": 4 },
+                { "label": I18n.tr("Preset 6"), "value": 5 },
+                { "label": I18n.tr("Preset 7"), "value": 6 },
+                { "label": I18n.tr("Preset 8"), "value": 7 }
+            ]
+            defaultValue: 0
+            visible: defaultToolMode.value === "preset"
+        }
+
+        Separator {
+            visible: defaultToolMode.value === "preset"
         }
 
         SelectionSettingPlus {
@@ -606,9 +643,12 @@ PluginSettings {
                 "value": "crop"
             }]
             defaultValue: "pen"
+            visible: defaultToolMode.value === "custom"
         }
 
-        Separator {}
+        Separator {
+            visible: defaultToolMode.value === "custom"
+        }
 
         SliderSettingPlus {
             id: defaultThickness
@@ -620,6 +660,7 @@ PluginSettings {
             leftLabel: "1"
             rightLabel: "20"
             previewType: "thickness"
+            visible: defaultToolMode.value === "custom"
         }
 
         Separator {}
