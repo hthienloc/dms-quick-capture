@@ -1067,7 +1067,7 @@ PluginSettings {
                         StyledText {
                             id: previewTextItem
                             visible: watermarkType.value === "text" || watermarkType.value === "hybrid"
-                            text: captureConfig.formatWatermarkText(watermarkText.value || "© {user}")
+                            text: captureConfig.formatWatermarkText(watermarkText.text || "© {user}")
                             font.pixelSize: Math.max(10, Math.round(watermarkPreviewArea.height * (watermarkSize.value / 100.0)))
                             font.bold: true
                             color: "#ffffff"

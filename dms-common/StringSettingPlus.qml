@@ -12,6 +12,7 @@ Item {
     property string placeholder: ""
     property string defaultValue: ""
     property string value: defaultValue
+    readonly property alias text: textField.text
     
     // Features
     property bool isDirectory: false
