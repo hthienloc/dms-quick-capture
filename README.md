@@ -38,6 +38,7 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 2. **Select Area:** Drag to select the screenshot region.
 3. **Annotate:**
    - **Switch Tools:** Use keyboard shortcuts (**1-4**, **Q-R**, **A-D**, **V** for Select, or **Tab** to toggle latest presets).
+   - **Copy/Duplicate Vector:** Press **V** to switch to the select tool, click a vector to grab it, then press **C** to duplicate it instantly. Pressing **C** without a selection will paste the last copied vector at the cursor position.
    - **Radial Menu:** **Right-click** to open custom presets.
    - **Thickness:** Use the **Mouse Wheel** to scale the brush size.
    - **Zoom / Magnify:** Hold **Z** to activate the magnifying circular lens under the cursor, and scroll the **Mouse Wheel** while holding **Z** to adjust the zoom factor (1.5x - 4x).

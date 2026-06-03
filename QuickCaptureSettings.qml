@@ -574,7 +574,7 @@ PluginSettings {
                 { label: I18n.tr("Radial Preset"), value: "preset" },
                 { label: I18n.tr("Custom Tool"), value: "custom" }
             ]
-            defaultValue: "custom"
+            defaultValue: "preset"
         }
 
         Separator {}
