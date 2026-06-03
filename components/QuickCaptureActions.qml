@@ -89,7 +89,6 @@ QtObject {
         // System Notification
         if (mode === "notification" || mode === "both") {
             // Use actual image as icon to encourage "Fill" behavior in many daemons.
-            // Also include both hyphen and underscore hints for compatibility.
             const icon = imagePath ? imagePath : "camera-photo-symbolic";
             const args = ["notify-send", "-a", "Quick Capture", "-i", icon, I18n.tr("Quick Capture"), message];
             if (imagePath) {
@@ -106,14 +105,12 @@ QtObject {
     }
 
     function notifyWarning(message) {
-        // Warnings always show as Toast for immediate attention, regardless of setting
         if (typeof ToastService !== "undefined" && ToastService) {
             ToastService.showWarning(message);
         }
     }
 
     function notifyError(message) {
-        // Errors always show as Toast and optionally System if configured
         if (typeof ToastService !== "undefined" && ToastService) {
             ToastService.showError(message);
         }
@@ -134,8 +131,6 @@ QtObject {
     }
 
     function copyFileToClipboard(tempOut, callback) {
-        // Use native DMS clipboard service to copy the image file.
-        // This removes the dependency on wl-clipboard and ensures it appears in DMS history.
         DMSService.sendRequest("clipboard.copyFile", { "filePath": tempOut }, function(response) {
             if (response.error) {
                 console.error("DMS native copy failed:", response.error);
@@ -159,10 +154,10 @@ QtObject {
     }
 
     function performSaveOnly() {
-        withExport((fullOut, thumbOut) => {
-            saveFile(fullOut, (stdout, exitCode, saveDir, filename) => {
+        withExport((tempOut) => {
+            saveFile(tempOut, (stdout, exitCode, saveDir, filename) => {
                 if (exitCode === 0) {
-                    notifyInfo(I18n.tr("Screenshot saved to %1/%2").arg(saveDir).arg(filename), thumbOut);
+                    notifyInfo(I18n.tr("Screenshot saved to %1/%2").arg(saveDir).arg(filename), tempOut);
                     root.closeRequested();
                 } else {
                     notifyError("Failed to save screenshot file.");
@@ -172,10 +167,10 @@ QtObject {
     }
 
     function performCopyOnly() {
-        withExport((fullOut, thumbOut) => {
-            copyFileToClipboard(fullOut, (stdout, exitCode) => {
+        withExport((tempOut) => {
+            copyFileToClipboard(tempOut, (stdout, exitCode) => {
                 if (exitCode === 0) {
-                    notifyInfo(I18n.tr("Screenshot copied to clipboard."), thumbOut);
+                    notifyInfo(I18n.tr("Screenshot copied to clipboard."), tempOut);
                     root.closeRequested();
                 } else {
                     notifyError("Failed to copy screenshot to clipboard.");
@@ -186,12 +181,12 @@ QtObject {
     }
 
     function performCopyAndSave() {
-        withExport((fullOut, thumbOut) => {
-            copyFileToClipboard(fullOut, (stdout, exitCode) => {
+        withExport((tempOut) => {
+            copyFileToClipboard(tempOut, (stdout, exitCode) => {
                 if (exitCode === 0) {
-                    saveFile(fullOut, (saveOut, saveCode, saveDir, filename) => {
+                    saveFile(tempOut, (saveOut, saveCode, saveDir, filename) => {
                         if (saveCode === 0) {
-                            notifyInfo(I18n.tr("Screenshot copied to clipboard and saved to %1").arg(saveDir), thumbOut);
+                            notifyInfo(I18n.tr("Screenshot copied to clipboard and saved to %1").arg(saveDir), tempOut);
                         } else {
                             notifyWarning("Screenshot copied to clipboard but failed to save file.");
                         }
@@ -219,12 +214,12 @@ QtObject {
     }
 
     function performFloatAction() {
-        withExport((fullOut, thumbOut) => {
-            const cmd = "cp -f -- " + shellPathExpression(fullOut) + " /tmp/dms_capture_bg.png" +
+        withExport((tempOut) => {
+            const cmd = "cp -f -- " + shellPathExpression(tempOut) + " /tmp/dms_capture_bg.png" +
                         " && dms ipc call floaty floatFromUrl file:///tmp/dms_capture_bg.png";
             Proc.runCommand("float-capture", ["sh", "-c", cmd], (stdout, exitCode) => {
                 if (exitCode === 0) {
-                    notifyInfo(I18n.tr("Floating window launched."), thumbOut);
+                    notifyInfo(I18n.tr("Floating window launched."), tempOut);
                     root.closeRequested();
                 } else {
                     notifyError("Failed to float image (make sure dms-floaty is running).");
