@@ -663,20 +663,7 @@ PluginSettings {
             visible: defaultToolMode.value === "custom"
         }
 
-        Separator {}
 
-
-
-        ButtonGroupSettingPlus {
-            id: tabBehavior
-            settingKey: "tabBehavior"
-            label: I18n.tr("Tab Key Behavior (Select)")
-            defaultValue: "toggle"
-            options: [
-                { "label": I18n.tr("Toggle Select"), "value": "toggle" },
-                { "label": I18n.tr("Hold Select"), "value": "hold" }
-            ]
-        }
     }
 
     SettingsCard {
@@ -2041,6 +2028,9 @@ PluginSettings {
                 ShortcutRow { keyText: I18n.tr("Key"); actionText: I18n.tr("Shortcut Action"); isHeader: true }
                 ShortcutRow { keyText: "Enter"; actionText: I18n.tr("Done (Action based on settings)") }
                 ShortcutRow { keyText: "Esc"; actionText: I18n.tr("Discard & Close") }
+                ShortcutRow { keyText: "Tab"; actionText: I18n.tr("Toggle between 2 latest presets") }
+                ShortcutRow { keyText: "V"; actionText: I18n.tr("Switch to Select Tool") }
+                ShortcutRow { keyText: "C"; actionText: I18n.tr("Copy vector / Paste / Duplicate") }
                 ShortcutRow { keyText: "Ctrl + Z"; actionText: I18n.tr("Undo last stroke") }
                 ShortcutRow { keyText: "Ctrl + S"; actionText: I18n.tr("Force Save to File") }
                 ShortcutRow { keyText: "Ctrl + C"; actionText: I18n.tr("Force Copy to Clipboard") }
@@ -2137,7 +2127,6 @@ PluginSettings {
         pluginData: {
             "color_palette_preset": palettePresetSetting.value,
             "catppuccin_variant": catppuccinVariantSetting.value,
-            "tabBehavior": tabBehavior.value,
             "toolbar_color_primary": toolbar_primary.value,
             "toolbar_color_0": c0.value,
             "toolbar_color_1": c1.value,

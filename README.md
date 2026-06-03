@@ -37,7 +37,7 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 1. **Trigger:** Use the bar icon, Control Center, or your `Print` key.
 2. **Select Area:** Drag to select the screenshot region.
 3. **Annotate:**
-   - **Switch Tools:** Use keyboard shortcuts (**1-4**, **Q-R**, **A-D**, or **Tab** to switch/toggle Select tool).
+   - **Switch Tools:** Use keyboard shortcuts (**1-4**, **Q-R**, **A-D**, **V** for Select, or **Tab** to toggle latest presets).
    - **Radial Menu:** **Right-click** to open custom presets.
    - **Thickness:** Use the **Mouse Wheel** to scale the brush size.
    - **Zoom / Magnify:** Hold **Z** to activate the magnifying circular lens under the cursor, and scroll the **Mouse Wheel** while holding **Z** to adjust the zoom factor (1.5x - 4x).
@@ -64,11 +64,11 @@ To pin your captured and annotated screenshots as borderless, floating desktop w
 
 | Key | Tool / Action |
 |-----|---------------|
-| `Tab` | Toggle/Hold Select mode |
+| `Tab` | Toggle between 2 latest radial presets |
 | `Z` | Hold Zoom / Magnify under cursor |
 | `X` | Toggle Hide/Show Annotations |
-| `C` | Copy held vector (in Select mode) |
-| `V` | Paste copied vector |
+| `V` | Switch to Select Tool |
+| `C` | Copy vector / Paste / Duplicate |
 | `1` - `4` | Pen, Line, Arrow, Rect |
 | `Q` - `R` | Ellipse, Text, Pixelate, Redact |
 | `A` - `D` | Stamp, Highlighter, Eraser |

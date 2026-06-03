@@ -102,7 +102,6 @@ QtObject {
     ]
 
     readonly property string selectedCatppuccinVariant: pluginData["catppuccin_variant"] || "mocha"
-    readonly property string tabBehavior: pluginData["tabBehavior"] || "toggle"
 
     readonly property var adaptiveColors: [
         Theme.info,
@@ -150,7 +149,7 @@ QtObject {
     }
 
     readonly property var toolShortcuts: [
-        { key: "Tab", tool: "select" },
+        { key: "V", tool: "select" },
         { key: "1", tool: "pen" },
         { key: "2", tool: "line" },
         { key: "3", tool: "arrow" },

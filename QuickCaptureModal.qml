@@ -132,9 +132,7 @@ DankModal {
     property real previewY: 0
     property bool showSizePreview: false
 
-    property bool isTabPressed: false
     property bool isZoomPressed: false
-    property string toolBeforeTab: ""
     property real cursorX: 0
     property real cursorY: 0
     readonly property real boardCursorX: boardContainerItem ? (boardContainerItem.width / 2 + (cursorX - drawingCanvas.width / 2) * fitScale) : 0
@@ -219,8 +217,81 @@ DankModal {
     property var boardContainerItem: null
     property var exportCanvasItem: null
 
-    // Radial Menu Presets
+    // Radial Menu Presets & History
     property var radialPresets: []
+    property var presetHistory: []
+
+    function recordPresetUsage(preset) {
+        if (!preset) return;
+        let history = [...window.presetHistory];
+        
+        // Find if preset (tool+color+thickness) is already in history and remove it
+        const matchIdx = history.findIndex(p => 
+            p.tool === preset.tool && 
+            p.color.toString() === preset.color.toString() && 
+            p.thickness === preset.thickness
+        );
+        if (matchIdx !== -1) history.splice(matchIdx, 1);
+        
+        // Add current to front
+        history.unshift({
+            tool: preset.tool,
+            color: preset.color,
+            thickness: preset.thickness
+        });
+        
+        // Keep only latest 2 for toggling
+        if (history.length > 2) history = history.slice(0, 2);
+        window.presetHistory = history;
+    }
+
+    function performPasteAction() {
+        if (!window.copiedStroke) return;
+
+        const mx = window.cursorX;
+        const my = window.cursorY;
+        const absPt = window.currentTool !== "crop" && window.hasSelection ? Qt.point(mx + window.cropRect.x, my + window.cropRect.y) : Qt.point(mx, my);
+
+        // Calculate the bounding box center of the copied stroke
+        let minX = Infinity, maxX = -Infinity;
+        let minY = Infinity, maxY = -Infinity;
+        for (let i = 0; i < window.copiedStroke.points.length; i++) {
+            const p = window.copiedStroke.points[i];
+            if (p.x < minX) minX = p.x;
+            if (p.x > maxX) maxX = p.x;
+            if (p.y < minY) minY = p.y;
+            if (p.y > maxY) maxY = p.y;
+        }
+        const centerX = (minX + maxX) / 2;
+        const centerY = (minY + maxY) / 2;
+
+        // Shift points so the pasted stroke is centered exactly at the current cursor position
+        const dx = absPt.x - (isFinite(centerX) ? centerX : 0);
+        const dy = absPt.y - (isFinite(centerY) ? centerY : 0);
+        const newPoints = window.copiedStroke.points.map(p => Qt.point(p.x + dx, p.y + dy));
+        
+        const pasted = {
+            tool: window.copiedStroke.tool,
+            color: window.copiedStroke.color,
+            width: window.copiedStroke.width,
+            points: newPoints,
+            counter: window.copiedStroke.counter
+        };
+        
+        window.pushStroke(pasted);
+        
+        if (window.currentTool === "select") {
+            window.preGrabStrokeWidth = window.strokeWidth;
+            window.preGrabColor = window.currentColor;
+            window.strokeWidth = pasted.width;
+            window.currentColor = pasted.color;
+            window.selectedStroke = pasted;
+            window.pressCoords = absPt;
+            window.originalPoints = newPoints;
+        }
+        
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
+    }
 
     function updateRadialPresets() {
         const list = [];
@@ -536,6 +607,7 @@ DankModal {
 
         if (token === "C" && !hasCtrl) {
             if (window.selectedStroke) {
+                // Duplicate: Copy then Paste
                 window.copiedStroke = {
                     tool: window.selectedStroke.tool,
                     color: window.selectedStroke.color.toString(),
@@ -543,59 +615,21 @@ DankModal {
                     points: window.selectedStroke.points.map(p => Qt.point(p.x, p.y)),
                     counter: window.selectedStroke.counter
                 };
+                window.performPasteAction();
+                event.accepted = true;
+                return;
+            } else if (window.copiedStroke) {
+                // Just Paste
+                window.performPasteAction();
                 event.accepted = true;
                 return;
             }
         }
 
         if (token === "V" && !hasCtrl) {
-            if (window.copiedStroke) {
-                const mx = window.cursorX;
-                const my = window.cursorY;
-                const absPt = window.currentTool !== "crop" && window.hasSelection ? Qt.point(mx + window.cropRect.x, my + window.cropRect.y) : Qt.point(mx, my);
-
-                // Calculate the bounding box center of the copied stroke
-                let minX = Infinity, maxX = -Infinity;
-                let minY = Infinity, maxY = -Infinity;
-                for (let i = 0; i < window.copiedStroke.points.length; i++) {
-                    const p = window.copiedStroke.points[i];
-                    if (p.x < minX) minX = p.x;
-                    if (p.x > maxX) maxX = p.x;
-                    if (p.y < minY) minY = p.y;
-                    if (p.y > maxY) maxY = p.y;
-                }
-                const centerX = (minX + maxX) / 2;
-                const centerY = (minY + maxY) / 2;
-
-                // Shift points so the pasted stroke is centered exactly at the current cursor position
-                const dx = absPt.x - (isFinite(centerX) ? centerX : 0);
-                const dy = absPt.y - (isFinite(centerY) ? centerY : 0);
-                const newPoints = window.copiedStroke.points.map(p => Qt.point(p.x + dx, p.y + dy));
-                
-                const pasted = {
-                    tool: window.copiedStroke.tool,
-                    color: window.copiedStroke.color,
-                    width: window.copiedStroke.width,
-                    points: newPoints,
-                    counter: window.copiedStroke.counter
-                };
-                
-                window.pushStroke(pasted);
-                
-                if (window.currentTool === "select") {
-                    window.preGrabStrokeWidth = window.strokeWidth;
-                    window.preGrabColor = window.currentColor;
-                    window.strokeWidth = pasted.width;
-                    window.currentColor = pasted.color;
-                    window.selectedStroke = pasted;
-                    window.pressCoords = absPt;
-                    window.originalPoints = newPoints;
-                }
-                
-                if (window.activeCanvas) window.activeCanvas.requestPaint();
-                event.accepted = true;
-                return;
-            }
+            window.currentTool = "select";
+            event.accepted = true;
+            return;
         }
 
         if (hasCtrl) {
@@ -623,18 +657,27 @@ DankModal {
                 event.accepted = true;
                 return;
             }
-            window.isTabPressed = true;
-            if (config.tabBehavior === "hold") {
-                if (window.currentTool !== "select") {
-                    window.toolBeforeTab = window.currentTool;
-                    window.currentTool = "select";
-                }
-            } else {
-                if (window.currentTool === "select") {
-                    window.currentTool = (window.lastActiveTool === "select" || window.lastActiveTool === "crop") ? "pen" : window.lastActiveTool;
-                } else {
-                    window.currentTool = "select";
-                }
+            if (window.presetHistory.length >= 2) {
+                const current = { 
+                    tool: window.currentTool, 
+                    color: window.currentColor.toString(), 
+                    thickness: window.strokeWidth 
+                };
+                const p0 = window.presetHistory[0];
+                const p1 = window.presetHistory[1];
+                
+                // Compare with history[0] to toggle
+                const isP0 = current.tool === p0.tool && 
+                             current.color.toString() === p0.color.toString() && 
+                             current.thickness === p0.thickness;
+                
+                const target = isP0 ? p1 : p0;
+                window.currentTool = target.tool;
+                window.currentColor = target.color;
+                window.strokeWidth = target.thickness;
+                
+                // Update history so the new current is at the top
+                window.recordPresetUsage(target);
             }
             event.accepted = true;
             return;
@@ -662,17 +705,6 @@ DankModal {
 
     modalFocusScope.Keys.onReleased: (event) => {
         if (event.key === Qt.Key_Tab) {
-            if (event.isAutoRepeat) {
-                event.accepted = true;
-                return;
-            }
-            window.isTabPressed = false;
-            if (config.tabBehavior === "hold") {
-                if (window.toolBeforeTab !== "") {
-                    window.currentTool = window.toolBeforeTab;
-                    window.toolBeforeTab = "";
-                }
-            }
             event.accepted = true;
             return;
         }
@@ -726,6 +758,7 @@ DankModal {
         window.toolbarVisible = window.configShowToolbar;
         window.strokeWidth = startThickness;
         window.currentColor = startColor;
+        window.recordPresetUsage({ tool: startTool, color: startColor, thickness: startThickness });
 
         window.strokes = [];
         window.stampCounter = 1;
@@ -2155,6 +2188,7 @@ DankModal {
                         window.currentTool = preset.tool;
                         window.currentColor = preset.color;
                         window.strokeWidth = preset.thickness;
+                        window.recordPresetUsage(preset);
                     }
                     onCenterClicked: {
                         window.currentTool = "select";
