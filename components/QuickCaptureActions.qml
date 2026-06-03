@@ -72,23 +72,56 @@ QtObject {
         return "\"" + escapeDoubleQuoted(value) + "\"";
     }
 
-    function notifyInfo(message) {
+    function sendNotification(message, imagePath) {
+        if (!message) return;
         const hasParent = root.parentWidget && root.parentWidget.pluginData;
-        const show = hasParent ? (root.parentWidget.pluginData.showToasts ?? true) : true;
-        if (show && typeof ToastService !== "undefined" && ToastService) {
-            ToastService.showInfo(message);
+        const mode = hasParent ? (root.parentWidget.pluginData.postNotification || "notification") : "notification";
+        
+        if (mode === "none") return;
+
+        // Toast Notification
+        if (mode === "toast" || mode === "both") {
+            if (typeof ToastService !== "undefined" && ToastService) {
+                ToastService.showInfo(message);
+            }
+        }
+
+        // System Notification
+        if (mode === "notification" || mode === "both") {
+            // Use actual image as icon to encourage "Fill" behavior in many daemons.
+            // Also include both hyphen and underscore hints for compatibility.
+            const icon = imagePath ? imagePath : "camera-photo-symbolic";
+            const args = ["notify-send", "-a", "Quick Capture", "-i", icon, I18n.tr("Quick Capture"), message];
+            if (imagePath) {
+                let cleanPath = imagePath.replace(/^file:\/\//, "");
+                args.push("-h", "string:image-path:" + cleanPath);
+                args.push("-h", "string:image_path:" + cleanPath);
+            }
+            Proc.runCommand("system-notify", args);
         }
     }
 
+    function notifyInfo(message, imagePath) {
+        root.sendNotification(message, imagePath);
+    }
+
     function notifyWarning(message) {
+        // Warnings always show as Toast for immediate attention, regardless of setting
         if (typeof ToastService !== "undefined" && ToastService) {
             ToastService.showWarning(message);
         }
     }
 
     function notifyError(message) {
+        // Errors always show as Toast and optionally System if configured
         if (typeof ToastService !== "undefined" && ToastService) {
             ToastService.showError(message);
+        }
+        
+        const hasParent = root.parentWidget && root.parentWidget.pluginData;
+        const mode = hasParent ? (root.parentWidget.pluginData.postNotification || "notification") : "notification";
+        if (mode === "notification" || mode === "both") {
+            Proc.runCommand("system-notify-error", ["notify-send", "-u", "critical", "-a", "Quick Capture", "-i", "error", I18n.tr("Quick Capture Error"), message]);
         }
     }
 
@@ -126,10 +159,10 @@ QtObject {
     }
 
     function performSaveOnly() {
-        withExport((tempOut) => {
-            saveFile(tempOut, (stdout, exitCode, saveDir, filename) => {
+        withExport((fullOut, thumbOut) => {
+            saveFile(fullOut, (stdout, exitCode, saveDir, filename) => {
                 if (exitCode === 0) {
-                    notifyInfo("Screenshot saved to " + saveDir + "/" + filename);
+                    notifyInfo(I18n.tr("Screenshot saved to %1/%2").arg(saveDir).arg(filename), thumbOut);
                     root.closeRequested();
                 } else {
                     notifyError("Failed to save screenshot file.");
@@ -139,10 +172,10 @@ QtObject {
     }
 
     function performCopyOnly() {
-        withExport((tempOut) => {
-            copyFileToClipboard(tempOut, (stdout, exitCode) => {
+        withExport((fullOut, thumbOut) => {
+            copyFileToClipboard(fullOut, (stdout, exitCode) => {
                 if (exitCode === 0) {
-                    notifyInfo("Screenshot copied to clipboard.");
+                    notifyInfo(I18n.tr("Screenshot copied to clipboard."), thumbOut);
                     root.closeRequested();
                 } else {
                     notifyError("Failed to copy screenshot to clipboard.");
@@ -153,12 +186,12 @@ QtObject {
     }
 
     function performCopyAndSave() {
-        withExport((tempOut) => {
-            copyFileToClipboard(tempOut, (stdout, exitCode) => {
+        withExport((fullOut, thumbOut) => {
+            copyFileToClipboard(fullOut, (stdout, exitCode) => {
                 if (exitCode === 0) {
-                    saveFile(tempOut, (saveOut, saveCode, saveDir) => {
+                    saveFile(fullOut, (saveOut, saveCode, saveDir, filename) => {
                         if (saveCode === 0) {
-                            notifyInfo("Screenshot copied to clipboard and saved to " + saveDir);
+                            notifyInfo(I18n.tr("Screenshot copied to clipboard and saved to %1").arg(saveDir), thumbOut);
                         } else {
                             notifyWarning("Screenshot copied to clipboard but failed to save file.");
                         }
@@ -186,11 +219,12 @@ QtObject {
     }
 
     function performFloatAction() {
-        withExport((tempOut) => {
-            const cmd = "cp -f -- " + shellPathExpression(tempOut) + " /tmp/dms_capture_bg.png" +
+        withExport((fullOut, thumbOut) => {
+            const cmd = "cp -f -- " + shellPathExpression(fullOut) + " /tmp/dms_capture_bg.png" +
                         " && dms ipc call floaty floatFromUrl file:///tmp/dms_capture_bg.png";
             Proc.runCommand("float-capture", ["sh", "-c", cmd], (stdout, exitCode) => {
                 if (exitCode === 0) {
+                    notifyInfo(I18n.tr("Floating window launched."), thumbOut);
                     root.closeRequested();
                 } else {
                     notifyError("Failed to float image (make sure dms-floaty is running).");

@@ -54,11 +54,7 @@ PluginComponent {
         const mode = root.activeIpcMode !== "" ? root.activeIpcMode : root.captureMode;
         const format = (pluginData.outputFormat || "png");
         const cursorVal = pluginData.includeCursor ? "on" : "off";
-        const args = [root.resolvedDmsPath, "screenshot", mode, "--no-clipboard", "--dir", "/tmp", "--filename", "dms_capture_bg.png", "--format", format, "--cursor", cursorVal];
-
-        if (!pluginData.showSystemNotification) {
-            args.push("--no-notify");
-        }
+        const args = [root.resolvedDmsPath, "screenshot", mode, "--no-clipboard", "--dir", "/tmp", "--filename", "dms_capture_bg.png", "--format", format, "--cursor", cursorVal, "--no-notify"];
 
         if (mode === "region" && pluginData.skipConfirm !== false) {
             args.push("--no-confirm");

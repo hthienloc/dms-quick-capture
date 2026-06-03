@@ -437,27 +437,24 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Notifications")
             icon: "notifications"
-            showReset: showToasts.isDirty || showSystemNotification.isDirty
+            showReset: postNotification.isDirty
             onResetClicked: {
-                showToasts.resetToDefault();
-                showSystemNotification.resetToDefault();
+                postNotification.resetToDefault();
             }
         }
 
-        ToggleSettingPlus {
-            id: showToasts
-            settingKey: "showToasts"
-            label: I18n.tr("Show Toast Notifications")
-            defaultValue: true
-        }
-
-        Separator {}
-
-        ToggleSettingPlus {
-            id: showSystemNotification
-            settingKey: "showSystemNotification"
-            label: I18n.tr("Show System Notification")
-            defaultValue: false
+        ButtonGroupSettingPlus {
+            id: postNotification
+            settingKey: "postNotification"
+            label: I18n.tr("Post-Capture Notification")
+            description: I18n.tr("Select which types of notifications to show after copying or saving.")
+            defaultValue: "notification"
+            options: [
+                { label: I18n.tr("Notification"), value: "notification" },
+                { label: I18n.tr("Toast"), value: "toast" },
+                { label: I18n.tr("Both"), value: "both" },
+                { label: I18n.tr("None"), value: "none" }
+            ]
         }
     }
 

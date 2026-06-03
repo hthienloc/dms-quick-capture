@@ -14,7 +14,7 @@ DankModal {
 
     CaptureConfig { 
         id: config 
-        pluginData: window.parentWidget?.pluginData || ({})
+        pluginData: (window.parentWidget && window.parentWidget.pluginData) || ({})
     }
 
     Image {
@@ -24,7 +24,7 @@ DankModal {
         property var fallbackPaths: []
         
         source: {
-            const rawPath = window.parentWidget?.pluginData?.watermarkImage || "";
+            const rawPath = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.watermarkImage) || "";
             if (rawPath) {
                 let p = rawPath.trim();
                 if (p.indexOf("~/") === 0) {
@@ -44,7 +44,7 @@ DankModal {
         }
         
         onStatusChanged: {
-            if (status === Image.Error && (!window.parentWidget?.pluginData?.watermarkImage)) {
+            if (status === Image.Error && (!(window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.watermarkImage))) {
                 if (pathIndex < fallbackPaths.length - 1) {
                     pathIndex++;
                 }
@@ -99,7 +99,7 @@ DankModal {
             const idx = window.strokes.indexOf(window.selectedStroke);
             if (idx !== -1) {
                 window.strokes[idx] = window.selectedStroke;
-                window.strokes = [...window.strokes];
+                window.strokes = window.strokes.slice();
             }
         }
         if (window.currentStroke) {
@@ -116,7 +116,7 @@ DankModal {
             const idx = window.strokes.indexOf(window.selectedStroke);
             if (idx !== -1) {
                 window.strokes[idx] = window.selectedStroke;
-                window.strokes = [...window.strokes]; // trigger reactivity
+                window.strokes = window.strokes.slice(); // trigger reactivity
             }
         }
         // Also update an in-progress stroke (e.g. actively drawing a highlight)
@@ -166,32 +166,32 @@ DankModal {
         return { r: c.r, g: c.g, b: c.b };
     }
 
-    backgroundOpacity: (parentWidget?.pluginData?.modalOpacity ?? 60) / 100
+    backgroundOpacity: (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.modalOpacity !== undefined ? window.parentWidget.pluginData.modalOpacity : 60) / 100
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
 
-    property int textFontSize: parentWidget?.pluginData?.textFontSize ?? 36
-    readonly property bool textMonospace: parentWidget?.pluginData?.textMonospace ?? false
+    property int textFontSize: (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textFontSize !== undefined ? window.parentWidget.pluginData.textFontSize : 36)
+    readonly property bool textMonospace: (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textMonospace !== undefined ? window.parentWidget.pluginData.textMonospace : false)
     
     // Rich Text Options
-    property bool textBold: parentWidget?.pluginData?.textBold ?? false
+    property bool textBold: (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textBold !== undefined ? window.parentWidget.pluginData.textBold : false)
     onTextBoldChanged: {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
-    property bool textItalic: parentWidget?.pluginData?.textItalic ?? false
+    property bool textItalic: (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textItalic !== undefined ? window.parentWidget.pluginData.textItalic : false)
     onTextItalicChanged: {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
-    property bool textUnderline: parentWidget?.pluginData?.textUnderline ?? false
+    property bool textUnderline: (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textUnderline !== undefined ? window.parentWidget.pluginData.textUnderline : false)
     onTextUnderlineChanged: {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
-    property string textFontFamily: parentWidget?.pluginData?.textFontFamily ?? (textMonospace ? "monospace" : "sans-serif")
+    property string textFontFamily: (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textFontFamily !== undefined ? window.parentWidget.pluginData.textFontFamily : (textMonospace ? "monospace" : "sans-serif"))
     onTextFontFamilyChanged: {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
-    readonly property string textInputMode: parentWidget?.pluginData?.textInputMode ?? "inline"
-    readonly property string toolbarPosition: parentWidget?.pluginData?.toolbarPosition ?? "top"
-    readonly property bool configShowToolbar: parentWidget?.pluginData?.showToolbar ?? true
+    readonly property string textInputMode: (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textInputMode !== undefined ? window.parentWidget.pluginData.textInputMode : "inline")
+    readonly property string toolbarPosition: (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.toolbarPosition !== undefined ? window.parentWidget.pluginData.toolbarPosition : "top")
+    readonly property bool configShowToolbar: (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.showToolbar !== undefined ? window.parentWidget.pluginData.showToolbar : true)
     readonly property bool enableMagnifier: true
     property bool toolbarVisible: true
     onConfigShowToolbarChanged: {
@@ -216,6 +216,7 @@ DankModal {
     property var bgImageItem: null
     property var boardContainerItem: null
     property var exportCanvasItem: null
+    property var exportThumbItem: null
 
     // Radial Menu Presets & History
     property var radialPresets: []
@@ -223,14 +224,14 @@ DankModal {
 
     function recordPresetUsage(preset) {
         if (!preset) return;
-        let history = [...window.presetHistory];
+        let history = window.presetHistory.slice();
         
         // Find if preset (tool+color+thickness) is already in history and remove it
-        const matchIdx = history.findIndex(p => 
-            p.tool === preset.tool && 
+        const matchIdx = history.findIndex(function(p) {
+            return p.tool === preset.tool && 
             p.color.toString() === preset.color.toString() && 
             p.thickness === preset.thickness
-        );
+        });
         if (matchIdx !== -1) history.splice(matchIdx, 1);
         
         // Add current to front
@@ -268,7 +269,7 @@ DankModal {
         // Shift points so the pasted stroke is centered exactly at the current cursor position
         const dx = absPt.x - (isFinite(centerX) ? centerX : 0);
         const dy = absPt.y - (isFinite(centerY) ? centerY : 0);
-        const newPoints = window.copiedStroke.points.map(p => Qt.point(p.x + dx, p.y + dy));
+        const newPoints = window.copiedStroke.points.map(function(p) { return Qt.point(p.x + dx, p.y + dy); });
         
         const pasted = {
             tool: window.copiedStroke.tool,
@@ -335,8 +336,8 @@ DankModal {
     property rect cropRect: Qt.rect(0, 0, 0, 0)
     property bool hasSelection: false
 
-    readonly property bool roundRect: parentWidget?.pluginData?.roundRect ?? true
-    readonly property bool roundHighlighter: parentWidget?.pluginData?.roundHighlighter ?? false
+    readonly property bool roundRect: parentWidgetpluginDataroundRect || true
+    readonly property bool roundHighlighter: parentWidgetpluginDataroundHighlighter || false
     property string activeHandle: "none" // "tl", "tr", "bl", "br", "new", "none"
     property point selectStart: Qt.point(0, 0)
     property var exportCallback: null
@@ -728,7 +729,7 @@ DankModal {
 
         const defaultToolMode = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.defaultToolMode || "custom") : "custom";
         if (defaultToolMode === "preset") {
-            const presetIdxRaw = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.defaultPresetIndex ?? "0") : "0";
+            const presetIdxRaw = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.defaultPresetIndex || "0") : "0";
             const presetIdx = parseInt(presetIdxRaw, 10);
             const t = window.parentWidget && window.parentWidget.pluginData ? window.parentWidget.pluginData["preset_" + presetIdx + "_tool"] : undefined;
             if (t && t !== "none") {
@@ -812,7 +813,7 @@ DankModal {
                     id: toolbarCard
                     z: 100
                     visible: window.toolbarVisible
-                    pluginData: window.parentWidget?.pluginData || ({})
+                    pluginData: (window.parentWidget && window.parentWidget.pluginData) || ({})
 
                     anchors.top: window.toolbarPosition === "bottom" ? undefined : parent.top
                     anchors.bottom: window.toolbarPosition === "bottom" ? parent.bottom : undefined
@@ -1033,18 +1034,18 @@ DankModal {
                             ctx.restore();
 
                             // 5. Draw Watermark Preview in Editor
-                            const enableWatermark = window.parentWidget?.pluginData?.enableWatermark ?? false;
+                            const enableWatermark = window.parentWidgetpluginDataenableWatermark || false;
                             if (enableWatermark && window.currentTool !== "crop") {
-                                const watermarkType = window.parentWidget?.pluginData?.watermarkType || "text";
-                                const watermarkOpacity = (window.parentWidget?.pluginData?.watermarkOpacity ?? 20) / 100.0;
-                                const watermarkPosition = window.parentWidget?.pluginData?.watermarkPosition || "bottom_right";
-                                const watermarkSize = (window.parentWidget?.pluginData?.watermarkSize ?? 5) / 100.0;
-                                const watermarkTextSize = (window.parentWidget?.pluginData?.watermarkTextSize ?? 5) / 100.0;
+                                const watermarkType = window.parentWidgetpluginDatawatermarkType || "text";
+                                const watermarkOpacity = (window.parentWidgetpluginDatawatermarkOpacity || 20) / 100.0;
+                                const watermarkPosition = window.parentWidgetpluginDatawatermarkPosition || "bottom_right";
+                                const watermarkSize = (window.parentWidgetpluginDatawatermarkSize || 5) / 100.0;
+                                const watermarkTextSize = (window.parentWidgetpluginDatawatermarkTextSize || 5) / 100.0;
 
                                 ctx.save();
                                 ctx.globalAlpha = watermarkOpacity;
                                 if (watermarkType === "text" || watermarkType === "hybrid") {
-                                    const rawText = window.parentWidget?.pluginData?.watermarkText || "© {user}";
+                                    const rawText = window.parentWidgetpluginDatawatermarkText || "© {user}";
                                     const textStr = config.formatWatermarkText(rawText);
                                     const lines = textStr.split("\n");
                                     const fontSize = Math.round(Math.max(12, drawingCanvas.height * watermarkTextSize));
@@ -2024,18 +2025,18 @@ DankModal {
                         }
 
                         // 3. Overlay custom watermark if enabled
-                        const enableWatermark = window.parentWidget?.pluginData?.enableWatermark ?? false;
+                        const enableWatermark = window.parentWidgetpluginDataenableWatermark || false;
                         if (enableWatermark) {
-                              const watermarkType = window.parentWidget?.pluginData?.watermarkType || "text";
-                              const watermarkOpacity = (window.parentWidget?.pluginData?.watermarkOpacity ?? 20) / 100.0;
-                              const watermarkPosition = window.parentWidget?.pluginData?.watermarkPosition || "bottom_right";
-                              const watermarkSize = (window.parentWidget?.pluginData?.watermarkSize ?? 5) / 100.0;
-                              const watermarkTextSize = (window.parentWidget?.pluginData?.watermarkTextSize ?? 5) / 100.0;
+                              const watermarkType = window.parentWidgetpluginDatawatermarkType || "text";
+                              const watermarkOpacity = (window.parentWidgetpluginDatawatermarkOpacity || 20) / 100.0;
+                              const watermarkPosition = window.parentWidgetpluginDatawatermarkPosition || "bottom_right";
+                              const watermarkSize = (window.parentWidgetpluginDatawatermarkSize || 5) / 100.0;
+                              const watermarkTextSize = (window.parentWidgetpluginDatawatermarkTextSize || 5) / 100.0;
 
                              ctx.save();
                              ctx.globalAlpha = watermarkOpacity;
                              if (watermarkType === "text" || watermarkType === "hybrid") {
-                                  const rawText = window.parentWidget?.pluginData?.watermarkText || "© {user}";
+                                  const rawText = window.parentWidgetpluginDatawatermarkText || "© {user}";
                                   const textStr = config.formatWatermarkText(rawText);
                                   const lines = textStr.split("\n");
                                   const fontSize = Math.round(Math.max(12, exportCanvas.height * watermarkTextSize));
@@ -2168,12 +2169,55 @@ DankModal {
                         const tempOut = "/tmp/dms_capture_output." + format;
                         exportCanvas.save(tempOut);
 
-                        if (window.exportCallback) {
-                            const cb = window.exportCallback;
-                            window.exportCallback = null;
-                            Qt.callLater(() => {
-                                cb(tempOut);
-                            });
+                        if (window.exportThumbItem) {
+                            window.exportThumbItem.requestPaint();
+                        } else {
+                            if (window.exportCallback) {
+                                const cb = window.exportCallback;
+                                window.exportCallback = null;
+                                Qt.callLater(() => { cb(tempOut, tempOut); });
+                            }
+                        }
+                    }
+                }
+
+                // Square 1:1 Thumbnail for Notifications
+                Canvas {
+                    id: thumbnailCanvas
+                    width: 256
+                    height: 256
+                    visible: true
+                    opacity: 0
+                    x: -9999
+                    y: -9999
+                    renderTarget: Canvas.Image
+                    Component.onCompleted: window.exportThumbItem = thumbnailCanvas
+                    onPaint: {
+                        var ctx = thumbnailCanvas.getContext("2d");
+                        ctx.clearRect(0, 0, 256, 256);
+                        
+                        if (window.exportCanvasItem) {
+                            const srcW = window.exportCanvasItem.width;
+                            const srcH = window.exportCanvasItem.height;
+                            const size = Math.min(srcW, srcH);
+                            const sx = (srcW - size) / 2;
+                            const sy = (srcH - size) / 2;
+                            
+                            // Center-crop to square
+                            ctx.drawImage(window.exportCanvasItem, sx, sy, size, size, 0, 0, 256, 256);
+                            
+                            const format = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.outputFormat) || "png";
+                            const thumbOut = "/tmp/dms_capture_thumb." + format;
+                            thumbnailCanvas.save(thumbOut);
+
+                            if (window.exportCallback) {
+                                const cb = window.exportCallback;
+                                window.exportCallback = null;
+                                const fullOut = "/tmp/dms_capture_output." + format;
+                                Qt.callLater(() => {
+                                    cb(fullOut, thumbOut);
+                                });
+                            }
                         }
                     }
                 }
@@ -2181,9 +2225,9 @@ DankModal {
                 RadialMenu {
                     id: radialMenu
                     presets: window.radialPresets
-                    hoverTrigger: window.parentWidget?.pluginData?.radialHoverTrigger ?? false
-                    hoverDelay: window.parentWidget?.pluginData?.radialHoverDelay ?? 300
-                    menuOpacity: (window.parentWidget?.pluginData?.radialMenuOpacity ?? 100) / 100
+                    hoverTrigger: window.parentWidgetpluginDataradialHoverTrigger || false
+                    hoverDelay: window.parentWidgetpluginDataradialHoverDelay || 300
+                    menuOpacity: (window.parentWidgetpluginDataradialMenuOpacity || 100) / 100
                     onPresetSelected: (preset) => {
                         window.currentTool = preset.tool;
                         window.currentColor = preset.color;
