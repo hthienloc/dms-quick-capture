@@ -17,8 +17,10 @@ PluginComponent {
     readonly property string captureMode: (pluginData.captureMode || "region")
     property string activeIpcMode: ""
     property string resolvedDmsPath: "dms"
+    property bool restoringFromFloat: false
 
     function triggerCapture(mode) {
+        root.restoringFromFloat = false;
         if (root.isDaemonInstance) {
             root.activeIpcMode = mode || "";
             root.startCaptureAfterDelay();
@@ -108,6 +110,7 @@ PluginComponent {
     }
 
     function selectImageAndAnnotate() {
+        root.restoringFromFloat = false;
         if (root.isDaemonInstance) {
             root.closeControlCenter();
             fileBrowserModal.open();
@@ -121,6 +124,7 @@ PluginComponent {
     }
 
     function fromClipboard() {
+        root.restoringFromFloat = false;
         if (root.isDaemonInstance) {
             root.closeControlCenter();
             const checkCmd = "if wl-paste -t image/png > /tmp/dms_capture_bg.png 2>/dev/null || xclip -selection clipboard -t image/png -o > /tmp/dms_capture_bg.png 2>/dev/null; then echo \"IMAGE\"; else TEXT=$(wl-paste -n 2>/dev/null || xclip -selection clipboard -o 2>/dev/null); if [ -n \"$TEXT\" ]; then echo \"TEXT:$TEXT\"; else echo \"EMPTY\"; fi; fi";
@@ -242,6 +246,7 @@ PluginComponent {
     }
 
     function handleDrop(drop) {
+        root.restoringFromFloat = false;
         let urlStr = "";
         if (drop.hasUrls && drop.urls.length > 0) {
             urlStr = drop.urls[0].toString();
@@ -439,9 +444,11 @@ PluginComponent {
             if (path.startsWith("file://")) {
                 path = path.substring(7);
             }
-            if (path === "/tmp/dms_capture_bg.png") {
+            if (path === "/tmp/dms_capture_bg.png" || path === "/tmp/dms_capture_float.png") {
+                root.restoringFromFloat = (path === "/tmp/dms_capture_float.png");
                 root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
             } else if (path.startsWith("http://") || path.startsWith("https://")) {
+                root.restoringFromFloat = false;
                 root.isDownloading = true;
                 Proc.runCommand("download-image", ["curl", "-s", "-L", "-o", "/tmp/dms_capture_bg.png", path], (stdout, exitCode) => {
                     root.isDownloading = false;
@@ -450,6 +457,7 @@ PluginComponent {
                     }
                 });
             } else {
+                root.restoringFromFloat = false;
                 Proc.runCommand("copy-image", ["cp", "-f", path, "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
                     if (exitCode === 0) {
                         root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");

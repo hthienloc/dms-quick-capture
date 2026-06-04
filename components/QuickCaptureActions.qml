@@ -6,6 +6,7 @@ QtObject {
     id: root
 
     property var parentWidget: null
+    property var modal: null
     property var exportAndExecute: null
 
     signal closeRequested()
@@ -214,16 +215,70 @@ QtObject {
     }
 
     function performFloatAction() {
+        if (!root.modal) {
+            console.error("QuickCaptureActions: modal reference is null");
+            return;
+        }
+
         withExport((tempOut) => {
-            const cmd = "cp -f -- " + shellPathExpression(tempOut) + " /tmp/dms_capture_bg.png" +
-                        " && dms ipc call floaty floatFromUrl file:///tmp/dms_capture_bg.png";
-            Proc.runCommand("float-capture", ["sh", "-c", cmd], (stdout, exitCode) => {
-                if (exitCode === 0) {
-                    notifyInfo(I18n.tr("Floating window launched."), tempOut);
-                    root.closeRequested();
-                } else {
-                    notifyError("Failed to float image (make sure dms-floaty is running).");
+            // 1. Serialize strokes (typing text is already committed by withExport)
+            let strokesList = root.modal.strokes || [];
+            let serializedStrokes = [];
+            for (let i = 0; i < strokesList.length; i++) {
+                let s = strokesList[i];
+                let newStroke = {
+                    tool: s.tool,
+                    color: s.color,
+                    width: s.width,
+                    points: []
+                };
+                if (s.points) {
+                    for (let j = 0; j < s.points.length; j++) {
+                        newStroke.points.push({ x: s.points[j].x, y: s.points[j].y });
+                    }
                 }
+                if (s.text !== undefined) newStroke.text = s.text;
+                if (s.isMonospace !== undefined) newStroke.isMonospace = s.isMonospace;
+                if (s.fontFamily !== undefined) newStroke.fontFamily = s.fontFamily;
+                if (s.isBold !== undefined) newStroke.isBold = s.isBold;
+                if (s.isItalic !== undefined) newStroke.isItalic = s.isItalic;
+                if (s.isUnderline !== undefined) newStroke.isUnderline = s.isUnderline;
+                if (s.counter !== undefined) newStroke.counter = s.counter;
+                serializedStrokes.push(newStroke);
+            }
+
+            // 2. Serialize other states
+            let stateData = {
+                strokes: serializedStrokes,
+                stampCounter: root.modal.stampCounter,
+                cropRect: {
+                    x: root.modal.cropRect.x,
+                    y: root.modal.cropRect.y,
+                    width: root.modal.cropRect.width,
+                    height: root.modal.cropRect.height
+                },
+                hasSelection: root.modal.hasSelection
+            };
+
+            let jsonStr = JSON.stringify(stateData);
+
+            // 3. Write strokes to sidecar file
+            Proc.runCommand("write-strokes", ["python3", "-c", "import sys; open('/tmp/dms_capture_strokes.json', 'w').write(sys.argv[1])", jsonStr], (stdout, writeExitCode) => {
+                if (writeExitCode !== 0) {
+                    console.error("Failed to write strokes JSON sidecar");
+                }
+                
+                // 4. Float the baked image
+                const cmd = "cp -f -- " + shellPathExpression(tempOut) + " /tmp/dms_capture_float.png" +
+                            " && dms ipc call floaty floatFromUrl file:///tmp/dms_capture_float.png";
+                Proc.runCommand("float-capture", ["sh", "-c", cmd], (stdout, exitCode) => {
+                    if (exitCode === 0) {
+                        notifyInfo(I18n.tr("Floating window launched."), tempOut);
+                        root.closeRequested();
+                    } else {
+                        notifyError("Failed to float image (make sure dms-floaty is running).");
+                    }
+                });
             });
         });
     }

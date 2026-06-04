@@ -344,6 +344,7 @@ DankModal {
     QuickCaptureActions {
         id: captureActions
         parentWidget: window.parentWidget
+        modal: window
         exportAndExecute: window.exportAndExecute
         onCloseRequested: window.discardAndClose()
     }
@@ -769,6 +770,61 @@ DankModal {
         window.cropRect = Qt.rect(0, 0, 0, 0);
         window.hasSelection = false;
         window.activeHandle = "none";
+
+        if (window.parentWidget && window.parentWidget.restoringFromFloat) {
+            Proc.runCommand("read-strokes", ["cat", "/tmp/dms_capture_strokes.json"], (stdout, exitCode) => {
+                if (exitCode === 0 && stdout) {
+                    try {
+                        let data = JSON.parse(stdout);
+                        if (data && data.strokes) {
+                            let restoredStrokes = [];
+                            for (let i = 0; i < data.strokes.length; i++) {
+                                let s = data.strokes[i];
+                                let stroke = {
+                                    tool: s.tool,
+                                    color: s.color,
+                                    width: s.width,
+                                    points: []
+                                };
+                                if (s.points) {
+                                    for (let j = 0; j < s.points.length; j++) {
+                                        stroke.points.push(Qt.point(s.points[j].x, s.points[j].y));
+                                    }
+                                }
+                                if (s.text !== undefined) stroke.text = s.text;
+                                if (s.isMonospace !== undefined) stroke.isMonospace = s.isMonospace;
+                                if (s.fontFamily !== undefined) stroke.fontFamily = s.fontFamily;
+                                if (s.isBold !== undefined) stroke.isBold = s.isBold;
+                                if (s.isItalic !== undefined) stroke.isItalic = s.isItalic;
+                                if (s.isUnderline !== undefined) stroke.isUnderline = s.isUnderline;
+                                if (s.counter !== undefined) stroke.counter = s.counter;
+                                restoredStrokes.push(stroke);
+                            }
+                            window.strokes = restoredStrokes;
+                        }
+                        if (data && data.stampCounter !== undefined) {
+                            window.stampCounter = data.stampCounter;
+                        }
+                        if (data && data.cropRect) {
+                            window.cropRect = Qt.rect(data.cropRect.x, data.cropRect.y, data.cropRect.width, data.cropRect.height);
+                            window.hasSelection = (data.cropRect.width > 0 && data.cropRect.height > 0);
+                        }
+                        if (window.activeCanvas) window.activeCanvas.requestPaint();
+                    } catch (e) {
+                        console.error("Failed to parse strokes json:", e);
+                    }
+                }
+                // Cleanup sidecar immediately
+                Proc.runCommand("clean-strokes", ["rm", "-f", "/tmp/dms_capture_strokes.json"]);
+                if (window.parentWidget) {
+                    window.parentWidget.restoringFromFloat = false;
+                }
+            });
+        } else {
+            // Delete sidecar just in case it exists from a previous float that was closed
+            Proc.runCommand("clean-strokes", ["rm", "-f", "/tmp/dms_capture_strokes.json"]);
+        }
+
         Qt.callLater(() => {
             if (modalFocusScope) modalFocusScope.forceActiveFocus();
         });
