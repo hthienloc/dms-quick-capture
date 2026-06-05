@@ -184,10 +184,13 @@ QtObject {
 
     function resolveColor(rawColor) {
         if (!rawColor) return Theme.primary;
+        if (typeof rawColor !== "string") {
+            return Qt.color(rawColor);
+        }
         let resolved = rawColor;
         if (rawColor === "primary") {
             resolved = Theme.primary;
-        } else if (rawColor.startsWith("slot_")) {
+        } else if (rawColor.indexOf("slot_") === 0) {
             const parts = rawColor.split("_");
             const slotIdx = parseInt(parts[1]) - 1;
             if (slotIdx === 0) {

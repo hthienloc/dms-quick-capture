@@ -20,49 +20,20 @@ DankModal {
     Image {
         id: watermarkImageLoader
         
-        property int pathIndex: -1
-        property var fallbackPaths: []
-        
-        onStatusChanged: {
-            if (status === Image.Error && (!window.parentWidget || !window.parentWidget.pluginData || !window.parentWidget.pluginData.watermarkImage)) {
-                if (pathIndex >= 0 && pathIndex < fallbackPaths.length - 1) {
-                    pathIndex++;
-                    source = fallbackPaths[pathIndex];
-                }
-            }
-        }
-        
-        Component.onCompleted: {
-            const username = Quickshell.env("USER") || Quickshell.env("USERNAME") || "";
-            const home = Quickshell.env("HOME") || "";
-            const list = [];
-            if (home) {
-                list.push("file://" + home + "/.face");
-                list.push("file://" + home + "/.face.icon");
-            }
-            if (username) {
-                list.push("file:///var/lib/AccountsService/icons/" + username);
-            }
-            list.push("image://icon/user-info");
-            list.push("image://icon/avatar-default");
-            fallbackPaths = list;
-            
+        source: {
             const rawPath = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.watermarkImage) ? window.parentWidget.pluginData.watermarkImage : "";
             if (rawPath) {
                 let p = rawPath.trim();
                 if (p.indexOf("~/") === 0) {
+                    const home = Quickshell.env("HOME") || "";
                     p = home + p.substring(1);
                 }
                 if (p.indexOf("/") === 0) {
                     p = "file://" + p;
                 }
-                source = p;
-            } else {
-                pathIndex = 0;
-                if (fallbackPaths.length > 0) {
-                    source = fallbackPaths[0];
-                }
+                return p;
             }
+            return "";
         }
         
         visible: false
@@ -130,11 +101,24 @@ DankModal {
     property real previewY: 0
     property bool showSizePreview: false
 
+    readonly property real canvasWidth: {
+        if (window.currentTool !== "crop" && window.hasSelection) {
+            return window.cropRect.width;
+        }
+        return window.bgImageItem ? window.bgImageItem.sourceSize.width : 1;
+    }
+    readonly property real canvasHeight: {
+        if (window.currentTool !== "crop" && window.hasSelection) {
+            return window.cropRect.height;
+        }
+        return window.bgImageItem ? window.bgImageItem.sourceSize.height : 1;
+    }
+
     property bool isZoomPressed: false
     property real cursorX: 0
     property real cursorY: 0
-    readonly property real boardCursorX: boardContainerItem ? (boardContainerItem.width / 2 + (cursorX - drawingCanvas.width / 2) * fitScale) : 0
-    readonly property real boardCursorY: boardContainerItem ? (boardContainerItem.height / 2 + (cursorY - drawingCanvas.height / 2) * fitScale) : 0
+    readonly property real boardCursorX: boardContainerItem ? (boardContainerItem.width / 2 + (cursorX - canvasWidth / 2) * fitScale) : 0
+    readonly property real boardCursorY: boardContainerItem ? (boardContainerItem.height / 2 + (cursorY - canvasHeight / 2) * fitScale) : 0
 
     property bool showAnnotations: true
     onShowAnnotationsChanged: {
@@ -960,18 +944,8 @@ DankModal {
                         transformOrigin: Item.Center
                         renderTarget: Canvas.Image
 
-                        width: {
-                            if (window.currentTool !== "crop" && window.hasSelection) {
-                                return window.cropRect.width;
-                            }
-                            return window.bgImageItem ? window.bgImageItem.sourceSize.width : 1;
-                        }
-                        height: {
-                            if (window.currentTool !== "crop" && window.hasSelection) {
-                                return window.cropRect.height;
-                            }
-                            return window.bgImageItem ? window.bgImageItem.sourceSize.height : 1;
-                        }
+                        width: window.canvasWidth
+                        height: window.canvasHeight
 
                         layer.enabled: false
 
