@@ -28,9 +28,14 @@ Item {
     }
 
     function loadValue() {
-        const settings = findSettings()
-        if (settings && settings.pluginService) {
-            value = settings.loadValue(settingKey, defaultValue)
+        const settings = findSettings();
+        if (settings) {
+            const pluginId = settings.pluginId;
+            if (pluginId && typeof SettingsData !== "undefined") {
+                value = SettingsData.getPluginSetting(pluginId, settingKey, defaultValue);
+            } else if (settings.pluginService) {
+                value = settings.loadValue(settingKey, defaultValue);
+            }
         }
     }
 

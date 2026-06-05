@@ -28,10 +28,17 @@ Item {
 
     function loadValue() {
         const settings = findSettings();
-        if (settings && settings.pluginService) {
-            const loadedValue = settings.loadValue(settingKey, defaultValue);
-            value = loadedValue;
-            isInitialized = true;
+        if (settings) {
+            const pluginId = settings.pluginId;
+            if (pluginId && typeof SettingsData !== "undefined") {
+                const loadedValue = SettingsData.getPluginSetting(pluginId, settingKey, defaultValue);
+                value = loadedValue;
+                isInitialized = true;
+            } else if (settings.pluginService) {
+                const loadedValue = settings.loadValue(settingKey, defaultValue);
+                value = loadedValue;
+                isInitialized = true;
+            }
         }
     }
 
