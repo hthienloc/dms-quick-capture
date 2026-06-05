@@ -101,8 +101,7 @@ Item {
         // ── Label Row ─────────────────────────────────────────────────────────
         Item {
             width: parent.width
-            visible: root.label !== ""
-            height: visible ? 32 : 0
+            height: 32
 
             Row {
                 anchors.left: parent.left

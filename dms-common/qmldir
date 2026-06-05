@@ -30,3 +30,4 @@ TagChip 1.0 TagChip.qml
 WatermarkText 1.0 WatermarkText.qml
 ButtonGroupSettingPlus 1.0 ButtonGroupSettingPlus.qml
 DankSliderPlus 1.0 DankSliderPlus.qml
+NumericText 1.0 NumericText.qml
