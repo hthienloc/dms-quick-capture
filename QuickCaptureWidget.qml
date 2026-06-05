@@ -303,7 +303,6 @@ PluginComponent {
     pluginId: "quickCapture"
     pluginService: PluginService
 
-    // Bar Pill Integration
     horizontalBarPill: Component {
         Item {
             implicitWidth: horizontalRow.implicitWidth
@@ -333,6 +332,17 @@ PluginComponent {
                 onDropped: (drop) => {
                     draggingOver = false;
                     root.handleDrop(drop);
+                }
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.MiddleButton
+                cursorShape: Qt.PointingHandCursor
+                onClicked: (mouse) => {
+                    if (mouse.button === Qt.MiddleButton) {
+                        root.selectImageAndAnnotate();
+                    }
                 }
             }
         }
@@ -367,6 +377,17 @@ PluginComponent {
                 onDropped: (drop) => {
                     draggingOver = false;
                     root.handleDrop(drop);
+                }
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.MiddleButton
+                cursorShape: Qt.PointingHandCursor
+                onClicked: (mouse) => {
+                    if (mouse.button === Qt.MiddleButton) {
+                        root.selectImageAndAnnotate();
+                    }
                 }
             }
         }

@@ -1999,7 +1999,8 @@ PluginSettings {
 
                 ShortcutRow { keyText: I18n.tr("Action"); actionText: I18n.tr("Interaction / Result"); isHeader: true }
                 ShortcutRow { keyText: I18n.tr("Left Click"); actionText: I18n.tr("Start interactive screenshot capture") }
-                ShortcutRow { keyText: I18n.tr("Right Click"); actionText: I18n.tr("Open file browser to select image") }
+                ShortcutRow { keyText: I18n.tr("Middle Click"); actionText: I18n.tr("Open file browser to select image") }
+                ShortcutRow { keyText: I18n.tr("Right Click"); actionText: I18n.tr("Annotate image from clipboard") }
                 ShortcutRow { keyText: I18n.tr("Drag Image"); actionText: I18n.tr("Drop image onto icon to annotate") }
             }
 

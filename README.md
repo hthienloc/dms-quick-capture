@@ -29,6 +29,7 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 | Action | Result |
 |--------|--------|
 | **Left Click** | Trigger interactive screenshot capture |
+| **Middle Click** | Open file browser to select and annotate an image |
 | **Right Click** | Annotate image from clipboard (supports raw images, paths, and URLs) |
 | **Drop Image** | Drag any image file onto the icon to annotate it |
 
