@@ -51,8 +51,6 @@ Item {
         root.y = y - height / 2;
         root.visibleState = true;
         selectedIndex = -1;
-        radialMouseArea.mouseX = width / 2;
-        radialMouseArea.mouseY = height / 2;
     }
 
     function close() {
