@@ -1,5 +1,6 @@
 import "./dms-common"
 import QtQuick
+import Quickshell
 import qs.Common
 import qs.Modules.Plugins
 import qs.Services
@@ -553,13 +554,12 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Drawing")
             icon: "brush"
-            showReset: defaultToolMode.isDirty || defaultPresetIndex.isDirty || defaultTool.isDirty || defaultThickness.isDirty || enableMagnifier.isDirty
+            showReset: defaultToolMode.isDirty || defaultPresetIndex.isDirty || defaultTool.isDirty || defaultThickness.isDirty
             onResetClicked: {
                 defaultToolMode.resetToDefault();
                 defaultPresetIndex.resetToDefault();
                 defaultTool.resetToDefault();
                 defaultThickness.resetToDefault();
-                enableMagnifier.resetToDefault();
             }
         }
 
@@ -969,8 +969,8 @@ PluginSettings {
                 id: watermarkPreviewArea
                 width: parent.width
                 height: 160
-                radius: Theme.cornerRadiusSmall
-                color: Theme.surfaceContainerLow
+                radius: Theme.cornerRadius / 2
+                color: Theme.surfaceContainer
                 clip: true
 
                 // A dark checkered/gradient backdrop representing a mock captured screenshot
