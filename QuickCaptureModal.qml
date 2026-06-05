@@ -20,33 +20,14 @@ DankModal {
     Image {
         id: watermarkImageLoader
         
-        property int pathIndex: 0
+        property int pathIndex: -1
         property var fallbackPaths: []
-        
-        source: {
-            const rawPath = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.watermarkImage) ? window.parentWidget.pluginData.watermarkImage : "";
-            if (rawPath) {
-                let p = rawPath.trim();
-                if (p.indexOf("~/") === 0) {
-                    const home = Quickshell.env("HOME") || "";
-                    p = home + p.substring(1);
-                }
-                if (p.indexOf("/") === 0) {
-                    p = "file://" + p;
-                }
-                return p;
-            }
-            
-            if (fallbackPaths.length > 0 && pathIndex < fallbackPaths.length) {
-                return fallbackPaths[pathIndex];
-            }
-            return "";
-        }
         
         onStatusChanged: {
             if (status === Image.Error && (!window.parentWidget || !window.parentWidget.pluginData || !window.parentWidget.pluginData.watermarkImage)) {
-                if (pathIndex < fallbackPaths.length - 1) {
+                if (pathIndex >= 0 && pathIndex < fallbackPaths.length - 1) {
                     pathIndex++;
+                    source = fallbackPaths[pathIndex];
                 }
             }
         }
@@ -65,6 +46,23 @@ DankModal {
             list.push("image://icon/user-info");
             list.push("image://icon/avatar-default");
             fallbackPaths = list;
+            
+            const rawPath = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.watermarkImage) ? window.parentWidget.pluginData.watermarkImage : "";
+            if (rawPath) {
+                let p = rawPath.trim();
+                if (p.indexOf("~/") === 0) {
+                    p = home + p.substring(1);
+                }
+                if (p.indexOf("/") === 0) {
+                    p = "file://" + p;
+                }
+                source = p;
+            } else {
+                pathIndex = 0;
+                if (fallbackPaths.length > 0) {
+                    source = fallbackPaths[0];
+                }
+            }
         }
         
         visible: false
