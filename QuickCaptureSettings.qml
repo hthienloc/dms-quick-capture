@@ -1634,12 +1634,9 @@ PluginSettings {
                 Item { width: 1; height: Theme.spacingXS }
 
                 SelectionSettingPlus {
+                    id: presetToolSetting
                     settingKey: "preset_" + index + "_tool"
                     label: I18n.tr("Preset Tool")
-                    onValueChanged: {
-                        radialMenuCard.activePresetTools[index] = value;
-                        radialMenuCard.activePresetTools = [...radialMenuCard.activePresetTools];
-                    }
                     options: [{
                         "label": I18n.tr("None / Disabled"),
                         "value": "none"
@@ -1690,6 +1687,14 @@ PluginSettings {
                         if (index === 6) return "redact";
                         if (index === 7) return "pixelate";
                         return "none";
+                    }
+                }
+
+                Connections {
+                    target: presetToolSetting
+                    function onValueChanged() {
+                        radialMenuCard.activePresetTools[index] = presetToolSetting.value;
+                        radialMenuCard.activePresetTools = [...radialMenuCard.activePresetTools];
                     }
                 }
 
@@ -1863,14 +1868,18 @@ PluginSettings {
                             id: presetColorSetting
                             settingKey: "preset_" + presetIndex + "_color"
                             label: ""
-                            onValueChanged: {
-                                radialMenuCard.activePresetColors[presetIndex] = value;
-                                radialMenuCard.activePresetColors = [...radialMenuCard.activePresetColors];
-                            }
                             defaultValue: {
                                 if (presetIndex === 6) return "#000000"; // Black
                                 if (presetIndex === 7) return "#ffffff"; // White
                                 return "primary";
+                            }
+                        }
+
+                        Connections {
+                            target: presetColorSetting
+                            function onValueChanged() {
+                                radialMenuCard.activePresetColors[presetIndex] = presetColorSetting.value;
+                                radialMenuCard.activePresetColors = [...radialMenuCard.activePresetColors];
                             }
                         }
                     }
@@ -1879,12 +1888,9 @@ PluginSettings {
                 Separator {}
 
                 SliderSettingPlus {
+                    id: presetThicknessSetting
                     settingKey: "preset_" + index + "_thickness"
                     label: I18n.tr("Preset Thickness")
-                    onValueChanged: {
-                        radialMenuCard.activePresetThicknesses[index] = value;
-                        radialMenuCard.activePresetThicknesses = [...radialMenuCard.activePresetThicknesses];
-                    }
                     defaultValue: 6
                     minimum: 1
                     maximum: 20
@@ -1892,6 +1898,14 @@ PluginSettings {
                     rightLabel: "20"
                     previewType: "thickness"
                     previewColor: presetColorSetting.value
+                }
+
+                Connections {
+                    target: presetThicknessSetting
+                    function onValueChanged() {
+                        radialMenuCard.activePresetThicknesses[index] = presetThicknessSetting.value;
+                        radialMenuCard.activePresetThicknesses = [...radialMenuCard.activePresetThicknesses];
+                    }
                 }
             }
         }
