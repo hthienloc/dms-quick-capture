@@ -8,6 +8,7 @@ import qs.Widgets
 import qs.Modals.Common
 import "./dms-common"
 import "components"
+import "components/StrokePainter.js" as StrokePainter
 
 DankModal {
     id: window
@@ -159,12 +160,6 @@ DankModal {
     property point typingCoords: Qt.point(0,0)
     property string currentTypingText: ""
 
-    // Helper to decode hex color to RGB
-    function hexToRgb(hex) {
-        if (!hex) return { r: 0.2, g: 0.5, b: 1 };
-        const c = Qt.color(hex);
-        return { r: c.r, g: c.g, b: c.b };
-    }
 
     backgroundOpacity: (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.modalOpacity !== undefined ? window.parentWidget.pluginData.modalOpacity : 60) / 100
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
@@ -1052,13 +1047,22 @@ DankModal {
                             }
 
                             if (window.showAnnotations) {
+                                const options = {
+                                    roundHighlighter: window.roundHighlighter,
+                                    roundRect: window.roundRect,
+                                    cornerRadius: Theme.cornerRadius,
+                                    bgImageItem: window.bgImageItem,
+                                    bgImageReady: window.bgImageItem && window.bgImageItem.status === Image.Ready,
+                                    isCurrentStroke: false
+                                };
                                 for (var i = 0; i < window.strokes.length; i++) {
-                                    drawStroke(ctx, window.strokes[i]);
+                                    StrokePainter.drawStroke(ctx, window.strokes[i], options);
                                 }
 
                                 // 3. Draw current dragging stroke
                                 if (window.currentStroke) {
-                                    drawStroke(ctx, window.currentStroke);
+                                    const currentOptions = Object.assign({}, options, { isCurrentStroke: true });
+                                    StrokePainter.drawStroke(ctx, window.currentStroke, currentOptions);
                                 }
 
                                 // 4. Draw temporary live typing text
@@ -1225,249 +1229,6 @@ DankModal {
                                     ctx.drawImage(watermarkImageLoader, ix, iy, targetW, targetH);
                                 }
                                 ctx.restore();
-                            }
-                        }
-
-                        function drawStroke(ctx, stroke) {
-                            if (stroke.points.length === 0) return;
-
-                            const rgb = window.hexToRgb(stroke.color);
-
-                            if (stroke.tool === "pen") {
-                                ctx.strokeStyle = stroke.color;
-                                ctx.lineWidth = stroke.width;
-                                ctx.lineCap = "round";
-                                ctx.lineJoin = "round";
-                                ctx.beginPath();
-                                ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-                                for (var i = 1; i < stroke.points.length; i++) {
-                                    ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
-                                }
-                                ctx.stroke();
-
-                            } else if (stroke.tool === "line") {
-                                ctx.strokeStyle = stroke.color;
-                                ctx.lineWidth = stroke.width;
-                                ctx.lineCap = "round";
-                                ctx.lineJoin = "round";
-                                const p0 = stroke.points[0];
-                                const p1 = stroke.points[stroke.points.length - 1];
-                                ctx.beginPath();
-                                ctx.moveTo(p0.x, p0.y);
-                                ctx.lineTo(p1.x, p1.y);
-                                ctx.stroke();
-
-                            } else if (stroke.tool === "highlighter") {
-                                ctx.strokeStyle = Qt.rgba(rgb.r, rgb.g, rgb.b, 0.4);
-                                ctx.lineWidth = stroke.width * 4;
-                                ctx.lineCap = window.roundHighlighter ? "round" : "square";
-                                ctx.lineJoin = window.roundHighlighter ? "round" : "miter";
-                                ctx.beginPath();
-                                ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-                                for (var i = 1; i < stroke.points.length; i++) {
-                                    ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
-                                }
-                                ctx.stroke();
-
-                            } else if (stroke.tool === "rect") {
-                                ctx.strokeStyle = stroke.color;
-                                ctx.lineWidth = stroke.width;
-                                ctx.lineCap = "round";
-                                ctx.lineJoin = "round";
-                                const p0 = stroke.points[0];
-                                const p1 = stroke.points[stroke.points.length - 1];
-                                const rx = Math.min(p0.x, p1.x);
-                                const ry = Math.min(p0.y, p1.y);
-                                const rw = Math.abs(p1.x - p0.x);
-                                const rh = Math.abs(p1.y - p0.y);
-                                // Adjust radius to be larger than half the stroke width to prevent sharp inner corners
-                                const baseRadius = window.roundRect ? (Theme.cornerRadius + (stroke.width / 2)) : 0;
-                                const radius = Math.min(baseRadius, Math.min(rw, rh) / 2);
-
-                                ctx.beginPath();
-                                ctx.moveTo(rx + radius, ry);
-                                ctx.lineTo(rx + rw - radius, ry);
-                                ctx.arcTo(rx + rw, ry, rx + rw, ry + radius, radius);
-                                ctx.lineTo(rx + rw, ry + rh - radius);
-                                ctx.arcTo(rx + rw, ry + rh, rx + rw - radius, ry + rh, radius);
-                                ctx.lineTo(rx + radius, ry + rh);
-                                ctx.arcTo(rx, ry + rh, rx, ry + rh - radius, radius);
-                                ctx.lineTo(rx, ry + radius);
-                                ctx.arcTo(rx, ry, rx + radius, ry, radius);
-                                ctx.closePath();
-                                ctx.stroke();
-
-                            } else if (stroke.tool === "ellipse") {
-                                ctx.strokeStyle = stroke.color;
-                                ctx.lineWidth = stroke.width;
-                                ctx.lineCap = "round";
-                                ctx.lineJoin = "round";
-                                const p0 = stroke.points[0];
-                                const p1 = stroke.points[stroke.points.length - 1];
-                                const rx = Math.min(p0.x, p1.x);
-                                const ry = Math.min(p0.y, p1.y);
-                                const rw = Math.abs(p1.x - p0.x);
-                                const rh = Math.abs(p1.y - p0.y);
-
-                                if (rw > 0 && rh > 0) {
-                                    ctx.save();
-                                    ctx.beginPath();
-                                    ctx.translate(rx + rw / 2, ry + rh / 2);
-                                    ctx.scale(rw / 2, rh / 2);
-                                    ctx.arc(0, 0, 1, 0, 2 * Math.PI);
-                                    ctx.restore();
-                                    ctx.stroke();
-                                }
-
-                            } else if (stroke.tool === "arrow") {
-                                ctx.strokeStyle = stroke.color;
-                                ctx.fillStyle = stroke.color;
-                                ctx.lineWidth = stroke.width;
-                                ctx.lineCap = "round";
-                                ctx.lineJoin = "round";
-                                const p0 = stroke.points[0];
-                                const p1 = stroke.points[stroke.points.length - 1];
-                                const dx = p1.x - p0.x;
-                                const dy = p1.y - p0.y;
-                                const len = Math.sqrt(dx * dx + dy * dy);
-
-                                if (len > 0) {
-                                    const angle = Math.atan2(dy, dx);
-                                    const spread = Math.PI / 7;
-                                    const headLength = Math.max(15, stroke.width * 4);
-                                    
-                                    // Shorten shaft so it stops exactly inside the arrowhead base
-                                    const shaftLength = Math.max(0, len - headLength * 0.8);
-                                    const shaftEndX = p0.x + shaftLength * Math.cos(angle);
-                                    const shaftEndY = p0.y + shaftLength * Math.sin(angle);
-
-                                    // Draw shaft
-                                    ctx.beginPath();
-                                    ctx.moveTo(p0.x, p0.y);
-                                    ctx.lineTo(shaftEndX, shaftEndY);
-                                    ctx.stroke();
-
-                                    // Draw head
-                                    ctx.beginPath();
-                                    ctx.moveTo(p1.x, p1.y);
-                                    ctx.lineTo(p1.x - headLength * Math.cos(angle - spread), p1.y - headLength * Math.sin(angle - spread));
-                                    ctx.lineTo(p1.x - headLength * Math.cos(angle + spread), p1.y - headLength * Math.sin(angle + spread));
-                                    ctx.closePath();
-                                    ctx.fill();
-                                }
-
-                            } else if (stroke.tool === "redact") {
-                                const p0 = stroke.points[0];
-                                const p1 = stroke.points[stroke.points.length - 1];
-                                const rx = Math.min(p0.x, p1.x);
-                                const ry = Math.min(p0.y, p1.y);
-                                const rw = Math.abs(p1.x - p0.x);
-                                const rh = Math.abs(p1.y - p0.y);
-                                const radius = window.roundRect ? Math.min(Theme.cornerRadius, Math.min(rw, rh) / 2) : 0;
-
-                                ctx.fillStyle = stroke.color;
-                                ctx.beginPath();
-                                ctx.moveTo(rx + radius, ry);
-                                ctx.lineTo(rx + rw - radius, ry);
-                                ctx.arcTo(rx + rw, ry, rx + rw, ry + radius, radius);
-                                ctx.lineTo(rx + rw, ry + rh - radius);
-                                ctx.arcTo(rx + rw, ry + rh, rx + rw - radius, ry + rh, radius);
-                                ctx.lineTo(rx + radius, ry + rh);
-                                ctx.arcTo(rx, ry + rh, rx, ry + rh - radius, radius);
-                                ctx.lineTo(rx, ry + radius);
-                                ctx.arcTo(rx, ry, rx + radius, ry, radius);
-                                ctx.closePath();
-                                ctx.fill();
-
-                            } else if (stroke.tool === "pixelate") {
-                                if (stroke.points.length >= 2) {
-                                    const p0 = stroke.points[0];
-                                    const p1 = stroke.points[stroke.points.length - 1];
-                                    const rx = Math.floor(Math.min(p0.x, p1.x));
-                                    const ry = Math.floor(Math.min(p0.y, p1.y));
-                                    const rw = Math.floor(Math.abs(p1.x - p0.x));
-                                    const rh = Math.floor(Math.abs(p1.y - p0.y));
-
-                                    if (rw > 2 && rh > 2) {
-                                        ctx.save();
-                                        ctx.beginPath();
-                                        ctx.rect(rx, ry, rw, rh);
-                                        ctx.clip();
-                                        ctx.imageSmoothingEnabled = false;
-
-                                        if (window.bgImageItem && window.bgImageItem.status === Image.Ready) {
-                                            const blockSize = Math.max(8, Math.min(36, stroke.width * 3));
-                                            const sampleSize = Math.max(1, Math.round(blockSize / 5));
-                                            const imgW = window.bgImageItem.sourceSize.width;
-                                            const imgH = window.bgImageItem.sourceSize.height;
-                                            for (let y = ry; y < ry + rh; y += blockSize) {
-                                                for (let x = rx; x < rx + rw; x += blockSize) {
-                                                    const bw = Math.min(blockSize, rx + rw - x);
-                                                    const bh = Math.min(blockSize, ry + rh - y);
-                                                    if (bw <= 0 || bh <= 0) continue;
-                                                    let sx = Math.min(x + Math.floor(bw / 2), rx + rw - 1);
-                                                    let sy = Math.min(y + Math.floor(bh / 2), ry + rh - 1);
-                                                    sx = Math.max(0, Math.min(sx, Math.max(0, imgW - sampleSize)));
-                                                    sy = Math.max(0, Math.min(sy, Math.max(0, imgH - sampleSize)));
-                                                    ctx.drawImage(window.bgImageItem, sx, sy, sampleSize, sampleSize, x, y, bw, bh);
-                                                }
-                                            }
-                                        }
-
-                                        if (stroke === window.currentStroke) {
-                                            ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
-                                            ctx.lineWidth = 1;
-                                            ctx.setLineDash([4, 4]);
-                                            ctx.strokeRect(rx, ry, rw, rh);
-                                        }
-                                        ctx.restore();
-                                    }
-                                }
-
-                            } else if (stroke.tool === "stamp") {
-                                const pt = stroke.points[0];
-                                const radius = stroke.width * 5;
-                                const lum = 0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b;
-                                const textColor = lum > 0.5 ? "#000000" : "#ffffff";
-
-                                // Circle backdrop
-                                ctx.fillStyle = stroke.color;
-                                ctx.beginPath();
-                                ctx.arc(pt.x, pt.y, radius, 0, 2 * Math.PI);
-                                ctx.fill();
-
-                                // Dynamic contrasting label — measureText for reliable centering across digit counts
-                                const fontSize = Math.round(radius * 1.2);
-                                const text = String(stroke.counter);
-                                ctx.fillStyle = textColor;
-                                ctx.font = "bold " + fontSize + "px sans-serif";
-                                ctx.textBaseline = "middle";
-                                ctx.textAlign = "left";
-                                const textW = ctx.measureText(text).width;
-                                ctx.fillText(text, pt.x - textW / 2, pt.y + Math.round(fontSize * 0.1));
-                            } else if (stroke.tool === "text") {
-                                const pt = stroke.points[0];
-                                ctx.fillStyle = stroke.color;
-                                
-                                let styleStr = "";
-                                if (stroke.isItalic) styleStr += "italic ";
-                                if (stroke.isBold) styleStr += "bold ";
-                                const fFamily = stroke.fontFamily || (stroke.isMonospace ? "monospace" : "sans-serif");
-                                
-                                ctx.font = styleStr + Math.round(stroke.width) + "px " + fFamily;
-                                ctx.textAlign = "left";
-                                ctx.textBaseline = "top";
-                                ctx.fillText(stroke.text, pt.x, pt.y);
-
-                                if (stroke.isUnderline) {
-                                    const textWidth = ctx.measureText(stroke.text).width;
-                                    ctx.strokeStyle = stroke.color;
-                                    ctx.lineWidth = Math.max(1.5, Math.round(stroke.width * 0.08));
-                                    ctx.beginPath();
-                                    ctx.moveTo(pt.x, pt.y + stroke.width * 1.05);
-                                    ctx.lineTo(pt.x + textWidth, pt.y + stroke.width * 1.05);
-                                    ctx.stroke();
-                                }
                             }
                         }
 
@@ -1852,93 +1613,10 @@ DankModal {
                             color: "black"
                         }
                     }
-                    Popup {
+                    TextInputDialog {
                         id: textInputDialog
-                        width: 320
-                        height: 160
-                        padding: 0
-                        modal: false
-                        focus: true
-                        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-                        anchors.centerIn: parent
-
-                        background: Rectangle {
-                            color: "transparent"
-                        }
-
-                        onOpened: {
-                            Qt.callLater(() => {
-                                textInputField.text = "";
-                                textInputField.forceActiveFocus();
-                            });
-                        }
-
-                        onClosed: {
-                            if (window.isTyping) {
-                                window.isTyping = false;
-                                window.currentTypingText = "";
-                                if (window.activeCanvas) window.activeCanvas.requestPaint();
-                                modalFocusScope.forceActiveFocus();
-                            }
-                        }
-
-                        contentItem: Rectangle {
-                            color: Theme.surfaceContainer
-                            radius: Theme.cornerRadius
-                            border.color: Theme.withAlpha(Theme.outline, 0.15)
-                            border.width: 1
-
-                            Column {
-                                anchors.fill: parent
-                                anchors.margins: Theme.spacingM
-                                spacing: Theme.spacingM
-
-                                StyledText {
-                                    text: I18n.tr("Add Text Note")
-                                    font.bold: true
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    color: Theme.surfaceText
-                                }
-
-                                DankTextField {
-                                    id: textInputField
-                                    width: parent.width
-                                    placeholderText: I18n.tr("Type note...")
-                                    focus: true
-                                    onAccepted: {
-                                        window.currentTypingText = textInputField.text;
-                                        textInputDialog.close();
-                                        window.commitTypingText();
-                                    }
-                                }
-
-                                Row {
-                                    width: parent.width
-                                    spacing: Theme.spacingS
-                                    layoutDirection: Qt.RightToLeft
-
-                                    DankButton {
-                                        text: I18n.tr("Add")
-                                        backgroundColor: Theme.primary
-                                        textColor: Theme.primaryText
-                                        onClicked: {
-                                            window.currentTypingText = textInputField.text;
-                                            textInputDialog.close();
-                                            window.commitTypingText();
-                                        }
-                                    }
-
-                                    DankButton {
-                                        text: I18n.tr("Cancel")
-                                        backgroundColor: Theme.surfaceContainerHigh
-                                        textColor: Theme.surfaceText
-                                        onClicked: {
-                                            textInputDialog.close();
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        window: window
+                        modalFocusScope: modalFocusScope
                     }
 
                     Timer {
@@ -1951,94 +1629,13 @@ DankModal {
                         }
                     }
 
-                    Rectangle {
+                    Magnifier {
                         id: magnifier
-                        width: 140
-                        height: 140
-                        radius: 70
-                        border.color: Theme.primary
-                        border.width: 2
-                        color: "black"
-                        visible: window.enableMagnifier && window.isZoomPressed && drawMouseArea.containsMouse
-                        z: 200
-                        enabled: false
-
-                        x: drawingCanvas.mapToItem(boardContainer, window.cursorX, window.cursorY).x - (width / 2)
-                        y: drawingCanvas.mapToItem(boardContainer, window.cursorX, window.cursorY).y - (height / 2)
-
-                        property real zoomFactor: 1.5
-
-                        clip: true
-
-                        Canvas {
-                            id: magnifierCanvas
-                            anchors.fill: parent
-
-                            Connections {
-                                target: drawingCanvas
-                                function onPaint() { magnifierCanvas.requestPaint(); }
-                            }
-
-                            Connections {
-                                target: window
-                                function onCursorXChanged() { magnifierCanvas.requestPaint(); }
-                                function onCursorYChanged() { magnifierCanvas.requestPaint(); }
-                            }
-
-                            Connections {
-                                target: magnifier
-                                function onZoomFactorChanged() { magnifierCanvas.requestPaint(); }
-                            }
-
-                            onPaint: {
-                                var ctx = magnifierCanvas.getContext("2d");
-                                ctx.clearRect(0, 0, magnifierCanvas.width, magnifierCanvas.height);
-
-                                ctx.save();
-
-                                // Clip to circle shape to match the parent circle magnifier
-                                ctx.beginPath();
-                                ctx.arc(magnifierCanvas.width / 2, magnifierCanvas.height / 2, magnifierCanvas.width / 2 - 2, 0, 2 * Math.PI);
-                                ctx.clip();
-
-                                // Translate center of magnifier to (0,0)
-                                ctx.translate(magnifierCanvas.width / 2, magnifierCanvas.height / 2);
-                                // Scale zoom factor
-                                ctx.scale(magnifier.zoomFactor, magnifier.zoomFactor);
-                                // Translate cursor to (0,0)
-                                ctx.translate(-window.cursorX, -window.cursorY);
-
-                                // 1. Draw background image
-                                if (staticBgImage.status === Image.Ready || staticBgImage.width > 0) {
-                                    ctx.drawImage(staticBgImage, 0, 0, drawingCanvas.width, drawingCanvas.height);
-                                }
-
-                                // 2. Draw annotations
-                                if (window.showAnnotations) {
-                                    for (var i = 0; i < window.strokes.length; i++) {
-                                        drawingCanvas.drawStroke(ctx, window.strokes[i]);
-                                    }
-                                    if (window.currentStroke) {
-                                        drawingCanvas.drawStroke(ctx, window.currentStroke);
-                                    }
-                                }
-
-                                ctx.restore();
-                            }
-                        }
-
-                        Rectangle {
-                            anchors.centerIn: parent
-                            width: 16
-                            height: 1.5
-                            color: Theme.primary
-                        }
-                        Rectangle {
-                            anchors.centerIn: parent
-                            width: 1.5
-                            height: 16
-                            color: Theme.primary
-                        }
+                        window: window
+                        drawingCanvas: drawingCanvas
+                        staticBgImage: staticBgImage
+                        boardContainer: boardContainer
+                        drawMouseArea: drawMouseArea
                     }
                 }
 
