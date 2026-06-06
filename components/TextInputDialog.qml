@@ -14,7 +14,7 @@ Popup {
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
     anchors.centerIn: parent
 
-    property var window
+    property var rootWindow
     property var modalFocusScope
 
     background: Rectangle {
@@ -29,10 +29,10 @@ Popup {
     }
 
     onClosed: {
-        if (window.isTyping) {
-            window.isTyping = false;
-            window.currentTypingText = "";
-            if (window.activeCanvas) window.activeCanvas.requestPaint();
+        if (rootWindow && rootWindow.isTyping) {
+            rootWindow.isTyping = false;
+            rootWindow.currentTypingText = "";
+            if (rootWindow.activeCanvas) rootWindow.activeCanvas.requestPaint();
             modalFocusScope.forceActiveFocus();
         }
     }
@@ -61,8 +61,10 @@ Popup {
                 placeholderText: I18n.tr("Type note...")
                 focus: true
                 onAccepted: {
-                    window.currentTypingText = textInputField.text;
-                    window.commitTypingText();
+                    if (rootWindow) {
+                        rootWindow.currentTypingText = textInputField.text;
+                        rootWindow.commitTypingText();
+                    }
                     root.close();
                 }
             }
@@ -77,8 +79,10 @@ Popup {
                     backgroundColor: Theme.primary
                     textColor: Theme.primaryText
                     onClicked: {
-                        window.currentTypingText = textInputField.text;
-                        window.commitTypingText();
+                        if (rootWindow) {
+                            rootWindow.currentTypingText = textInputField.text;
+                            rootWindow.commitTypingText();
+                        }
                         root.close();
                     }
                 }

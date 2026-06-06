@@ -1615,7 +1615,7 @@ DankModal {
                     }
                     TextInputDialog {
                         id: textInputDialog
-                        window: window
+                        rootWindow: window
                         modalFocusScope: modalFocusScope
                     }
 
@@ -1631,7 +1631,7 @@ DankModal {
 
                     Magnifier {
                         id: magnifier
-                        window: window
+                        rootWindow: window
                         drawingCanvas: drawingCanvas
                         staticBgImage: staticBgImage
                         boardContainer: boardContainer

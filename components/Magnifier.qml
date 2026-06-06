@@ -10,14 +10,14 @@ Rectangle {
     border.color: Theme.primary
     border.width: 2
     color: "black"
-    visible: (window && drawMouseArea) ? (window.enableMagnifier && window.isZoomPressed && drawMouseArea.containsMouse) : false
+    visible: (rootWindow && drawMouseArea) ? (rootWindow.enableMagnifier && rootWindow.isZoomPressed && drawMouseArea.containsMouse) : false
     z: 200
     enabled: false
 
-    x: (drawingCanvas && boardContainer && window) ? (drawingCanvas.mapToItem(boardContainer, window.cursorX, window.cursorY).x - (width / 2)) : 0
-    y: (drawingCanvas && boardContainer && window) ? (drawingCanvas.mapToItem(boardContainer, window.cursorX, window.cursorY).y - (height / 2)) : 0
+    x: (drawingCanvas && boardContainer && rootWindow) ? (drawingCanvas.mapToItem(boardContainer, rootWindow.cursorX, rootWindow.cursorY).x - (width / 2)) : 0
+    y: (drawingCanvas && boardContainer && rootWindow) ? (drawingCanvas.mapToItem(boardContainer, rootWindow.cursorX, rootWindow.cursorY).y - (height / 2)) : 0
 
-    property var window
+    property var rootWindow
     property var drawingCanvas
     property var staticBgImage
     property var boardContainer
@@ -37,7 +37,7 @@ Rectangle {
         }
 
         Connections {
-            target: window
+            target: rootWindow
             function onCursorXChanged() { magnifierCanvas.requestPaint(); }
             function onCursorYChanged() { magnifierCanvas.requestPaint(); }
         }
@@ -48,7 +48,7 @@ Rectangle {
         }
 
         onPaint: {
-            if (!window || !drawingCanvas || !staticBgImage) return;
+            if (!rootWindow || !drawingCanvas || !staticBgImage) return;
 
             var ctx = magnifierCanvas.getContext("2d");
             ctx.clearRect(0, 0, magnifierCanvas.width, magnifierCanvas.height);
@@ -65,7 +65,7 @@ Rectangle {
             // Scale zoom factor
             ctx.scale(root.zoomFactor, root.zoomFactor);
             // Translate cursor to (0,0)
-            ctx.translate(-window.cursorX, -window.cursorY);
+            ctx.translate(-rootWindow.cursorX, -rootWindow.cursorY);
 
             // 1. Draw background image
             if (staticBgImage.status === Image.Ready || staticBgImage.width > 0) {
@@ -73,21 +73,21 @@ Rectangle {
             }
 
             // 2. Draw annotations
-            if (window.showAnnotations) {
+            if (rootWindow.showAnnotations) {
                 const options = {
-                    roundHighlighter: window.roundHighlighter,
-                    roundRect: window.roundRect,
+                    roundHighlighter: rootWindow.roundHighlighter,
+                    roundRect: rootWindow.roundRect,
                     cornerRadius: Theme.cornerRadius,
-                    bgImageItem: window.bgImageItem,
-                    bgImageReady: window.bgImageItem && window.bgImageItem.status === Image.Ready,
+                    bgImageItem: rootWindow.bgImageItem,
+                    bgImageReady: rootWindow.bgImageItem && rootWindow.bgImageItem.status === Image.Ready,
                     isCurrentStroke: false
                 };
 
-                for (var i = 0; i < window.strokes.length; i++) {
-                    StrokePainter.drawStroke(ctx, window.strokes[i], options);
+                for (var i = 0; i < rootWindow.strokes.length; i++) {
+                    StrokePainter.drawStroke(ctx, rootWindow.strokes[i], options);
                 }
-                if (window.currentStroke) {
-                    StrokePainter.drawStroke(ctx, window.currentStroke, options);
+                if (rootWindow.currentStroke) {
+                    StrokePainter.drawStroke(ctx, rootWindow.currentStroke, options);
                 }
             }
 
