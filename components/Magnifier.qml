@@ -10,12 +10,12 @@ Rectangle {
     border.color: Theme.primary
     border.width: 2
     color: "black"
-    visible: window.enableMagnifier && window.isZoomPressed && drawMouseArea.containsMouse
+    visible: (window && drawMouseArea) ? (window.enableMagnifier && window.isZoomPressed && drawMouseArea.containsMouse) : false
     z: 200
     enabled: false
 
-    x: drawingCanvas.mapToItem(boardContainer, window.cursorX, window.cursorY).x - (width / 2)
-    y: drawingCanvas.mapToItem(boardContainer, window.cursorX, window.cursorY).y - (height / 2)
+    x: (drawingCanvas && boardContainer && window) ? (drawingCanvas.mapToItem(boardContainer, window.cursorX, window.cursorY).x - (width / 2)) : 0
+    y: (drawingCanvas && boardContainer && window) ? (drawingCanvas.mapToItem(boardContainer, window.cursorX, window.cursorY).y - (height / 2)) : 0
 
     property var window
     property var drawingCanvas
@@ -48,6 +48,8 @@ Rectangle {
         }
 
         onPaint: {
+            if (!window || !drawingCanvas || !staticBgImage) return;
+
             var ctx = magnifierCanvas.getContext("2d");
             ctx.clearRect(0, 0, magnifierCanvas.width, magnifierCanvas.height);
 

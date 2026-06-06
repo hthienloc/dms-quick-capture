@@ -136,8 +136,8 @@ DankModal {
     property bool isZoomPressed: false
     property real cursorX: 0
     property real cursorY: 0
-    readonly property real boardCursorX: boardContainerItem ? (boardContainerItem.width / 2 + (cursorX - drawingCanvas.width / 2) * fitScale) : 0
-    readonly property real boardCursorY: boardContainerItem ? (boardContainerItem.height / 2 + (cursorY - drawingCanvas.height / 2) * fitScale) : 0
+    readonly property real boardCursorX: (boardContainerItem && typeof drawingCanvas !== "undefined" && drawingCanvas) ? (boardContainerItem.width / 2 + (cursorX - drawingCanvas.width / 2) * fitScale) : 0
+    readonly property real boardCursorY: (boardContainerItem && typeof drawingCanvas !== "undefined" && drawingCanvas) ? (boardContainerItem.height / 2 + (cursorY - drawingCanvas.height / 2) * fitScale) : 0
 
     property bool showAnnotations: true
     onShowAnnotationsChanged: {

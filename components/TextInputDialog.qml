@@ -62,8 +62,8 @@ Popup {
                 focus: true
                 onAccepted: {
                     window.currentTypingText = textInputField.text;
-                    root.close();
                     window.commitTypingText();
+                    root.close();
                 }
             }
 
@@ -78,8 +78,8 @@ Popup {
                     textColor: Theme.primaryText
                     onClicked: {
                         window.currentTypingText = textInputField.text;
-                        root.close();
                         window.commitTypingText();
+                        root.close();
                     }
                 }
 
