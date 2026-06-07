@@ -515,6 +515,139 @@ PluginSettings {
     }
 
     SettingsCard {
+        id: toolbarPaletteSection
+        SectionTitle {
+            text: I18n.tr("Toolbar Palette")
+            icon: "palette"
+            showReset: toolbar_primary.isDirty || c0.isDirty || c1.isDirty || c2.isDirty || c3.isDirty || c4.isDirty || c5.isDirty || c6.isDirty
+            onResetClicked: {
+                toolbar_primary.resetToDefault();
+                c0.resetToDefault(); c1.resetToDefault(); c2.resetToDefault();
+                c3.resetToDefault(); c4.resetToDefault(); c5.resetToDefault();
+                c6.resetToDefault();
+            }
+        }
+
+        InfoText {
+            text: I18n.tr("Select a color palette preset or customize the color slots individually.")
+        }
+
+        Item { width: 1; height: Theme.spacingS }
+
+        SelectionSettingPlus {
+            id: palettePresetSetting
+            settingKey: "color_palette_preset"
+            label: I18n.tr("Palette Preset")
+            defaultValue: "adaptive"
+            options: [
+                { "label": I18n.tr("Adaptive (DMS Theme)"), "value": "adaptive" },
+                { "label": I18n.tr("Classic (Tailwind)"), "value": "classic" },
+                { "label": I18n.tr("Nord (Pastel Cold)"), "value": "nord" },
+                { "label": I18n.tr("Gruvbox (Warm Retro)"), "value": "gruvbox" },
+                { "label": I18n.tr("Dracula (High Contrast Dark)"), "value": "dracula" },
+                { "label": I18n.tr("Catppuccin"), "value": "catppuccin" },
+                { "label": I18n.tr("Custom Colors"), "value": "custom" }
+            ]
+        }
+
+        ButtonGroupSettingPlus {
+            id: catppuccinVariantSetting
+            settingKey: "catppuccin_variant"
+            label: ""
+            defaultValue: "mocha"
+            options: [
+                { "label": "Latte", "value": "latte" },
+                { "label": "Frappé", "value": "frappe" },
+                { "label": "Macchiato", "value": "macchiato" },
+                { "label": "Mocha", "value": "mocha" }
+            ]
+            visible: palettePresetSetting.value === "catppuccin"
+            height: visible ? implicitHeight : 0
+        }
+
+        Item { width: 1; height: Theme.spacingS }
+
+        Grid {
+            width: parent.width
+            columns: 4
+            rowSpacing: Theme.spacingM
+            columnSpacing: Theme.spacingM
+
+            CompactColorSetting {
+                id: toolbar_primary
+                settingKey: "toolbar_color_primary"
+                label: I18n.tr("Slot 1")
+                defaultValue: "primary"
+                readOnly: palettePresetSetting.value !== "custom"
+                overrideColor: palettePresetSetting.value !== "custom" ? Theme.primary : null
+            }
+
+            CompactColorSetting {
+                id: c0
+                settingKey: "toolbar_color_0"
+                label: I18n.tr("Slot 2")
+                defaultValue: captureConfig.defaultAccentColors[0]
+                readOnly: palettePresetSetting.value !== "custom"
+                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[0] : null
+            }
+
+            CompactColorSetting {
+                id: c1
+                settingKey: "toolbar_color_1"
+                label: I18n.tr("Slot 3")
+                defaultValue: captureConfig.defaultAccentColors[1]
+                readOnly: palettePresetSetting.value !== "custom"
+                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[1] : null
+            }
+
+            CompactColorSetting {
+                id: c2
+                settingKey: "toolbar_color_2"
+                label: I18n.tr("Slot 4")
+                defaultValue: captureConfig.defaultAccentColors[2]
+                readOnly: palettePresetSetting.value !== "custom"
+                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[2] : null
+            }
+
+            CompactColorSetting {
+                id: c3
+                settingKey: "toolbar_color_3"
+                label: I18n.tr("Slot 5")
+                defaultValue: captureConfig.defaultAccentColors[3]
+                readOnly: palettePresetSetting.value !== "custom"
+                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[3] : null
+            }
+
+            CompactColorSetting {
+                id: c4
+                settingKey: "toolbar_color_4"
+                label: I18n.tr("Slot 6")
+                defaultValue: captureConfig.defaultAccentColors[4]
+                readOnly: palettePresetSetting.value !== "custom"
+                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[4] : null
+            }
+
+            CompactColorSetting {
+                id: c5
+                settingKey: "toolbar_color_5"
+                label: I18n.tr("Slot 7")
+                defaultValue: captureConfig.defaultAccentColors[5]
+                readOnly: palettePresetSetting.value !== "custom"
+                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[5] : null
+            }
+
+            CompactColorSetting {
+                id: c6
+                settingKey: "toolbar_color_6"
+                label: I18n.tr("Slot 8")
+                defaultValue: captureConfig.defaultAccentColors[6]
+                readOnly: palettePresetSetting.value !== "custom"
+                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[6] : null
+            }
+        }
+    }
+
+    SettingsCard {
         id: backdropStylesCard
         SectionTitle {
             text: I18n.tr("Styles")
@@ -577,10 +710,9 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Drawing")
             icon: "brush"
-            showReset: defaultToolMode.isDirty || defaultPresetIndex.isDirty || defaultTool.isDirty || defaultThickness.isDirty
+            showReset: defaultToolMode.isDirty || defaultTool.isDirty || defaultThickness.isDirty
             onResetClicked: {
                 defaultToolMode.resetToDefault();
-                defaultPresetIndex.resetToDefault();
                 defaultTool.resetToDefault();
                 defaultThickness.resetToDefault();
             }
@@ -599,27 +731,7 @@ PluginSettings {
 
         Separator {}
 
-        SelectionSettingPlus {
-            id: defaultPresetIndex
-            settingKey: "defaultPresetIndex"
-            label: I18n.tr("Starting Preset")
-            options: [
-                { "label": I18n.tr("Preset 1"), "value": "0" },
-                { "label": I18n.tr("Preset 2"), "value": "1" },
-                { "label": I18n.tr("Preset 3"), "value": "2" },
-                { "label": I18n.tr("Preset 4"), "value": "3" },
-                { "label": I18n.tr("Preset 5"), "value": "4" },
-                { "label": I18n.tr("Preset 6"), "value": "5" },
-                { "label": I18n.tr("Preset 7"), "value": "6" },
-                { "label": I18n.tr("Preset 8"), "value": "7" }
-            ]
-            defaultValue: "0"
-            visible: defaultToolMode.value === "preset"
-        }
 
-        Separator {
-            visible: defaultToolMode.value === "preset"
-        }
 
         SelectionSettingPlus {
             id: defaultTool
@@ -1265,134 +1377,82 @@ PluginSettings {
     }
 
     SettingsCard {
-        id: toolbarPaletteSection
+        id: radialBehaviorsCard
         SectionTitle {
-            text: I18n.tr("Toolbar Palette")
-            icon: "palette"
-            showReset: toolbar_primary.isDirty || c0.isDirty || c1.isDirty || c2.isDirty || c3.isDirty || c4.isDirty || c5.isDirty || c6.isDirty
+            text: I18n.tr("Radial Menu Settings")
+            icon: "mouse"
+            showReset: defaultPresetIndex.isDirty || radialHoverTrigger.isDirty || radialHoverDelay.isDirty || radialMenuOpacity.isDirty
             onResetClicked: {
-                toolbar_primary.resetToDefault();
-                c0.resetToDefault(); c1.resetToDefault(); c2.resetToDefault();
-                c3.resetToDefault(); c4.resetToDefault(); c5.resetToDefault();
-                c6.resetToDefault();
+                defaultPresetIndex.resetToDefault();
+                radialHoverTrigger.resetToDefault();
+                radialHoverDelay.resetToDefault();
+                radialMenuOpacity.resetToDefault();
             }
         }
 
-        InfoText {
-            text: I18n.tr("Select a color palette preset or customize the color slots individually.")
-        }
-
-        Item { width: 1; height: Theme.spacingS }
-
         SelectionSettingPlus {
-            id: palettePresetSetting
-            settingKey: "color_palette_preset"
-            label: I18n.tr("Palette Preset")
-            defaultValue: "adaptive"
+            id: defaultPresetIndex
+            settingKey: "defaultPresetIndex"
+            label: I18n.tr("Starting Preset")
             options: [
-                { "label": I18n.tr("Adaptive (DMS Theme)"), "value": "adaptive" },
-                { "label": I18n.tr("Classic (Tailwind)"), "value": "classic" },
-                { "label": I18n.tr("Nord (Pastel Cold)"), "value": "nord" },
-                { "label": I18n.tr("Gruvbox (Warm Retro)"), "value": "gruvbox" },
-                { "label": I18n.tr("Dracula (High Contrast Dark)"), "value": "dracula" },
-                { "label": I18n.tr("Catppuccin"), "value": "catppuccin" },
-                { "label": I18n.tr("Custom Colors"), "value": "custom" }
+                { "label": I18n.tr("Preset 1"), "value": "0" },
+                { "label": I18n.tr("Preset 2"), "value": "1" },
+                { "label": I18n.tr("Preset 3"), "value": "2" },
+                { "label": I18n.tr("Preset 4"), "value": "3" },
+                { "label": I18n.tr("Preset 5"), "value": "4" },
+                { "label": I18n.tr("Preset 6"), "value": "5" },
+                { "label": I18n.tr("Preset 7"), "value": "6" },
+                { "label": I18n.tr("Preset 8"), "value": "7" }
             ]
+            defaultValue: "0"
         }
 
-        ButtonGroupSettingPlus {
-            id: catppuccinVariantSetting
-            settingKey: "catppuccin_variant"
-            label: ""
-            defaultValue: "mocha"
-            options: [
-                { "label": "Latte", "value": "latte" },
-                { "label": "Frappé", "value": "frappe" },
-                { "label": "Macchiato", "value": "macchiato" },
-                { "label": "Mocha", "value": "mocha" }
-            ]
-            visible: palettePresetSetting.value === "catppuccin"
+        Separator {}
+
+        ToggleSettingPlus {
+            id: radialHoverTrigger
+            settingKey: "radialHoverTrigger"
+            label: I18n.tr("Trigger on Hover")
+            description: I18n.tr("Select a tool preset automatically by hovering over it, without needing to release the mouse click.")
+            defaultValue: false
+        }
+
+        Separator {
+            visible: radialHoverTrigger.value
+            height: visible ? 1 : 0
+        }
+
+        SliderSettingPlus {
+            id: radialHoverDelay
+            settingKey: "radialHoverDelay"
+            label: I18n.tr("Hover Trigger Delay")
+            defaultValue: 300
+            minimum: 100
+            maximum: 1000
+            leftLabel: "100"
+            rightLabel: "1000"
+            unit: "ms"
+            visible: radialHoverTrigger.value
             height: visible ? implicitHeight : 0
         }
 
-        Item { width: 1; height: Theme.spacingS }
+        Separator {}
 
-        Grid {
-            width: parent.width
-            columns: 4
-            rowSpacing: Theme.spacingM
-            columnSpacing: Theme.spacingM
+        SliderSettingPlus {
+            id: radialMenuOpacity
+            settingKey: "radialMenuOpacity"
+            label: I18n.tr("Radial Menu Opacity")
+            defaultValue: 100
+            minimum: 0
+            maximum: 100
+            leftLabel: "0"
+            rightLabel: "100"
+            unit: "%"
 
-            CompactColorSetting {
-                id: toolbar_primary
-                settingKey: "toolbar_color_primary"
-                label: I18n.tr("Slot 1")
-                defaultValue: "primary"
-                readOnly: palettePresetSetting.value !== "custom"
-                overrideColor: palettePresetSetting.value !== "custom" ? Theme.primary : null
-            }
-
-            CompactColorSetting {
-                id: c0
-                settingKey: "toolbar_color_0"
-                label: I18n.tr("Slot 2")
-                defaultValue: captureConfig.defaultAccentColors[0]
-                readOnly: palettePresetSetting.value !== "custom"
-                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[0] : null
-            }
-
-            CompactColorSetting {
-                id: c1
-                settingKey: "toolbar_color_1"
-                label: I18n.tr("Slot 3")
-                defaultValue: captureConfig.defaultAccentColors[1]
-                readOnly: palettePresetSetting.value !== "custom"
-                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[1] : null
-            }
-
-            CompactColorSetting {
-                id: c2
-                settingKey: "toolbar_color_2"
-                label: I18n.tr("Slot 4")
-                defaultValue: captureConfig.defaultAccentColors[2]
-                readOnly: palettePresetSetting.value !== "custom"
-                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[2] : null
-            }
-
-            CompactColorSetting {
-                id: c3
-                settingKey: "toolbar_color_3"
-                label: I18n.tr("Slot 5")
-                defaultValue: captureConfig.defaultAccentColors[3]
-                readOnly: palettePresetSetting.value !== "custom"
-                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[3] : null
-            }
-
-            CompactColorSetting {
-                id: c4
-                settingKey: "toolbar_color_4"
-                label: I18n.tr("Slot 6")
-                defaultValue: captureConfig.defaultAccentColors[4]
-                readOnly: palettePresetSetting.value !== "custom"
-                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[4] : null
-            }
-
-            CompactColorSetting {
-                id: c5
-                settingKey: "toolbar_color_5"
-                label: I18n.tr("Slot 7")
-                defaultValue: captureConfig.defaultAccentColors[5]
-                readOnly: palettePresetSetting.value !== "custom"
-                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[5] : null
-            }
-
-            CompactColorSetting {
-                id: c6
-                settingKey: "toolbar_color_6"
-                label: I18n.tr("Slot 8")
-                defaultValue: captureConfig.defaultAccentColors[6]
-                readOnly: palettePresetSetting.value !== "custom"
-                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[6] : null
+            Binding {
+                target: root
+                property: "radialMenuOpacityValue"
+                value: radialMenuOpacity.value
             }
         }
     }
@@ -1934,67 +1994,6 @@ PluginSettings {
         }
     }
  
-    SettingsCard {
-        id: radialBehaviorsCard
-        SectionTitle {
-            text: I18n.tr("Radial Menu Settings")
-            icon: "mouse"
-            showReset: radialHoverTrigger.isDirty || radialHoverDelay.isDirty || radialMenuOpacity.isDirty
-            onResetClicked: {
-                radialHoverTrigger.resetToDefault();
-                radialHoverDelay.resetToDefault();
-                radialMenuOpacity.resetToDefault();
-            }
-        }
-
-        ToggleSettingPlus {
-            id: radialHoverTrigger
-            settingKey: "radialHoverTrigger"
-            label: I18n.tr("Trigger on Hover")
-            description: I18n.tr("Select a tool preset automatically by hovering over it, without needing to release the mouse click.")
-            defaultValue: false
-        }
-
-        Separator {
-            visible: radialHoverTrigger.value
-            height: visible ? 1 : 0
-        }
-
-        SliderSettingPlus {
-            id: radialHoverDelay
-            settingKey: "radialHoverDelay"
-            label: I18n.tr("Hover Trigger Delay")
-            defaultValue: 300
-            minimum: 100
-            maximum: 1000
-            leftLabel: "100"
-            rightLabel: "1000"
-            unit: "ms"
-            visible: radialHoverTrigger.value
-            height: visible ? implicitHeight : 0
-        }
-
-        Separator {}
-
-        SliderSettingPlus {
-            id: radialMenuOpacity
-            settingKey: "radialMenuOpacity"
-            label: I18n.tr("Radial Menu Opacity")
-            defaultValue: 100
-            minimum: 0
-            maximum: 100
-            leftLabel: "0"
-            rightLabel: "100"
-            unit: "%"
-
-            Binding {
-                target: root
-                property: "radialMenuOpacityValue"
-                value: radialMenuOpacity.value
-            }
-        }
-    }
-
     SettingsCard {
         SectionTitle { 
             id: usageTitle
