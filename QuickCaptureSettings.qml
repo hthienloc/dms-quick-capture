@@ -706,6 +706,624 @@ PluginSettings {
     }
 
     SettingsCard {
+        id: radialMenuCard
+
+        property int presetActiveIndex: 0
+
+        property var activePresetTools: ["pen", "arrow", "rect", "highlighter", "ellipse", "stamp", "redact", "pixelate"]
+        property var activePresetColors: ["primary", "primary", "primary", "primary", "primary", "primary", "#000000", "#ffffff"]
+        property var activePresetThicknesses: [6, 6, 6, 6, 6, 6, 6, 6]
+
+        readonly property var currentPresets: {
+            const list = [];
+            for (let i = 0; i < 8; i++) {
+                const tool = radialMenuCard.activePresetTools[i] || "none";
+                const color = radialMenuCard.activePresetColors[i] || "primary";
+                const thickness = radialMenuCard.activePresetThicknesses[i] ?? 6;
+                list.push({ tool: tool, color: color, thickness: thickness });
+            }
+            return list;
+        }
+
+        SectionTitle {
+            text: I18n.tr("Radial Menu")
+            icon: "settings"
+        }
+
+        InfoText {
+            text: I18n.tr("Configure up to 8 quick-access tool presets. Right-click anywhere during capture to open the radial menu.")
+        }
+
+        Item { width: 1; height: Theme.spacingXS }
+
+        Item { width: 1; height: Theme.spacingXS }
+
+        // Interactive Radial Menu Simulation
+        Item {
+            id: simulatedRadialMenu
+            width: 240
+            height: 240
+            anchors.horizontalCenter: parent.horizontalCenter
+            opacity: root.radialMenuOpacityValue / 100
+
+            readonly property real outerRadius: 110
+            readonly property real innerRadius: 40
+            readonly property real midRadius: (innerRadius + outerRadius) / 2
+            readonly property real itemRadius: 22
+            readonly property real centerRadius: 34
+
+            // Segmented Background Canvas
+            Canvas {
+                id: simulatedCanvas
+                anchors.fill: parent
+                antialiasing: true
+
+                onPaint: {
+                    var ctx = getContext("2d");
+                    ctx.clearRect(0, 0, width, height);
+
+                    var centerX = width / 2;
+                    var centerY = height / 2;
+                    var numSectors = 8;
+                    var sectorAngle = 2 * Math.PI / numSectors;
+
+                    for (var i = 0; i < numSectors; i++) {
+                        var startAngle = i * sectorAngle - Math.PI / 2 - sectorAngle / 2;
+                        var endAngle = startAngle + sectorAngle;
+
+                        ctx.beginPath();
+                        ctx.arc(centerX, centerY, simulatedRadialMenu.outerRadius, startAngle, endAngle);
+                        ctx.arc(centerX, centerY, simulatedRadialMenu.innerRadius, endAngle, startAngle, true);
+                        ctx.closePath();
+
+                        // Highlight active segment
+                        if (radialMenuCard.presetActiveIndex === i) {
+                            ctx.fillStyle = Theme.primary;
+                        } else {
+                            ctx.fillStyle = Theme.withAlpha(Theme.surfaceContainerHigh, 0.88);
+                        }
+                        ctx.fill();
+
+                        ctx.strokeStyle = radialMenuCard.presetActiveIndex === i ? Theme.primary : Theme.withAlpha(Theme.outline, 0.15);
+                        ctx.lineWidth = radialMenuCard.presetActiveIndex === i ? 2 : 1;
+                        ctx.stroke();
+                    }
+                }
+
+                // Redraw on active index changes
+                Connections {
+                    target: radialMenuCard
+                    function onPresetActiveIndexChanged() { simulatedCanvas.requestPaint(); }
+                }
+                
+                // Redraw on preset changes (color or tool changed in settings)
+                Connections {
+                    target: radialMenuCard
+                    function onCurrentPresetsChanged() { simulatedCanvas.requestPaint(); }
+                }
+                
+                Component.onCompleted: simulatedCanvas.requestPaint()
+            }
+
+            // Outer circle outline
+            Rectangle {
+                anchors.fill: parent
+                radius: width / 2
+                color: "transparent"
+                border.color: Theme.withAlpha(Theme.outline, 0.25)
+                border.width: 1.5
+            }
+
+            // Outer icons overlay
+            Repeater {
+                model: radialMenuCard.currentPresets
+
+                delegate: Item {
+                    width: simulatedRadialMenu.itemRadius * 2
+                    height: width
+                    
+                    property real angle: (index * 360 / 8) - 90
+                    property real rad: angle * Math.PI / 180
+                    
+                    x: (simulatedRadialMenu.width / 2) + simulatedRadialMenu.midRadius * Math.cos(rad) - simulatedRadialMenu.itemRadius
+                    y: (simulatedRadialMenu.height / 2) + simulatedRadialMenu.midRadius * Math.sin(rad) - simulatedRadialMenu.itemRadius
+
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: 1
+
+                        StyledText {
+                            text: (index + 1)
+                            font.pixelSize: 8
+                            font.bold: true
+                            color: radialMenuCard.presetActiveIndex === index ? Theme.onPrimary : Theme.surfaceVariantText
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            opacity: 0.6
+                        }
+
+                        DankIcon {
+                            name: {
+                                const tool = captureConfig.toolButtons.find(t => t.id === modelData.tool);
+                                return tool ? tool.icon : "help";
+                            }
+                            size: 18
+                            color: {
+                                if (radialMenuCard.presetActiveIndex === index) return Theme.onPrimary;
+                                if (modelData.tool === "none") return Theme.withAlpha(Theme.surfaceVariantText, 0.3);
+                                return captureConfig.resolveColor(modelData.color);
+                            }
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                    }
+                }
+            }
+
+            // Center Info Button
+            Rectangle {
+                id: simulatedCenterButton
+                width: simulatedRadialMenu.centerRadius * 2
+                height: width
+                radius: simulatedRadialMenu.centerRadius
+                anchors.centerIn: parent
+                color: Theme.surfaceContainerHighest
+                border.color: Theme.withAlpha(Theme.outline, 0.4)
+                border.width: 1
+
+                Column {
+                    anchors.centerIn: parent
+                    spacing: 1
+                    
+                    DankIcon {
+                        name: {
+                            const p = radialMenuCard.currentPresets[radialMenuCard.presetActiveIndex];
+                            if (p && p.tool !== "none") {
+                                const tool = captureConfig.toolButtons.find(t => t.id === p.tool);
+                                return tool ? tool.icon : "check";
+                            }
+                            return "block";
+                        }
+                        size: 20
+                        color: {
+                            const p = radialMenuCard.currentPresets[radialMenuCard.presetActiveIndex];
+                            if (!p || p.tool === "none") return Theme.surfaceVariantText;
+                            return captureConfig.resolveColor(p.color);
+                        }
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    StyledText {
+                        text: I18n.tr("Preset %1").arg(radialMenuCard.presetActiveIndex + 1)
+                        font.pixelSize: 8
+                        font.bold: true
+                        color: Theme.surfaceVariantText
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+            }
+
+            // Mouse Area to click segments
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+
+                onPositionChanged: (mouse) => {
+                    const dx = mouse.x - width / 2;
+                    const dy = mouse.y - height / 2;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < simulatedRadialMenu.innerRadius || dist > simulatedRadialMenu.outerRadius) {
+                        return;
+                    }
+
+                    let angle = Math.atan2(dy, dx) * 180 / Math.PI + 90;
+                    if (angle < 0) angle += 360;
+                    
+                    const numSectors = 8;
+                    const sectorSize = 360 / numSectors;
+                    const idx = Math.floor((angle + sectorSize / 2) % 360 / sectorSize);
+                    
+                    if (idx >= 0 && idx < numSectors && radialMenuCard.presetActiveIndex !== idx) {
+                        radialMenuCard.presetActiveIndex = idx;
+                    }
+                }
+
+                onClicked: (mouse) => {
+                    const dx = mouse.x - width / 2;
+                    const dy = mouse.y - height / 2;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < simulatedRadialMenu.innerRadius || dist > simulatedRadialMenu.outerRadius) {
+                        return;
+                    }
+
+                    let angle = Math.atan2(dy, dx) * 180 / Math.PI + 90;
+                    if (angle < 0) angle += 360;
+                    
+                    const numSectors = 8;
+                    const sectorSize = 360 / numSectors;
+                    const idx = Math.floor((angle + sectorSize / 2) % 360 / sectorSize);
+                    
+                    if (idx >= 0 && idx < numSectors) {
+                        radialMenuCard.presetActiveIndex = idx;
+                    }
+                }
+            }
+        }
+
+
+
+        Repeater {
+            model: 8
+
+            Column {
+                id: presetDelegate
+                width: parent.width
+                spacing: Theme.spacingM
+                visible: radialMenuCard.presetActiveIndex === index
+                readonly property int presetIndex: index
+
+                Item { width: 1; height: Theme.spacingXS }
+
+                SelectionSettingPlus {
+                    id: presetToolSetting
+                    settingKey: "preset_" + index + "_tool"
+                    label: I18n.tr("Preset Tool")
+                    options: [{
+                        "label": I18n.tr("None / Disabled"),
+                        "value": "none"
+                    }, {
+                        "label": I18n.tr("Freehand Pen"),
+                        "value": "pen"
+                    }, {
+                        "label": I18n.tr("Straight Line"),
+                        "value": "line"
+                    }, {
+                        "label": I18n.tr("Arrow Vector"),
+                        "value": "arrow"
+                    }, {
+                        "label": I18n.tr("Rectangle Outline"),
+                        "value": "rect"
+                    }, {
+                        "label": I18n.tr("Ellipse / Circle"),
+                        "value": "ellipse"
+                    }, {
+                        "label": I18n.tr("Text Note"),
+                        "value": "text"
+                    }, {
+                        "label": I18n.tr("Pixelate"),
+                        "value": "pixelate"
+                    }, {
+                        "label": I18n.tr("Redact / Blackout"),
+                        "value": "redact"
+                    }, {
+                        "label": I18n.tr("Number Stamp"),
+                        "value": "stamp"
+                    }, {
+                        "label": I18n.tr("Highlighter"),
+                        "value": "highlighter"
+                    }, {
+                        "label": I18n.tr("Eraser"),
+                        "value": "eraser"
+                    }, {
+                        "label": I18n.tr("Crop / Resize"),
+                        "value": "crop"
+                    }]
+                    defaultValue: {
+                        if (index === 0) return "pen";
+                        if (index === 1) return "arrow";
+                        if (index === 2) return "rect";
+                        if (index === 3) return "highlighter";
+                        if (index === 4) return "ellipse";
+                        if (index === 5) return "stamp";
+                        if (index === 6) return "redact";
+                        if (index === 7) return "pixelate";
+                        return "none";
+                    }
+                }
+
+                Connections {
+                    target: presetToolSetting
+                    function onValueChanged() {
+                        radialMenuCard.activePresetTools[index] = presetToolSetting.value;
+                        radialMenuCard.activePresetTools = [...radialMenuCard.activePresetTools];
+                    }
+                }
+
+                Separator {}
+
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacingS
+
+                    StyledText {
+                        text: I18n.tr("Preset Color")
+                        font.pixelSize: Theme.fontSizeLarge
+                        font.weight: Font.Medium
+                        color: Theme.surfaceText
+                    }
+
+                    // Row containing 8 Slots + Separator + Custom Swatch & Optional Color Bar
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingS
+
+                        // 1. 8 Slots
+                        Row {
+                            spacing: Theme.spacingXS
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            Repeater {
+                                model: 8
+                                delegate: Rectangle {
+                                    width: 28
+                                    height: 28
+                                    radius: 14
+                                    color: {
+                                        if (index === 0) return toolbar_primary.resolvedColor;
+                                        if (index === 1) return c0.resolvedColor;
+                                        if (index === 2) return c1.resolvedColor;
+                                        if (index === 3) return c2.resolvedColor;
+                                        if (index === 4) return c3.resolvedColor;
+                                        if (index === 5) return c4.resolvedColor;
+                                        if (index === 6) return c5.resolvedColor;
+                                        if (index === 7) return c6.resolvedColor;
+                                        return "transparent";
+                                    }
+
+                                    property bool isSelected: presetColorSetting.value === "slot_" + (index + 1)
+                                    border.width: isSelected ? 2 : 1
+                                    border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.outline, 0.4)
+                                    scale: hoverArea.containsMouse ? 1.1 : 1.0
+                                    Behavior on scale { NumberAnimation { duration: 100 } }
+
+                                    DankIcon {
+                                        anchors.centerIn: parent
+                                        name: "check"
+                                        size: 14
+                                        color: (parent.color.r * 0.299 + parent.color.g * 0.587 + parent.color.b * 0.114) > 0.6 ? "#000000" : "#ffffff"
+                                        visible: parent.isSelected
+                                    }
+
+                                    MouseArea {
+                                        id: hoverArea
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            presetColorSetting.value = "slot_" + (index + 1);
+                                            radialMenuCard.activePresetColors[presetIndex] = presetColorSetting.value;
+                                            radialMenuCard.activePresetColors = [...radialMenuCard.activePresetColors];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Small separator bar
+                        Rectangle {
+                            width: 1
+                            height: 20
+                            color: Theme.withAlpha(Theme.outline, 0.2)
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        // 2. Custom Option and Bar Row
+                        Row {
+                            spacing: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            // Custom button swatch
+                            Rectangle {
+                                id: customSwatch
+                                width: 28
+                                height: 28
+                                radius: 14
+                                property bool isSelected: !presetColorSetting.value.startsWith("slot_")
+                                color: isSelected ? captureConfig.resolveColor(presetColorSetting.value) : Theme.surfaceContainerHighest
+                                border.width: isSelected ? 2 : 1
+                                border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.outline, 0.4)
+                                scale: customHover.containsMouse ? 1.1 : 1.0
+                                Behavior on scale { NumberAnimation { duration: 100 } }
+
+                                DankIcon {
+                                    anchors.centerIn: parent
+                                    name: "palette"
+                                    size: 14
+                                    color: {
+                                        if (!parent.isSelected) return Theme.surfaceText;
+                                        return (parent.color.r * 0.299 + parent.color.g * 0.587 + parent.color.b * 0.114) > 0.6 ? "#000000" : "#ffffff";
+                                    }
+                                }
+
+                                MouseArea {
+                                    id: customHover
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        if (!parent.isSelected) {
+                                            presetColorSetting.value = "primary";
+                                            radialMenuCard.activePresetColors[presetIndex] = presetColorSetting.value;
+                                            radialMenuCard.activePresetColors = [...radialMenuCard.activePresetColors];
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Dynamic Custom Color Bar directly to the right
+                            Rectangle {
+                                id: customColorBar
+                                width: 110
+                                height: 28
+                                radius: 14
+                                visible: !presetColorSetting.value.startsWith("slot_")
+                                color: captureConfig.resolveColor(presetColorSetting.value)
+                                border.color: Theme.withAlpha(Theme.surfaceText, 0.15)
+                                border.width: 1
+
+                                StyledText {
+                                    anchors.centerIn: parent
+                                    text: presetColorSetting.value === "primary" ? I18n.tr("PRIMARY") : presetColorSetting.value.toString().toUpperCase()
+                                    font.pixelSize: Theme.fontSizeSmall - 1
+                                    font.weight: Font.Bold
+                                    isMonospace: true
+                                    color: (parent.color.r * 0.299 + parent.color.g * 0.587 + parent.color.b * 0.114) > 0.6 ? "#000000" : "#ffffff"
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        if (typeof PopoutService !== "undefined" && PopoutService && PopoutService.colorPickerModal) {
+                                            PopoutService.colorPickerModal.selectedColor = captureConfig.resolveColor(presetColorSetting.value);
+                                            PopoutService.colorPickerModal.pickerTitle = I18n.tr("Preset Color");
+                                            PopoutService.colorPickerModal.onColorSelectedCallback = function (selectedColor) {
+                                                presetColorSetting.value = selectedColor.toString();
+                                                radialMenuCard.activePresetColors[presetIndex] = presetColorSetting.value;
+                                                radialMenuCard.activePresetColors = [...radialMenuCard.activePresetColors];
+                                            };
+                                            PopoutService.colorPickerModal.show();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Hidden headless ColorSettingPlus to load/save settings automatically
+                    Item {
+                        width: 0; height: 0
+                        visible: false
+
+                        ColorSettingPlus {
+                            id: presetColorSetting
+                            settingKey: "preset_" + presetIndex + "_color"
+                            label: ""
+                            defaultValue: {
+                                if (presetIndex === 6) return "#000000"; // Black
+                                if (presetIndex === 7) return "#ffffff"; // White
+                                return "primary";
+                            }
+                        }
+
+                        Connections {
+                            target: presetColorSetting
+                            function onValueChanged() {
+                                radialMenuCard.activePresetColors[presetIndex] = presetColorSetting.value;
+                                radialMenuCard.activePresetColors = [...radialMenuCard.activePresetColors];
+                            }
+                        }
+                    }
+                }
+
+                Separator {}
+
+                SliderSettingPlus {
+                    id: presetThicknessSetting
+                    settingKey: "preset_" + index + "_thickness"
+                    label: I18n.tr("Preset Thickness")
+                    defaultValue: 6
+                    minimum: 1
+                    maximum: 20
+                    leftLabel: "1"
+                    rightLabel: "20"
+                    previewType: "thickness"
+                    previewColor: presetColorSetting.value
+                }
+
+                Connections {
+                    target: presetThicknessSetting
+                    function onValueChanged() {
+                        radialMenuCard.activePresetThicknesses[index] = presetThicknessSetting.value;
+                        radialMenuCard.activePresetThicknesses = [...radialMenuCard.activePresetThicknesses];
+                    }
+                }
+            }
+        }
+    }
+ 
+    SettingsCard {
+        id: radialBehaviorsCard
+        SectionTitle {
+            text: I18n.tr("Radial Menu Settings")
+            icon: "mouse"
+            showReset: defaultPresetIndex.isDirty || radialHoverTrigger.isDirty || radialHoverDelay.isDirty || radialMenuOpacity.isDirty
+            onResetClicked: {
+                defaultPresetIndex.resetToDefault();
+                radialHoverTrigger.resetToDefault();
+                radialHoverDelay.resetToDefault();
+                radialMenuOpacity.resetToDefault();
+            }
+        }
+
+        SelectionSettingPlus {
+            id: defaultPresetIndex
+            settingKey: "defaultPresetIndex"
+            label: I18n.tr("Starting Preset")
+            options: [
+                { "label": I18n.tr("Preset 1"), "value": "0" },
+                { "label": I18n.tr("Preset 2"), "value": "1" },
+                { "label": I18n.tr("Preset 3"), "value": "2" },
+                { "label": I18n.tr("Preset 4"), "value": "3" },
+                { "label": I18n.tr("Preset 5"), "value": "4" },
+                { "label": I18n.tr("Preset 6"), "value": "5" },
+                { "label": I18n.tr("Preset 7"), "value": "6" },
+                { "label": I18n.tr("Preset 8"), "value": "7" }
+            ]
+            defaultValue: "0"
+        }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            id: radialHoverTrigger
+            settingKey: "radialHoverTrigger"
+            label: I18n.tr("Trigger on Hover")
+            description: I18n.tr("Select a tool preset automatically by hovering over it, without needing to release the mouse click.")
+            defaultValue: false
+        }
+
+        Separator {
+            visible: radialHoverTrigger.value
+            height: visible ? 1 : 0
+        }
+
+        SliderSettingPlus {
+            id: radialHoverDelay
+            settingKey: "radialHoverDelay"
+            label: I18n.tr("Hover Trigger Delay")
+            defaultValue: 300
+            minimum: 100
+            maximum: 1000
+            leftLabel: "100"
+            rightLabel: "1000"
+            unit: "ms"
+            visible: radialHoverTrigger.value
+            height: visible ? implicitHeight : 0
+        }
+
+        Separator {}
+
+        SliderSettingPlus {
+            id: radialMenuOpacity
+            settingKey: "radialMenuOpacity"
+            label: I18n.tr("Radial Menu Opacity")
+            defaultValue: 100
+            minimum: 0
+            maximum: 100
+            leftLabel: "0"
+            rightLabel: "100"
+            unit: "%"
+
+            Binding {
+                target: root
+                property: "radialMenuOpacityValue"
+                value: radialMenuOpacity.value
+            }
+        }
+    }
+
+    SettingsCard {
         id: drawingCard
         SectionTitle {
             text: I18n.tr("Drawing")
@@ -1376,624 +1994,6 @@ PluginSettings {
         }
     }
 
-    SettingsCard {
-        id: radialBehaviorsCard
-        SectionTitle {
-            text: I18n.tr("Radial Menu Settings")
-            icon: "mouse"
-            showReset: defaultPresetIndex.isDirty || radialHoverTrigger.isDirty || radialHoverDelay.isDirty || radialMenuOpacity.isDirty
-            onResetClicked: {
-                defaultPresetIndex.resetToDefault();
-                radialHoverTrigger.resetToDefault();
-                radialHoverDelay.resetToDefault();
-                radialMenuOpacity.resetToDefault();
-            }
-        }
-
-        SelectionSettingPlus {
-            id: defaultPresetIndex
-            settingKey: "defaultPresetIndex"
-            label: I18n.tr("Starting Preset")
-            options: [
-                { "label": I18n.tr("Preset 1"), "value": "0" },
-                { "label": I18n.tr("Preset 2"), "value": "1" },
-                { "label": I18n.tr("Preset 3"), "value": "2" },
-                { "label": I18n.tr("Preset 4"), "value": "3" },
-                { "label": I18n.tr("Preset 5"), "value": "4" },
-                { "label": I18n.tr("Preset 6"), "value": "5" },
-                { "label": I18n.tr("Preset 7"), "value": "6" },
-                { "label": I18n.tr("Preset 8"), "value": "7" }
-            ]
-            defaultValue: "0"
-        }
-
-        Separator {}
-
-        ToggleSettingPlus {
-            id: radialHoverTrigger
-            settingKey: "radialHoverTrigger"
-            label: I18n.tr("Trigger on Hover")
-            description: I18n.tr("Select a tool preset automatically by hovering over it, without needing to release the mouse click.")
-            defaultValue: false
-        }
-
-        Separator {
-            visible: radialHoverTrigger.value
-            height: visible ? 1 : 0
-        }
-
-        SliderSettingPlus {
-            id: radialHoverDelay
-            settingKey: "radialHoverDelay"
-            label: I18n.tr("Hover Trigger Delay")
-            defaultValue: 300
-            minimum: 100
-            maximum: 1000
-            leftLabel: "100"
-            rightLabel: "1000"
-            unit: "ms"
-            visible: radialHoverTrigger.value
-            height: visible ? implicitHeight : 0
-        }
-
-        Separator {}
-
-        SliderSettingPlus {
-            id: radialMenuOpacity
-            settingKey: "radialMenuOpacity"
-            label: I18n.tr("Radial Menu Opacity")
-            defaultValue: 100
-            minimum: 0
-            maximum: 100
-            leftLabel: "0"
-            rightLabel: "100"
-            unit: "%"
-
-            Binding {
-                target: root
-                property: "radialMenuOpacityValue"
-                value: radialMenuOpacity.value
-            }
-        }
-    }
-
-    SettingsCard {
-        id: radialMenuCard
-
-        property int presetActiveIndex: 0
-
-        property var activePresetTools: ["pen", "arrow", "rect", "highlighter", "ellipse", "stamp", "redact", "pixelate"]
-        property var activePresetColors: ["primary", "primary", "primary", "primary", "primary", "primary", "#000000", "#ffffff"]
-        property var activePresetThicknesses: [6, 6, 6, 6, 6, 6, 6, 6]
-
-        readonly property var currentPresets: {
-            const list = [];
-            for (let i = 0; i < 8; i++) {
-                const tool = radialMenuCard.activePresetTools[i] || "none";
-                const color = radialMenuCard.activePresetColors[i] || "primary";
-                const thickness = radialMenuCard.activePresetThicknesses[i] ?? 6;
-                list.push({ tool: tool, color: color, thickness: thickness });
-            }
-            return list;
-        }
-
-        SectionTitle {
-            text: I18n.tr("Radial Menu")
-            icon: "settings"
-        }
-
-        InfoText {
-            text: I18n.tr("Configure up to 8 quick-access tool presets. Right-click anywhere during capture to open the radial menu.")
-        }
-
-        Item { width: 1; height: Theme.spacingXS }
-
-        Item { width: 1; height: Theme.spacingXS }
-
-        // Interactive Radial Menu Simulation
-        Item {
-            id: simulatedRadialMenu
-            width: 240
-            height: 240
-            anchors.horizontalCenter: parent.horizontalCenter
-            opacity: root.radialMenuOpacityValue / 100
-
-            readonly property real outerRadius: 110
-            readonly property real innerRadius: 40
-            readonly property real midRadius: (innerRadius + outerRadius) / 2
-            readonly property real itemRadius: 22
-            readonly property real centerRadius: 34
-
-            // Segmented Background Canvas
-            Canvas {
-                id: simulatedCanvas
-                anchors.fill: parent
-                antialiasing: true
-
-                onPaint: {
-                    var ctx = getContext("2d");
-                    ctx.clearRect(0, 0, width, height);
-
-                    var centerX = width / 2;
-                    var centerY = height / 2;
-                    var numSectors = 8;
-                    var sectorAngle = 2 * Math.PI / numSectors;
-
-                    for (var i = 0; i < numSectors; i++) {
-                        var startAngle = i * sectorAngle - Math.PI / 2 - sectorAngle / 2;
-                        var endAngle = startAngle + sectorAngle;
-
-                        ctx.beginPath();
-                        ctx.arc(centerX, centerY, simulatedRadialMenu.outerRadius, startAngle, endAngle);
-                        ctx.arc(centerX, centerY, simulatedRadialMenu.innerRadius, endAngle, startAngle, true);
-                        ctx.closePath();
-
-                        // Highlight active segment
-                        if (radialMenuCard.presetActiveIndex === i) {
-                            ctx.fillStyle = Theme.primary;
-                        } else {
-                            ctx.fillStyle = Theme.withAlpha(Theme.surfaceContainerHigh, 0.88);
-                        }
-                        ctx.fill();
-
-                        ctx.strokeStyle = radialMenuCard.presetActiveIndex === i ? Theme.primary : Theme.withAlpha(Theme.outline, 0.15);
-                        ctx.lineWidth = radialMenuCard.presetActiveIndex === i ? 2 : 1;
-                        ctx.stroke();
-                    }
-                }
-
-                // Redraw on active index changes
-                Connections {
-                    target: radialMenuCard
-                    function onPresetActiveIndexChanged() { simulatedCanvas.requestPaint(); }
-                }
-                
-                // Redraw on preset changes (color or tool changed in settings)
-                Connections {
-                    target: radialMenuCard
-                    function onCurrentPresetsChanged() { simulatedCanvas.requestPaint(); }
-                }
-                
-                Component.onCompleted: simulatedCanvas.requestPaint()
-            }
-
-            // Outer circle outline
-            Rectangle {
-                anchors.fill: parent
-                radius: width / 2
-                color: "transparent"
-                border.color: Theme.withAlpha(Theme.outline, 0.25)
-                border.width: 1.5
-            }
-
-            // Outer icons overlay
-            Repeater {
-                model: radialMenuCard.currentPresets
-
-                delegate: Item {
-                    width: simulatedRadialMenu.itemRadius * 2
-                    height: width
-                    
-                    property real angle: (index * 360 / 8) - 90
-                    property real rad: angle * Math.PI / 180
-                    
-                    x: (simulatedRadialMenu.width / 2) + simulatedRadialMenu.midRadius * Math.cos(rad) - simulatedRadialMenu.itemRadius
-                    y: (simulatedRadialMenu.height / 2) + simulatedRadialMenu.midRadius * Math.sin(rad) - simulatedRadialMenu.itemRadius
-
-                    Column {
-                        anchors.centerIn: parent
-                        spacing: 1
-
-                        StyledText {
-                            text: (index + 1)
-                            font.pixelSize: 8
-                            font.bold: true
-                            color: radialMenuCard.presetActiveIndex === index ? Theme.onPrimary : Theme.surfaceVariantText
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            opacity: 0.6
-                        }
-
-                        DankIcon {
-                            name: {
-                                const tool = captureConfig.toolButtons.find(t => t.id === modelData.tool);
-                                return tool ? tool.icon : "help";
-                            }
-                            size: 18
-                            color: {
-                                if (radialMenuCard.presetActiveIndex === index) return Theme.onPrimary;
-                                if (modelData.tool === "none") return Theme.withAlpha(Theme.surfaceVariantText, 0.3);
-                                return captureConfig.resolveColor(modelData.color);
-                            }
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                    }
-                }
-            }
-
-            // Center Info Button
-            Rectangle {
-                id: simulatedCenterButton
-                width: simulatedRadialMenu.centerRadius * 2
-                height: width
-                radius: simulatedRadialMenu.centerRadius
-                anchors.centerIn: parent
-                color: Theme.surfaceContainerHighest
-                border.color: Theme.withAlpha(Theme.outline, 0.4)
-                border.width: 1
-
-                Column {
-                    anchors.centerIn: parent
-                    spacing: 1
-                    
-                    DankIcon {
-                        name: {
-                            const p = radialMenuCard.currentPresets[radialMenuCard.presetActiveIndex];
-                            if (p && p.tool !== "none") {
-                                const tool = captureConfig.toolButtons.find(t => t.id === p.tool);
-                                return tool ? tool.icon : "check";
-                            }
-                            return "block";
-                        }
-                        size: 20
-                        color: {
-                            const p = radialMenuCard.currentPresets[radialMenuCard.presetActiveIndex];
-                            if (!p || p.tool === "none") return Theme.surfaceVariantText;
-                            return captureConfig.resolveColor(p.color);
-                        }
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-
-                    StyledText {
-                        text: I18n.tr("Preset %1").arg(radialMenuCard.presetActiveIndex + 1)
-                        font.pixelSize: 8
-                        font.bold: true
-                        color: Theme.surfaceVariantText
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-                }
-            }
-
-            // Mouse Area to click segments
-            MouseArea {
-                anchors.fill: parent
-                hoverEnabled: true
-
-                onPositionChanged: (mouse) => {
-                    const dx = mouse.x - width / 2;
-                    const dy = mouse.y - height / 2;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (dist < simulatedRadialMenu.innerRadius || dist > simulatedRadialMenu.outerRadius) {
-                        return;
-                    }
-
-                    let angle = Math.atan2(dy, dx) * 180 / Math.PI + 90;
-                    if (angle < 0) angle += 360;
-                    
-                    const numSectors = 8;
-                    const sectorSize = 360 / numSectors;
-                    const idx = Math.floor((angle + sectorSize / 2) % 360 / sectorSize);
-                    
-                    if (idx >= 0 && idx < numSectors && radialMenuCard.presetActiveIndex !== idx) {
-                        radialMenuCard.presetActiveIndex = idx;
-                    }
-                }
-
-                onClicked: (mouse) => {
-                    const dx = mouse.x - width / 2;
-                    const dy = mouse.y - height / 2;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (dist < simulatedRadialMenu.innerRadius || dist > simulatedRadialMenu.outerRadius) {
-                        return;
-                    }
-
-                    let angle = Math.atan2(dy, dx) * 180 / Math.PI + 90;
-                    if (angle < 0) angle += 360;
-                    
-                    const numSectors = 8;
-                    const sectorSize = 360 / numSectors;
-                    const idx = Math.floor((angle + sectorSize / 2) % 360 / sectorSize);
-                    
-                    if (idx >= 0 && idx < numSectors) {
-                        radialMenuCard.presetActiveIndex = idx;
-                    }
-                }
-            }
-        }
-
-
-
-        Repeater {
-            model: 8
-
-            Column {
-                id: presetDelegate
-                width: parent.width
-                spacing: Theme.spacingM
-                visible: radialMenuCard.presetActiveIndex === index
-                readonly property int presetIndex: index
-
-                Item { width: 1; height: Theme.spacingXS }
-
-                SelectionSettingPlus {
-                    id: presetToolSetting
-                    settingKey: "preset_" + index + "_tool"
-                    label: I18n.tr("Preset Tool")
-                    options: [{
-                        "label": I18n.tr("None / Disabled"),
-                        "value": "none"
-                    }, {
-                        "label": I18n.tr("Freehand Pen"),
-                        "value": "pen"
-                    }, {
-                        "label": I18n.tr("Straight Line"),
-                        "value": "line"
-                    }, {
-                        "label": I18n.tr("Arrow Vector"),
-                        "value": "arrow"
-                    }, {
-                        "label": I18n.tr("Rectangle Outline"),
-                        "value": "rect"
-                    }, {
-                        "label": I18n.tr("Ellipse / Circle"),
-                        "value": "ellipse"
-                    }, {
-                        "label": I18n.tr("Text Note"),
-                        "value": "text"
-                    }, {
-                        "label": I18n.tr("Pixelate"),
-                        "value": "pixelate"
-                    }, {
-                        "label": I18n.tr("Redact / Blackout"),
-                        "value": "redact"
-                    }, {
-                        "label": I18n.tr("Number Stamp"),
-                        "value": "stamp"
-                    }, {
-                        "label": I18n.tr("Highlighter"),
-                        "value": "highlighter"
-                    }, {
-                        "label": I18n.tr("Eraser"),
-                        "value": "eraser"
-                    }, {
-                        "label": I18n.tr("Crop / Resize"),
-                        "value": "crop"
-                    }]
-                    defaultValue: {
-                        if (index === 0) return "pen";
-                        if (index === 1) return "arrow";
-                        if (index === 2) return "rect";
-                        if (index === 3) return "highlighter";
-                        if (index === 4) return "ellipse";
-                        if (index === 5) return "stamp";
-                        if (index === 6) return "redact";
-                        if (index === 7) return "pixelate";
-                        return "none";
-                    }
-                }
-
-                Connections {
-                    target: presetToolSetting
-                    function onValueChanged() {
-                        radialMenuCard.activePresetTools[index] = presetToolSetting.value;
-                        radialMenuCard.activePresetTools = [...radialMenuCard.activePresetTools];
-                    }
-                }
-
-                Separator {}
-
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingS
-
-                    StyledText {
-                        text: I18n.tr("Preset Color")
-                        font.pixelSize: Theme.fontSizeLarge
-                        font.weight: Font.Medium
-                        color: Theme.surfaceText
-                    }
-
-                    // Row containing 8 Slots + Separator + Custom Swatch & Optional Color Bar
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingS
-
-                        // 1. 8 Slots
-                        Row {
-                            spacing: Theme.spacingXS
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            Repeater {
-                                model: 8
-                                delegate: Rectangle {
-                                    width: 28
-                                    height: 28
-                                    radius: 14
-                                    color: {
-                                        if (index === 0) return toolbar_primary.resolvedColor;
-                                        if (index === 1) return c0.resolvedColor;
-                                        if (index === 2) return c1.resolvedColor;
-                                        if (index === 3) return c2.resolvedColor;
-                                        if (index === 4) return c3.resolvedColor;
-                                        if (index === 5) return c4.resolvedColor;
-                                        if (index === 6) return c5.resolvedColor;
-                                        if (index === 7) return c6.resolvedColor;
-                                        return "transparent";
-                                    }
-
-                                    property bool isSelected: presetColorSetting.value === "slot_" + (index + 1)
-                                    border.width: isSelected ? 2 : 1
-                                    border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.outline, 0.4)
-                                    scale: hoverArea.containsMouse ? 1.1 : 1.0
-                                    Behavior on scale { NumberAnimation { duration: 100 } }
-
-                                    DankIcon {
-                                        anchors.centerIn: parent
-                                        name: "check"
-                                        size: 14
-                                        color: (parent.color.r * 0.299 + parent.color.g * 0.587 + parent.color.b * 0.114) > 0.6 ? "#000000" : "#ffffff"
-                                        visible: parent.isSelected
-                                    }
-
-                                    MouseArea {
-                                        id: hoverArea
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: {
-                                            presetColorSetting.value = "slot_" + (index + 1);
-                                            radialMenuCard.activePresetColors[presetIndex] = presetColorSetting.value;
-                                            radialMenuCard.activePresetColors = [...radialMenuCard.activePresetColors];
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // Small separator bar
-                        Rectangle {
-                            width: 1
-                            height: 20
-                            color: Theme.withAlpha(Theme.outline, 0.2)
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        // 2. Custom Option and Bar Row
-                        Row {
-                            spacing: Theme.spacingS
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            // Custom button swatch
-                            Rectangle {
-                                id: customSwatch
-                                width: 28
-                                height: 28
-                                radius: 14
-                                property bool isSelected: !presetColorSetting.value.startsWith("slot_")
-                                color: isSelected ? captureConfig.resolveColor(presetColorSetting.value) : Theme.surfaceContainerHighest
-                                border.width: isSelected ? 2 : 1
-                                border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.outline, 0.4)
-                                scale: customHover.containsMouse ? 1.1 : 1.0
-                                Behavior on scale { NumberAnimation { duration: 100 } }
-
-                                DankIcon {
-                                    anchors.centerIn: parent
-                                    name: "palette"
-                                    size: 14
-                                    color: {
-                                        if (!parent.isSelected) return Theme.surfaceText;
-                                        return (parent.color.r * 0.299 + parent.color.g * 0.587 + parent.color.b * 0.114) > 0.6 ? "#000000" : "#ffffff";
-                                    }
-                                }
-
-                                MouseArea {
-                                    id: customHover
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        if (!parent.isSelected) {
-                                            presetColorSetting.value = "primary";
-                                            radialMenuCard.activePresetColors[presetIndex] = presetColorSetting.value;
-                                            radialMenuCard.activePresetColors = [...radialMenuCard.activePresetColors];
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Dynamic Custom Color Bar directly to the right
-                            Rectangle {
-                                id: customColorBar
-                                width: 110
-                                height: 28
-                                radius: 14
-                                visible: !presetColorSetting.value.startsWith("slot_")
-                                color: captureConfig.resolveColor(presetColorSetting.value)
-                                border.color: Theme.withAlpha(Theme.surfaceText, 0.15)
-                                border.width: 1
-
-                                StyledText {
-                                    anchors.centerIn: parent
-                                    text: presetColorSetting.value === "primary" ? I18n.tr("PRIMARY") : presetColorSetting.value.toString().toUpperCase()
-                                    font.pixelSize: Theme.fontSizeSmall - 1
-                                    font.weight: Font.Bold
-                                    isMonospace: true
-                                    color: (parent.color.r * 0.299 + parent.color.g * 0.587 + parent.color.b * 0.114) > 0.6 ? "#000000" : "#ffffff"
-                                }
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        if (typeof PopoutService !== "undefined" && PopoutService && PopoutService.colorPickerModal) {
-                                            PopoutService.colorPickerModal.selectedColor = captureConfig.resolveColor(presetColorSetting.value);
-                                            PopoutService.colorPickerModal.pickerTitle = I18n.tr("Preset Color");
-                                            PopoutService.colorPickerModal.onColorSelectedCallback = function (selectedColor) {
-                                                presetColorSetting.value = selectedColor.toString();
-                                                radialMenuCard.activePresetColors[presetIndex] = presetColorSetting.value;
-                                                radialMenuCard.activePresetColors = [...radialMenuCard.activePresetColors];
-                                            };
-                                            PopoutService.colorPickerModal.show();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // Hidden headless ColorSettingPlus to load/save settings automatically
-                    Item {
-                        width: 0; height: 0
-                        visible: false
-
-                        ColorSettingPlus {
-                            id: presetColorSetting
-                            settingKey: "preset_" + presetIndex + "_color"
-                            label: ""
-                            defaultValue: {
-                                if (presetIndex === 6) return "#000000"; // Black
-                                if (presetIndex === 7) return "#ffffff"; // White
-                                return "primary";
-                            }
-                        }
-
-                        Connections {
-                            target: presetColorSetting
-                            function onValueChanged() {
-                                radialMenuCard.activePresetColors[presetIndex] = presetColorSetting.value;
-                                radialMenuCard.activePresetColors = [...radialMenuCard.activePresetColors];
-                            }
-                        }
-                    }
-                }
-
-                Separator {}
-
-                SliderSettingPlus {
-                    id: presetThicknessSetting
-                    settingKey: "preset_" + index + "_thickness"
-                    label: I18n.tr("Preset Thickness")
-                    defaultValue: 6
-                    minimum: 1
-                    maximum: 20
-                    leftLabel: "1"
-                    rightLabel: "20"
-                    previewType: "thickness"
-                    previewColor: presetColorSetting.value
-                }
-
-                Connections {
-                    target: presetThicknessSetting
-                    function onValueChanged() {
-                        radialMenuCard.activePresetThicknesses[index] = presetThicknessSetting.value;
-                        radialMenuCard.activePresetThicknesses = [...radialMenuCard.activePresetThicknesses];
-                    }
-                }
-            }
-        }
-    }
- 
     SettingsCard {
         SectionTitle { 
             id: usageTitle
