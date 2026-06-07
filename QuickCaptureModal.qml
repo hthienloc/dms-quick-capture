@@ -107,14 +107,14 @@ DankModal {
         const q = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.editQuality) || "1080";
         if (q === "original") return Infinity;
         const val = parseInt(q);
-        return isNaN(val) ? 1080 : val;
+        return (isNaN(val) || val <= 0) ? 1080 : val;
     }
     readonly property real editScale: {
         if (!window.bgImageItem) return 1.0;
         const w = window.bgImageItem.sourceSize.width;
         const h = window.bgImageItem.sourceSize.height;
         const max = Math.max(w, h);
-        if (max <= maxEditDimension) return 1.0;
+        if (isNaN(max) || max <= 0 || max <= maxEditDimension) return 1.0;
         return maxEditDimension / max;
     }
 
@@ -2085,27 +2085,6 @@ DankModal {
                               // Draw current dragging stroke if any
                               if (window.currentStroke) {
                                   window.activeCanvas.drawStroke(ctx, window.currentStroke);
-                              }
-                              
-                              // Draw temporary live typing text if any
-                              if (window.isTyping) {
-                                  ctx.fillStyle = window.currentColor;
-                                  let styleStr = "";
-                                  if (window.textItalic) styleStr += "italic ";
-                                  if (window.textBold) styleStr += "bold ";
-                                  ctx.font = styleStr + Math.round(window.textFontSize) + "px " + window.textFontFamily;
-                                  ctx.textAlign = "left";
-                                  ctx.textBaseline = "top";
-                                  ctx.fillText(window.currentTypingText, window.typingCoords.x, window.typingCoords.y);
-                                  if (window.textUnderline) {
-                                      const textWidth = ctx.measureText(window.currentTypingText).width;
-                                      ctx.strokeStyle = window.currentColor;
-                                      ctx.lineWidth = Math.max(1.5, Math.round(window.textFontSize * 0.08));
-                                      ctx.beginPath();
-                                      ctx.moveTo(window.typingCoords.x, window.typingCoords.y + window.textFontSize * 1.05);
-                                      ctx.lineTo(window.typingCoords.x + textWidth, window.typingCoords.y + window.textFontSize * 1.05);
-                                      ctx.stroke();
-                                  }
                               }
                               ctx.restore();
                          }
