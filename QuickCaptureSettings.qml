@@ -519,10 +519,11 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Styles")
             icon: "aspect_ratio"
-            showReset: modalOpacity.isDirty || showCanvasBorder.isDirty
+            showReset: modalOpacity.isDirty || showCanvasBorder.isDirty || editQuality.isDirty
             onResetClicked: {
                 modalOpacity.resetToDefault();
                 showCanvasBorder.resetToDefault();
+                editQuality.resetToDefault();
             }
         }
 
@@ -546,6 +547,22 @@ PluginSettings {
             settingKey: "showCanvasBorder"
             label: I18n.tr("Show Screenshot Border")
             defaultValue: true
+        }
+
+        Separator {}
+
+        SelectionSettingPlus {
+            id: editQuality
+            settingKey: "editQuality"
+            label: I18n.tr("Editor Canvas Resolution")
+            options: [
+                { label: I18n.tr("Low (480p)"), value: "480" },
+                { label: I18n.tr("Medium (720p)"), value: "720" },
+                { label: I18n.tr("High (1080p)"), value: "1080" },
+                { label: I18n.tr("Very High (1440p)"), value: "1440" },
+                { label: I18n.tr("Original (Unscaled)"), value: "original" }
+            ]
+            defaultValue: "1080"
         }
     }
 

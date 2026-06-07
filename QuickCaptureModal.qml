@@ -103,7 +103,12 @@ DankModal {
 
 
     // --- Proxy Editing Optimization ---
-    property real maxEditDimension: 1080
+    readonly property real maxEditDimension: {
+        const q = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.editQuality) || "1080";
+        if (q === "original") return Infinity;
+        const val = parseInt(q);
+        return isNaN(val) ? 1080 : val;
+    }
     readonly property real editScale: {
         if (!window.bgImageItem) return 1.0;
         const w = window.bgImageItem.sourceSize.width;
