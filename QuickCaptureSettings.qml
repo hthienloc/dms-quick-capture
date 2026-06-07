@@ -556,11 +556,11 @@ PluginSettings {
             settingKey: "editQuality"
             label: I18n.tr("Editor Resolution Limit")
             options: [
-                { label: I18n.tr("Low (480p)"), value: "480" },
-                { label: I18n.tr("Medium (720p)"), value: "720" },
-                { label: I18n.tr("High (1080p)"), value: "1080" },
-                { label: I18n.tr("Very High (1440p)"), value: "1440" },
-                { label: I18n.tr("Ultra High (2160p / 4K)"), value: "2160" },
+                { label: I18n.tr("480px"), value: "480" },
+                { label: I18n.tr("720px"), value: "720" },
+                { label: I18n.tr("1080px"), value: "1080" },
+                { label: I18n.tr("1440px"), value: "1440" },
+                { label: I18n.tr("2160px (4K)"), value: "2160" },
                 { label: I18n.tr("Original (Unscaled)"), value: "original" }
             ]
             defaultValue: "1080"
