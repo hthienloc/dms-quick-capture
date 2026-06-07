@@ -273,7 +273,6 @@ QtObject {
                             " && dms ipc call floaty floatFromUrl file:///tmp/dms_capture_float.png";
                 Proc.runCommand("float-capture", ["sh", "-c", cmd], (stdout, exitCode) => {
                     if (exitCode === 0) {
-                        notifyInfo(I18n.tr("Floating window launched."), tempOut);
                         root.closeRequested();
                     } else {
                         notifyError("Failed to float image (make sure dms-floaty is running).");
