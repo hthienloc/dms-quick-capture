@@ -101,6 +101,18 @@ DankModal {
     property real previewY: 0
     property bool showSizePreview: false
 
+
+    // --- Proxy Editing Optimization ---
+    property real maxEditDimension: 1080
+    readonly property real editScale: {
+        if (!window.bgImageItem) return 1.0;
+        const w = window.bgImageItem.sourceSize.width;
+        const h = window.bgImageItem.sourceSize.height;
+        const max = Math.max(w, h);
+        if (max <= maxEditDimension) return 1.0;
+        return maxEditDimension / max;
+    }
+
     readonly property real canvasWidth: {
         if (window.currentTool !== "crop" && window.hasSelection) {
             return window.cropRect.width;
@@ -458,8 +470,8 @@ DankModal {
             window.exportCanvasItem.width = window.cropRect.width / window.dpr;
             window.exportCanvasItem.height = window.cropRect.height / window.dpr;
         } else if (window.activeCanvas) {
-            window.exportCanvasItem.width = window.activeCanvas.width / window.dpr;
-            window.exportCanvasItem.height = window.activeCanvas.height / window.dpr;
+            window.exportCanvasItem.width = window.canvasWidth / window.dpr;
+            window.exportCanvasItem.height = window.canvasHeight / window.dpr;
         }
         window.exportCanvasItem.requestPaint();
     }
@@ -928,24 +940,24 @@ DankModal {
                             mipmap: true
                             
                             // Handle crop positioning
-                            x: (window.currentTool !== "crop" && window.hasSelection) ? -window.cropRect.x : 0
-                            y: (window.currentTool !== "crop" && window.hasSelection) ? -window.cropRect.y : 0
+                            x: (window.currentTool !== "crop" && window.hasSelection) ? -window.cropRect.x * window.editScale : 0
+                            y: (window.currentTool !== "crop" && window.hasSelection) ? -window.cropRect.y * window.editScale : 0
                             
                             // Scale to original size if cropped, otherwise fit to canvas
-                            width: (window.currentTool !== "crop" && window.hasSelection) ? window.bgImageItem.sourceSize.width : parent.width
-                            height: (window.currentTool !== "crop" && window.hasSelection) ? window.bgImageItem.sourceSize.height : parent.height
+                            width: (window.currentTool !== "crop" && window.hasSelection) ? window.bgImageItem.sourceSize.width * window.editScale : parent.width
+                            height: (window.currentTool !== "crop" && window.hasSelection) ? window.bgImageItem.sourceSize.height * window.editScale : parent.height
                         }
                     }
 
                     Canvas {
                         id: drawingCanvas
                         anchors.centerIn: parent
-                        scale: window.fitScale
+                        scale: window.fitScale / window.editScale
                         transformOrigin: Item.Center
                         renderTarget: Canvas.Image
 
-                        width: window.canvasWidth
-                        height: window.canvasHeight
+                        width: window.canvasWidth * window.editScale
+                        height: window.canvasHeight * window.editScale
 
                         layer.enabled: false
 
@@ -960,6 +972,8 @@ DankModal {
                         onPaint: {
                             var ctx = drawingCanvas.getContext("2d");
                             ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+                            ctx.save();
+                            ctx.scale(window.editScale, window.editScale);
 
                             // 1. Draw Dimming Selection Overlay (only if in crop mode)
                             if (window.currentTool === "crop") {
@@ -967,13 +981,13 @@ DankModal {
                                     ctx.save();
                                     ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
                                     // Left
-                                    ctx.fillRect(0, 0, window.cropRect.x, drawingCanvas.height);
+                                    ctx.fillRect(0, 0, window.cropRect.x, window.canvasHeight);
                                     // Right
-                                    ctx.fillRect(window.cropRect.x + window.cropRect.width, 0, drawingCanvas.width - (window.cropRect.x + window.cropRect.width), drawingCanvas.height);
+                                    ctx.fillRect(window.cropRect.x + window.cropRect.width, 0, window.canvasWidth - (window.cropRect.x + window.cropRect.width), window.canvasHeight);
                                     // Top
                                     ctx.fillRect(window.cropRect.x, 0, window.cropRect.width, window.cropRect.y);
                                     // Bottom
-                                    ctx.fillRect(window.cropRect.x, window.cropRect.y + window.cropRect.height, window.cropRect.width, drawingCanvas.height - (window.cropRect.y + window.cropRect.height));
+                                    ctx.fillRect(window.cropRect.x, window.cropRect.y + window.cropRect.height, window.cropRect.width, window.canvasHeight - (window.cropRect.y + window.cropRect.height));
 
                                     // Selection border
                                     ctx.strokeStyle = Theme.primary;
@@ -1008,7 +1022,7 @@ DankModal {
                                 } else {
                                     // Dim full canvas slightly before selection
                                     ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
-                                    ctx.fillRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+                                    ctx.fillRect(0, 0, window.canvasWidth, window.canvasHeight);
                                 }
                             }
 
@@ -1075,7 +1089,7 @@ DankModal {
                                     const rawText = window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.watermarkText || "© {user}";
                                     const textStr = config.formatWatermarkText(rawText);
                                     const lines = textStr.split("\n");
-                                    const fontSize = Math.round(Math.max(12, drawingCanvas.height * watermarkTextSize));
+                                    const fontSize = Math.round(Math.max(12, window.canvasHeight * watermarkTextSize));
                                     ctx.font = "bold " + fontSize + "px sans-serif";
                                     ctx.fillStyle = "#ffffff";
                                     ctx.shadowColor = "#000000";
@@ -1100,8 +1114,8 @@ DankModal {
                                     if (hasImage) {
                                         const imgW = watermarkImageLoader.sourceSize.width;
                                         const imgH = watermarkImageLoader.sourceSize.height;
-                                        const maxW = drawingCanvas.width * watermarkSize;
-                                        const maxH = drawingCanvas.height * watermarkSize;
+                                        const maxW = window.canvasWidth * watermarkSize;
+                                        const maxH = window.canvasHeight * watermarkSize;
                                         const scale = Math.min(maxW / imgW, maxH / imgH, 1.0);
                                         targetW = imgW * scale;
                                         targetH = imgH * scale;
@@ -1114,32 +1128,32 @@ DankModal {
                                     let ty = fontSize + margin;
 
                                     if (watermarkPosition === "bottom_right") {
-                                        tx = drawingCanvas.width - totalW - margin;
-                                        ty = drawingCanvas.height - (lines.length - 1) * lineHeight - margin;
+                                        tx = window.canvasWidth - totalW - margin;
+                                        ty = window.canvasHeight - (lines.length - 1) * lineHeight - margin;
                                     } else if (watermarkPosition === "bottom_left") {
                                         tx = margin;
-                                        ty = drawingCanvas.height - (lines.length - 1) * lineHeight - margin;
+                                        ty = window.canvasHeight - (lines.length - 1) * lineHeight - margin;
                                     } else if (watermarkPosition === "top_right") {
-                                        tx = drawingCanvas.width - totalW - margin;
+                                        tx = window.canvasWidth - totalW - margin;
                                         ty = fontSize + margin;
                                     } else if (watermarkPosition === "top_left") {
                                         tx = margin;
                                         ty = fontSize + margin;
                                     } else if (watermarkPosition === "center") {
-                                        tx = (drawingCanvas.width - totalW) / 2;
-                                        ty = (drawingCanvas.height - totalH) / 2 + fontSize + (totalH - totalTextHeight) / 2;
+                                        tx = (window.canvasWidth - totalW) / 2;
+                                        ty = (window.canvasHeight - totalH) / 2 + fontSize + (totalH - totalTextHeight) / 2;
                                     } else if (watermarkPosition === "top") {
-                                        tx = (drawingCanvas.width - totalW) / 2;
+                                        tx = (window.canvasWidth - totalW) / 2;
                                         ty = fontSize + margin;
                                     } else if (watermarkPosition === "bottom") {
-                                        tx = (drawingCanvas.width - totalW) / 2;
-                                        ty = drawingCanvas.height - (lines.length - 1) * lineHeight - margin;
+                                        tx = (window.canvasWidth - totalW) / 2;
+                                        ty = window.canvasHeight - (lines.length - 1) * lineHeight - margin;
                                     } else if (watermarkPosition === "left") {
                                         tx = margin;
-                                        ty = (drawingCanvas.height - totalH) / 2 + fontSize + (totalH - totalTextHeight) / 2;
+                                        ty = (window.canvasHeight - totalH) / 2 + fontSize + (totalH - totalTextHeight) / 2;
                                     } else if (watermarkPosition === "right") {
-                                        tx = drawingCanvas.width - totalW - margin;
-                                        ty = (drawingCanvas.height - totalH) / 2 + fontSize + (totalH - totalTextHeight) / 2;
+                                        tx = window.canvasWidth - totalW - margin;
+                                        ty = (window.canvasHeight - totalH) / 2 + fontSize + (totalH - totalTextHeight) / 2;
                                     }
 
                                     if (hasImage) {
@@ -1155,8 +1169,8 @@ DankModal {
                                 } else if (watermarkType === "image" && watermarkImageLoader.status === Image.Ready) {
                                     const imgW = watermarkImageLoader.sourceSize.width;
                                     const imgH = watermarkImageLoader.sourceSize.height;
-                                    const maxW = drawingCanvas.width * watermarkSize;
-                                    const maxH = drawingCanvas.height * watermarkSize;
+                                    const maxW = window.canvasWidth * watermarkSize;
+                                    const maxH = window.canvasHeight * watermarkSize;
                                     const scale = Math.min(maxW / imgW, maxH / imgH, 1.0);
                                     const targetW = imgW * scale;
                                     const targetH = imgH * scale;
@@ -1166,38 +1180,39 @@ DankModal {
                                     let iy = margin;
 
                                     if (watermarkPosition === "bottom_right") {
-                                        ix = drawingCanvas.width - targetW - margin;
-                                        iy = drawingCanvas.height - targetH - margin;
+                                        ix = window.canvasWidth - targetW - margin;
+                                        iy = window.canvasHeight - targetH - margin;
                                     } else if (watermarkPosition === "bottom_left") {
                                         ix = margin;
-                                        iy = drawingCanvas.height - targetH - margin;
+                                        iy = window.canvasHeight - targetH - margin;
                                     } else if (watermarkPosition === "top_right") {
-                                        ix = drawingCanvas.width - targetW - margin;
+                                        ix = window.canvasWidth - targetW - margin;
                                         iy = margin;
                                     } else if (watermarkPosition === "top_left") {
                                         ix = margin;
                                         iy = margin;
                                     } else if (watermarkPosition === "center") {
-                                        ix = (drawingCanvas.width - targetW) / 2;
-                                        iy = (drawingCanvas.height - targetH) / 2;
+                                        ix = (window.canvasWidth - targetW) / 2;
+                                        iy = (window.canvasHeight - targetH) / 2;
                                     } else if (watermarkPosition === "top") {
-                                        ix = (drawingCanvas.width - targetW) / 2;
+                                        ix = (window.canvasWidth - targetW) / 2;
                                         iy = margin;
                                     } else if (watermarkPosition === "bottom") {
-                                        ix = (drawingCanvas.width - targetW) / 2;
-                                        iy = drawingCanvas.height - targetH - margin;
+                                        ix = (window.canvasWidth - targetW) / 2;
+                                        iy = window.canvasHeight - targetH - margin;
                                     } else if (watermarkPosition === "left") {
                                         ix = margin;
-                                        iy = (drawingCanvas.height - targetH) / 2;
+                                        iy = (window.canvasHeight - targetH) / 2;
                                     } else if (watermarkPosition === "right") {
-                                        ix = drawingCanvas.width - targetW - margin;
-                                        iy = (drawingCanvas.height - targetH) / 2;
+                                        ix = window.canvasWidth - targetW - margin;
+                                        iy = (window.canvasHeight - targetH) / 2;
                                     }
 
                                     ctx.drawImage(watermarkImageLoader, ix, iy, targetW, targetH);
                                 }
                                 ctx.restore();
                             }
+                            ctx.restore();
                         }
 
                         function drawStroke(ctx, stroke) {
@@ -1451,19 +1466,23 @@ DankModal {
                             acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
 
                             function getAbsolutePoint(mx, my) {
+                                const rx = mx / window.editScale;
+                                const ry = my / window.editScale;
                                 if (window.currentTool !== "crop" && window.hasSelection) {
-                                    return Qt.point(mx + window.cropRect.x, my + window.cropRect.y);
+                                    return Qt.point(rx + window.cropRect.x, ry + window.cropRect.y);
                                 }
-                                return Qt.point(mx, my);
+                                return Qt.point(rx, ry);
                             }
 
                             // Visual cursor feedback based on hover position
                             property string hoveredHandle: "none"
                             property int hoveredStrokeIdx: -1
                             onPositionChanged: (mouse) => {
-                                window.cursorX = mouse.x;
-                                window.cursorY = mouse.y;
-                                hoveredHandle = window.getHoveredHandle(mouse.x, mouse.y);
+                                const origX = mouse.x / window.editScale;
+                                const origY = mouse.y / window.editScale;
+                                window.cursorX = origX;
+                                window.cursorY = origY;
+                                hoveredHandle = window.getHoveredHandle(origX, origY);
 
                                 const absPt = getAbsolutePoint(mouse.x, mouse.y);
 
@@ -1485,10 +1504,10 @@ DankModal {
 
                                 if (window.currentTool === "crop") {
                                     if (window.activeHandle === "new") {
-                                        const x1 = Math.min(window.selectStart.x, mouse.x);
-                                        const y1 = Math.min(window.selectStart.y, mouse.y);
-                                        const w = Math.abs(mouse.x - window.selectStart.x);
-                                        const h = Math.abs(mouse.y - window.selectStart.y);
+                                        const x1 = Math.min(window.selectStart.x, origX);
+                                        const y1 = Math.min(window.selectStart.y, origY);
+                                        const w = Math.abs(origX - window.selectStart.x);
+                                        const h = Math.abs(origY - window.selectStart.y);
                                         window.cropRect = Qt.rect(x1, y1, w, h);
                                         drawingCanvas.requestPaint();
                                         return;
@@ -1503,21 +1522,21 @@ DankModal {
                                         let newH = cr.height;
 
                                         if (window.activeHandle === "tl") {
-                                            newX = Math.min(mouse.x, cr.x + cr.width - 10);
-                                            newY = Math.min(mouse.y, cr.y + cr.height - 10);
+                                            newX = Math.min(origX, cr.x + cr.width - 10);
+                                            newY = Math.min(origY, cr.y + cr.height - 10);
                                             newW = cr.x + cr.width - newX;
                                             newH = cr.y + cr.height - newY;
                                         } else if (window.activeHandle === "tr") {
-                                            newY = Math.min(mouse.y, cr.y + cr.height - 10);
-                                            newW = Math.max(10, mouse.x - cr.x);
+                                            newY = Math.min(origY, cr.y + cr.height - 10);
+                                            newW = Math.max(10, origX - cr.x);
                                             newH = cr.y + cr.height - newY;
                                         } else if (window.activeHandle === "bl") {
-                                            newX = Math.min(mouse.x, cr.x + cr.width - 10);
+                                            newX = Math.min(origX, cr.x + cr.width - 10);
                                             newW = cr.x + cr.width - newX;
-                                            newH = Math.max(10, mouse.y - cr.y);
+                                            newH = Math.max(10, origY - cr.y);
                                         } else if (window.activeHandle === "br") {
-                                            newW = Math.max(10, mouse.x - cr.x);
-                                            newH = Math.max(10, mouse.y - cr.y);
+                                            newW = Math.max(10, origX - cr.x);
+                                            newH = Math.max(10, origY - cr.y);
                                         }
 
                                         window.cropRect = Qt.rect(newX, newY, newW, newH);
@@ -1578,7 +1597,7 @@ DankModal {
                                 if (window.currentTool === "select") {
                                     return window.selectedStroke ? Qt.ClosedHandCursor : (drawMouseArea.hoveredStrokeIdx !== -1 ? Qt.OpenHandCursor : Qt.ArrowCursor);
                                 }
-                                if (window.hasSelection && window.isInsideCropRect(mouseX, mouseY)) {
+                                if (window.hasSelection && window.isInsideCropRect(mouseX / window.editScale, mouseY / window.editScale)) {
                                     return Qt.CrossCursor;
                                 }
                                 return Qt.CrossCursor;
@@ -1633,7 +1652,9 @@ DankModal {
                                 }
 
                                 if (window.currentTool === "crop") {
-                                    const handle = window.getHoveredHandle(mouse.x, mouse.y);
+                                    const ox = mouse.x / window.editScale;
+                                    const oy = mouse.y / window.editScale;
+                                    const handle = window.getHoveredHandle(ox, oy);
                                     if (handle !== "none") {
                                         window.activeHandle = handle;
                                         return;
@@ -1641,8 +1662,8 @@ DankModal {
 
                                     // Drag-to-select crop area
                                     window.activeHandle = "new";
-                                    window.selectStart = Qt.point(mouse.x, mouse.y);
-                                    window.cropRect = Qt.rect(mouse.x, mouse.y, 0, 0);
+                                    window.selectStart = Qt.point(ox, oy);
+                                    window.cropRect = Qt.rect(ox, oy, 0, 0);
                                     window.hasSelection = false;
                                     drawingCanvas.requestPaint();
                                     return;
@@ -1935,8 +1956,8 @@ DankModal {
                         z: 200
                         enabled: false
 
-                        x: drawingCanvas.mapToItem(boardContainer, window.cursorX, window.cursorY).x - (width / 2)
-                        y: drawingCanvas.mapToItem(boardContainer, window.cursorX, window.cursorY).y - (height / 2)
+                        x: drawingCanvas.mapToItem(boardContainer, window.cursorX * window.editScale, window.cursorY * window.editScale).x - (width / 2)
+                        y: drawingCanvas.mapToItem(boardContainer, window.cursorX * window.editScale, window.cursorY * window.editScale).y - (height / 2)
 
                         property real zoomFactor: 1.5
 
@@ -1982,7 +2003,7 @@ DankModal {
 
                                 // 1. Draw background image
                                 if (staticBgImage.status === Image.Ready || staticBgImage.width > 0) {
-                                    ctx.drawImage(staticBgImage, 0, 0, drawingCanvas.width, drawingCanvas.height);
+                                    ctx.drawImage(staticBgImage, 0, 0, window.canvasWidth, window.canvasHeight);
                                 }
 
                                 // 2. Draw annotations
@@ -2046,10 +2067,43 @@ DankModal {
                              }
                         }
 
-                        // 2. Overlay the annotations (drawingCanvas)
-                        if (window.activeCanvas) {
-                            ctx.drawImage(window.activeCanvas, 0, 0);
-                        }
+                         // 2. Overlay the annotations at full resolution
+                         if (window.showAnnotations && window.activeCanvas) {
+                              ctx.save();
+                              if (window.hasSelection) {
+                                  ctx.translate(-window.cropRect.x, -window.cropRect.y);
+                              }
+                              // Draw all completed strokes
+                              for (var i = 0; i < window.strokes.length; i++) {
+                                  window.activeCanvas.drawStroke(ctx, window.strokes[i]);
+                              }
+                              // Draw current dragging stroke if any
+                              if (window.currentStroke) {
+                                  window.activeCanvas.drawStroke(ctx, window.currentStroke);
+                              }
+                              
+                              // Draw temporary live typing text if any
+                              if (window.isTyping) {
+                                  ctx.fillStyle = window.currentColor;
+                                  let styleStr = "";
+                                  if (window.textItalic) styleStr += "italic ";
+                                  if (window.textBold) styleStr += "bold ";
+                                  ctx.font = styleStr + Math.round(window.textFontSize) + "px " + window.textFontFamily;
+                                  ctx.textAlign = "left";
+                                  ctx.textBaseline = "top";
+                                  ctx.fillText(window.currentTypingText, window.typingCoords.x, window.typingCoords.y);
+                                  if (window.textUnderline) {
+                                      const textWidth = ctx.measureText(window.currentTypingText).width;
+                                      ctx.strokeStyle = window.currentColor;
+                                      ctx.lineWidth = Math.max(1.5, Math.round(window.textFontSize * 0.08));
+                                      ctx.beginPath();
+                                      ctx.moveTo(window.typingCoords.x, window.typingCoords.y + window.textFontSize * 1.05);
+                                      ctx.lineTo(window.typingCoords.x + textWidth, window.typingCoords.y + window.textFontSize * 1.05);
+                                      ctx.stroke();
+                                  }
+                              }
+                              ctx.restore();
+                         }
 
                         // 3. Overlay custom watermark if enabled
                         const enableWatermark = window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.enableWatermark || false;
