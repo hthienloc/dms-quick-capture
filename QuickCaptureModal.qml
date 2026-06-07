@@ -8,6 +8,8 @@ import qs.Widgets
 import qs.Modals.Common
 import "./dms-common"
 import "components"
+import "components/Helpers.js" as Helpers
+import "components/DrawingRenderer.js" as DrawingRenderer
 
 DankModal {
     id: window
@@ -159,11 +161,7 @@ DankModal {
     property string currentTypingText: ""
 
     // Helper to decode hex color to RGB
-    function hexToRgb(hex) {
-        if (!hex) return { r: 0.2, g: 0.5, b: 1 };
-        const c = Qt.color(hex);
-        return { r: c.r, g: c.g, b: c.b };
-    }
+    function hexToRgb(hex) { return Helpers.hexToRgb(hex, Qt); }
 
     backgroundOpacity: (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.modalOpacity !== undefined ? window.parentWidget.pluginData.modalOpacity : 60) / 100
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
@@ -363,19 +361,11 @@ DankModal {
     }
 
     function isInsideCropRect(mx, my) {
-        if (!hasSelection) return false;
-        return mx >= cropRect.x && mx <= (cropRect.x + cropRect.width) &&
-               my >= cropRect.y && my <= (cropRect.y + cropRect.height);
+        return Helpers.isInsideCropRect(mx, my, window.hasSelection, window.cropRect);
     }
 
     function constrainSquarePoint(start, point) {
-        if (!start || !point) return point || Qt.point(0, 0);
-        const dx = point.x - start.x;
-        const dy = point.y - start.y;
-        const size = Math.max(Math.abs(dx), Math.abs(dy));
-        const sx = dx < 0 ? -1 : 1;
-        const sy = dy < 0 ? -1 : 1;
-        return Qt.point(start.x + sx * size, start.y + sy * size);
+        return Helpers.constrainSquarePoint(start, point, Qt);
     }
 
     function findStrokeAt(mx, my) {
@@ -481,47 +471,7 @@ DankModal {
         window.exportCanvasItem.requestPaint();
     }
 
-    function shortcutToken(key) {
-        switch (key) {
-        case Qt.Key_0: return "0";
-        case Qt.Key_1: return "1";
-        case Qt.Key_2: return "2";
-        case Qt.Key_3: return "3";
-        case Qt.Key_4: return "4";
-        case Qt.Key_5: return "5";
-        case Qt.Key_6: return "6";
-        case Qt.Key_7: return "7";
-        case Qt.Key_8: return "8";
-        case Qt.Key_9: return "9";
-        case Qt.Key_A: return "A";
-        case Qt.Key_B: return "B";
-        case Qt.Key_C: return "C";
-        case Qt.Key_D: return "D";
-        case Qt.Key_E: return "E";
-        case Qt.Key_F: return "F";
-        case Qt.Key_G: return "G";
-        case Qt.Key_H: return "H";
-        case Qt.Key_I: return "I";
-        case Qt.Key_J: return "J";
-        case Qt.Key_K: return "K";
-        case Qt.Key_L: return "L";
-        case Qt.Key_M: return "M";
-        case Qt.Key_N: return "N";
-        case Qt.Key_O: return "O";
-        case Qt.Key_P: return "P";
-        case Qt.Key_Q: return "Q";
-        case Qt.Key_R: return "R";
-        case Qt.Key_S: return "S";
-        case Qt.Key_T: return "T";
-        case Qt.Key_U: return "U";
-        case Qt.Key_V: return "V";
-        case Qt.Key_W: return "W";
-        case Qt.Key_X: return "X";
-        case Qt.Key_Y: return "Y";
-        case Qt.Key_Z: return "Z";
-        default: return "";
-        }
-    }
+    function shortcutToken(key) { return Helpers.shortcutToken(key, Qt); }
 
     function shortcutColor(color) {
         return color === "primary" ? Theme.primary : color;
@@ -981,55 +931,12 @@ DankModal {
                             ctx.scale(window.editScale, window.editScale);
 
                             // 1. Draw Dimming Selection Overlay (only if in crop mode)
-                            if (window.currentTool === "crop") {
-                                if (window.cropRect.width > 0 && window.cropRect.height > 0) {
-                                    ctx.save();
-                                    ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
-                                    // Left
-                                    ctx.fillRect(0, 0, window.cropRect.x, window.canvasHeight);
-                                    // Right
-                                    ctx.fillRect(window.cropRect.x + window.cropRect.width, 0, window.canvasWidth - (window.cropRect.x + window.cropRect.width), window.canvasHeight);
-                                    // Top
-                                    ctx.fillRect(window.cropRect.x, 0, window.cropRect.width, window.cropRect.y);
-                                    // Bottom
-                                    ctx.fillRect(window.cropRect.x, window.cropRect.y + window.cropRect.height, window.cropRect.width, window.canvasHeight - (window.cropRect.y + window.cropRect.height));
-
-                                    // Selection border
-                                    ctx.strokeStyle = Theme.primary;
-                                    ctx.lineWidth = 1.5;
-                                    ctx.strokeRect(window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height);
-
-                                    // 4 Corner resize handles
-                                    const hs = 10;
-                                    const hh = hs / 2;
-                                    ctx.fillStyle = Theme.primary;
-                                    ctx.strokeStyle = "#ffffff";
-                                    ctx.lineWidth = 1.5;
-
-                                    const x1 = window.cropRect.x;
-                                    const y1 = window.cropRect.y;
-                                    const x2 = window.cropRect.x + window.cropRect.width;
-                                    const y2 = window.cropRect.y + window.cropRect.height;
-
-                                    // TL
-                                    ctx.fillRect(x1 - hh, y1 - hh, hs, hs);
-                                    ctx.strokeRect(x1 - hh, y1 - hh, hs, hs);
-                                    // TR
-                                    ctx.fillRect(x2 - hh, y1 - hh, hs, hs);
-                                    ctx.strokeRect(x2 - hh, y1 - hh, hs, hs);
-                                    // BL
-                                    ctx.fillRect(x1 - hh, y2 - hh, hs, hs);
-                                    ctx.strokeRect(x1 - hh, y2 - hh, hs, hs);
-                                    // BR
-                                    ctx.fillRect(x2 - hh, y2 - hh, hs, hs);
-                                    ctx.strokeRect(x2 - hh, y2 - hh, hs, hs);
-                                    ctx.restore();
-                                } else {
-                                    // Dim full canvas slightly before selection
-                                    ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
-                                    ctx.fillRect(0, 0, window.canvasWidth, window.canvasHeight);
-                                }
-                            }
+                            DrawingRenderer.drawSelectionOverlay(ctx, {
+                                isCropMode: window.currentTool === "crop",
+                                cropRect: window.cropRect,
+                                canvasWidth: window.canvasWidth,
+                                canvasHeight: window.canvasHeight
+                            }, Theme);
 
                             // 2. Draw annotations (translated in edit mode, or clipped in crop mode)
                             ctx.save();
@@ -1049,7 +956,8 @@ DankModal {
 
                                 // 3. Draw current dragging stroke
                                 if (window.currentStroke) {
-                                    drawStroke(ctx, window.currentStroke);
+                                    const tempStroke = Object.assign({}, window.currentStroke, { isCurrent: true });
+                                    drawStroke(ctx, tempStroke);
                                 }
 
                                 // 4. Draw temporary live typing text
@@ -1080,387 +988,31 @@ DankModal {
                             ctx.restore();
 
                             // 5. Draw Watermark Preview in Editor
-                            const enableWatermark = window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.enableWatermark || false;
-                            if (enableWatermark && window.currentTool !== "crop") {
-                                const watermarkType = window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.watermarkType || "text";
-                                const watermarkOpacity = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.watermarkOpacity !== undefined ? window.parentWidget.pluginData.watermarkOpacity : 20) / 100.0;
-                                const watermarkPosition = window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.watermarkPosition || "bottom_right";
-                                const watermarkSize = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.watermarkSize !== undefined ? window.parentWidget.pluginData.watermarkSize : 5) / 100.0;
-                                const watermarkTextSize = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.watermarkTextSize !== undefined ? window.parentWidget.pluginData.watermarkTextSize : 5) / 100.0;
+                            const pData = (window.parentWidget && window.parentWidget.pluginData) || {};
+                            DrawingRenderer.drawWatermark(ctx, {
+                                enabled: pData.enableWatermark && window.currentTool !== "crop",
+                                type: pData.watermarkType || "text",
+                                opacity: (pData.watermarkOpacity !== undefined ? pData.watermarkOpacity : 20) / 100.0,
+                                position: pData.watermarkPosition || "bottom_right",
+                                text: pData.watermarkText || "© {user}",
+                                textScale: (pData.watermarkTextSize !== undefined ? pData.watermarkTextSize : 5) / 100.0,
+                                imageScale: (pData.watermarkSize !== undefined ? pData.watermarkSize : 5) / 100.0,
+                                canvasWidth: window.canvasWidth,
+                                canvasHeight: window.canvasHeight,
+                                imageLoader: watermarkImageLoader,
+                                imageReady: watermarkImageLoader.status === Image.Ready,
+                                imageSourceSize: watermarkImageLoader.sourceSize
+                            }, config);
 
-                                ctx.save();
-                                ctx.globalAlpha = watermarkOpacity;
-                                if (watermarkType === "text" || watermarkType === "hybrid") {
-                                    const rawText = window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.watermarkText || "© {user}";
-                                    const textStr = config.formatWatermarkText(rawText);
-                                    const lines = textStr.split("\n");
-                                    const fontSize = Math.round(Math.max(12, window.canvasHeight * watermarkTextSize));
-                                    ctx.font = "bold " + fontSize + "px sans-serif";
-                                    ctx.fillStyle = "#ffffff";
-                                    ctx.shadowColor = "#000000";
-                                    ctx.shadowOffsetX = 1;
-                                    ctx.shadowOffsetY = 1;
-                                    ctx.shadowBlur = 2;
-
-                                    const lineHeight = fontSize * 1.25;
-                                    let maxTextWidth = 0;
-                                    for (let i = 0; i < lines.length; i++) {
-                                        const w = ctx.measureText(lines[i]).width;
-                                        if (w > maxTextWidth) maxTextWidth = w;
-                                    }
-
-                                    const totalTextHeight = lines.length * lineHeight;
-                                    const margin = 20;
-                                    const spacing = Math.round(fontSize * 0.4);
-
-                                    const hasImage = (watermarkType === "hybrid" && watermarkImageLoader.status === Image.Ready);
-                                    let targetW = 0;
-                                    let targetH = 0;
-                                    if (hasImage) {
-                                        const imgW = watermarkImageLoader.sourceSize.width;
-                                        const imgH = watermarkImageLoader.sourceSize.height;
-                                        const maxW = window.canvasWidth * watermarkSize;
-                                        const maxH = window.canvasHeight * watermarkSize;
-                                        const scale = Math.min(maxW / imgW, maxH / imgH, 1.0);
-                                        targetW = imgW * scale;
-                                        targetH = imgH * scale;
-                                    }
-
-                                    const totalW = (hasImage ? targetW + spacing : 0) + maxTextWidth;
-                                    const totalH = Math.max(targetH, totalTextHeight);
-
-                                    let tx = margin;
-                                    let ty = fontSize + margin;
-
-                                    if (watermarkPosition === "bottom_right") {
-                                        tx = window.canvasWidth - totalW - margin;
-                                        ty = window.canvasHeight - (lines.length - 1) * lineHeight - margin;
-                                    } else if (watermarkPosition === "bottom_left") {
-                                        tx = margin;
-                                        ty = window.canvasHeight - (lines.length - 1) * lineHeight - margin;
-                                    } else if (watermarkPosition === "top_right") {
-                                        tx = window.canvasWidth - totalW - margin;
-                                        ty = fontSize + margin;
-                                    } else if (watermarkPosition === "top_left") {
-                                        tx = margin;
-                                        ty = fontSize + margin;
-                                    } else if (watermarkPosition === "center") {
-                                        tx = (window.canvasWidth - totalW) / 2;
-                                        ty = (window.canvasHeight - totalH) / 2 + fontSize + (totalH - totalTextHeight) / 2;
-                                    } else if (watermarkPosition === "top") {
-                                        tx = (window.canvasWidth - totalW) / 2;
-                                        ty = fontSize + margin;
-                                    } else if (watermarkPosition === "bottom") {
-                                        tx = (window.canvasWidth - totalW) / 2;
-                                        ty = window.canvasHeight - (lines.length - 1) * lineHeight - margin;
-                                    } else if (watermarkPosition === "left") {
-                                        tx = margin;
-                                        ty = (window.canvasHeight - totalH) / 2 + fontSize + (totalH - totalTextHeight) / 2;
-                                    } else if (watermarkPosition === "right") {
-                                        tx = window.canvasWidth - totalW - margin;
-                                        ty = (window.canvasHeight - totalH) / 2 + fontSize + (totalH - totalTextHeight) / 2;
-                                    }
-
-                                    if (hasImage) {
-                                        const iy = ty - fontSize + (totalTextHeight - targetH) / 2;
-                                        ctx.drawImage(watermarkImageLoader, tx, iy, targetW, targetH);
-                                    }
-
-                                    const textX = tx + (hasImage ? targetW + spacing : 0);
-                                    for (let i = 0; i < lines.length; i++) {
-                                        ctx.fillText(lines[i], textX, ty + i * lineHeight);
-                                    }
-
-                                } else if (watermarkType === "image" && watermarkImageLoader.status === Image.Ready) {
-                                    const imgW = watermarkImageLoader.sourceSize.width;
-                                    const imgH = watermarkImageLoader.sourceSize.height;
-                                    const maxW = window.canvasWidth * watermarkSize;
-                                    const maxH = window.canvasHeight * watermarkSize;
-                                    const scale = Math.min(maxW / imgW, maxH / imgH, 1.0);
-                                    const targetW = imgW * scale;
-                                    const targetH = imgH * scale;
-
-                                    const margin = 20;
-                                    let ix = margin;
-                                    let iy = margin;
-
-                                    if (watermarkPosition === "bottom_right") {
-                                        ix = window.canvasWidth - targetW - margin;
-                                        iy = window.canvasHeight - targetH - margin;
-                                    } else if (watermarkPosition === "bottom_left") {
-                                        ix = margin;
-                                        iy = window.canvasHeight - targetH - margin;
-                                    } else if (watermarkPosition === "top_right") {
-                                        ix = window.canvasWidth - targetW - margin;
-                                        iy = margin;
-                                    } else if (watermarkPosition === "top_left") {
-                                        ix = margin;
-                                        iy = margin;
-                                    } else if (watermarkPosition === "center") {
-                                        ix = (window.canvasWidth - targetW) / 2;
-                                        iy = (window.canvasHeight - targetH) / 2;
-                                    } else if (watermarkPosition === "top") {
-                                        ix = (window.canvasWidth - targetW) / 2;
-                                        iy = margin;
-                                    } else if (watermarkPosition === "bottom") {
-                                        ix = (window.canvasWidth - targetW) / 2;
-                                        iy = window.canvasHeight - targetH - margin;
-                                    } else if (watermarkPosition === "left") {
-                                        ix = margin;
-                                        iy = (window.canvasHeight - targetH) / 2;
-                                    } else if (watermarkPosition === "right") {
-                                        ix = window.canvasWidth - targetW - margin;
-                                        iy = (window.canvasHeight - targetH) / 2;
-                                    }
-
-                                    ctx.drawImage(watermarkImageLoader, ix, iy, targetW, targetH);
-                                }
-                                ctx.restore();
-                            }
                             ctx.restore();
                         }
 
                         function drawStroke(ctx, stroke) {
-                            if (stroke.points.length === 0) return;
-
-                            const rgb = window.hexToRgb(stroke.color);
-
-                            if (stroke.tool === "pen") {
-                                ctx.strokeStyle = stroke.color;
-                                ctx.lineWidth = stroke.width;
-                                ctx.lineCap = "round";
-                                ctx.lineJoin = "round";
-                                ctx.beginPath();
-                                ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-                                for (var i = 1; i < stroke.points.length; i++) {
-                                    ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
-                                }
-                                ctx.stroke();
-
-                            } else if (stroke.tool === "line") {
-                                ctx.strokeStyle = stroke.color;
-                                ctx.lineWidth = stroke.width;
-                                ctx.lineCap = "round";
-                                ctx.lineJoin = "round";
-                                const p0 = stroke.points[0];
-                                const p1 = stroke.points[stroke.points.length - 1];
-                                ctx.beginPath();
-                                ctx.moveTo(p0.x, p0.y);
-                                ctx.lineTo(p1.x, p1.y);
-                                ctx.stroke();
-
-                            } else if (stroke.tool === "highlighter") {
-                                ctx.strokeStyle = Qt.rgba(rgb.r, rgb.g, rgb.b, 0.4);
-                                ctx.lineWidth = stroke.width * 4;
-                                ctx.lineCap = window.roundHighlighter ? "round" : "square";
-                                ctx.lineJoin = window.roundHighlighter ? "round" : "miter";
-                                ctx.beginPath();
-                                ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-                                for (var i = 1; i < stroke.points.length; i++) {
-                                    ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
-                                }
-                                ctx.stroke();
-
-                            } else if (stroke.tool === "rect") {
-                                ctx.strokeStyle = stroke.color;
-                                ctx.lineWidth = stroke.width;
-                                ctx.lineCap = "round";
-                                ctx.lineJoin = "round";
-                                const p0 = stroke.points[0];
-                                const p1 = stroke.points[stroke.points.length - 1];
-                                const rx = Math.min(p0.x, p1.x);
-                                const ry = Math.min(p0.y, p1.y);
-                                const rw = Math.abs(p1.x - p0.x);
-                                const rh = Math.abs(p1.y - p0.y);
-                                // Adjust radius to be larger than half the stroke width to prevent sharp inner corners
-                                const baseRadius = window.roundRect ? (Theme.cornerRadius + (stroke.width / 2)) : 0;
-                                const radius = Math.min(baseRadius, Math.min(rw, rh) / 2);
-
-                                ctx.beginPath();
-                                ctx.moveTo(rx + radius, ry);
-                                ctx.lineTo(rx + rw - radius, ry);
-                                ctx.arcTo(rx + rw, ry, rx + rw, ry + radius, radius);
-                                ctx.lineTo(rx + rw, ry + rh - radius);
-                                ctx.arcTo(rx + rw, ry + rh, rx + rw - radius, ry + rh, radius);
-                                ctx.lineTo(rx + radius, ry + rh);
-                                ctx.arcTo(rx, ry + rh, rx, ry + rh - radius, radius);
-                                ctx.lineTo(rx, ry + radius);
-                                ctx.arcTo(rx, ry, rx + radius, ry, radius);
-                                ctx.closePath();
-                                ctx.stroke();
-
-                            } else if (stroke.tool === "ellipse") {
-                                ctx.strokeStyle = stroke.color;
-                                ctx.lineWidth = stroke.width;
-                                ctx.lineCap = "round";
-                                ctx.lineJoin = "round";
-                                const p0 = stroke.points[0];
-                                const p1 = stroke.points[stroke.points.length - 1];
-                                const rx = Math.min(p0.x, p1.x);
-                                const ry = Math.min(p0.y, p1.y);
-                                const rw = Math.abs(p1.x - p0.x);
-                                const rh = Math.abs(p1.y - p0.y);
-
-                                if (rw > 0 && rh > 0) {
-                                    ctx.save();
-                                    ctx.beginPath();
-                                    ctx.translate(rx + rw / 2, ry + rh / 2);
-                                    ctx.scale(rw / 2, rh / 2);
-                                    ctx.arc(0, 0, 1, 0, 2 * Math.PI);
-                                    ctx.restore();
-                                    ctx.stroke();
-                                }
-
-                            } else if (stroke.tool === "arrow") {
-                                ctx.strokeStyle = stroke.color;
-                                ctx.fillStyle = stroke.color;
-                                ctx.lineWidth = stroke.width;
-                                ctx.lineCap = "round";
-                                ctx.lineJoin = "round";
-                                const p0 = stroke.points[0];
-                                const p1 = stroke.points[stroke.points.length - 1];
-                                const dx = p1.x - p0.x;
-                                const dy = p1.y - p0.y;
-                                const len = Math.sqrt(dx * dx + dy * dy);
-
-                                if (len > 0) {
-                                    const angle = Math.atan2(dy, dx);
-                                    const spread = Math.PI / 7;
-                                    const headLength = Math.max(15, stroke.width * 4);
-                                    
-                                    // Shorten shaft so it stops exactly inside the arrowhead base
-                                    const shaftLength = Math.max(0, len - headLength * 0.8);
-                                    const shaftEndX = p0.x + shaftLength * Math.cos(angle);
-                                    const shaftEndY = p0.y + shaftLength * Math.sin(angle);
-
-                                    // Draw shaft
-                                    ctx.beginPath();
-                                    ctx.moveTo(p0.x, p0.y);
-                                    ctx.lineTo(shaftEndX, shaftEndY);
-                                    ctx.stroke();
-
-                                    // Draw head
-                                    ctx.beginPath();
-                                    ctx.moveTo(p1.x, p1.y);
-                                    ctx.lineTo(p1.x - headLength * Math.cos(angle - spread), p1.y - headLength * Math.sin(angle - spread));
-                                    ctx.lineTo(p1.x - headLength * Math.cos(angle + spread), p1.y - headLength * Math.sin(angle + spread));
-                                    ctx.closePath();
-                                    ctx.fill();
-                                }
-
-                            } else if (stroke.tool === "redact") {
-                                const p0 = stroke.points[0];
-                                const p1 = stroke.points[stroke.points.length - 1];
-                                const rx = Math.min(p0.x, p1.x);
-                                const ry = Math.min(p0.y, p1.y);
-                                const rw = Math.abs(p1.x - p0.x);
-                                const rh = Math.abs(p1.y - p0.y);
-                                const radius = window.roundRect ? Math.min(Theme.cornerRadius, Math.min(rw, rh) / 2) : 0;
-
-                                ctx.fillStyle = stroke.color;
-                                ctx.beginPath();
-                                ctx.moveTo(rx + radius, ry);
-                                ctx.lineTo(rx + rw - radius, ry);
-                                ctx.arcTo(rx + rw, ry, rx + rw, ry + radius, radius);
-                                ctx.lineTo(rx + rw, ry + rh - radius);
-                                ctx.arcTo(rx + rw, ry + rh, rx + rw - radius, ry + rh, radius);
-                                ctx.lineTo(rx + radius, ry + rh);
-                                ctx.arcTo(rx, ry + rh, rx, ry + rh - radius, radius);
-                                ctx.lineTo(rx, ry + radius);
-                                ctx.arcTo(rx, ry, rx + radius, ry, radius);
-                                ctx.closePath();
-                                ctx.fill();
-
-                            } else if (stroke.tool === "pixelate") {
-                                if (stroke.points.length >= 2) {
-                                    const p0 = stroke.points[0];
-                                    const p1 = stroke.points[stroke.points.length - 1];
-                                    const rx = Math.floor(Math.min(p0.x, p1.x));
-                                    const ry = Math.floor(Math.min(p0.y, p1.y));
-                                    const rw = Math.floor(Math.abs(p1.x - p0.x));
-                                    const rh = Math.floor(Math.abs(p1.y - p0.y));
-
-                                    if (rw > 2 && rh > 2) {
-                                        ctx.save();
-                                        ctx.beginPath();
-                                        ctx.rect(rx, ry, rw, rh);
-                                        ctx.clip();
-                                        ctx.imageSmoothingEnabled = false;
-
-                                        if (window.bgImageItem && window.bgImageItem.status === Image.Ready) {
-                                            const blockSize = Math.max(8, Math.min(36, stroke.width * 3));
-                                            const sampleSize = Math.max(1, Math.round(blockSize / 5));
-                                            const imgW = window.bgImageItem.sourceSize.width;
-                                            const imgH = window.bgImageItem.sourceSize.height;
-                                            for (let y = ry; y < ry + rh; y += blockSize) {
-                                                for (let x = rx; x < rx + rw; x += blockSize) {
-                                                    const bw = Math.min(blockSize, rx + rw - x);
-                                                    const bh = Math.min(blockSize, ry + rh - y);
-                                                    if (bw <= 0 || bh <= 0) continue;
-                                                    let sx = Math.min(x + Math.floor(bw / 2), rx + rw - 1);
-                                                    let sy = Math.min(y + Math.floor(bh / 2), ry + rh - 1);
-                                                    sx = Math.max(0, Math.min(sx, Math.max(0, imgW - sampleSize)));
-                                                    sy = Math.max(0, Math.min(sy, Math.max(0, imgH - sampleSize)));
-                                                    ctx.drawImage(window.bgImageItem, sx, sy, sampleSize, sampleSize, x, y, bw, bh);
-                                                }
-                                            }
-                                        }
-
-                                        if (stroke === window.currentStroke) {
-                                            ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
-                                            ctx.lineWidth = 1;
-                                            ctx.setLineDash([4, 4]);
-                                            ctx.strokeRect(rx, ry, rw, rh);
-                                        }
-                                        ctx.restore();
-                                    }
-                                }
-
-                            } else if (stroke.tool === "stamp") {
-                                const pt = stroke.points[0];
-                                const radius = stroke.width * 5;
-                                const lum = 0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b;
-                                const textColor = lum > 0.5 ? "#000000" : "#ffffff";
-
-                                // Circle backdrop
-                                ctx.fillStyle = stroke.color;
-                                ctx.beginPath();
-                                ctx.arc(pt.x, pt.y, radius, 0, 2 * Math.PI);
-                                ctx.fill();
-
-                                // Dynamic contrasting label — measureText for reliable centering across digit counts
-                                const fontSize = Math.round(radius * 1.2);
-                                const text = String(stroke.counter);
-                                ctx.fillStyle = textColor;
-                                ctx.font = "bold " + fontSize + "px sans-serif";
-                                ctx.textBaseline = "middle";
-                                ctx.textAlign = "left";
-                                const textW = ctx.measureText(text).width;
-                                ctx.fillText(text, pt.x - textW / 2, pt.y + Math.round(fontSize * 0.1));
-                            } else if (stroke.tool === "text") {
-                                const pt = stroke.points[0];
-                                ctx.fillStyle = stroke.color;
-                                
-                                let styleStr = "";
-                                if (stroke.isItalic) styleStr += "italic ";
-                                if (stroke.isBold) styleStr += "bold ";
-                                const fFamily = stroke.fontFamily || (stroke.isMonospace ? "monospace" : "sans-serif");
-                                
-                                ctx.font = styleStr + Math.round(stroke.width) + "px " + fFamily;
-                                ctx.textAlign = "left";
-                                ctx.textBaseline = "top";
-                                ctx.fillText(stroke.text, pt.x, pt.y);
-
-                                if (stroke.isUnderline) {
-                                    const textWidth = ctx.measureText(stroke.text).width;
-                                    ctx.strokeStyle = stroke.color;
-                                    ctx.lineWidth = Math.max(1.5, Math.round(stroke.width * 0.08));
-                                    ctx.beginPath();
-                                    ctx.moveTo(pt.x, pt.y + stroke.width * 1.05);
-                                    ctx.lineTo(pt.x + textWidth, pt.y + stroke.width * 1.05);
-                                    ctx.stroke();
-                                }
-                            }
+                            DrawingRenderer.drawStroke(ctx, stroke, Helpers, Qt, Theme, {
+                                roundRect: window.roundRect,
+                                roundHighlighter: window.roundHighlighter,
+                                bgImageItem: window.bgImageItem,
+                            });
                         }
 
                         // Mouse Drawing & Action Capture
@@ -2090,144 +1642,21 @@ DankModal {
                          }
 
                         // 3. Overlay custom watermark if enabled
-                        const enableWatermark = window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.enableWatermark || false;
-                        if (enableWatermark) {
-                              const watermarkType = window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.watermarkType || "text";
-                              const watermarkOpacity = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.watermarkOpacity !== undefined ? window.parentWidget.pluginData.watermarkOpacity : 20) / 100.0;
-                              const watermarkPosition = window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.watermarkPosition || "bottom_right";
-                              const watermarkSize = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.watermarkSize !== undefined ? window.parentWidget.pluginData.watermarkSize : 5) / 100.0;
-                              const watermarkTextSize = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.watermarkTextSize !== undefined ? window.parentWidget.pluginData.watermarkTextSize : 5) / 100.0;
-
-                             ctx.save();
-                             ctx.globalAlpha = watermarkOpacity;
-                             if (watermarkType === "text" || watermarkType === "hybrid") {
-                                  const rawText = window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.watermarkText || "© {user}";
-                                  const textStr = config.formatWatermarkText(rawText);
-                                  const lines = textStr.split("\n");
-                                  const fontSize = Math.round(Math.max(12, exportCanvas.height * watermarkTextSize));
-                                  ctx.font = "bold " + fontSize + "px sans-serif";
-                                  ctx.fillStyle = "#ffffff";
-                                  ctx.shadowColor = "#000000";
-                                  ctx.shadowOffsetX = 1;
-                                  ctx.shadowOffsetY = 1;
-                                  ctx.shadowBlur = 2;
-
-                                  const lineHeight = fontSize * 1.25;
-                                  let maxTextWidth = 0;
-                                  for (let i = 0; i < lines.length; i++) {
-                                      const w = ctx.measureText(lines[i]).width;
-                                      if (w > maxTextWidth) maxTextWidth = w;
-                                  }
-
-                                  const totalTextHeight = lines.length * lineHeight;
-                                  const margin = 20;
-                                  const spacing = Math.round(fontSize * 0.4);
-
-                                  // Check if we have image for hybrid
-                                  const hasImage = (watermarkType === "hybrid" && watermarkImageLoader.status === Image.Ready);
-                                  let targetW = 0;
-                                  let targetH = 0;
-                                  if (hasImage) {
-                                      const imgW = watermarkImageLoader.sourceSize.width;
-                                      const imgH = watermarkImageLoader.sourceSize.height;
-                                      const maxW = exportCanvas.width * watermarkSize;
-                                      const maxH = exportCanvas.height * watermarkSize;
-                                      const scale = Math.min(maxW / imgW, maxH / imgH, 1.0);
-                                      targetW = imgW * scale;
-                                      targetH = imgH * scale;
-                                  }
-
-                                  const totalW = (hasImage ? targetW + spacing : 0) + maxTextWidth;
-                                  const totalH = Math.max(targetH, totalTextHeight);
-
-                                  let tx = margin;
-                                  let ty = fontSize + margin;
-
-                                  if (watermarkPosition === "bottom_right") {
-                                      tx = exportCanvas.width - totalW - margin;
-                                      ty = exportCanvas.height - (lines.length - 1) * lineHeight - margin;
-                                  } else if (watermarkPosition === "bottom_left") {
-                                      tx = margin;
-                                      ty = exportCanvas.height - (lines.length - 1) * lineHeight - margin;
-                                  } else if (watermarkPosition === "top_right") {
-                                      tx = exportCanvas.width - totalW - margin;
-                                      ty = fontSize + margin;
-                                  } else if (watermarkPosition === "top_left") {
-                                      tx = margin;
-                                      ty = fontSize + margin;
-                                  } else if (watermarkPosition === "center") {
-                                      tx = (exportCanvas.width - totalW) / 2;
-                                      ty = (exportCanvas.height - totalH) / 2 + fontSize + (totalH - totalTextHeight) / 2;
-                                  } else if (watermarkPosition === "top") {
-                                      tx = (exportCanvas.width - totalW) / 2;
-                                      ty = fontSize + margin;
-                                  } else if (watermarkPosition === "bottom") {
-                                      tx = (exportCanvas.width - totalW) / 2;
-                                      ty = exportCanvas.height - (lines.length - 1) * lineHeight - margin;
-                                  } else if (watermarkPosition === "left") {
-                                      tx = margin;
-                                      ty = (exportCanvas.height - totalH) / 2 + fontSize + (totalH - totalTextHeight) / 2;
-                                  } else if (watermarkPosition === "right") {
-                                      tx = exportCanvas.width - totalW - margin;
-                                      ty = (exportCanvas.height - totalH) / 2 + fontSize + (totalH - totalTextHeight) / 2;
-                                  }
-
-                                  if (hasImage) {
-                                      const iy = ty - fontSize + (totalTextHeight - targetH) / 2;
-                                      ctx.drawImage(watermarkImageLoader, tx, iy, targetW, targetH);
-                                  }
-
-                                  const textX = tx + (hasImage ? targetW + spacing : 0);
-                                  for (let i = 0; i < lines.length; i++) {
-                                      ctx.fillText(lines[i], textX, ty + i * lineHeight);
-                                  }
-
-                             } else if (watermarkType === "image" && watermarkImageLoader.status === Image.Ready) {
-                                 const imgW = watermarkImageLoader.sourceSize.width;
-                                 const imgH = watermarkImageLoader.sourceSize.height;
-                                 const maxW = exportCanvas.width * watermarkSize;
-                                 const maxH = exportCanvas.height * watermarkSize;
-                                 const scale = Math.min(maxW / imgW, maxH / imgH, 1.0);
-                                 const targetW = imgW * scale;
-                                 const targetH = imgH * scale;
-
-                                 const margin = 20;
-                                 let ix = margin;
-                                 let iy = margin;
-
-                                 if (watermarkPosition === "bottom_right") {
-                                     ix = exportCanvas.width - targetW - margin;
-                                     iy = exportCanvas.height - targetH - margin;
-                                 } else if (watermarkPosition === "bottom_left") {
-                                     ix = margin;
-                                     iy = exportCanvas.height - targetH - margin;
-                                 } else if (watermarkPosition === "top_right") {
-                                     ix = exportCanvas.width - targetW - margin;
-                                     iy = margin;
-                                 } else if (watermarkPosition === "top_left") {
-                                     ix = margin;
-                                     iy = margin;
-                                 } else if (watermarkPosition === "center") {
-                                     ix = (exportCanvas.width - targetW) / 2;
-                                     iy = (exportCanvas.height - targetH) / 2;
-                                 } else if (watermarkPosition === "top") {
-                                     ix = (exportCanvas.width - targetW) / 2;
-                                     iy = margin;
-                                 } else if (watermarkPosition === "bottom") {
-                                     ix = (exportCanvas.width - targetW) / 2;
-                                     iy = exportCanvas.height - targetH - margin;
-                                 } else if (watermarkPosition === "left") {
-                                     ix = margin;
-                                     iy = (exportCanvas.height - targetH) / 2;
-                                 } else if (watermarkPosition === "right") {
-                                     ix = exportCanvas.width - targetW - margin;
-                                     iy = (exportCanvas.height - targetH) / 2;
-                                 }
-
-                                 ctx.drawImage(watermarkImageLoader, ix, iy, targetW, targetH);
-                            }
-                            ctx.restore();
-                        }
+                        const pData = (window.parentWidget && window.parentWidget.pluginData) || {};
+                        DrawingRenderer.drawWatermark(ctx, {
+                            enabled: pData.enableWatermark,
+                            type: pData.watermarkType || "text",
+                            opacity: (pData.watermarkOpacity !== undefined ? pData.watermarkOpacity : 20) / 100.0,
+                            position: pData.watermarkPosition || "bottom_right",
+                            text: pData.watermarkText || "© {user}",
+                            textScale: (pData.watermarkTextSize !== undefined ? pData.watermarkTextSize : 5) / 100.0,
+                            imageScale: (pData.watermarkSize !== undefined ? pData.watermarkSize : 5) / 100.0,
+                            canvasWidth: window.canvasWidth,
+                            canvasHeight: window.canvasHeight,
+                            imageLoader: watermarkImageLoader,
+                            imageReady: watermarkImageLoader.status === Image.Ready,
+                            imageSourceSize: watermarkImageLoader.sourceSize
+                        }, config);
 
                         ctx.restore();
                         const format = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.outputFormat) || "png";
@@ -2274,7 +1703,7 @@ DankModal {
                             var r = imgData.data[0];
                             var g = imgData.data[1];
                             var b = imgData.data[2];
-                            var brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+                            var brightness = Helpers.getLuminance({ r: r/255, g: g/255, b: b/255 });
                             window.isScreenshotDark = (brightness < 0.35);
                             window.hasSampledContrast = true;
                         }

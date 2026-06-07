@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import Quickshell
+import "components/Helpers.js" as Helpers
 
 QtObject {
     property var pluginData: ({})
@@ -174,13 +175,7 @@ QtObject {
         { key: "R", color: accentColors[6] }
     ]
 
-    function findByKey(items, key) {
-        if (!items) return null;
-        for (var i = 0; i < items.length; i++) {
-            if (items[i].key === key) return items[i];
-        }
-        return null;
-    }
+    function findByKey(items, key) { return Helpers.findByKey(items, key); }
 
     function resolveColor(rawColor) {
         if (!rawColor) return Theme.primary;
@@ -203,40 +198,5 @@ QtObject {
         return Qt.color(resolved);
     }
 
-    function formatWatermarkText(pattern) {
-        if (!pattern) return "";
-        const username = Quickshell.env("USER") || Quickshell.env("USERNAME") || "User";
-        const now = new Date();
-        const pad = function(num, size) {
-            let s = num + "";
-            while (s.length < (size || 2)) s = "0" + s;
-            return s;
-        };
-
-        const yyyy = now.getFullYear();
-        const MM = pad(now.getMonth() + 1);
-        const dd = pad(now.getDate());
-        const HH = pad(now.getHours());
-        const mm = pad(now.getMinutes());
-        const ss = pad(now.getSeconds());
-
-        return pattern
-            .replace(/\\n/g, "\n")
-            .replace(/\{nl\}/gi, "\n")
-            .replace(/\{newline\}/gi, "\n")
-            .replace(/\{user\}/gi, username)
-            .replace(/\{username\}/gi, username)
-            .replace(/%Y/g, yyyy)
-            .replace(/%m/g, MM)
-            .replace(/%d/g, dd)
-            .replace(/%H/g, HH)
-            .replace(/%M/g, mm)
-            .replace(/%S/g, ss)
-            .replace(/\{yyyy\}/gi, yyyy)
-            .replace(/\{MM\}/g, MM)
-            .replace(/\{dd\}/gi, dd)
-            .replace(/\{HH\}/gi, HH)
-            .replace(/\{mm\}/g, mm)
-            .replace(/\{ss\}/gi, ss);
-    }
+    function formatWatermarkText(pattern) { return Helpers.formatWatermarkText(pattern, Quickshell); }
 }
