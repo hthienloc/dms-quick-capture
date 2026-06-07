@@ -1247,33 +1247,15 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Radial Menu Settings")
             icon: "mouse"
-            showReset: defaultPresetIndex.isDirty || radialHoverTrigger.isDirty || radialHoverDelay.isDirty || radialMenuOpacity.isDirty
+            showReset: radialHoverTrigger.isDirty || radialHoverDelay.isDirty || radialMenuOpacity.isDirty
             onResetClicked: {
-                defaultPresetIndex.resetToDefault();
                 radialHoverTrigger.resetToDefault();
                 radialHoverDelay.resetToDefault();
                 radialMenuOpacity.resetToDefault();
             }
         }
 
-        SelectionSettingPlus {
-            id: defaultPresetIndex
-            settingKey: "defaultPresetIndex"
-            label: I18n.tr("Starting Preset")
-            options: [
-                { "label": I18n.tr("Preset 1"), "value": "0" },
-                { "label": I18n.tr("Preset 2"), "value": "1" },
-                { "label": I18n.tr("Preset 3"), "value": "2" },
-                { "label": I18n.tr("Preset 4"), "value": "3" },
-                { "label": I18n.tr("Preset 5"), "value": "4" },
-                { "label": I18n.tr("Preset 6"), "value": "5" },
-                { "label": I18n.tr("Preset 7"), "value": "6" },
-                { "label": I18n.tr("Preset 8"), "value": "7" }
-            ]
-            defaultValue: "0"
-        }
 
-        Separator {}
 
         ToggleSettingPlus {
             id: radialHoverTrigger
@@ -1328,9 +1310,10 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Drawing")
             icon: "brush"
-            showReset: defaultToolMode.isDirty || defaultTool.isDirty || defaultThickness.isDirty
+            showReset: defaultToolMode.isDirty || defaultPresetIndex.isDirty || defaultTool.isDirty || defaultThickness.isDirty
             onResetClicked: {
                 defaultToolMode.resetToDefault();
+                defaultPresetIndex.resetToDefault();
                 defaultTool.resetToDefault();
                 defaultThickness.resetToDefault();
             }
@@ -1348,6 +1331,28 @@ PluginSettings {
         }
 
         Separator {}
+
+        SelectionSettingPlus {
+            id: defaultPresetIndex
+            settingKey: "defaultPresetIndex"
+            label: I18n.tr("Starting Preset")
+            options: [
+                { "label": I18n.tr("Preset 1"), "value": "0" },
+                { "label": I18n.tr("Preset 2"), "value": "1" },
+                { "label": I18n.tr("Preset 3"), "value": "2" },
+                { "label": I18n.tr("Preset 4"), "value": "3" },
+                { "label": I18n.tr("Preset 5"), "value": "4" },
+                { "label": I18n.tr("Preset 6"), "value": "5" },
+                { "label": I18n.tr("Preset 7"), "value": "6" },
+                { "label": I18n.tr("Preset 8"), "value": "7" }
+            ]
+            defaultValue: "0"
+            visible: defaultToolMode.value === "preset"
+        }
+
+        Separator {
+            visible: defaultToolMode.value === "preset"
+        }
 
 
 
