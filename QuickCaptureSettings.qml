@@ -565,6 +565,11 @@ PluginSettings {
             ]
             defaultValue: "1080"
         }
+
+        InfoText {
+            text: I18n.tr("If you experience lag during editing, consider lowering the resolution limit.")
+            opacity: 0.8
+        }
     }
 
     SettingsCard {
