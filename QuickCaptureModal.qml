@@ -49,7 +49,7 @@ DankModal {
     property var parentWidget: null
 
     // State Variables
-    property string currentTool: "crop" // crop, select, pen, line, arrow, rect, ellipse, text, pixelate, redact, stamp, highlighter, eraser
+    property string currentTool: "crop" // crop, select, pen, line, arrow, rect, ellipse, text, pixelate, redact, stamp, highlighter, eraser, spotlight
     property string lastActiveTool: "pen"
     readonly property real dpr: Screen.devicePixelRatio || 1.0
     onCurrentToolChanged: {
@@ -394,7 +394,7 @@ DankModal {
                     }
                     if (dist < threshold) return i;
                 }
-            } else if (stroke.tool === "rect" || stroke.tool === "redact" || stroke.tool === "pixelate") {
+            } else if (stroke.tool === "rect" || stroke.tool === "redact" || stroke.tool === "pixelate" || stroke.tool === "spotlight") {
                 const p0 = stroke.points[0];
                 const p1 = stroke.points[stroke.points.length - 1];
                 const x1 = Math.min(p0.x, p1.x);
@@ -950,12 +950,63 @@ DankModal {
                             }
 
                             if (window.showAnnotations) {
+                                // 2.1 Draw Spotlight Layer (Dimming + Holes)
+                                const spotlights = window.strokes.filter(s => s.tool === "spotlight");
+                                if (window.currentStroke && window.currentStroke.tool === "spotlight") {
+                                    spotlights.push(window.currentStroke);
+                                }
+
+                                if (spotlights.length > 0) {
+                                    ctx.save();
+                                    const spotlightOpacity = Math.min(0.9, 0.2 + (window.strokeWidth / 50.0) * 0.65);
+                                    
+                                    ctx.beginPath();
+                                    // Outer rectangle covering the whole view
+                                    ctx.rect(0, 0, window.canvasWidth, window.canvasHeight);
+                                    
+                                    for (let s of spotlights) {
+                                        if (s.points.length >= 2) {
+                                            const p0 = s.points[0];
+                                            const p1 = s.points[s.points.length - 1];
+                                            const rx = Math.min(p0.x, p1.x);
+                                            const ry = Math.min(p0.y, p1.y);
+                                            const rw = Math.abs(p1.x - p0.x);
+                                            const rh = Math.abs(p1.y - p0.y);
+                                            
+                                            if (rw > 0 && rh > 0) {
+                                                const radius = window.roundRect ? Math.min(Theme.cornerRadius, Math.min(rw, rh) / 2) : 0;
+                                                if (radius > 0) {
+                                                    ctx.moveTo(rx + radius, ry);
+                                                    ctx.lineTo(rx + rw - radius, ry);
+                                                    ctx.arcTo(rx + rw, ry, rx + rw, ry + radius, radius);
+                                                    ctx.lineTo(rx + rw, ry + rh - radius);
+                                                    ctx.arcTo(rx + rw, ry + rh, rx + rw - radius, ry + rh, radius);
+                                                    ctx.lineTo(rx + radius, ry + rh);
+                                                    ctx.arcTo(rx, ry + rh, rx, ry + rh - radius, radius);
+                                                    ctx.lineTo(rx, ry + radius);
+                                                    ctx.arcTo(rx, ry, rx + radius, ry, radius);
+                                                    ctx.closePath();
+                                                } else {
+                                                    ctx.rect(rx, ry, rw, rh);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                    ctx.clip("evenodd");
+                                    ctx.fillStyle = "rgba(0, 0, 0, " + spotlightOpacity + ")";
+                                    ctx.fillRect(0, 0, window.canvasWidth, window.canvasHeight);
+                                    ctx.restore();
+                                }
+
                                 for (var i = 0; i < window.strokes.length; i++) {
-                                    drawStroke(ctx, window.strokes[i]);
+                                    if (window.strokes[i].tool !== "spotlight") {
+                                        drawStroke(ctx, window.strokes[i]);
+                                    }
                                 }
 
                                 // 3. Draw current dragging stroke
-                                if (window.currentStroke) {
+                                if (window.currentStroke && window.currentStroke.tool !== "spotlight") {
                                     const tempStroke = Object.assign({}, window.currentStroke, { isCurrent: true });
                                     drawStroke(ctx, tempStroke);
                                 }
@@ -1116,7 +1167,7 @@ DankModal {
                                              window.currentStroke.points.push(absPt);
                                          }
                                      } else if (window.currentTool === "rect" || window.currentTool === "ellipse" || window.currentTool === "arrow" || window.currentTool === "line"
-                                              || window.currentTool === "redact" || window.currentTool === "pixelate" || window.currentTool === "highlighter") {
+                                              || window.currentTool === "redact" || window.currentTool === "pixelate" || window.currentTool === "highlighter" || window.currentTool === "spotlight") {
                                          
                                          let finalPt = absPt;
                                          if ((mouse.modifiers & Qt.ShiftModifier) && (window.currentTool === "line" || window.currentTool === "arrow" || window.currentTool === "highlighter")) {
@@ -1132,7 +1183,7 @@ DankModal {
                                                      finalPt = Qt.point(p0.x + L * Math.cos(snappedAngle), p0.y + L * Math.sin(snappedAngle));
                                                  }
                                              }
-                                         } else if ((mouse.modifiers & Qt.ShiftModifier) && (window.currentTool === "ellipse" || window.currentTool === "rect" || window.currentTool === "redact" || window.currentTool === "pixelate")) {
+                                         } else if ((mouse.modifiers & Qt.ShiftModifier) && (window.currentTool === "ellipse" || window.currentTool === "rect" || window.currentTool === "redact" || window.currentTool === "pixelate" || window.currentTool === "spotlight")) {
                                              if (window.currentStroke.points[0]) {
                                                  finalPt = window.constrainSquarePoint(window.currentStroke.points[0], absPt);
                                              }
@@ -1364,6 +1415,7 @@ DankModal {
                             height: width
                             radius: {
                                 if (window.currentTool === "highlighter") return window.roundHighlighter ? width / 2 : 0;
+                                if (window.currentTool === "spotlight" || window.currentTool === "rect" || window.currentTool === "redact") return window.roundRect ? (Theme.cornerRadius * window.editScale) : 0;
                                 if (window.currentTool === "pixelate" || window.currentTool === "text") return 0;
                                 return width / 2;
                             }
@@ -1376,7 +1428,13 @@ DankModal {
                                 anchors.top: parent.bottom
                                 anchors.topMargin: 4 / drawingCanvas.scale
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                text: (window.currentTool === "text" ? window.textFontSize : window.strokeWidth) + "px"
+                                text: {
+                                    if (window.currentTool === "spotlight") {
+                                        const op = Math.round((Math.min(0.9, 0.2 + (window.strokeWidth / 50.0) * 0.65)) * 100);
+                                        return op + "%";
+                                    }
+                                    return (window.currentTool === "text" ? window.textFontSize : window.strokeWidth) + "px";
+                                }
                                 color: Theme.primary
                                 font.pixelSize: 10 / drawingCanvas.scale
                                 font.bold: true

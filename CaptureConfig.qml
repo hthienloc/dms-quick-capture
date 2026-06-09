@@ -17,7 +17,8 @@ QtObject {
         { id: "redact", icon: "square", tooltip: qsTr("Redact / Blackout (R)") },
         { id: "stamp", icon: "looks_one", tooltip: qsTr("Number Stamp (A)") },
         { id: "highlighter", icon: "border_color", tooltip: qsTr("Highlighter (S)") },
-        { id: "eraser", icon: "auto_fix_normal", tooltip: qsTr("Eraser (D)") }
+        { id: "eraser", icon: "auto_fix_normal", tooltip: qsTr("Eraser (D)") },
+        { id: "spotlight", icon: "highlight", tooltip: qsTr("Focus Spotlight (F)") }
     ]
 
     readonly property string selectedPreset: pluginData["color_palette_preset"] || "adaptive"
@@ -161,7 +162,8 @@ QtObject {
         { key: "R", tool: "redact" },
         { key: "A", tool: "stamp" },
         { key: "S", tool: "highlighter" },
-        { key: "D", tool: "eraser" }
+        { key: "D", tool: "eraser" },
+        { key: "F", tool: "spotlight" }
     ]
 
     readonly property var colorShortcuts: [
