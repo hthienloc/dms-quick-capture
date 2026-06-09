@@ -1349,25 +1349,36 @@ DankModal {
                             x: window.previewX - (width / 2)
                             y: window.previewY - (height / 2)
                             width: {
-                                if (window.currentTool === "text") return window.textFontSize;
-                                if (window.currentTool === "highlighter") return window.strokeWidth * 4;
-                                if (window.currentTool === "stamp") return window.strokeWidth * 10;
-                                return window.strokeWidth;
+                                let base = window.strokeWidth;
+                                if (window.currentTool === "text") {
+                                    base = window.textFontSize;
+                                } else if (window.currentTool === "highlighter") {
+                                    base = window.strokeWidth * 4;
+                                } else if (window.currentTool === "stamp") {
+                                    base = window.strokeWidth * 10;
+                                } else if (window.currentTool === "pixelate") {
+                                    base = Math.max(8, Math.min(36, window.strokeWidth * 3));
+                                }
+                                return base * window.editScale;
                             }
                             height: width
-                            radius: (window.currentTool === "highlighter" || window.currentTool === "pixelate" || window.currentTool === "text") ? 0 : width / 2
+                            radius: {
+                                if (window.currentTool === "highlighter") return window.roundHighlighter ? width / 2 : 0;
+                                if (window.currentTool === "pixelate" || window.currentTool === "text") return 0;
+                                return width / 2;
+                            }
                             color: "transparent"
                             border.color: Theme.primary
-                            border.width: 1.5
+                            border.width: 1.5 / drawingCanvas.scale
                             z: 20
 
                             StyledText {
                                 anchors.top: parent.bottom
-                                anchors.topMargin: 4
+                                anchors.topMargin: 4 / drawingCanvas.scale
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: (window.currentTool === "text" ? window.textFontSize : window.strokeWidth) + "px"
                                 color: Theme.primary
-                                font.pixelSize: 10
+                                font.pixelSize: 10 / drawingCanvas.scale
                                 font.bold: true
                             }
                         }
