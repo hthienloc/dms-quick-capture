@@ -958,7 +958,18 @@ DankModal {
 
                                 if (spotlights.length > 0) {
                                     ctx.save();
-                                    const spotlightOpacity = Math.min(0.9, 0.2 + (window.strokeWidth / 50.0) * 0.65);
+                                    
+                                    // Determine which width to use for the global dimming opacity
+                                    let activeWidth = window.strokeWidth;
+                                    if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "spotlight") {
+                                        activeWidth = window.selectedStroke.width;
+                                    } else {
+                                        // If no active selection/drawing, use the last spotlight's width to maintain consistency
+                                        const lastSpotlight = window.strokes.slice().reverse().find(s => s.tool === "spotlight");
+                                        if (lastSpotlight) activeWidth = lastSpotlight.width;
+                                    }
+
+                                    const spotlightOpacity = Math.min(0.9, 0.2 + (activeWidth / 50.0) * 0.65);
                                     
                                     ctx.beginPath();
                                     // Outer rectangle covering the whole view
