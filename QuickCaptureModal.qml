@@ -1704,6 +1704,71 @@ DankModal {
                              }
                         }
 
+                        // 1.5 Overlay the Spotlight Layer
+                        if (window.showAnnotations) {
+                            const spotlights = window.strokes.filter(s => s.tool === "spotlight");
+                            if (window.currentStroke && window.currentStroke.tool === "spotlight") {
+                                spotlights.push(window.currentStroke);
+                            }
+
+                            if (spotlights.length > 0) {
+                                ctx.save();
+                                
+                                let activeWidth = window.strokeWidth;
+                                if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "spotlight") {
+                                    activeWidth = window.selectedStroke.width;
+                                } else {
+                                    const lastSpotlight = window.strokes.slice().reverse().find(s => s.tool === "spotlight");
+                                    if (lastSpotlight) activeWidth = lastSpotlight.width;
+                                }
+                                const spotlightOpacity = Math.min(0.9, 0.2 + (activeWidth / 50.0) * 0.65);
+                                
+                                ctx.beginPath();
+                                // Cover the entire exported area
+                                ctx.rect(0, 0, window.canvasWidth, window.canvasHeight);
+                                
+                                ctx.save();
+                                if (window.hasSelection) {
+                                    ctx.translate(-window.cropRect.x, -window.cropRect.y);
+                                }
+                                
+                                for (let s of spotlights) {
+                                    if (s.points.length >= 2) {
+                                        const p0 = s.points[0];
+                                        const p1 = s.points[s.points.length - 1];
+                                        const rx = Math.min(p0.x, p1.x);
+                                        const ry = Math.min(p0.y, p1.y);
+                                        const rw = Math.abs(p1.x - p0.x);
+                                        const rh = Math.abs(p1.y - p0.y);
+                                        
+                                        if (rw > 0 && rh > 0) {
+                                            const radius = window.roundRect ? Math.min(Theme.cornerRadius, Math.min(rw, rh) / 2) : 0;
+                                            if (radius > 0) {
+                                                ctx.moveTo(rx + radius, ry);
+                                                ctx.lineTo(rx + rw - radius, ry);
+                                                ctx.arcTo(rx + rw, ry, rx + rw, ry + radius, radius);
+                                                ctx.lineTo(rx + rw, ry + rh - radius);
+                                                ctx.arcTo(rx + rw, ry + rh, rx + rw - radius, ry + rh, radius);
+                                                ctx.lineTo(rx + radius, ry + rh);
+                                                ctx.arcTo(rx, ry + rh, rx, ry + rh - radius, radius);
+                                                ctx.lineTo(rx, ry + radius);
+                                                ctx.arcTo(rx, ry, rx + radius, ry, radius);
+                                                ctx.closePath();
+                                            } else {
+                                                ctx.rect(rx, ry, rw, rh);
+                                            }
+                                        }
+                                    }
+                                }
+                                ctx.restore();
+                                
+                                ctx.clip("evenodd");
+                                ctx.fillStyle = "rgba(0, 0, 0, " + spotlightOpacity + ")";
+                                ctx.fillRect(0, 0, window.canvasWidth, window.canvasHeight);
+                                ctx.restore();
+                            }
+                        }
+
                          // 2. Overlay the annotations at full resolution
                          if (window.showAnnotations && window.activeCanvas) {
                               ctx.save();
