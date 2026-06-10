@@ -148,6 +148,12 @@ DankModal {
     property var copiedStroke: null
 
     property var strokes: []
+    readonly property bool hasSpotlights: {
+        for (let i = 0; i < strokes.length; i++) {
+            if (strokes[i].tool === "spotlight") return true;
+        }
+        return false;
+    }
     property var currentStroke: null
     property var selectedStroke: null
     property int preGrabStrokeWidth: 8
@@ -852,7 +858,9 @@ DankModal {
                         }
                     }
                     onUndoRequested: window.performUndo()
+                    onFloatRequested: captureActions.performFloatAction()
                     onSaveRequested: captureActions.performSaveOnly()
+
                     onCopyRequested: captureActions.performCopyOnly()
                     onCopyAndSaveRequested: captureActions.performCopyAndSave()
                     onCloseRequested: window.discardAndClose()
@@ -951,22 +959,25 @@ DankModal {
 
                             if (window.showAnnotations) {
                                 // 2.1 Draw Spotlight Layer (Dimming + Holes)
-                                const spotlights = window.strokes.filter(s => s.tool === "spotlight");
-                                if (window.currentStroke && window.currentStroke.tool === "spotlight") {
-                                    spotlights.push(window.currentStroke);
-                                }
+                                const isDrawingSpotlight = window.currentStroke && window.currentStroke.tool === "spotlight";
+                                if (window.hasSpotlights || isDrawingSpotlight) {
+                                    const spotlights = window.strokes.filter(s => s.tool === "spotlight");
+                                    if (isDrawingSpotlight) {
+                                        spotlights.push(window.currentStroke);
+                                    }
 
-                                if (spotlights.length > 0) {
-                                    ctx.save();
-                                    
-                                    // Determine which width to use for the global dimming opacity
-                                    let activeWidth = window.strokeWidth;
-                                    if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "spotlight") {
-                                        activeWidth = window.selectedStroke.width;
-                                    } else {
-                                        // If no active selection/drawing, use the last spotlight's width to maintain consistency
-                                        const lastSpotlight = window.strokes.slice().reverse().find(s => s.tool === "spotlight");
-                                        if (lastSpotlight) activeWidth = lastSpotlight.width;
+                                    if (spotlights.length > 0) {
+                                        ctx.save();
+                                        
+                                        // Determine which width to use for the global dimming opacity
+                                        let activeWidth = window.strokeWidth;
+                                        if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "spotlight") {
+                                            activeWidth = window.selectedStroke.width;
+                                        } else {
+                                            // If no active selection/drawing, use the last spotlight's width to maintain consistency
+                                            const lastSpotlight = window.strokes.slice().reverse().find(s => s.tool === "spotlight");
+                                            if (lastSpotlight) activeWidth = lastSpotlight.width;
+                                        }
                                     }
 
                                     const spotlightOpacity = Math.min(0.9, 0.2 + (activeWidth / 50.0) * 0.65);
@@ -1706,20 +1717,23 @@ DankModal {
 
                         // 1.5 Overlay the Spotlight Layer
                         if (window.showAnnotations) {
-                            const spotlights = window.strokes.filter(s => s.tool === "spotlight");
-                            if (window.currentStroke && window.currentStroke.tool === "spotlight") {
-                                spotlights.push(window.currentStroke);
-                            }
+                            const isDrawingSpotlight = window.currentStroke && window.currentStroke.tool === "spotlight";
+                            if (window.hasSpotlights || isDrawingSpotlight) {
+                                const spotlights = window.strokes.filter(s => s.tool === "spotlight");
+                                if (isDrawingSpotlight) {
+                                    spotlights.push(window.currentStroke);
+                                }
 
-                            if (spotlights.length > 0) {
-                                ctx.save();
-                                
-                                let activeWidth = window.strokeWidth;
-                                if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "spotlight") {
-                                    activeWidth = window.selectedStroke.width;
-                                } else {
-                                    const lastSpotlight = window.strokes.slice().reverse().find(s => s.tool === "spotlight");
-                                    if (lastSpotlight) activeWidth = lastSpotlight.width;
+                                if (spotlights.length > 0) {
+                                    ctx.save();
+                                    
+                                    let activeWidth = window.strokeWidth;
+                                    if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "spotlight") {
+                                        activeWidth = window.selectedStroke.width;
+                                    } else {
+                                        const lastSpotlight = window.strokes.slice().reverse().find(s => s.tool === "spotlight");
+                                        if (lastSpotlight) activeWidth = lastSpotlight.width;
+                                    }
                                 }
                                 const spotlightOpacity = Math.min(0.9, 0.2 + (activeWidth / 50.0) * 0.65);
                                 
