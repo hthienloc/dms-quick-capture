@@ -31,3 +31,6 @@ WatermarkText 1.0 WatermarkText.qml
 ButtonGroupSettingPlus 1.0 ButtonGroupSettingPlus.qml
 DankSliderPlus 1.0 DankSliderPlus.qml
 NumericText 1.0 NumericText.qml
+SettingsDivider 1.0 SettingsDivider.qml
+DankIconPickerPlus 1.0 DankIconPickerPlus.qml
+ElevationShadow 1.0 ElevationShadow.qml

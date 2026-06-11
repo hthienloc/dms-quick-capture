@@ -11,6 +11,7 @@ Rectangle {
     CaptureConfig { id: config; pluginData: root.pluginData }
 
     property string currentTool: "crop"
+    property string activeToolType: currentTool
     property color currentColor: Theme.primary
     property int strokeWidth: 8
     property bool canUndo: false
@@ -125,13 +126,20 @@ Rectangle {
             Row {
                 spacing: Theme.spacingS; anchors.verticalCenter: parent.verticalCenter
                 Text {
-                    text: root.strokeWidth + "px"; width: 32; horizontalAlignment: Text.AlignRight
+                    text: {
+                        if (root.activeToolType === "spotlight") {
+                            const op = Math.round((Math.min(0.9, 0.2 + (root.strokeWidth / 50.0) * 0.65)) * 100);
+                            return op + "%";
+                        }
+                        return root.strokeWidth + "px";
+                    }
+                    width: 32; horizontalAlignment: Text.AlignRight
                     color: Theme.surfaceText; font.pixelSize: 11; font.bold: true; anchors.verticalCenter: parent.verticalCenter
                 }
                 DankSlider {
                     id: hSlider
-                    minimum: 1
-                    maximum: root.currentTool === "text" ? 72 : 50
+                    minimum: root.activeToolType === "pixelate" ? 2 : 1
+                    maximum: root.activeToolType === "pixelate" ? 12 : (root.activeToolType === "text" ? 72 : 50)
                     width: 100
                     height: 36
                     showValue: false
@@ -225,7 +233,14 @@ Rectangle {
 
             // Thickness Text Only
             Text {
-                text: root.strokeWidth + "px"; color: Theme.surfaceText; font.pixelSize: 10; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter
+                text: {
+                    if (root.activeToolType === "spotlight") {
+                        const op = Math.round((Math.min(0.9, 0.2 + (root.strokeWidth / 50.0) * 0.65)) * 100);
+                        return op + "%";
+                    }
+                    return root.strokeWidth + "px";
+                }
+                color: Theme.surfaceText; font.pixelSize: 10; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter
             }
 
             Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }

@@ -31,14 +31,18 @@ SettingsCard {
         let xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
             if (xhr.readyState !== XMLHttpRequest.DONE) return;
+            if (!root) return; // Component might be destroyed
+
             if (xhr.status === 200) {
                 try {
                     let data = JSON.parse(xhr.responseText);
-                    root._contributors = data.map(u => ({
-                        name:   u.login,
-                        avatar: u.avatar_url,
-                        url:    u.html_url
-                    }));
+                    if (Array.isArray(data)) {
+                        root._contributors = data.map(u => ({
+                            name:   u.login,
+                            avatar: u.avatar_url,
+                            url:    u.html_url
+                        }));
+                    }
                 } catch (e) {
                     console.error("[PluginAbout] parse error:", e);
                 }

@@ -44,19 +44,11 @@ Item {
 
     function loadValue() {
         const settings = findSettings();
-        if (settings) {
-            const pluginId = settings.pluginId;
-            if (pluginId && typeof SettingsData !== "undefined") {
-                const val = SettingsData.getPluginSetting(pluginId, settingKey, defaultValue);
-                value = val;
-                dankSlider.value = val;
-                isInitialized = true;
-            } else if (settings.pluginService) {
-                const val = settings.loadValue(settingKey, defaultValue);
-                value = val;
-                dankSlider.value = val;
-                isInitialized = true;
-            }
+        if (settings && settings.pluginService) {
+            const val = settings.loadValue(settingKey, defaultValue);
+            value = val;
+            dankSlider.value = val;
+            isInitialized = true;
         }
     }
 
