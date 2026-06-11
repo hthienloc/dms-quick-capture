@@ -11,6 +11,7 @@
         "control-center",
         "dankbar-widget"
     ],
+    "component": "./QuickCaptureWidget.qml",
     "components": {
         "daemon": "./QuickCaptureWidget.qml",
         "widget": "./QuickCaptureWidget.qml"
