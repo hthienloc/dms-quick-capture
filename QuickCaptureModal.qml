@@ -971,6 +971,18 @@ DankModal {
                             }
 
                             if (window.showAnnotations) {
+                                // 2.05 Draw Pixelate strokes BEFORE dimming layer
+                                // This ensures they get dimmed if they are outside a spotlight
+                                for (let i = 0; i < window.strokes.length; i++) {
+                                    if (window.strokes[i].tool === "pixelate") {
+                                        drawStroke(ctx, window.strokes[i]);
+                                    }
+                                }
+                                if (window.currentStroke && window.currentStroke.tool === "pixelate") {
+                                    const tempStroke = Object.assign({}, window.currentStroke, { isCurrent: true });
+                                    drawStroke(ctx, tempStroke);
+                                }
+
                                 // 2.1 Draw Spotlight Layer (Dimming + Holes)
                                 const isDrawingSpotlight = window.currentStroke && window.currentStroke.tool === "spotlight";
                                 if (window.hasSpotlights || isDrawingSpotlight) {
@@ -1034,13 +1046,13 @@ DankModal {
                                 }
 
                                 for (var i = 0; i < window.strokes.length; i++) {
-                                    if (window.strokes[i].tool !== "spotlight") {
+                                    if (window.strokes[i].tool !== "spotlight" && window.strokes[i].tool !== "pixelate") {
                                         drawStroke(ctx, window.strokes[i]);
                                     }
                                 }
 
                                 // 3. Draw current dragging stroke
-                                if (window.currentStroke && window.currentStroke.tool !== "spotlight") {
+                                if (window.currentStroke && window.currentStroke.tool !== "spotlight" && window.currentStroke.tool !== "pixelate") {
                                     const tempStroke = Object.assign({}, window.currentStroke, { isCurrent: true });
                                     drawStroke(ctx, tempStroke);
                                 }
@@ -1746,6 +1758,13 @@ DankModal {
 
                         // 1.5 Overlay the Spotlight Layer
                         if (window.showAnnotations) {
+                            // 1.4 Draw Pixelate BEFORE spotlight layer in export
+                            for (let i = 0; i < window.strokes.length; i++) {
+                                if (window.strokes[i].tool === "pixelate") {
+                                    window.activeCanvas.drawStroke(ctx, window.strokes[i]);
+                                }
+                            }
+
                             const isDrawingSpotlight = window.currentStroke && window.currentStroke.tool === "spotlight";
                             if (window.hasSpotlights || isDrawingSpotlight) {
                                 const spotlights = window.strokes.filter(s => s.tool === "spotlight");
@@ -1822,7 +1841,9 @@ DankModal {
                               }
                               // Draw all completed strokes
                               for (var i = 0; i < window.strokes.length; i++) {
-                                  window.activeCanvas.drawStroke(ctx, window.strokes[i]);
+                                  if (window.strokes[i].tool !== "pixelate") {
+                                      window.activeCanvas.drawStroke(ctx, window.strokes[i]);
+                                  }
                               }
                               // Draw current dragging stroke if any
                               if (window.currentStroke) {
