@@ -67,7 +67,7 @@ DankModal {
     // Intensity Management
     property int strokeWidth: 8
     property int pixelateIntensity: 8
-    property int spotlightIntensity: 25
+    property int spotlightIntensity: 50
     property int textFontSize: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textFontSize !== undefined ? window.parentWidget.pluginData.textFontSize : 36
 
     readonly property string effectiveTool: (currentTool === "select" && selectedStroke) ? selectedStroke.tool : currentTool
@@ -81,7 +81,7 @@ DankModal {
     function updateActiveIntensity(val) {
         if (effectiveTool === "text") textFontSize = val;
         else if (effectiveTool === "pixelate") pixelateIntensity = Math.max(2, Math.min(12, val));
-        else if (effectiveTool === "spotlight") spotlightIntensity = Math.max(1, Math.min(50, val));
+        else if (effectiveTool === "spotlight") spotlightIntensity = Math.max(10, Math.min(95, val));
         else strokeWidth = Math.max(1, Math.min(50, val));
 
         if (selectedStroke) {
@@ -991,7 +991,7 @@ DankModal {
                                             if (lastSpotlight) activeInt = lastSpotlight.width;
                                         }
 
-                                        const spotlightOpacity = Math.min(0.9, 0.2 + (activeInt / 50.0) * 0.65);
+                                        const spotlightOpacity = activeInt / 100.0;
                                         
                                         ctx.beginPath();
                                         // Outer rectangle covering the whole view
@@ -1430,7 +1430,7 @@ DankModal {
                                 const tool = window.effectiveTool;
                                 let multiplier = 1;
                                 if (tool === "text" || tool === "pixelate") multiplier = 2;
-                                else if (tool === "spotlight") multiplier = 4;
+                                else if (tool === "spotlight") multiplier = 5;
 
                                 window.updateActiveIntensity(window.activeIntensity + (step * multiplier));
 
@@ -1481,11 +1481,11 @@ DankModal {
                                 text: {
                                     const tool = window.effectiveTool;
                                     if (tool === "spotlight") {
-                                        const op = Math.round((Math.min(0.9, 0.2 + (window.activeIntensity / 50.0) * 0.65)) * 100);
-                                        return op + "%";
+                                        return window.activeIntensity + "%";
                                     }
                                     return window.activeIntensity + "px";
                                 }
+
                                 color: Theme.primary
                                 font.pixelSize: 10 / drawingCanvas.scale
                                 font.bold: true
@@ -1762,11 +1762,12 @@ DankModal {
                                     } else {
                                         const lastSpotlight = window.strokes.slice().reverse().find(s => s.tool === "spotlight");
                                         if (lastSpotlight) activeInt = lastSpotlight.width;
-                                    }
+                                        }
 
-                                    const spotlightOpacity = Math.min(0.9, 0.2 + (activeInt / 50.0) * 0.65);
-                                    
-                                    ctx.beginPath();
+                                        const spotlightOpacity = activeInt / 100.0;
+
+                                        ctx.beginPath();
+
                                     // Cover the entire exported area
                                     ctx.rect(0, 0, window.canvasWidth, window.canvasHeight);
                                     

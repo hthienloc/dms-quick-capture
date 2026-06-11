@@ -128,8 +128,7 @@ Rectangle {
                 Text {
                     text: {
                         if (root.activeToolType === "spotlight") {
-                            const op = Math.round((Math.min(0.9, 0.2 + (root.strokeWidth / 50.0) * 0.65)) * 100);
-                            return op + "%";
+                            return root.strokeWidth + "%";
                         }
                         return root.strokeWidth + "px";
                     }
@@ -138,8 +137,8 @@ Rectangle {
                 }
                 DankSlider {
                     id: hSlider
-                    minimum: root.activeToolType === "pixelate" ? 2 : 1
-                    maximum: root.activeToolType === "pixelate" ? 12 : (root.activeToolType === "text" ? 72 : 50)
+                    minimum: root.activeToolType === "pixelate" ? 2 : (root.activeToolType === "spotlight" ? 10 : 1)
+                    maximum: root.activeToolType === "pixelate" ? 12 : (root.activeToolType === "text" ? 100 : (root.activeToolType === "spotlight" ? 95 : 50))
                     width: 100
                     height: 36
                     showValue: false
@@ -235,8 +234,7 @@ Rectangle {
             Text {
                 text: {
                     if (root.activeToolType === "spotlight") {
-                        const op = Math.round((Math.min(0.9, 0.2 + (root.strokeWidth / 50.0) * 0.65)) * 100);
-                        return op + "%";
+                        return root.strokeWidth + "%";
                     }
                     return root.strokeWidth + "px";
                 }
