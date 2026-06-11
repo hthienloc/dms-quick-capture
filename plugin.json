@@ -8,9 +8,13 @@
     "icon": "photo_camera",
     "type": "daemon",
     "capabilities": [
-        "control-center"
+        "control-center",
+        "dankbar-widget"
     ],
-    "component": "./QuickCaptureWidget.qml",
+    "components": {
+        "daemon": "./QuickCaptureWidget.qml",
+        "widget": "./QuickCaptureWidget.qml"
+    },
     "settings": "./QuickCaptureSettings.qml",
     "requires_dms": ">=1.2.0",
     "requires": [],
