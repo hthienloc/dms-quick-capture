@@ -1240,11 +1240,58 @@ PluginSettings {
                     label: I18n.tr("Preset Thickness")
                     defaultValue: 6
                     minimum: 1
-                    maximum: 20
-                    leftLabel: "1"
-                    rightLabel: "20"
+                    maximum: 50
+                    unit: "px"
+                    leftLabel: String(minimum)
+                    rightLabel: String(maximum)
                     previewType: "thickness"
                     previewColor: presetColorSetting.value
+                }
+
+                function refreshThicknessConstraints() {
+                    const t = presetToolSetting.value;
+                    if (t === "text") {
+                        presetThicknessSetting.label = I18n.tr("Font Size");
+                        presetThicknessSetting.minimum = 12;
+                        presetThicknessSetting.maximum = 120;
+                        presetThicknessSetting.unit = "px";
+                        presetThicknessSetting.previewType = "none";
+                    } else if (t === "pixelate") {
+                        presetThicknessSetting.label = I18n.tr("Pixel Intensity");
+                        presetThicknessSetting.minimum = 2;
+                        presetThicknessSetting.maximum = 12;
+                        presetThicknessSetting.unit = "px";
+                        presetThicknessSetting.previewType = "none";
+                    } else if (t === "spotlight") {
+                        presetThicknessSetting.label = I18n.tr("Dimming Opacity");
+                        presetThicknessSetting.minimum = 10;
+                        presetThicknessSetting.maximum = 95;
+                        presetThicknessSetting.unit = "%";
+                        presetThicknessSetting.previewType = "none";
+                    } else if (t === "stamp") {
+                        presetThicknessSetting.label = I18n.tr("Stamp Size");
+                        presetThicknessSetting.minimum = 1;
+                        presetThicknessSetting.maximum = 50;
+                        presetThicknessSetting.unit = "px";
+                        presetThicknessSetting.previewType = "thickness";
+                    } else {
+                        presetThicknessSetting.label = I18n.tr("Preset Thickness");
+                        presetThicknessSetting.minimum = 1;
+                        presetThicknessSetting.maximum = 50;
+                        presetThicknessSetting.unit = "px";
+                        presetThicknessSetting.previewType = "thickness";
+                    }
+                    presetThicknessSetting.leftLabel = String(presetThicknessSetting.minimum);
+                    presetThicknessSetting.rightLabel = String(presetThicknessSetting.maximum);
+                }
+
+                Connections {
+                    target: presetToolSetting
+                    function onValueChanged() {
+                        radialMenuCard.activePresetTools[index] = presetToolSetting.value;
+                        radialMenuCard.activePresetTools = [...radialMenuCard.activePresetTools];
+                        presetDelegate.refreshThicknessConstraints();
+                    }
                 }
 
                 Connections {
@@ -1253,6 +1300,12 @@ PluginSettings {
                         radialMenuCard.activePresetThicknesses[index] = presetThicknessSetting.value;
                         radialMenuCard.activePresetThicknesses = [...radialMenuCard.activePresetThicknesses];
                     }
+                }
+
+                Component.onCompleted: {
+                    Qt.callLater(() => {
+                        presetDelegate.refreshThicknessConstraints();
+                    });
                 }
             }
         }
