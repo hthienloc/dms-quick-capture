@@ -34,6 +34,7 @@ Rectangle {
     signal copyAndSaveRequested()
     signal closeRequested()
     signal textToolRightClicked(real globalX, real globalY)
+    signal annotationsToggled()
 
     width: isVertical ? 56 : (contentLayout.width + Theme.spacingM * 2)
     height: isVertical ? (contentLayout.height + Theme.spacingM * 2) : 56
@@ -79,7 +80,7 @@ Rectangle {
                     tooltipText: root.showAnnotations ? "Hide Annotations (X)" : "Show Annotations (X)"
                     iconColor: root.showAnnotations ? Theme.primary : Theme.surfaceText
                     backgroundColor: "transparent"
-                    onClicked: root.showAnnotations = !root.showAnnotations
+                    onClicked: root.annotationsToggled()
                 }
                 DankActionButton {
                     iconName: "crop"; buttonSize: 36; iconSize: 18; tooltipText: "Crop (Ctrl+X)"
@@ -204,7 +205,7 @@ Rectangle {
                     tooltipText: root.showAnnotations ? "Hide Annotations (X)" : "Show Annotations (X)"
                     iconColor: root.showAnnotations ? Theme.primary : Theme.surfaceText
                     backgroundColor: "transparent"
-                    onClicked: root.showAnnotations = !root.showAnnotations
+                    onClicked: root.annotationsToggled()
                 }
                 DankActionButton {
                     iconName: "crop"; buttonSize: 36; iconSize: 18; tooltipText: "Crop (Ctrl+X)"

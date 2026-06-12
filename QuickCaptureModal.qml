@@ -856,12 +856,7 @@ DankModal {
                     isVertical: (window.toolbarPosition === "left" || window.toolbarPosition === "right")
 
                     showAnnotations: window.showAnnotations
-                    onShowAnnotationsChanged: {
-                        if (window.showAnnotations !== toolbarCard.showAnnotations) {
-                            window.showAnnotations = toolbarCard.showAnnotations;
-                        }
-                    }
-                    
+
                     currentTool: window.currentTool
                     activeToolType: window.effectiveTool
                     currentColor: window.currentColor
@@ -873,6 +868,7 @@ DankModal {
                     onColorSelected: (color) => window.currentColor = color
                     onStrokeWidthSelected: (width) => window.updateActiveIntensity(width)
                     onUndoRequested: window.performUndo()
+                    onAnnotationsToggled: window.showAnnotations = !window.showAnnotations
 
                     onFloatRequested: captureActions.performFloatAction()
                     onSaveRequested: captureActions.performSaveOnly()
