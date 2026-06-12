@@ -182,10 +182,8 @@ Item {
                             else if (index === 1) isActive = root.italicActive;
                             else if (index === 2) isActive = root.underlineActive;
 
-                            if (root.selectedIndex === index) {
+                            if (root.selectedIndex === index || isActive) {
                                 return Theme.onPrimary;
-                            } else if (isActive) {
-                                return Theme.primary;
                             } else {
                                 return Theme.surfaceVariantText;
                             }
@@ -203,10 +201,8 @@ Item {
                             else if (index === 1) isActive = root.italicActive;
                             else if (index === 2) isActive = root.underlineActive;
 
-                            if (root.selectedIndex === index) {
+                            if (root.selectedIndex === index || isActive) {
                                 return Theme.onPrimary;
-                            } else if (isActive) {
-                                return Theme.primary;
                             } else {
                                 return Theme.surfaceVariantText;
                             }
