@@ -66,7 +66,7 @@ Rectangle {
             
             // Left Group
             Row {
-                spacing: Theme.spacingM; anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.spacingXS; anchors.verticalCenter: parent.verticalCenter
                 DankActionButton {
                     iconName: "near_me"; buttonSize: 36; iconSize: 18; tooltipText: "Select (Tab)"
                     backgroundColor: root.currentTool === "select" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
@@ -109,8 +109,6 @@ Rectangle {
                         MouseArea {
                             anchors.fill: parent
                             acceptedButtons: Qt.RightButton
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
                             onClicked: (mouse) => {
                                 if (modelData.id === "text" && mouse.button === Qt.RightButton) {
                                     var pt = mapToItem(null, 18, 18);
@@ -193,7 +191,7 @@ Rectangle {
             spacing: Theme.spacingL
             
             Column {
-                spacing: Theme.spacingM; anchors.horizontalCenter: parent.horizontalCenter
+                spacing: Theme.spacingXS; anchors.horizontalCenter: parent.horizontalCenter
                 DankActionButton {
                     iconName: "near_me"; buttonSize: 36; iconSize: 18; tooltipText: "Select (Tab)"
                     backgroundColor: root.currentTool === "select" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
@@ -235,8 +233,6 @@ Rectangle {
                         MouseArea {
                             anchors.fill: parent
                             acceptedButtons: Qt.RightButton
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
                             onClicked: (mouse) => {
                                 if (modelData.id === "text" && mouse.button === Qt.RightButton) {
                                     var pt = mapToItem(null, 18, 18);

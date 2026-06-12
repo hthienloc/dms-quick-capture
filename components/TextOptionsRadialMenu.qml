@@ -114,14 +114,23 @@ Item {
                     if (root.selectedIndex === i) {
                         ctx.fillStyle = Theme.primary;
                     } else if (isActive) {
-                        ctx.fillStyle = Theme.withAlpha(Theme.primary, 0.45);
+                        ctx.fillStyle = Theme.primary;
                     } else {
                         ctx.fillStyle = Theme.withAlpha(Theme.surfaceContainerHigh, 0.92);
                     }
                     ctx.fill();
 
-                    ctx.strokeStyle = root.selectedIndex === i ? Theme.primary : Theme.withAlpha(Theme.outline, 0.15);
-                    ctx.lineWidth = root.selectedIndex === i ? 2 : 1;
+                    // active: solid primary border; hovered: primary border; idle: faint outline
+                    if (root.selectedIndex === i) {
+                        ctx.strokeStyle = Theme.primary;
+                        ctx.lineWidth = 2;
+                    } else if (isActive) {
+                        ctx.strokeStyle = Theme.primary;
+                        ctx.lineWidth = 3;
+                    } else {
+                        ctx.strokeStyle = Theme.withAlpha(Theme.outline, 0.15);
+                        ctx.lineWidth = 1;
+                    }
                     ctx.stroke();
                 }
             }
