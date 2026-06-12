@@ -75,7 +75,8 @@ QtObject {
 
     function cleanupTemp(path) {
         if (path && path.startsWith("/tmp/dms_capture_")) {
-            Proc.runCommand("cleanup-temp", ["rm", "-f", path]);
+            // Delay cleanup by 10s to allow notification daemons to load the image
+            Proc.runCommand("cleanup-temp-delayed", ["sh", "-c", "sleep 10 && rm -f -- " + shellPathExpression(path)]);
         }
     }
 
@@ -96,9 +97,17 @@ QtObject {
         // System Notification
         if (mode === "notification" || mode === "both") {
             // Use actual image as icon to encourage "Fill" behavior in many daemons.
-            const icon = imagePath ? imagePath : "camera-photo-symbolic";
+            // Note: notify-send -i supports file paths.
+            let icon = imagePath ? imagePath : "camera-photo-symbolic";
+            
+            // If the icon is a PDF, it won't show a preview. 
+            // In that case, we hope the caller passed a PNG fallback or we use a generic icon.
+            if (icon.toLowerCase().endsWith(".pdf")) {
+                icon = "image-x-generic";
+            }
+
             const args = ["notify-send", "-a", "Quick Capture", "-i", icon, I18n.tr("Quick Capture"), message];
-            if (imagePath) {
+            if (imagePath && !imagePath.toLowerCase().endsWith(".pdf")) {
                 let cleanPath = imagePath.replace(/^file:\/\//, "");
                 args.push("-h", "string:image-path:" + cleanPath);
                 args.push("-h", "string:image_path:" + cleanPath);
@@ -156,15 +165,19 @@ QtObject {
                         " && cp -- " + shellPathExpression(tempOut) + " " + shellPathExpression(targetPath);
 
         Proc.runCommand("save-capture-file", ["sh", "-c", saveCmd], (stdout, exitCode) => {
-            callback(stdout, exitCode, saveDir, filename);
+            callback(stdout, exitCode, saveDir, filename, targetPath);
         }, 0, 5000);
     }
 
     function performSaveOnly() {
         withExport((tempOut, pngTemp) => {
-            saveFile(tempOut, (stdout, exitCode, saveDir, filename) => {
+            saveFile(tempOut, (stdout, exitCode, saveDir, filename, targetPath) => {
                 if (exitCode === 0) {
-                    notifyInfo(I18n.tr("Screenshot saved to %1/%2").arg(saveDir).arg(filename), tempOut);
+                    // Tilde expansion for notification path
+                    const notifyPath = targetPath.replace(/^~/, Quickshell.env("HOME"));
+                    // Use pngTemp for icon if target is PDF
+                    const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && pngTemp) ? pngTemp : notifyPath;
+                    notifyInfo(I18n.tr("Screenshot saved to %1/%2").arg(saveDir).arg(filename), iconPath);
                     root.closeRequested();
                 } else {
                     notifyError("Failed to save screenshot file.");
@@ -197,9 +210,11 @@ QtObject {
             const clipSource = pngTemp || tempOut;
             copyFileToClipboard(clipSource, (stdout, exitCode) => {
                 if (exitCode === 0) {
-                    saveFile(tempOut, (saveOut, saveCode, saveDir, filename) => {
+                    saveFile(tempOut, (saveOut, saveCode, saveDir, filename, targetPath) => {
                         if (saveCode === 0) {
-                            notifyInfo(I18n.tr("Screenshot copied to clipboard and saved to %1").arg(saveDir), tempOut);
+                            const notifyPath = targetPath.replace(/^~/, Quickshell.env("HOME"));
+                            const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && pngTemp) ? pngTemp : notifyPath;
+                            notifyInfo(I18n.tr("Screenshot copied to clipboard and saved to %1").arg(saveDir), iconPath);
                         } else {
                             notifyWarning("Screenshot copied to clipboard but failed to save file.");
                         }
