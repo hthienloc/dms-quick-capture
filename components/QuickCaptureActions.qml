@@ -73,6 +73,12 @@ QtObject {
         return "\"" + escapeDoubleQuoted(value) + "\"";
     }
 
+    function cleanupTemp(path) {
+        if (path && path.startsWith("/tmp/dms_capture_")) {
+            Proc.runCommand("cleanup-temp", ["rm", "-f", path]);
+        }
+    }
+
     function sendNotification(message, imagePath) {
         if (!message) return;
         const hasParent = root.parentWidget && root.parentWidget.pluginData;
@@ -155,7 +161,7 @@ QtObject {
     }
 
     function performSaveOnly() {
-        withExport((tempOut) => {
+        withExport((tempOut, pngTemp) => {
             saveFile(tempOut, (stdout, exitCode, saveDir, filename) => {
                 if (exitCode === 0) {
                     notifyInfo(I18n.tr("Screenshot saved to %1/%2").arg(saveDir).arg(filename), tempOut);
@@ -163,27 +169,33 @@ QtObject {
                 } else {
                     notifyError("Failed to save screenshot file.");
                 }
+                cleanupTemp(tempOut);
+                if (pngTemp) cleanupTemp(pngTemp);
             });
         });
     }
 
     function performCopyOnly() {
-        withExport((tempOut) => {
-            copyFileToClipboard(tempOut, (stdout, exitCode) => {
+        withExport((tempOut, pngTemp) => {
+            const clipSource = pngTemp || tempOut;
+            copyFileToClipboard(clipSource, (stdout, exitCode) => {
                 if (exitCode === 0) {
-                    notifyInfo(I18n.tr("Screenshot copied to clipboard."), tempOut);
+                    notifyInfo(I18n.tr("Screenshot copied to clipboard."), clipSource);
                     root.closeRequested();
                 } else {
                     notifyError("Failed to copy screenshot to clipboard.");
                     root.closeRequested();
                 }
+                cleanupTemp(tempOut);
+                if (pngTemp) cleanupTemp(pngTemp);
             });
         });
     }
 
     function performCopyAndSave() {
-        withExport((tempOut) => {
-            copyFileToClipboard(tempOut, (stdout, exitCode) => {
+        withExport((tempOut, pngTemp) => {
+            const clipSource = pngTemp || tempOut;
+            copyFileToClipboard(clipSource, (stdout, exitCode) => {
                 if (exitCode === 0) {
                     saveFile(tempOut, (saveOut, saveCode, saveDir, filename) => {
                         if (saveCode === 0) {
@@ -192,10 +204,14 @@ QtObject {
                             notifyWarning("Screenshot copied to clipboard but failed to save file.");
                         }
                         root.closeRequested();
+                        cleanupTemp(tempOut);
+                        if (pngTemp) cleanupTemp(pngTemp);
                     });
                 } else {
                     notifyError("Failed to copy screenshot to clipboard.");
                     root.closeRequested();
+                    cleanupTemp(tempOut);
+                    if (pngTemp) cleanupTemp(pngTemp);
                 }
             });
         });
@@ -220,7 +236,7 @@ QtObject {
             return;
         }
 
-        withExport((tempOut) => {
+        withExport((tempOut, pngTemp) => {
             // 1. Serialize strokes (typing text is already committed by withExport)
             let strokesList = root.modal.strokes || [];
             let serializedStrokes = [];
@@ -277,6 +293,8 @@ QtObject {
                     } else {
                         notifyError("Failed to float image (make sure dms-floaty is running).");
                     }
+                    cleanupTemp(tempOut);
+                    if (pngTemp) cleanupTemp(pngTemp);
                 });
             });
         });

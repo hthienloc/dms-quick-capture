@@ -1882,14 +1882,12 @@ DankModal {
                             }
                         }
 
-                        function finishExport(path, isConverted = false) {
+                        function finishExport(path, pngPath = "") {
                             if (window.exportCallback) {
                                 const cb = window.exportCallback;
                                 window.exportCallback = null;
                                 Qt.callLater(() => {
-                                    cb(path);
-                                    // If we converted, cleanup the original PNG
-                                    if (isConverted) cleanupTemp(pngTemp);
+                                    cb(path, pngPath);
                                 });
                             }
                         }
@@ -1921,16 +1919,16 @@ DankModal {
                             if (cmd) {
                                 Proc.runCommand("convert-format", [cmd].concat(args), (stdout, exitCode) => {
                                     if (exitCode === 0) {
-                                        finishExport(finalOut, true);
+                                        finishExport(finalOut, pngTemp);
                                     } else {
                                         console.error("[QuickCapture] Conversion failed (exit " + exitCode + "):", stdout);
                                         // Fallback to PNG and cleanup finalOut if it was partially created
                                         cleanupTemp(finalOut);
-                                        finishExport(pngTemp, false);
+                                        finishExport(pngTemp);
                                     }
                                 });
                             } else {
-                                finishExport(pngTemp, false);
+                                finishExport(pngTemp);
                             }
                         }
                     }
