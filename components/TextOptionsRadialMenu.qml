@@ -224,14 +224,14 @@ Item {
                 spacing: 2
                 
                 DankIcon {
-                    name: "close"
+                    name: "text_fields"
                     size: 20
                     color: root.selectedIndex === -2 ? Theme.primary : Theme.surfaceVariantText
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
                 StyledText {
-                    text: I18n.tr("Close")
+                    text: I18n.tr("Text")
                     font.pixelSize: 8
                     font.bold: true
                     color: root.selectedIndex === -2 ? Theme.primary : Theme.surfaceVariantText

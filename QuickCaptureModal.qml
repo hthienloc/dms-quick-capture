@@ -1922,7 +1922,10 @@ DankModal {
                     onBoldToggled: window.textBold = !window.textBold
                     onItalicToggled: window.textItalic = !window.textItalic
                     onUnderlineToggled: window.textUnderline = !window.textUnderline
-                    onCenterClicked: textOptionsRadialMenu.close()
+                    onCenterClicked: {
+                        window.currentTool = "text";
+                        textOptionsRadialMenu.close();
+                    }
                 }
 
                 Canvas {
