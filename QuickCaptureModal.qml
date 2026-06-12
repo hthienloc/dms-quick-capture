@@ -1870,16 +1870,56 @@ DankModal {
                         }, config);
 
                         ctx.restore();
-                        const format = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.outputFormat) || "png";
-                        const tempOut = "/tmp/dms_capture_" + Date.now() + "." + format;
-                        exportCanvas.save(tempOut);
 
-                        if (window.exportCallback) {
-                            const cb = window.exportCallback;
-                            window.exportCallback = null;
-                            Qt.callLater(() => {
-                                cb(tempOut);
-                            });
+                        const pData = (window.parentWidget && window.parentWidget.pluginData) || {};
+                        const format = pData.outputFormat || "png";
+                        const baseTemp = "/tmp/dms_capture_" + Date.now();
+                        const pngTemp = baseTemp + ".png";
+                        const finalOut = baseTemp + "." + format;
+
+                        function finishExport(path) {
+                            if (window.exportCallback) {
+                                const cb = window.exportCallback;
+                                window.exportCallback = null;
+                                Qt.callLater(() => {
+                                    cb(path);
+                                });
+                            }
+                        }
+
+                        if (format === "png" || format === "ppm") {
+                            // Direct save for basic formats
+                            exportCanvas.save(finalOut);
+                            finishExport(finalOut);
+                        } else {
+                            // Save to PNG first, then convert for quality control or special formats
+                            exportCanvas.save(pngTemp);
+                            
+                            let convertCmd = "";
+                            if (format === "webp") {
+                                const quality = pData.webpQuality ?? 80;
+                                convertCmd = "magick convert " + pngTemp + " -quality " + quality + " " + finalOut;
+                            } else if (format === "jpg") {
+                                const quality = pData.jpegQuality ?? 90;
+                                convertCmd = "magick convert " + pngTemp + " -quality " + quality + " " + finalOut;
+                            } else if (format === "pdf") {
+                                // Prefer img2pdf for better PDF wrapping
+                                convertCmd = "img2pdf " + pngTemp + " -o " + finalOut;
+                            }
+                            
+                            if (convertCmd) {
+                                Proc.runCommand("convert-format", ["sh", "-c", convertCmd], (stdout, exitCode) => {
+                                    if (exitCode === 0) {
+                                        finishExport(finalOut);
+                                    } else {
+                                        console.error("[QuickCapture] Conversion failed:", stdout);
+                                        // Fallback to PNG if conversion fails
+                                        finishExport(pngTemp);
+                                    }
+                                });
+                            } else {
+                                finishExport(pngTemp);
+                            }
                         }
                     }
                 }
