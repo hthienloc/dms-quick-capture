@@ -1871,17 +1871,26 @@ DankModal {
 
                         ctx.restore();
 
+                        const pData = (window.parentWidget && window.parentWidget.pluginData) || {};
                         const format = pData.outputFormat || "png";
                         const baseTemp = "/tmp/dms_capture_" + Date.now();
                         const pngTemp = baseTemp + ".png";
                         const finalOut = baseTemp + "." + format;
 
-                        function finishExport(path) {
+                        function cleanupTemp(path) {
+                            if (path && path.startsWith("/tmp/dms_capture_")) {
+                                Proc.runCommand("cleanup-temp", ["rm", "-f", path]);
+                            }
+                        }
+
+                        function finishExport(path, isConverted = false) {
                             if (window.exportCallback) {
                                 const cb = window.exportCallback;
                                 window.exportCallback = null;
                                 Qt.callLater(() => {
                                     cb(path);
+                                    // If we converted, cleanup the original PNG
+                                    if (isConverted) cleanupTemp(pngTemp);
                                 });
                             }
                         }
@@ -1894,30 +1903,35 @@ DankModal {
                             // Save to PNG first, then convert for quality control or special formats
                             exportCanvas.save(pngTemp);
                             
-                            let convertCmd = "";
+                            let cmd = "";
+                            let args = [];
+
                             if (format === "webp") {
-                                const quality = pData.webpQuality ?? 80;
-                                convertCmd = "magick convert " + pngTemp + " -quality " + quality + " " + finalOut;
+                                const quality = String(pData.webpQuality ?? 80);
+                                cmd = "magick";
+                                args = ["convert", pngTemp, "-quality", quality, finalOut];
                             } else if (format === "jpg") {
-                                const quality = pData.jpegQuality ?? 90;
-                                convertCmd = "magick convert " + pngTemp + " -quality " + quality + " " + finalOut;
+                                const quality = String(pData.jpegQuality ?? 90);
+                                cmd = "magick";
+                                args = ["convert", pngTemp, "-quality", quality, finalOut];
                             } else if (format === "pdf") {
-                                // Prefer img2pdf for better PDF wrapping
-                                convertCmd = "img2pdf " + pngTemp + " -o " + finalOut;
+                                cmd = "img2pdf";
+                                args = [pngTemp, "-o", finalOut];
                             }
                             
-                            if (convertCmd) {
-                                Proc.runCommand("convert-format", ["sh", "-c", convertCmd], (stdout, exitCode) => {
+                            if (cmd) {
+                                Proc.runCommand("convert-format", [cmd].concat(args), (stdout, exitCode) => {
                                     if (exitCode === 0) {
-                                        finishExport(finalOut);
+                                        finishExport(finalOut, true);
                                     } else {
-                                        console.error("[QuickCapture] Conversion failed:", stdout);
-                                        // Fallback to PNG if conversion fails
-                                        finishExport(pngTemp);
+                                        console.error("[QuickCapture] Conversion failed (exit " + exitCode + "):", stdout);
+                                        // Fallback to PNG and cleanup finalOut if it was partially created
+                                        cleanupTemp(finalOut);
+                                        finishExport(pngTemp, false);
                                     }
                                 });
                             } else {
-                                finishExport(pngTemp);
+                                finishExport(pngTemp, false);
                             }
                         }
                     }
