@@ -550,35 +550,80 @@ PluginSettings {
 
         Item { width: 1; height: Theme.spacingS }
 
-        SelectionSettingPlus {
-            id: palettePresetSetting
-            settingKey: "color_palette_preset"
-            label: I18n.tr("Palette Preset")
-            defaultValue: "adaptive"
-            options: [
-                { "label": I18n.tr("Adaptive (DMS Theme)"), "value": "adaptive" },
-                { "label": I18n.tr("Classic (Tailwind)"), "value": "classic" },
-                { "label": I18n.tr("Nord (Pastel Cold)"), "value": "nord" },
-                { "label": I18n.tr("Gruvbox (Warm Retro)"), "value": "gruvbox" },
-                { "label": I18n.tr("Dracula (High Contrast Dark)"), "value": "dracula" },
-                { "label": I18n.tr("Catppuccin"), "value": "catppuccin" },
-                { "label": I18n.tr("Custom Colors"), "value": "custom" }
-            ]
-        }
+        Item {
+            id: palettePresetContainer
+            width: parent.width
+            height: presetLayout.implicitHeight
 
-        ButtonGroupSettingPlus {
-            id: catppuccinVariantSetting
-            settingKey: "catppuccin_variant"
-            label: ""
-            defaultValue: "mocha"
-            options: [
-                { "label": "Latte", "value": "latte" },
-                { "label": "Frappé", "value": "frappe" },
-                { "label": "Macchiato", "value": "macchiato" },
-                { "label": "Mocha", "value": "mocha" }
-            ]
-            visible: palettePresetSetting.value === "catppuccin"
-            height: visible ? implicitHeight : 0
+            HoverHandler {
+                id: containerHover
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                anchors.leftMargin: -12
+                anchors.rightMargin: -12
+                anchors.topMargin: -6
+                anchors.bottomMargin: -6
+                radius: Theme.cornerRadius
+                color: containerHover.hovered ? Theme.withAlpha(Theme.primary, 0.08) : "transparent"
+                Behavior on color { ColorAnimation { duration: 150 } }
+            }
+
+            Column {
+                id: presetLayout
+                width: parent.width
+                spacing: Theme.spacingXS
+
+                SelectionSettingPlus {
+                    id: palettePresetSetting
+                    settingKey: "color_palette_preset"
+                    label: I18n.tr("Palette Preset")
+                    defaultValue: "adaptive"
+                    options: [
+                        { "label": I18n.tr("Adaptive (DMS Theme)"), "value": "adaptive" },
+                        { "label": I18n.tr("Classic (Tailwind)"), "value": "classic" },
+                        { "label": I18n.tr("Nord (Pastel Cold)"), "value": "nord" },
+                        { "label": I18n.tr("Gruvbox (Warm Retro)"), "value": "gruvbox" },
+                        { "label": I18n.tr("Dracula (High Contrast Dark)"), "value": "dracula" },
+                        { "label": I18n.tr("Catppuccin"), "value": "catppuccin" },
+                        { "label": I18n.tr("Custom Colors"), "value": "custom" }
+                    ]
+                    Component.onCompleted: {
+                        for (var i = 0; i < children.length; i++) {
+                            if (children[i].toString().indexOf("Rectangle") !== -1) {
+                                children[i].visible = false;
+                            }
+                        }
+                    }
+                }
+
+                ButtonGroupSettingPlus {
+                    id: catppuccinVariantSetting
+                    settingKey: "catppuccin_variant"
+                    label: ""
+                    defaultValue: "mocha"
+                    options: [
+                        { "label": "Latte", "value": "latte" },
+                        { "label": "Frappé", "value": "frappe" },
+                        { "label": "Macchiato", "value": "macchiato" },
+                        { "label": "Mocha", "value": "mocha" }
+                    ]
+                    visible: palettePresetSetting.value === "catppuccin"
+                    height: visible ? implicitHeight : 0
+                    Component.onCompleted: {
+                        for (var i = 0; i < children.length; i++) {
+                            if (children[i].toString().indexOf("Rectangle") !== -1) {
+                                children[i].visible = false;
+                            }
+                        }
+                        if (children[1] && children[1].children[0]) {
+                            children[1].children[0].height = 0;
+                            children[1].children[0].visible = false;
+                        }
+                    }
+                }
+            }
         }
 
         Item { width: 1; height: Theme.spacingS }
