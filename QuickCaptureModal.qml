@@ -174,6 +174,9 @@ DankModal {
     property var currentStroke: null
     property var selectedStroke: null
     property int preGrabStrokeWidth: 8
+    property int preGrabTextFontSize: 36
+    property int preGrabPixelateIntensity: 8
+    property int preGrabSpotlightIntensity: 50
     property color preGrabColor: Theme.primary
     property point pressCoords: Qt.point(0, 0)
     property var originalPoints: []
@@ -1294,6 +1297,9 @@ DankModal {
                                         // Save previous style state if nothing was selected yet
                                         if (!window.selectedStroke) {
                                             window.preGrabStrokeWidth = window.strokeWidth;
+                                            window.preGrabTextFontSize = window.textFontSize;
+                                            window.preGrabPixelateIntensity = window.pixelateIntensity;
+                                            window.preGrabSpotlightIntensity = window.spotlightIntensity;
                                             window.preGrabColor = window.currentColor;
                                         }
                                         
@@ -1402,12 +1408,15 @@ DankModal {
 
                             onReleased: (mouse) => {
                                 if (window.currentTool === "select") {
-                                    window.selectedStroke = null;
-                                    window.strokeWidth = window.preGrabStrokeWidth;
-                                    window.currentColor = window.preGrabColor;
-                                    window.originalPoints = [];
-                                    drawingCanvas.requestPaint();
-                                    return;
+                                     window.selectedStroke = null;
+                                     window.strokeWidth = window.preGrabStrokeWidth;
+                                     window.textFontSize = window.preGrabTextFontSize;
+                                     window.pixelateIntensity = window.preGrabPixelateIntensity;
+                                     window.spotlightIntensity = window.preGrabSpotlightIntensity;
+                                     window.currentColor = window.preGrabColor;
+                                     window.originalPoints = [];
+                                     drawingCanvas.requestPaint();
+                                     return;
                                 }
 
                                 if (window.currentTool === "crop") {
@@ -1893,7 +1902,10 @@ DankModal {
                     onPresetSelected: (preset) => {
                         window.currentTool = preset.tool;
                         window.currentColor = preset.color;
-                        window.strokeWidth = preset.thickness;
+                        if (preset.tool === "text") window.textFontSize = preset.thickness;
+                        else if (preset.tool === "pixelate") window.pixelateIntensity = Math.max(2, Math.min(12, preset.thickness));
+                        else if (preset.tool === "spotlight") window.spotlightIntensity = Math.max(10, Math.min(95, preset.thickness));
+                        else window.strokeWidth = preset.thickness;
                         window.recordPresetUsage(preset);
                     }
                     onCenterClicked: {
