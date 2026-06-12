@@ -1871,7 +1871,6 @@ DankModal {
 
                         ctx.restore();
 
-                        const pData = (window.parentWidget && window.parentWidget.pluginData) || {};
                         const format = pData.outputFormat || "png";
                         const baseTemp = "/tmp/dms_capture_" + Date.now();
                         const pngTemp = baseTemp + ".png";
