@@ -114,7 +114,7 @@ Item {
                     if (root.selectedIndex === i) {
                         ctx.fillStyle = Theme.primary;
                     } else if (isActive) {
-                        ctx.fillStyle = Theme.withAlpha(Theme.primary, 0.25);
+                        ctx.fillStyle = Theme.withAlpha(Theme.primary, 0.45);
                     } else {
                         ctx.fillStyle = Theme.withAlpha(Theme.surfaceContainerHigh, 0.92);
                     }
@@ -291,6 +291,7 @@ Item {
                 } else if (root.selectedIndex === -2) {
                     root.centerClicked();
                 }
+                root.selectedIndex = -1;
             }
             
             onClicked: (mouse) => {

@@ -109,6 +109,8 @@ Rectangle {
                         MouseArea {
                             anchors.fill: parent
                             acceptedButtons: Qt.RightButton
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
                             onClicked: (mouse) => {
                                 if (modelData.id === "text" && mouse.button === Qt.RightButton) {
                                     var pt = mapToItem(null, 18, 18);
@@ -233,6 +235,8 @@ Rectangle {
                         MouseArea {
                             anchors.fill: parent
                             acceptedButtons: Qt.RightButton
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
                             onClicked: (mouse) => {
                                 if (modelData.id === "text" && mouse.button === Qt.RightButton) {
                                     var pt = mapToItem(null, 18, 18);
