@@ -111,22 +111,21 @@ Item {
                     else if (i === 1) isActive = root.italicActive;
                     else if (i === 2) isActive = root.underlineActive;
 
-                    if (root.selectedIndex === i) {
-                        ctx.fillStyle = Theme.primary;
-                    } else if (isActive) {
+                    // fill: active → primary; hovered-only or idle → surfaceContainerHigh
+                    if (isActive) {
                         ctx.fillStyle = Theme.primary;
                     } else {
                         ctx.fillStyle = Theme.withAlpha(Theme.surfaceContainerHigh, 0.92);
                     }
                     ctx.fill();
 
-                    // active: solid primary border; hovered: primary border; idle: faint outline
-                    if (root.selectedIndex === i) {
-                        ctx.strokeStyle = Theme.primary;
-                        ctx.lineWidth = 2;
-                    } else if (isActive) {
+                    // border: active → primary 3px; hovered → primary 2px; idle → faint 1px
+                    if (isActive) {
                         ctx.strokeStyle = Theme.primary;
                         ctx.lineWidth = 3;
+                    } else if (root.selectedIndex === i) {
+                        ctx.strokeStyle = Theme.primary;
+                        ctx.lineWidth = 2;
                     } else {
                         ctx.strokeStyle = Theme.withAlpha(Theme.outline, 0.15);
                         ctx.lineWidth = 1;
@@ -182,11 +181,7 @@ Item {
                             else if (index === 1) isActive = root.italicActive;
                             else if (index === 2) isActive = root.underlineActive;
 
-                            if (root.selectedIndex === index || isActive) {
-                                return Theme.onPrimary;
-                            } else {
-                                return Theme.surfaceVariantText;
-                            }
+                            return isActive ? Theme.onPrimary : Theme.surfaceVariantText;
                         }
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
@@ -201,11 +196,7 @@ Item {
                             else if (index === 1) isActive = root.italicActive;
                             else if (index === 2) isActive = root.underlineActive;
 
-                            if (root.selectedIndex === index || isActive) {
-                                return Theme.onPrimary;
-                            } else {
-                                return Theme.surfaceVariantText;
-                            }
+                            return isActive ? Theme.onPrimary : Theme.surfaceVariantText;
                         }
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
