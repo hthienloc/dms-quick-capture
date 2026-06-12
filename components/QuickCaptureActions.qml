@@ -96,12 +96,8 @@ QtObject {
 
         // System Notification
         if (mode === "notification" || mode === "both") {
-            // Use actual image as icon to encourage "Fill" behavior in many daemons.
-            // Note: notify-send -i supports file paths.
             let icon = imagePath ? imagePath : "camera-photo-symbolic";
             
-            // If the icon is a PDF, it won't show a preview. 
-            // In that case, we hope the caller passed a PNG fallback or we use a generic icon.
             if (icon.toLowerCase().endsWith(".pdf")) {
                 icon = "image-x-generic";
             }
@@ -146,6 +142,46 @@ QtObject {
         root.exportAndExecute(callback);
     }
 
+    function convertIfNeeded(pngPath, callback) {
+        const pData = (root.parentWidget && root.parentWidget.pluginData) || {};
+        const format = pData.outputFormat || "png";
+
+        if (format === "png" || format === "ppm") {
+            callback(pngPath, "");
+            return;
+        }
+
+        const finalOut = pngPath.replace(/\.png$/, "." + format);
+        let cmd = "";
+        let args = [];
+
+        if (format === "webp") {
+            const quality = String(pData.webpQuality ?? 80);
+            cmd = "magick";
+            args = ["convert", pngPath, "-quality", quality, finalOut];
+        } else if (format === "jpg") {
+            const quality = String(pData.jpegQuality ?? 90);
+            cmd = "magick";
+            args = ["convert", pngPath, "-quality", quality, finalOut];
+        } else if (format === "pdf") {
+            cmd = "img2pdf";
+            args = [pngPath, "-o", finalOut];
+        }
+
+        if (cmd) {
+            Proc.runCommand("convert-format", [cmd].concat(args), (stdout, exitCode) => {
+                if (exitCode === 0) {
+                    callback(finalOut, pngPath);
+                } else {
+                    console.error("[QuickCapture] Conversion failed (exit " + exitCode + "):", stdout);
+                    callback(pngPath, ""); // Fallback to PNG
+                }
+            });
+        } else {
+            callback(pngPath, "");
+        }
+    }
+
     function copyFileToClipboard(tempOut, callback) {
         DMSService.sendRequest("clipboard.copyFile", { "filePath": tempOut }, function(response) {
             if (response.error) {
@@ -170,64 +206,68 @@ QtObject {
     }
 
     function performSaveOnly() {
-        withExport((tempOut, pngTemp) => {
-            saveFile(tempOut, (stdout, exitCode, saveDir, filename, targetPath) => {
-                if (exitCode === 0) {
-                    // Tilde expansion for notification path
-                    const notifyPath = targetPath.replace(/^~/, Quickshell.env("HOME"));
-                    // Use pngTemp for icon if target is PDF
-                    const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && pngTemp) ? pngTemp : notifyPath;
-                    notifyInfo(I18n.tr("Screenshot saved to %1/%2").arg(saveDir).arg(filename), iconPath);
-                    root.closeRequested();
-                } else {
-                    notifyError("Failed to save screenshot file.");
-                }
-                cleanupTemp(tempOut);
-                if (pngTemp) cleanupTemp(pngTemp);
+        withExport((pngPath) => {
+            convertIfNeeded(pngPath, (finalPath, originalPng) => {
+                saveFile(finalPath, (stdout, exitCode, saveDir, filename, targetPath) => {
+                    if (exitCode === 0) {
+                        const notifyPath = targetPath.replace(/^~/, Quickshell.env("HOME"));
+                        const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && originalPng) ? originalPng : notifyPath;
+                        notifyInfo(I18n.tr("Screenshot saved to %1/%2").arg(saveDir).arg(filename), iconPath);
+                        root.closeRequested();
+                    } else {
+                        notifyError("Failed to save screenshot file.");
+                    }
+                    cleanupTemp(finalPath);
+                    if (originalPng) cleanupTemp(originalPng);
+                });
             });
         });
     }
 
     function performCopyOnly() {
-        withExport((tempOut, pngTemp) => {
-            const clipSource = pngTemp || tempOut;
-            copyFileToClipboard(clipSource, (stdout, exitCode) => {
-                if (exitCode === 0) {
-                    notifyInfo(I18n.tr("Screenshot copied to clipboard."), clipSource);
-                    root.closeRequested();
-                } else {
-                    notifyError("Failed to copy screenshot to clipboard.");
-                    root.closeRequested();
-                }
-                cleanupTemp(tempOut);
-                if (pngTemp) cleanupTemp(pngTemp);
+        withExport((pngPath) => {
+            convertIfNeeded(pngPath, (finalPath, originalPng) => {
+                const clipSource = originalPng || finalPath;
+                copyFileToClipboard(clipSource, (stdout, exitCode) => {
+                    if (exitCode === 0) {
+                        notifyInfo(I18n.tr("Screenshot copied to clipboard."), clipSource);
+                        root.closeRequested();
+                    } else {
+                        notifyError("Failed to copy screenshot to clipboard.");
+                        root.closeRequested();
+                    }
+                    cleanupTemp(finalPath);
+                    if (originalPng) cleanupTemp(originalPng);
+                });
             });
         });
     }
 
     function performCopyAndSave() {
-        withExport((tempOut, pngTemp) => {
-            const clipSource = pngTemp || tempOut;
-            copyFileToClipboard(clipSource, (stdout, exitCode) => {
-                if (exitCode === 0) {
-                    saveFile(tempOut, (saveOut, saveCode, saveDir, filename, targetPath) => {
-                        if (saveCode === 0) {
-                            const notifyPath = targetPath.replace(/^~/, Quickshell.env("HOME"));
-                            const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && pngTemp) ? pngTemp : notifyPath;
-                            notifyInfo(I18n.tr("Screenshot copied to clipboard and saved to %1").arg(saveDir), iconPath);
-                        } else {
-                            notifyWarning("Screenshot copied to clipboard but failed to save file.");
-                        }
+        withExport((pngPath) => {
+            convertIfNeeded(pngPath, (finalPath, originalPng) => {
+                const clipSource = originalPng || finalPath;
+                copyFileToClipboard(clipSource, (stdout, exitCode) => {
+                    if (exitCode === 0) {
+                        saveFile(finalPath, (saveOut, saveCode, saveDir, filename, targetPath) => {
+                            if (saveCode === 0) {
+                                const notifyPath = targetPath.replace(/^~/, Quickshell.env("HOME"));
+                                const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && originalPng) ? originalPng : notifyPath;
+                                notifyInfo(I18n.tr("Screenshot copied to clipboard and saved to %1").arg(saveDir), iconPath);
+                            } else {
+                                notifyWarning("Screenshot copied to clipboard but failed to save file.");
+                            }
+                            root.closeRequested();
+                            cleanupTemp(finalPath);
+                            if (originalPng) cleanupTemp(originalPng);
+                        });
+                    } else {
+                        notifyError("Failed to copy screenshot to clipboard.");
                         root.closeRequested();
-                        cleanupTemp(tempOut);
-                        if (pngTemp) cleanupTemp(pngTemp);
-                    });
-                } else {
-                    notifyError("Failed to copy screenshot to clipboard.");
-                    root.closeRequested();
-                    cleanupTemp(tempOut);
-                    if (pngTemp) cleanupTemp(pngTemp);
-                }
+                        cleanupTemp(finalPath);
+                        if (originalPng) cleanupTemp(originalPng);
+                    }
+                });
             });
         });
     }
@@ -251,65 +291,67 @@ QtObject {
             return;
         }
 
-        withExport((tempOut, pngTemp) => {
-            // 1. Serialize strokes (typing text is already committed by withExport)
-            let strokesList = root.modal.strokes || [];
-            let serializedStrokes = [];
-            for (let i = 0; i < strokesList.length; i++) {
-                let s = strokesList[i];
-                let newStroke = {
-                    tool: s.tool,
-                    color: s.color,
-                    width: s.width,
-                    points: []
+        withExport((pngPath) => {
+            convertIfNeeded(pngPath, (finalPath, originalPng) => {
+                // 1. Serialize strokes
+                let strokesList = root.modal.strokes || [];
+                let serializedStrokes = [];
+                for (let i = 0; i < strokesList.length; i++) {
+                    let s = strokesList[i];
+                    let newStroke = {
+                        tool: s.tool,
+                        color: s.color,
+                        width: s.width,
+                        points: []
+                    };
+                    if (s.points) {
+                        for (let j = 0; j < s.points.length; j++) {
+                            newStroke.points.push({ x: s.points[j].x, y: s.points[j].y });
+                        }
+                    }
+                    if (s.text !== undefined) newStroke.text = s.text;
+                    if (s.isMonospace !== undefined) newStroke.isMonospace = s.isMonospace;
+                    if (s.fontFamily !== undefined) newStroke.fontFamily = s.fontFamily;
+                    if (s.isBold !== undefined) newStroke.isBold = s.isBold;
+                    if (s.isItalic !== undefined) newStroke.isItalic = s.isItalic;
+                    if (s.isUnderline !== undefined) newStroke.isUnderline = s.isUnderline;
+                    if (s.counter !== undefined) newStroke.counter = s.counter;
+                    serializedStrokes.push(newStroke);
+                }
+
+                // 2. Serialize other states
+                let stateData = {
+                    strokes: serializedStrokes,
+                    stampCounter: root.modal.stampCounter,
+                    cropRect: {
+                        x: root.modal.cropRect.x,
+                        y: root.modal.cropRect.y,
+                        width: root.modal.cropRect.width,
+                        height: root.modal.cropRect.height
+                    },
+                    hasSelection: root.modal.hasSelection
                 };
-                if (s.points) {
-                    for (let j = 0; j < s.points.length; j++) {
-                        newStroke.points.push({ x: s.points[j].x, y: s.points[j].y });
+
+                let jsonStr = JSON.stringify(stateData);
+
+                // 3. Write strokes to sidecar file
+                Proc.runCommand("write-strokes", ["python3", "-c", "import sys; open('/tmp/dms_capture_strokes.json', 'w').write(sys.argv[1])", jsonStr], (stdout, writeExitCode) => {
+                    if (writeExitCode !== 0) {
+                        console.error("Failed to write strokes JSON sidecar");
                     }
-                }
-                if (s.text !== undefined) newStroke.text = s.text;
-                if (s.isMonospace !== undefined) newStroke.isMonospace = s.isMonospace;
-                if (s.fontFamily !== undefined) newStroke.fontFamily = s.fontFamily;
-                if (s.isBold !== undefined) newStroke.isBold = s.isBold;
-                if (s.isItalic !== undefined) newStroke.isItalic = s.isItalic;
-                if (s.isUnderline !== undefined) newStroke.isUnderline = s.isUnderline;
-                if (s.counter !== undefined) newStroke.counter = s.counter;
-                serializedStrokes.push(newStroke);
-            }
-
-            // 2. Serialize other states
-            let stateData = {
-                strokes: serializedStrokes,
-                stampCounter: root.modal.stampCounter,
-                cropRect: {
-                    x: root.modal.cropRect.x,
-                    y: root.modal.cropRect.y,
-                    width: root.modal.cropRect.width,
-                    height: root.modal.cropRect.height
-                },
-                hasSelection: root.modal.hasSelection
-            };
-
-            let jsonStr = JSON.stringify(stateData);
-
-            // 3. Write strokes to sidecar file
-            Proc.runCommand("write-strokes", ["python3", "-c", "import sys; open('/tmp/dms_capture_strokes.json', 'w').write(sys.argv[1])", jsonStr], (stdout, writeExitCode) => {
-                if (writeExitCode !== 0) {
-                    console.error("Failed to write strokes JSON sidecar");
-                }
-                
-                // 4. Float the baked image
-                const cmd = "cp -f -- " + shellPathExpression(tempOut) + " /tmp/dms_capture_float.png" +
-                            " && dms ipc call floaty floatFromUrl file:///tmp/dms_capture_float.png";
-                Proc.runCommand("float-capture", ["sh", "-c", cmd], (stdout, exitCode) => {
-                    if (exitCode === 0) {
-                        root.closeRequested();
-                    } else {
-                        notifyError("Failed to float image (make sure dms-floaty is running).");
-                    }
-                    cleanupTemp(tempOut);
-                    if (pngTemp) cleanupTemp(pngTemp);
+                    
+                    // 4. Float the baked image
+                    const cmd = "cp -f -- " + shellPathExpression(finalPath) + " /tmp/dms_capture_float.png" +
+                                " && dms ipc call floaty floatFromUrl file:///tmp/dms_capture_float.png";
+                    Proc.runCommand("float-capture", ["sh", "-c", cmd], (stdout, exitCode) => {
+                        if (exitCode === 0) {
+                            root.closeRequested();
+                        } else {
+                            notifyError("Failed to float image (make sure dms-floaty is running).");
+                        }
+                        cleanupTemp(finalPath);
+                        if (originalPng) cleanupTemp(originalPng);
+                    });
                 });
             });
         });

@@ -1871,65 +1871,15 @@ DankModal {
 
                         ctx.restore();
 
-                        const format = pData.outputFormat || "png";
-                        const baseTemp = "/tmp/dms_capture_" + Date.now();
-                        const pngTemp = baseTemp + ".png";
-                        const finalOut = baseTemp + "." + format;
+                        const tempOut = "/tmp/dms_capture_" + Date.now() + ".png";
+                        exportCanvas.save(tempOut);
 
-                        function cleanupTemp(path) {
-                            if (path && path.startsWith("/tmp/dms_capture_")) {
-                                Proc.runCommand("cleanup-temp", ["rm", "-f", path]);
-                            }
-                        }
-
-                        function finishExport(path, pngPath = "") {
-                            if (window.exportCallback) {
-                                const cb = window.exportCallback;
-                                window.exportCallback = null;
-                                Qt.callLater(() => {
-                                    cb(path, pngPath);
-                                });
-                            }
-                        }
-
-                        if (format === "png" || format === "ppm") {
-                            // Direct save for basic formats
-                            exportCanvas.save(finalOut);
-                            finishExport(finalOut);
-                        } else {
-                            // Save to PNG first, then convert for quality control or special formats
-                            exportCanvas.save(pngTemp);
-                            
-                            let cmd = "";
-                            let args = [];
-
-                            if (format === "webp") {
-                                const quality = String(pData.webpQuality ?? 80);
-                                cmd = "magick";
-                                args = ["convert", pngTemp, "-quality", quality, finalOut];
-                            } else if (format === "jpg") {
-                                const quality = String(pData.jpegQuality ?? 90);
-                                cmd = "magick";
-                                args = ["convert", pngTemp, "-quality", quality, finalOut];
-                            } else if (format === "pdf") {
-                                cmd = "img2pdf";
-                                args = [pngTemp, "-o", finalOut];
-                            }
-                            
-                            if (cmd) {
-                                Proc.runCommand("convert-format", [cmd].concat(args), (stdout, exitCode) => {
-                                    if (exitCode === 0) {
-                                        finishExport(finalOut, pngTemp);
-                                    } else {
-                                        console.error("[QuickCapture] Conversion failed (exit " + exitCode + "):", stdout);
-                                        // Fallback to PNG and cleanup finalOut if it was partially created
-                                        cleanupTemp(finalOut);
-                                        finishExport(pngTemp);
-                                    }
-                                });
-                            } else {
-                                finishExport(pngTemp);
-                            }
+                        if (window.exportCallback) {
+                            const cb = window.exportCallback;
+                            window.exportCallback = null;
+                            Qt.callLater(() => {
+                                cb(tempOut);
+                            });
                         }
                     }
                 }
