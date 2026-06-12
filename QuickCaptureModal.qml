@@ -1870,8 +1870,8 @@ DankModal {
                         }, config);
 
                         ctx.restore();
-                        const format = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.outputFormat) || "png";
-                        const tempOut = "/tmp/dms_capture_" + Date.now() + "." + format;
+
+                        const tempOut = "/tmp/dms_capture_" + Date.now() + ".png";
                         exportCanvas.save(tempOut);
 
                         if (window.exportCallback) {

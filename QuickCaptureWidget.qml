@@ -54,7 +54,8 @@ PluginComponent {
 
     function screenshotArgs() {
         const mode = root.activeIpcMode !== "" ? root.activeIpcMode : root.captureMode;
-        const format = (pluginData.outputFormat || "png");
+        // Always use PNG for the background to ensure compatibility with the editor
+        const format = "png";
         const cursorVal = pluginData.includeCursor ? "on" : "off";
         const args = [root.resolvedDmsPath, "screenshot", mode, "--no-clipboard", "--dir", "/tmp", "--filename", "dms_capture_bg.png", "--format", format, "--cursor", cursorVal, "--no-notify"];
 
@@ -65,11 +66,6 @@ PluginComponent {
         if (mode === "output") {
             const outName = pluginData.outputTargetName || "DP-1";
             args.push("--output", outName);
-        }
-
-        if (format === "jpg") {
-            const quality = pluginData.jpegQuality ?? 90;
-            args.push("--quality", String(quality));
         }
 
         return args;

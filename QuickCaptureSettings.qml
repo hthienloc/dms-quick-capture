@@ -408,13 +408,15 @@ PluginSettings {
             options: [
                 { label: "PNG", value: "png" },
                 { label: "JPEG", value: "jpg" },
+                { label: "WebP", value: "webp" },
+                { label: "PDF", value: "pdf" },
                 { label: "PPM", value: "ppm" }
             ]
             defaultValue: "png"
         }
 
         Separator {
-            visible: outputFormat.value === "jpg"
+            visible: outputFormat.value === "jpg" || outputFormat.value === "webp"
             height: visible ? 1 : 0
         }
 
@@ -429,6 +431,20 @@ PluginSettings {
             leftLabel: "1"
             rightLabel: "100"
             visible: outputFormat.value === "jpg"
+            height: visible ? implicitHeight : 0
+        }
+
+        SliderSettingPlus {
+            id: webpQuality
+            settingKey: "webpQuality"
+            label: I18n.tr("WebP Quality")
+            defaultValue: 80
+            minimum: 1
+            maximum: 100
+            unit: "%"
+            leftLabel: "1"
+            rightLabel: "100"
+            visible: outputFormat.value === "webp"
             height: visible ? implicitHeight : 0
         }
     }
