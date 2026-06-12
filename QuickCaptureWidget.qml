@@ -337,7 +337,7 @@ PluginComponent {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: (mouse) => {
                     if (mouse.button === Qt.MiddleButton) {
-                        root.triggerCapture("screen");
+                        root.triggerCapture("full");
                     }
                 }
             }
@@ -382,7 +382,7 @@ PluginComponent {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: (mouse) => {
                     if (mouse.button === Qt.MiddleButton) {
-                        root.triggerCapture("screen");
+                        root.triggerCapture("full");
                     }
                 }
             }
