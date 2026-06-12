@@ -29,7 +29,7 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 | Action | Result |
 |--------|--------|
 | **Left Click** | Trigger interactive screenshot capture |
-| **Middle Click** | Open file browser to select and annotate an image |
+| **Middle Click** | Capture fullscreen (all monitors) instantly |
 | **Right Click** | Annotate image from clipboard (supports raw images, paths, and URLs) |
 | **Drop Image** | Drag any image file onto the icon to annotate it |
 
@@ -38,9 +38,10 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 1. **Trigger:** Use the bar icon, Control Center, or your `Print` key.
 2. **Select Area:** Drag to select the screenshot region.
 3. **Annotate:**
-   - **Switch Tools:** Use keyboard shortcuts (**1-4**, **Q-R**, **A-D**, **V** for Select, or **Tab** to toggle latest presets).
+   - **Switch Tools:** Use keyboard shortcuts (**1-4**, **Q-R**, **A-F**, **V** for Select, or **Tab** to toggle latest presets).
    - **Copy/Duplicate Vector:** Press **V** to switch to the select tool, click a vector to grab it, then press **C** to duplicate it instantly. Pressing **C** without a selection will paste the last copied vector at the cursor position.
-   - **Radial Menu:** **Right-click** to open custom presets.
+   - **Radial Menu:** **Right-click** on the canvas to open custom presets.
+   - **Text Options:** **Right-click** on the Text tool icon in the toolbar to toggle **Bold**, **Italic**, and **Underline** formatting. The menu stays open until you click outside or the center button.
    - **Thickness:** Use the **Mouse Wheel** to scale the brush size.
    - **Zoom / Magnify:** Hold **Z** to activate the magnifying circular lens under the cursor, and scroll the **Mouse Wheel** while holding **Z** to adjust the zoom factor (1.5x - 4x).
    - **Quick Erase:** **Middle-click** on any element to erase it.
@@ -73,7 +74,7 @@ To pin your captured and annotated screenshots as borderless, floating desktop w
 | `C` | Copy vector / Paste / Duplicate |
 | `1` - `4` | Pen, Line, Arrow, Rect |
 | `Q` - `R` | Ellipse, Text, Pixelate, Redact |
-| `A` - `D` | Stamp, Highlighter, Eraser |
+| `A` - `F` | Stamp, Highlighter, Eraser, Spotlight |
 | `Enter` | **Done** (Action based on settings) |
 | `Esc` | Discard & Close |
 | `Ctrl + Z` | Undo last stroke |
@@ -122,6 +123,7 @@ binds {
 - [x] Magnifying Glass (Loupe) for pixel-perfect placement and crop alignment (hold Z to activate, mouse wheel while holding Z to adjust zoom).
 - [x] Custom Text/Image Watermark or signature overlay stamp with adjustable opacity.
 - [x] Support picture-in-picture screenshot pinning (pin-to-desktop) documentation.
+- [x] Text formatting radial menu (Bold / Italic / Underline) accessible via right-click on the Text tool icon.
 
 ## License
 
