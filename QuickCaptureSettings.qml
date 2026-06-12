@@ -1250,37 +1250,53 @@ PluginSettings {
 
                 function refreshThicknessConstraints() {
                     const t = presetToolSetting.value;
+                    let defVal = 6;
                     if (t === "text") {
                         presetThicknessSetting.label = I18n.tr("Font Size");
                         presetThicknessSetting.minimum = 12;
                         presetThicknessSetting.maximum = 120;
                         presetThicknessSetting.unit = "px";
                         presetThicknessSetting.previewType = "none";
+                        defVal = 36;
                     } else if (t === "pixelate") {
                         presetThicknessSetting.label = I18n.tr("Pixel Intensity");
                         presetThicknessSetting.minimum = 2;
                         presetThicknessSetting.maximum = 12;
                         presetThicknessSetting.unit = "px";
                         presetThicknessSetting.previewType = "none";
+                        defVal = 8;
                     } else if (t === "spotlight") {
                         presetThicknessSetting.label = I18n.tr("Dimming Opacity");
                         presetThicknessSetting.minimum = 10;
                         presetThicknessSetting.maximum = 95;
                         presetThicknessSetting.unit = "%";
                         presetThicknessSetting.previewType = "none";
+                        defVal = 50;
                     } else if (t === "stamp") {
                         presetThicknessSetting.label = I18n.tr("Stamp Size");
                         presetThicknessSetting.minimum = 1;
                         presetThicknessSetting.maximum = 50;
                         presetThicknessSetting.unit = "px";
                         presetThicknessSetting.previewType = "thickness";
+                        defVal = 6;
                     } else {
                         presetThicknessSetting.label = I18n.tr("Preset Thickness");
                         presetThicknessSetting.minimum = 1;
                         presetThicknessSetting.maximum = 50;
                         presetThicknessSetting.unit = "px";
                         presetThicknessSetting.previewType = "thickness";
+                        defVal = 6;
                     }
+                    
+                    const oldDefVal = presetThicknessSetting.defaultValue;
+                    presetThicknessSetting.defaultValue = defVal;
+                    
+                    if (presetThicknessSetting.value === oldDefVal || 
+                        presetThicknessSetting.value < presetThicknessSetting.minimum || 
+                        presetThicknessSetting.value > presetThicknessSetting.maximum) {
+                        presetThicknessSetting.value = defVal;
+                    }
+                    
                     presetThicknessSetting.leftLabel = String(presetThicknessSetting.minimum);
                     presetThicknessSetting.rightLabel = String(presetThicknessSetting.maximum);
                 }
