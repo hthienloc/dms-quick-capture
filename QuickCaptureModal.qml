@@ -880,6 +880,7 @@ DankModal {
                     onCopyRequested: captureActions.performCopyOnly()
                     onCopyAndSaveRequested: captureActions.performCopyAndSave()
                     onCloseRequested: window.discardAndClose()
+                    onTextToolRightClicked: (globalX, globalY) => textOptionsRadialMenu.open(globalX, globalY)
                 }
 
                 // 2. Centered Canvas Board
@@ -1911,6 +1912,17 @@ DankModal {
                     onCenterClicked: {
                         window.currentTool = "select";
                     }
+                }
+
+                TextOptionsRadialMenu {
+                    id: textOptionsRadialMenu
+                    boldActive: window.textBold
+                    italicActive: window.textItalic
+                    underlineActive: window.textUnderline
+                    onBoldToggled: window.textBold = !window.textBold
+                    onItalicToggled: window.textItalic = !window.textItalic
+                    onUnderlineToggled: window.textUnderline = !window.textUnderline
+                    onCenterClicked: textOptionsRadialMenu.close()
                 }
 
                 Canvas {

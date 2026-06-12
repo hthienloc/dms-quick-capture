@@ -33,6 +33,7 @@ Rectangle {
     signal copyRequested()
     signal copyAndSaveRequested()
     signal closeRequested()
+    signal textToolRightClicked(real globalX, real globalY)
 
     width: isVertical ? 56 : (contentLayout.width + Theme.spacingM * 2)
     height: isVertical ? (contentLayout.height + Theme.spacingM * 2) : 56
@@ -95,11 +96,26 @@ Rectangle {
                 spacing: Theme.spacingXS; anchors.verticalCenter: parent.verticalCenter
                 Repeater {
                     model: config.toolButtons
-                    delegate: DankActionButton {
-                        iconName: modelData.icon; buttonSize: 36; iconSize: 18; tooltipText: modelData.tooltip
-                        backgroundColor: root.currentTool === modelData.id ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                        iconColor: root.currentTool === modelData.id ? Theme.primary : Theme.surfaceText
-                        onClicked: root.toolSelected(modelData.id)
+                    delegate: Item {
+                        width: 36
+                        height: 36
+                        DankActionButton {
+                            anchors.fill: parent
+                            iconName: modelData.icon; buttonSize: 36; iconSize: 18; tooltipText: modelData.tooltip
+                            backgroundColor: root.currentTool === modelData.id ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                            iconColor: root.currentTool === modelData.id ? Theme.primary : Theme.surfaceText
+                            onClicked: root.toolSelected(modelData.id)
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            acceptedButtons: Qt.RightButton
+                            onClicked: (mouse) => {
+                                if (modelData.id === "text" && mouse.button === Qt.RightButton) {
+                                    var pt = mapToItem(null, 18, 18);
+                                    root.textToolRightClicked(pt.x, pt.y);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -204,11 +220,26 @@ Rectangle {
                 columns: 1; spacing: Theme.spacingXS; anchors.horizontalCenter: parent.horizontalCenter
                 Repeater {
                     model: config.toolButtons
-                    delegate: DankActionButton {
-                        iconName: modelData.icon; buttonSize: 36; iconSize: 18
-                        backgroundColor: root.currentTool === modelData.id ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                        iconColor: root.currentTool === modelData.id ? Theme.primary : Theme.surfaceText
-                        onClicked: root.toolSelected(modelData.id)
+                    delegate: Item {
+                        width: 36
+                        height: 36
+                        DankActionButton {
+                            anchors.fill: parent
+                            iconName: modelData.icon; buttonSize: 36; iconSize: 18
+                            backgroundColor: root.currentTool === modelData.id ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                            iconColor: root.currentTool === modelData.id ? Theme.primary : Theme.surfaceText
+                            onClicked: root.toolSelected(modelData.id)
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            acceptedButtons: Qt.RightButton
+                            onClicked: (mouse) => {
+                                if (modelData.id === "text" && mouse.button === Qt.RightButton) {
+                                    var pt = mapToItem(null, 18, 18);
+                                    root.textToolRightClicked(pt.x, pt.y);
+                                }
+                            }
+                        }
                     }
                 }
             }
