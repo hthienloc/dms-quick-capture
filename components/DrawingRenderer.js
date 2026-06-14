@@ -237,16 +237,52 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         
         ctx.font = styleStr + Math.round(stroke.width) + "px " + fFamily;
         ctx.textAlign = "left";
-        ctx.textBaseline = "top";
-        ctx.fillText(stroke.text, pt.x, pt.y);
+        ctx.textBaseline = "middle";
+
+        if (stroke.hasBackground) {
+            const textMetrics = ctx.measureText(stroke.text);
+            const textWidth = textMetrics.width;
+            const h = stroke.width;
+            const padX = h * 0.3;
+            const padY = h * 0.15; // Further reduced vertical padding
+            const rx = pt.x - padX;
+            const ry = pt.y - padY;
+            const rw = textWidth + padX * 2;
+            const rh = h + padY * 2; // Symmetric height
+            const radius = stroke.cornerRadius || 0;
+
+            ctx.fillStyle = Helpers.getContrastingColor(stroke.color, Qt);
+
+            if (radius > 0) {
+                ctx.beginPath();
+                ctx.moveTo(rx + radius, ry);
+                ctx.lineTo(rx + rw - radius, ry);
+                ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + radius);
+                ctx.lineTo(rx + rw, ry + rh - radius);
+                ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - radius, ry + rh);
+                ctx.lineTo(rx + radius, ry + rh);
+                ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - radius);
+                ctx.lineTo(rx, ry + radius);
+                ctx.quadraticCurveTo(rx, ry, rx + radius, ry);
+                ctx.closePath();
+                ctx.fill();
+            } else {
+                ctx.fillRect(rx, ry, rw, rh);
+            }
+            
+            // Re-set fill color for text
+            ctx.fillStyle = stroke.color;
+        }
+
+        ctx.fillText(stroke.text, pt.x, pt.y + stroke.width / 2);
 
         if (stroke.isUnderline) {
             const textWidth = ctx.measureText(stroke.text).width;
             ctx.strokeStyle = stroke.color;
             ctx.lineWidth = Math.max(1.5, Math.round(stroke.width * 0.08));
             ctx.beginPath();
-            ctx.moveTo(pt.x, pt.y + stroke.width * 1.05);
-            ctx.lineTo(pt.x + textWidth, pt.y + stroke.width * 1.05);
+            ctx.moveTo(pt.x, pt.y + stroke.width * 1.1);
+            ctx.lineTo(pt.x + textWidth, pt.y + stroke.width * 1.1);
             ctx.stroke();
         }
     }

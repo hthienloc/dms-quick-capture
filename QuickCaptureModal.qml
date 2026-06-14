@@ -208,6 +208,14 @@ DankModal {
     onTextUnderlineChanged: {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
+    property bool textBackground: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textBackground !== undefined ? window.parentWidget.pluginData.textBackground : false
+    onTextBackgroundChanged: {
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
+    }
+    property int textCornerRadius: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textCornerRadius !== undefined ? window.parentWidget.pluginData.textCornerRadius : 8
+    onTextCornerRadiusChanged: {
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
+    }
     property string textFontFamily: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textFontFamily !== undefined ? window.parentWidget.pluginData.textFontFamily : (textMonospace ? "monospace" : "sans-serif")
     onTextFontFamilyChanged: {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
@@ -1069,8 +1077,44 @@ DankModal {
                                     
                                     ctx.font = styleStr + Math.round(window.textFontSize) + "px " + window.textFontFamily;
                                     ctx.textAlign = "left";
-                                    ctx.textBaseline = "top";
-                                    ctx.fillText(window.currentTypingText + "|", window.typingCoords.x, window.typingCoords.y);
+                                    ctx.textBaseline = "middle";
+
+                                    if (window.textBackground) {
+                                        const textMetrics = ctx.measureText(window.currentTypingText + "|");
+                                        const textWidth = textMetrics.width;
+                                        const h = window.textFontSize;
+                                        const padX = h * 0.3;
+                                        const padY = h * 0.15; // Further reduced vertical padding
+                                        const rx = window.typingCoords.x - padX;
+                                        const ry = window.typingCoords.y - padY;
+                                        const rw = textWidth + padX * 2;
+                                        const rh = h + padY * 2; // Symmetric height
+                                        const radius = window.textCornerRadius;
+
+                                        ctx.fillStyle = Helpers.getContrastingColor(window.currentColor.toString(), Qt);
+                                        
+                                        if (radius > 0) {
+                                            ctx.beginPath();
+                                            ctx.moveTo(rx + radius, ry);
+                                            ctx.lineTo(rx + rw - radius, ry);
+                                            ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + radius);
+                                            ctx.lineTo(rx + rw, ry + rh - radius);
+                                            ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - radius, ry + rh);
+                                            ctx.lineTo(rx + radius, ry + rh);
+                                            ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - radius);
+                                            ctx.lineTo(rx, ry + radius);
+                                            ctx.quadraticCurveTo(rx, ry, rx + radius, ry);
+                                            ctx.closePath();
+                                            ctx.fill();
+                                        } else {
+                                            ctx.fillRect(rx, ry, rw, rh);
+                                        }
+
+                                        // Re-set fill color for text
+                                        ctx.fillStyle = window.currentColor;
+                                    }
+
+                                    ctx.fillText(window.currentTypingText + "|", window.typingCoords.x, window.typingCoords.y + window.textFontSize / 2);
 
                                     if (window.textUnderline) {
                                         const textWidth = ctx.measureText(window.currentTypingText + "|").width;
@@ -1918,9 +1962,11 @@ DankModal {
                     boldActive: window.textBold
                     italicActive: window.textItalic
                     underlineActive: window.textUnderline
+                    backgroundActive: window.textBackground
                     onBoldToggled: window.textBold = !window.textBold
                     onItalicToggled: window.textItalic = !window.textItalic
                     onUnderlineToggled: window.textUnderline = !window.textUnderline
+                    onBackgroundToggled: window.textBackground = !window.textBackground
                     onCenterClicked: {
                         window.currentTool = "text";
                         textOptionsRadialMenu.close();
@@ -1973,6 +2019,8 @@ DankModal {
                 isBold: window.textBold,
                 isItalic: window.textItalic,
                 isUnderline: window.textUnderline,
+                hasBackground: window.textBackground,
+                cornerRadius: window.textCornerRadius,
                 points: [Qt.point(window.typingCoords.x, window.typingCoords.y)],
                 text: textStr
             });

@@ -20,10 +20,12 @@ Item {
     property bool boldActive: false
     property bool italicActive: false
     property bool underlineActive: false
+    property bool backgroundActive: false
 
     signal boldToggled()
     signal italicToggled()
     signal underlineToggled()
+    signal backgroundToggled()
     signal centerClicked()
 
     // Geometry config
@@ -94,7 +96,7 @@ Item {
 
                 var centerX = width / 2;
                 var centerY = height / 2;
-                var numSectors = 3;
+                var numSectors = 4;
                 var sectorAngle = 2 * Math.PI / numSectors;
 
                 for (var i = 0; i < numSectors; i++) {
@@ -110,6 +112,7 @@ Item {
                     if (i === 0) isActive = root.boldActive;
                     else if (i === 1) isActive = root.italicActive;
                     else if (i === 2) isActive = root.underlineActive;
+                    else if (i === 3) isActive = root.backgroundActive;
 
                     // fill: active → primary; hovered-only or idle → surfaceContainerHigh
                     if (isActive) {
@@ -140,6 +143,7 @@ Item {
             function onBoldActiveChanged() { radialCanvas.requestPaint(); }
             function onItalicActiveChanged() { radialCanvas.requestPaint(); }
             function onUnderlineActiveChanged() { radialCanvas.requestPaint(); }
+            function onBackgroundActiveChanged() { radialCanvas.requestPaint(); }
             function onSelectedIndexChanged() { radialCanvas.requestPaint(); }
         }
 
@@ -155,14 +159,15 @@ Item {
             model: [
                 { icon: "format_bold", label: "Bold" },
                 { icon: "format_italic", label: "Italic" },
-                { icon: "format_underlined", label: "Underline" }
+                { icon: "format_underlined", label: "Underline" },
+                { icon: "layers", label: "Background" }
             ]
 
             delegate: Item {
                 width: root.itemRadius * 2
                 height: width
                 
-                property real angle: (index * 120) - 90
+                property real angle: (index * 90) - 90
                 property real rad: angle * Math.PI / 180
                 
                 x: (menuContent.width / 2) + root.midRadius * Math.cos(rad) - root.itemRadius
@@ -180,6 +185,7 @@ Item {
                             if (index === 0) isActive = root.boldActive;
                             else if (index === 1) isActive = root.italicActive;
                             else if (index === 2) isActive = root.underlineActive;
+                            else if (index === 3) isActive = root.backgroundActive;
 
                             return isActive ? Theme.onPrimary : Theme.surfaceVariantText;
                         }
@@ -195,6 +201,7 @@ Item {
                             if (index === 0) isActive = root.boldActive;
                             else if (index === 1) isActive = root.italicActive;
                             else if (index === 2) isActive = root.underlineActive;
+                            else if (index === 3) isActive = root.backgroundActive;
 
                             return isActive ? Theme.onPrimary : Theme.surfaceVariantText;
                         }
@@ -264,10 +271,10 @@ Item {
                 let angle = Math.atan2(dy, dx) * 180 / Math.PI + 90;
                 if (angle < 0) angle += 360;
                 
-                const sectorSize = 120;
+                const sectorSize = 90;
                 const idx = Math.floor((angle + sectorSize / 2) % 360 / sectorSize);
                 
-                if (idx >= 0 && idx < 3) {
+                if (idx >= 0 && idx < 4) {
                     root.selectedIndex = idx;
                 }
             }
@@ -284,6 +291,8 @@ Item {
                     root.italicToggled();
                 } else if (root.selectedIndex === 2) {
                     root.underlineToggled();
+                } else if (root.selectedIndex === 3) {
+                    root.backgroundToggled();
                 } else if (root.selectedIndex === -2) {
                     root.centerClicked();
                 }

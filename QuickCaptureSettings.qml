@@ -1556,13 +1556,14 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Text")
             icon: "format_size"
-            showReset: textFontSize.isDirty || textFontFamily.isDirty || textBold.isDirty || textItalic.isDirty || textUnderline.isDirty || textInputMode.isDirty
+            showReset: textFontSize.isDirty || textFontFamily.isDirty || textBold.isDirty || textItalic.isDirty || textUnderline.isDirty || textBackground.isDirty || textInputMode.isDirty
             onResetClicked: {
                 textFontSize.resetToDefault();
                 textFontFamily.resetToDefault();
                 textBold.resetToDefault();
                 textItalic.resetToDefault();
                 textUnderline.resetToDefault();
+                textBackground.resetToDefault();
                 textInputMode.resetToDefault();
             }
         }
@@ -1622,6 +1623,15 @@ PluginSettings {
 
         Separator {}
 
+        ToggleSettingPlus {
+            id: textBackground
+            settingKey: "textBackground"
+            label: I18n.tr("Default Text Background")
+            defaultValue: false
+        }
+
+        Separator {}
+
         ButtonGroupSettingPlus {
             id: textInputMode
             settingKey: "textInputMode"
@@ -1657,6 +1667,20 @@ PluginSettings {
             settingKey: "roundRect"
             label: I18n.tr("Round Rectangle Corners")
             defaultValue: true
+        }
+
+        Separator {}
+
+        SliderSettingPlus {
+            id: textCornerRadius
+            settingKey: "textCornerRadius"
+            label: I18n.tr("Text Background Roundness")
+            defaultValue: 12
+            minimum: 0
+            maximum: 20
+            unit: "px"
+            leftLabel: "0"
+            rightLabel: "20"
         }
 
         Separator {}
