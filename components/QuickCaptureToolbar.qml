@@ -34,6 +34,7 @@ Rectangle {
     signal copyAndSaveRequested()
     signal closeRequested()
     signal textToolRightClicked(real globalX, real globalY)
+    signal stampToolRightClicked(real globalX, real globalY)
     signal annotationsToggled()
 
     width: isVertical ? 56 : (contentLayout.width + Theme.spacingM * 2)
@@ -111,9 +112,13 @@ Rectangle {
                             anchors.fill: parent
                             acceptedButtons: Qt.RightButton
                             onClicked: (mouse) => {
-                                if (modelData.id === "text" && mouse.button === Qt.RightButton) {
+                                if (mouse.button === Qt.RightButton) {
                                     var pt = mapToItem(null, 18, 18);
-                                    root.textToolRightClicked(pt.x, pt.y);
+                                    if (modelData.id === "text") {
+                                        root.textToolRightClicked(pt.x, pt.y);
+                                    } else if (modelData.id === "stamp") {
+                                        root.stampToolRightClicked(pt.x, pt.y);
+                                    }
                                 }
                             }
                         }
@@ -235,9 +240,13 @@ Rectangle {
                             anchors.fill: parent
                             acceptedButtons: Qt.RightButton
                             onClicked: (mouse) => {
-                                if (modelData.id === "text" && mouse.button === Qt.RightButton) {
+                                if (mouse.button === Qt.RightButton) {
                                     var pt = mapToItem(null, 18, 18);
-                                    root.textToolRightClicked(pt.x, pt.y);
+                                    if (modelData.id === "text") {
+                                        root.textToolRightClicked(pt.x, pt.y);
+                                    } else if (modelData.id === "stamp") {
+                                        root.stampToolRightClicked(pt.x, pt.y);
+                                    }
                                 }
                             }
                         }

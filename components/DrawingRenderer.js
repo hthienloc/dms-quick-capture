@@ -218,7 +218,7 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         ctx.fill();
 
         const fontSize = Math.round(radius * 1.2);
-        const text = String(stroke.counter);
+        const text = Helpers.formatCounter(stroke.counter, stroke.format || "numeric");
         ctx.fillStyle = textColor;
         ctx.font = "bold " + fontSize + "px sans-serif";
         ctx.textBaseline = "middle";

@@ -114,6 +114,7 @@ DankModal {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
     property int stampCounter: 1
+    property string stampCounterFormat: "numeric" // numeric, alpha, roman
     property bool isScreenshotDark: false
     property bool hasSampledContrast: false
     property real previewX: 0
@@ -877,6 +878,7 @@ DankModal {
                     onCopyAndSaveRequested: captureActions.performCopyAndSave()
                     onCloseRequested: window.discardAndClose()
                     onTextToolRightClicked: (globalX, globalY) => textOptionsRadialMenu.open(globalX, globalY)
+                    onStampToolRightClicked: (globalX, globalY) => stampOptionsRadialMenu.open(globalX, globalY)
                 }
 
                 // 2. Centered Canvas Board
@@ -1355,7 +1357,8 @@ DankModal {
                                         color: window.currentColor.toString(),
                                         width: window.strokeWidth,
                                         points: [getAbsolutePoint(mouse.x, mouse.y)],
-                                        counter: window.stampCounter
+                                        counter: window.stampCounter,
+                                        format: window.stampCounterFormat
                                     });
                                     window.stampCounter++;
                                     return;
@@ -1921,6 +1924,16 @@ DankModal {
                     onCenterClicked: {
                         window.currentTool = "text";
                         textOptionsRadialMenu.close();
+                    }
+                }
+
+                StampOptionsRadialMenu {
+                    id: stampOptionsRadialMenu
+                    currentFormat: window.stampCounterFormat
+                    onFormatSelected: (format) => window.stampCounterFormat = format
+                    onCenterClicked: {
+                        window.currentTool = "stamp";
+                        stampOptionsRadialMenu.close();
                     }
                 }
 

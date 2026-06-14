@@ -34,6 +34,43 @@ function getContrastingColor(hex, Qt) {
 }
 
 /**
+ * Formats a number according to the specified format.
+ * @param {number} n - The number to format.
+ * @param {string} format - The format ("numeric", "alpha", "roman").
+ * @returns {string} Formatted string.
+ */
+function formatCounter(n, format) {
+    if (format === "alpha") {
+        let res = "";
+        let num = n;
+        while (num > 0) {
+            let mod = (num - 1) % 26;
+            res = String.fromCharCode(65 + mod) + res;
+            num = Math.floor((num - mod) / 26);
+        }
+        return res || "A";
+    }
+    if (format === "roman") {
+        const roman = [
+            { v: 1000, s: "M" }, { v: 900, s: "CM" }, { v: 500, s: "D" }, { v: 400, s: "CD" },
+            { v: 100, s: "C" }, { v: 90, s: "XC" }, { v: 50, s: "L" }, { v: 40, s: "XL" },
+            { v: 10, s: "X" }, { v: 9, s: "IX" }, { v: 5, s: "V" }, { v: 4, s: "IV" },
+            { v: 1, s: "I" }
+        ];
+        let res = "";
+        let num = n;
+        for (let i = 0; i < roman.length; i++) {
+            while (num >= roman[i].v) {
+                res += roman[i].s;
+                num -= roman[i].v;
+            }
+        }
+        return res || "I";
+    }
+    return String(n);
+}
+
+/**
  * Maps a Qt.Key to its string representation for shortcut tokens.
  * @param {number} key - The Qt.Key value.
  * @param {object} Qt - The Qt object.
