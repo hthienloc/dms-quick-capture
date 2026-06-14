@@ -41,7 +41,7 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
    - **Switch Tools:** Use keyboard shortcuts (**1-4**, **Q-R**, **A-F**, **V** for Select, or **Tab** to toggle latest presets).
    - **Copy/Duplicate Vector:** Press **V** to switch to the select tool, click a vector to grab it, then press **C** to duplicate it instantly. Pressing **C** without a selection will paste the last copied vector at the cursor position.
    - **Radial Menu:** **Right-click** on the canvas to open custom presets.
-   - **Text Options:** **Right-click** on the Text tool icon in the toolbar to toggle **Bold**, **Italic**, and **Underline** formatting.
+   - **Text Options:** **Right-click** on the Text tool icon in the toolbar to toggle **Bold**, **Italic**, **Underline**, and **Background** (with automatic high-contrast coloring).
    - **Stamp Options:** **Right-click** on the Stamp tool icon in the toolbar to switch between **Numeric** (1, 2, 3), **Alphabetic** (A, B, C), and **Roman** (I, II, III) formats.
    - **Thickness:** Use the **Mouse Wheel** to scale the brush size.
    - **Zoom / Magnify:** Hold **Z** to activate the magnifying circular lens under the cursor, and scroll the **Mouse Wheel** while holding **Z** to adjust the zoom factor (1.5x - 4x).
@@ -124,7 +124,8 @@ binds {
 - [x] Magnifying Glass (Loupe) for pixel-perfect placement and crop alignment (hold Z to activate, mouse wheel while holding Z to adjust zoom).
 - [x] Custom Text/Image Watermark or signature overlay stamp with adjustable opacity.
 - [x] Support picture-in-picture screenshot pinning (pin-to-desktop) documentation.
-- [x] Text formatting radial menu (Bold / Italic / Underline) accessible via right-click on the Text tool icon.
+- [x] Text formatting radial menu (Bold / Italic / Underline / Background) accessible via right-click on the Text tool icon.
+- [x] Adjustable text background roundness (Settings -> Shapes).
 - [x] Alternative Counter formats (Numeric, Alphabetic, Roman) for the Stamp tool via right-click radial menu.
 
 ## License
