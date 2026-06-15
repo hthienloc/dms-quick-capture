@@ -42,21 +42,12 @@ Item {
 
     function loadValue() {
         const settings = findSettings();
-        if (settings) {
-            const pluginId = settings.pluginId;
-            if (pluginId && typeof SettingsData !== "undefined") {
-                const loadedValue = SettingsData.getPluginSetting(pluginId, settingKey, defaultValue);
-                if (textField.activeFocus && isInitialized) return;
-                value = loadedValue;
-                textField.text = loadedValue;
-                isInitialized = true;
-            } else if (settings.pluginService) {
-                const loadedValue = settings.loadValue(settingKey, defaultValue);
-                if (textField.activeFocus && isInitialized) return;
-                value = loadedValue;
-                textField.text = loadedValue;
-                isInitialized = true;
-            }
+        if (settings && settings.pluginService) {
+            const loadedValue = settings.loadValue(settingKey, defaultValue);
+            if (textField.activeFocus && isInitialized) return;
+            value = loadedValue;
+            textField.text = loadedValue;
+            isInitialized = true;
         }
     }
 

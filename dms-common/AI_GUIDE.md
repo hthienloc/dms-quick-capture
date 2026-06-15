@@ -134,4 +134,68 @@ Always use the established sync script to test changes in the live environment:
 ```bash
 ./sync_to_runtime.sh
 ```
+
+---
+
+## 6. DMS 1.5+ Plugin Migration (Composite API)
+
+In DMS 1.5.0, the plugin manifest schema has changed to natively support multiple surfaces (e.g., running a background service while simultaneously offering a panel widget).
+
+### A. The Change
+- **Legacy Format:** Used `component` (string) and classified the plugin's role under `type` (e.g., `daemon`, `widget`, `launcher`, `desktop`).
+- **New Format:** Uses `type: "composite"` and a `components` object mapping specific surfaces (`daemon`, `widget`, `launcher`, `desktop`) to their QML components.
+
+> [!WARNING]
+> If a plugin is marked as `"type": "daemon"` with legacy `"capabilities": ["dankbar-widget"]`, the shell's legacy classifier only indexes it as a daemon, making it **unsearchable** in the settings widget list. You must migrate it to the composite format.
+
+### B. Migration Example
+
+#### Before (Legacy `plugin.json`):
+```json
+{
+  "id": "floaty",
+  "name": "Floaty",
+  "type": "daemon",
+  "capabilities": [
+    "dankbar-widget",
+    "ipc"
+  ],
+  "component": "./FloatyPlugin.qml",
+  "settings": "./FloatySettings.qml"
+}
 ```
+
+#### After (DMS 1.5+ `plugin.json`):
+```json
+{
+  "id": "floaty",
+  "name": "Floaty",
+  "type": "composite",
+  "capabilities": [
+    "daemon",
+    "dankbar-widget",
+    "ipc"
+  ],
+  "components": {
+    "daemon": "./FloatyDaemon.qml",
+    "widget": "./FloatyWidget.qml"
+  },
+  "settings": "./FloatySettings.qml",
+  "requires_dms": ">=1.5.0"
+}
+```
+
+---
+
+## 7. Standardized Plugin Documentation
+Every new plugin should include a standardized README file to clearly document its installation, controls, capabilities, and IPC commands. Refer to [README_TEMPLATE.md](file:///home/loccun/Documents/GitHub/dms-common/README_TEMPLATE.md) for the official template layout.
+
+---
+
+## 8. Native DMS Services vs External Dependencies
+To ensure portability and consistent user notifications, dynamic styling, and configuration:
+- **Prioritize Native APIs:** Always prioritize DMS's built-in clipboard and screenshot mechanisms before falling back to external command-line tools.
+- **Clipboard:** DMS provides native clipboard handling for text and image formats. Avoid spawning processes like `wl-paste`, `wl-copy`, `xclip`, or `xsel` directly unless handling unsupported mime-types.
+- **Screenshots:** Use the native shell screenshot triggers (e.g. `dms screenshot region` or `dms screenshot full`) instead of raw system tools like `grim` or `slurp`. This allows the shell to manage overlays, focus grabbing, and screenshot notifications natively.
+
+
