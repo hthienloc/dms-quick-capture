@@ -112,7 +112,7 @@ All properties and functions live on `window`.
 | `C` | Duplicate selected stroke / paste copied |
 | `V` | Select tool |
 | `Tab` | Toggle between last 2 presets |
-| `Alt` (hold) | Magnifier loupe |
+| `B` (hold) | Magnifier loupe |
 | `1..4, Q..R, A..F, Z` | Tool shortcuts (from `CaptureConfig.toolShortcuts`) |
 
 ### Visual Hierarchy (Content Component)
@@ -181,7 +181,7 @@ Executed on `drawingCanvas`. Order:
 
 **onReleased**: finalize currentStroke via pushStroke, release crop/select state
 
-**onWheel**: Alt held → magnifier zoom (1.5–4.0); text tool → textFontSize; callout tool → calloutZoom; else → strokeWidth + preview
+**onWheel**: B held → magnifier zoom (1.5–4.0); text tool → textFontSize; callout tool → calloutZoom; else → strokeWidth + preview
 
 ---
 

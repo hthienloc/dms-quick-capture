@@ -44,7 +44,7 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
    - **Text Options:** **Right-click** on the Text tool icon in the toolbar to toggle **Bold**, **Italic**, **Underline**, and **Background** (with automatic high-contrast coloring).
    - **Stamp Options:** **Right-click** on the Stamp tool icon in the toolbar to switch between **Numeric** (1, 2, 3), **Alphabetic** (A, B, C), and **Roman** (I, II, III) formats.
    - **Thickness:** Use the **Mouse Wheel** to scale the brush size.
-   - **Magnifier Lens:** Hold **Alt** to activate the magnifying circular lens under the cursor, and scroll the **Mouse Wheel** while holding **Alt** to adjust the zoom factor (1.5x - 4x).
+   - **Magnifier Lens:** Hold **B** to activate the magnifying circular lens under the cursor, and scroll the **Mouse Wheel** while holding **B** to adjust the zoom factor (1.5x - 4x).
    - **Area Zoom (Callout):** Press **Z** (or select the Zoom icon) to draw a magnified callout box for a particular area. Adjust its zoom level (100%-500%) using the scroll wheel.
    - **Quick Erase:** **Middle-click** on any element to erase it.
    - **Shift Constraint:** Hold **Shift** while drawing to modify vector output:
@@ -71,7 +71,7 @@ To pin your captured and annotated screenshots as borderless, floating desktop w
 |-----|---------------|
 | `Tab` | Toggle between 2 latest radial presets |
 | `Z` | Switch to Area Zoom (Callout) Tool |
-| `Alt` (hold) | Magnifying circular lens under cursor |
+| `B` (hold) | Magnifying circular lens under cursor |
 | `X` | Toggle Hide/Show Annotations |
 | `V` | Switch to Select Tool |
 | `C` | Copy vector / Paste / Duplicate |
@@ -123,7 +123,7 @@ binds {
 - [x] Dynamic high-contrast canvas boundary and auto-adapting backdrop luminance for dark captures.
 - [x] Disjoint Copy vs Save toolbar pipelines separating clipboard and filesystem actions.
 - [x] Fix and fully enable the **Click-to-Type Text** annotation tool to reliably capture active keyboard input and support native inline text overlay typing.
-- [x] Magnifying Glass (Loupe) for pixel-perfect placement and crop alignment (hold Alt to activate, mouse wheel while holding Alt to adjust zoom).
+- [x] Magnifying Glass (Loupe) for pixel-perfect placement and crop alignment (hold B to activate, mouse wheel while holding B to adjust zoom).
 - [x] Area Zoom (Callout) to draw a magnified callout box for a particular area.
 - [x] Custom Text/Image Watermark or signature overlay stamp with adjustable opacity.
 - [x] Support picture-in-picture screenshot pinning (pin-to-desktop) documentation.

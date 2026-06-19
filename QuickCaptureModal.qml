@@ -680,7 +680,7 @@ DankModal {
             event.accepted = true;
             return;
         }
-        if (event.key === Qt.Key_Alt) {
+        if (event.key === Qt.Key_B) {
             if (event.isAutoRepeat) {
                 event.accepted = true;
                 return;
@@ -706,7 +706,7 @@ DankModal {
             event.accepted = true;
             return;
         }
-        if (event.key === Qt.Key_Alt) {
+        if (event.key === Qt.Key_B) {
             if (event.isAutoRepeat) {
                 event.accepted = true;
                 return;
@@ -1547,7 +1547,7 @@ DankModal {
 
                              onWheel: (wheel) => {
                                  const step = wheel.angleDelta.y > 0 ? 1 : -1;
-                                 if (window.enableMagnifier && (window.isZoomPressed || (wheel.modifiers & Qt.AltModifier))) {
+                                 if (window.enableMagnifier && window.isZoomPressed) {
                                      magnifier.zoomFactor = Math.max(1.5, Math.min(4.0, magnifier.zoomFactor + (step * 0.5)));
                                      wheel.accepted = true;
                                      return;

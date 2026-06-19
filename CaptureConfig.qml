@@ -19,7 +19,7 @@ QtObject {
         { id: "highlighter", icon: "border_color", tooltip: qsTr("Highlighter (S)") },
         { id: "eraser", icon: "auto_fix_normal", tooltip: qsTr("Eraser (D)") },
         { id: "spotlight", icon: "highlight", tooltip: qsTr("Focus Spotlight (F)") },
-        { id: "callout", icon: "zoom_in", tooltip: qsTr("Area Zoom (Z) | Hold Alt for Loupe") }
+        { id: "callout", icon: "zoom_in", tooltip: qsTr("Area Zoom (Z) | Hold B for Loupe") }
     ]
 
     readonly property string selectedPreset: pluginData["color_palette_preset"] || "adaptive"
