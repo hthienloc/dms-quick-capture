@@ -486,6 +486,15 @@ DankModal {
                 if (mx >= p0.x - 5 && mx <= p0.x + w && my >= p0.y - 5 && my <= p0.y + h) {
                     return i;
                 }
+            } else if (stroke.tool === "callout" && stroke.points.length === 4) {
+                const srcP0 = stroke.points[0];
+                const srcP1 = stroke.points[1];
+                const dstP0 = stroke.points[2];
+                const dstP1 = stroke.points[3];
+                if ((mx >= srcP0.x - 5 && mx <= srcP1.x + 5 && my >= srcP0.y - 5 && my <= srcP1.y + 5) ||
+                    (mx >= dstP0.x - 5 && mx <= dstP1.x + 5 && my >= dstP0.y - 5 && my <= dstP1.y + 5)) {
+                    return i;
+                }
             }
         }
         return -1;
