@@ -112,8 +112,8 @@ All properties and functions live on `window`.
 | `C` | Duplicate selected stroke / paste copied |
 | `V` | Select tool |
 | `Tab` | Toggle between last 2 presets |
-| `Z` (hold) | Magnifier loupe |
-| `1..4, Q..R, A..F` | Tool shortcuts (from `CaptureConfig.toolShortcuts`) |
+| `Alt` (hold) | Magnifier loupe |
+| `1..4, Q..R, A..F, Z` | Tool shortcuts (from `CaptureConfig.toolShortcuts`) |
 
 ### Visual Hierarchy (Content Component)
 
@@ -181,7 +181,7 @@ Executed on `drawingCanvas`. Order:
 
 **onReleased**: finalize currentStroke via pushStroke, release crop/select state
 
-**onWheel**: Z held → magnifier zoom (1.5–4.0); text tool → textFontSize; else → strokeWidth + preview
+**onWheel**: Alt held → magnifier zoom (1.5–4.0); text tool → textFontSize; callout tool → calloutZoom; else → strokeWidth + preview
 
 ---
 
@@ -308,6 +308,6 @@ Strokes use **absolute image coordinates**. Use `getAbsolutePoint(mx, my)` in Mo
 
 7. **pixelate tool**: The only tool that samples from `bgImageItem` (original image pixels) during `drawStroke`. All other tools are purely vector.
 
-8. **Intensity routing**: `strokeWidth`, `pixelateIntensity`, `spotlightIntensity`, `textFontSize` are separate properties. Always use `updateActiveIntensity(val)` — it routes to the correct one based on `effectiveTool`.
+8. **Intensity routing**: `strokeWidth`, `pixelateIntensity`, `spotlightIntensity`, `textFontSize`, `calloutZoom` are separate properties. Always use `updateActiveIntensity(val)` — it routes to the correct one based on `effectiveTool`.
 
 9. **TextOptionsRadialMenu z-order**: Uses `anchors.fill: parent` + `z: 2000` with a full-screen scrim MouseArea. The scrim must be the *first* child so the menu content renders on top.

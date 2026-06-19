@@ -69,12 +69,15 @@ DankModal {
     property int pixelateIntensity: 8
     property int spotlightIntensity: 50
     property int textFontSize: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textFontSize !== undefined ? window.parentWidget.pluginData.textFontSize : 36
+    property int calloutZoom: 150
+    property bool calloutDestDragging: false
 
     readonly property string effectiveTool: (currentTool === "select" && selectedStroke) ? selectedStroke.tool : currentTool
     property int activeIntensity: {
         if (effectiveTool === "text") return textFontSize;
         if (effectiveTool === "pixelate") return pixelateIntensity;
         if (effectiveTool === "spotlight") return spotlightIntensity;
+        if (effectiveTool === "callout") return calloutZoom;
         return strokeWidth;
     }
 
@@ -82,6 +85,7 @@ DankModal {
         if (effectiveTool === "text") textFontSize = val;
         else if (effectiveTool === "pixelate") pixelateIntensity = Math.max(2, Math.min(12, val));
         else if (effectiveTool === "spotlight") spotlightIntensity = Math.max(10, Math.min(95, val));
+        else if (effectiveTool === "callout") calloutZoom = Math.max(100, Math.min(500, val));
         else strokeWidth = Math.max(1, Math.min(50, val));
 
         if (selectedStroke) {
@@ -178,6 +182,7 @@ DankModal {
     property int preGrabTextFontSize: 36
     property int preGrabPixelateIntensity: 8
     property int preGrabSpotlightIntensity: 50
+    property int preGrabCalloutZoom: 150
     property color preGrabColor: Theme.primary
     property point pressCoords: Qt.point(0, 0)
     property var originalPoints: []
@@ -666,7 +671,7 @@ DankModal {
             event.accepted = true;
             return;
         }
-        if (event.key === Qt.Key_Z && !(event.modifiers & Qt.ControlModifier)) {
+        if (event.key === Qt.Key_Alt) {
             if (event.isAutoRepeat) {
                 event.accepted = true;
                 return;
@@ -692,7 +697,7 @@ DankModal {
             event.accepted = true;
             return;
         }
-        if (event.key === Qt.Key_Z && !(event.modifiers & Qt.ControlModifier)) {
+        if (event.key === Qt.Key_Alt) {
             if (event.isAutoRepeat) {
                 event.accepted = true;
                 return;
@@ -1190,11 +1195,18 @@ DankModal {
                                     if (window.selectedStroke) {
                                         const dx = absPt.x - window.pressCoords.x;
                                         const dy = absPt.y - window.pressCoords.y;
-                                        const newPoints = [];
-                                        for (let i = 0; i < window.originalPoints.length; i++) {
-                                            newPoints.push(Qt.point(window.originalPoints[i].x + dx, window.originalPoints[i].y + dy));
+                                        if (window.selectedStroke.tool === "callout" && window.calloutDestDragging && window.originalPoints.length === 4) {
+                                            const newPoints = [...window.selectedStroke.points];
+                                            newPoints[2] = Qt.point(window.originalPoints[2].x + dx, window.originalPoints[2].y + dy);
+                                            newPoints[3] = Qt.point(window.originalPoints[3].x + dx, window.originalPoints[3].y + dy);
+                                            window.selectedStroke.points = newPoints;
+                                        } else {
+                                            const newPoints = [];
+                                            for (let i = 0; i < window.originalPoints.length; i++) {
+                                                newPoints.push(Qt.point(window.originalPoints[i].x + dx, window.originalPoints[i].y + dy));
+                                            }
+                                            window.selectedStroke.points = newPoints;
                                         }
-                                        window.selectedStroke.points = newPoints;
                                         drawingCanvas.requestPaint();
                                     } else {
                                         hoveredStrokeIdx = window.findStrokeAt(absPt.x, absPt.y);
@@ -1331,7 +1343,6 @@ DankModal {
                                 }
 
                                 const absPt = getAbsolutePoint(mouse.x, mouse.y);
-
                                 if (window.currentTool === "select") {
                                     const strokeIdx = window.findStrokeAt(absPt.x, absPt.y);
                                     if (strokeIdx !== -1) {
@@ -1343,16 +1354,29 @@ DankModal {
                                             window.preGrabTextFontSize = window.textFontSize;
                                             window.preGrabPixelateIntensity = window.pixelateIntensity;
                                             window.preGrabSpotlightIntensity = window.spotlightIntensity;
+                                            window.preGrabCalloutZoom = window.calloutZoom;
                                             window.preGrabColor = window.currentColor;
                                         }
                                         
                                         window.selectedStroke = stroke;
                                         window.currentColor = stroke.color;
 
+                                        // Detection for callout destination dragging
+                                        if (stroke.tool === "callout" && stroke.points.length === 4) {
+                                            const dstP0 = stroke.points[2];
+                                            const dstP1 = stroke.points[3];
+                                            if (absPt.x >= dstP0.x && absPt.x <= dstP1.x && absPt.y >= dstP0.y && absPt.y <= dstP1.y) {
+                                                window.calloutDestDragging = true;
+                                            } else {
+                                                window.calloutDestDragging = false;
+                                            }
+                                        }
+ 
                                         // Sync internal state with stroke's intensity
                                         if (stroke.tool === "text") window.textFontSize = stroke.width;
                                         else if (stroke.tool === "pixelate") window.pixelateIntensity = stroke.width;
                                         else if (stroke.tool === "spotlight") window.spotlightIntensity = stroke.width;
+                                        else if (stroke.tool === "callout") window.calloutZoom = stroke.width;
                                         else window.strokeWidth = stroke.width;
                                         
                                         window.pressCoords = absPt;
@@ -1360,8 +1384,7 @@ DankModal {
                                         for (let p of stroke.points) {
                                             orig.push(Qt.point(p.x, p.y));
                                         }
-                                        window.originalPoints = orig;
-                                    }
+                                            }
                                     return;
                                 }
 
@@ -1457,7 +1480,9 @@ DankModal {
                                      window.textFontSize = window.preGrabTextFontSize;
                                      window.pixelateIntensity = window.preGrabPixelateIntensity;
                                      window.spotlightIntensity = window.preGrabSpotlightIntensity;
+                                     window.calloutZoom = window.preGrabCalloutZoom;
                                      window.currentColor = window.preGrabColor;
+                                     window.calloutDestDragging = false;
                                      window.originalPoints = [];
                                      drawingCanvas.requestPaint();
                                      return;
@@ -1480,31 +1505,58 @@ DankModal {
                                 }
 
                                 if (!window.currentStroke) return;
+                                let stroke = window.currentStroke;
+                                if (stroke.tool === "callout" && stroke.points.length >= 2) {
+                                    const p0 = stroke.points[0];
+                                    const p1 = stroke.points[stroke.points.length - 1];
+                                    const rw = Math.abs(p1.x - p0.x);
+                                    const rh = Math.abs(p1.y - p0.y);
+                                    
+                                    if (rw > 5 && rh > 5) {
+                                        // Create destination rect using current zoom factor
+                                        const zoom = stroke.width / 100.0;
+                                        const dw = rw * zoom;
+                                        const dh = rh * zoom;
+                                        const dx = Math.max(p0.x, p1.x) + 50;
+                                        const dy = Math.max(p0.y, p1.y) + 50;
+                                        
+                                        stroke.points = [
+                                            Qt.point(Math.min(p0.x, p1.x), Math.min(p0.y, p1.y)), // Source TL
+                                            Qt.point(Math.max(p0.x, p1.x), Math.max(p0.y, p1.y)), // Source BR
+                                            Qt.point(dx, dy), // Dest TL
+                                            Qt.point(dx + dw, dy + dh) // Dest BR
+                                        ];
+                                    } else {
+                                        window.currentStroke = null;
+                                        return;
+                                    }
+                                }
                                 window.pushStroke(window.currentStroke);
                                 window.currentStroke = null;
                             }
 
-                            onWheel: (wheel) => {
-                                const step = wheel.angleDelta.y > 0 ? 1 : -1;
-                                if (window.enableMagnifier && window.isZoomPressed) {
-                                    magnifier.zoomFactor = Math.max(1.5, Math.min(4.0, magnifier.zoomFactor + (step * 0.5)));
-                                    wheel.accepted = true;
-                                    return;
-                                }
+                             onWheel: (wheel) => {
+                                 const step = wheel.angleDelta.y > 0 ? 1 : -1;
+                                 if (window.enableMagnifier && (window.isZoomPressed || (wheel.modifiers & Qt.AltModifier))) {
+                                     magnifier.zoomFactor = Math.max(1.5, Math.min(4.0, magnifier.zoomFactor + (step * 0.5)));
+                                     wheel.accepted = true;
+                                     return;
+                                 }
 
-                                const tool = window.effectiveTool;
-                                let multiplier = 1;
-                                if (tool === "text" || tool === "pixelate") multiplier = 2;
-                                else if (tool === "spotlight") multiplier = 5;
+                                 const tool = window.effectiveTool;
+                                 let multiplier = 1;
+                                 if (tool === "text" || tool === "pixelate") multiplier = 2;
+                                 else if (tool === "spotlight") multiplier = 5;
+                                 else if (tool === "callout") multiplier = 10;
 
-                                window.updateActiveIntensity(window.activeIntensity + (step * multiplier));
+                                 window.updateActiveIntensity(window.activeIntensity + (step * multiplier));
 
-                                window.previewX = wheel.x;
-                                window.previewY = wheel.y;
-                                window.showSizePreview = true;
-                                previewTimer.restart();
-                                wheel.accepted = true;
-                            }
+                                 window.previewX = wheel.x;
+                                 window.previewY = wheel.y;
+                                 window.showSizePreview = true;
+                                 previewTimer.restart();
+                                 wheel.accepted = true;
+                             }
                         }
 
                         Rectangle {
@@ -1523,6 +1575,8 @@ DankModal {
                                     base = Math.max(8, Math.min(36, window.activeIntensity * 3));
                                 } else if (tool === "spotlight") {
                                     base = 100;
+                                } else if (tool === "callout") {
+                                    base = 40; // Small anchor size for text feedback
                                 }
                                 return base * window.editScale;
                             }
@@ -1531,11 +1585,11 @@ DankModal {
                                 const tool = window.effectiveTool;
                                 if (tool === "highlighter") return window.roundHighlighter ? width / 2 : 0;
                                 if (tool === "spotlight" || tool === "rect" || tool === "redact") return window.roundRect ? (Theme.cornerRadius * window.editScale) : 0;
-                                if (tool === "pixelate" || tool === "text") return 0;
+                                if (tool === "pixelate" || tool === "text" || tool === "callout") return 0;
                                 return width / 2;
                             }
                             color: "transparent"
-                            border.color: Theme.primary
+                            border.color: window.effectiveTool === "callout" ? "transparent" : Theme.primary
                             border.width: 1.5 / drawingCanvas.scale
                             z: 20
 
@@ -1545,7 +1599,7 @@ DankModal {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: {
                                     const tool = window.effectiveTool;
-                                    if (tool === "spotlight") {
+                                    if (tool === "spotlight" || tool === "callout") {
                                         return window.activeIntensity + "%";
                                     }
                                     return window.activeIntensity + "px";
@@ -1949,6 +2003,7 @@ DankModal {
                         if (preset.tool === "text") window.textFontSize = preset.thickness;
                         else if (preset.tool === "pixelate") window.pixelateIntensity = Math.max(2, Math.min(12, preset.thickness));
                         else if (preset.tool === "spotlight") window.spotlightIntensity = Math.max(10, Math.min(95, preset.thickness));
+                        else if (preset.tool === "callout") window.calloutZoom = Math.max(100, Math.min(500, preset.thickness));
                         else window.strokeWidth = preset.thickness;
                         window.recordPresetUsage(preset);
                     }

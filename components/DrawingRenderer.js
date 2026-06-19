@@ -226,6 +226,65 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         const textW = ctx.measureText(text).width;
         ctx.fillText(text, pt.x - textW / 2, pt.y + Math.round(fontSize * 0.1));
 
+    } else if (stroke.tool === "callout") {
+        if (stroke.points.length === 4) {
+            const srcP0 = stroke.points[0];
+            const srcP1 = stroke.points[1];
+            const dstP0 = stroke.points[2];
+            const dstP1 = stroke.points[3];
+            
+            const sx = srcP0.x;
+            const sy = srcP0.y;
+            const sw = srcP1.x - srcP0.x;
+            const sh = srcP1.y - srcP0.y;
+            
+            const dx = dstP0.x;
+            const dy = dstP0.y;
+            const dw = dstP1.x - dstP0.x;
+            const dh = dstP1.y - dstP0.y;
+
+            if (sw > 0 && sh > 0 && dw > 0 && dh > 0) {
+                // 1. Draw connecting lines (dynamic corners)
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                
+                // Simple logic: connect closest horizontal corners
+                if (dx > sx + sw) { // Dest is to the right
+                    ctx.moveTo(srcP1.x, srcP0.y); ctx.lineTo(dstP0.x, dstP0.y);
+                    ctx.moveTo(srcP1.x, srcP1.y); ctx.lineTo(dstP0.x, dstP1.y);
+                } else if (dx + dw < sx) { // Dest is to the left
+                    ctx.moveTo(srcP0.x, srcP0.y); ctx.lineTo(dstP1.x, dstP0.y);
+                    ctx.moveTo(srcP0.x, srcP1.y); ctx.lineTo(dstP1.x, dstP1.y);
+                } else { // Dest is above/below
+                    ctx.moveTo(srcP0.x, srcP1.y); ctx.lineTo(dstP0.x, dstP0.y);
+                    ctx.moveTo(srcP1.x, srcP1.y); ctx.lineTo(dstP1.x, dstP0.y);
+                }
+                ctx.stroke();
+
+                // 2. Draw destination image (magnified)
+                if (config.bgImageItem && config.bgImageItem.status === 1) {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.rect(dx, dy, dw, dh);
+                    ctx.clip();
+                    ctx.drawImage(config.bgImageItem, sx, sy, sw, sh, dx, dy, dw, dh);
+                    ctx.restore();
+                }
+
+                // 3. Draw borders with high visibility
+                ctx.strokeStyle = "white";
+                ctx.lineWidth = 2;
+                ctx.strokeRect(sx, sy, sw, sh);
+                ctx.strokeRect(dx, dy, dw, dh);
+                
+                ctx.strokeStyle = "rgba(0,0,0,0.5)";
+                ctx.lineWidth = 1;
+                ctx.strokeRect(sx-1, sy-1, sw+2, sh+2);
+                ctx.strokeRect(dx-1, dy-1, dw+2, dh+2);
+            }
+        }
+
     } else if (stroke.tool === "text") {
         const pt = stroke.points[0];
         ctx.fillStyle = stroke.color;

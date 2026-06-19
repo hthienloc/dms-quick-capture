@@ -18,7 +18,8 @@ QtObject {
         { id: "stamp", icon: "looks_one", tooltip: qsTr("Number Stamp (A)") },
         { id: "highlighter", icon: "border_color", tooltip: qsTr("Highlighter (S)") },
         { id: "eraser", icon: "auto_fix_normal", tooltip: qsTr("Eraser (D)") },
-        { id: "spotlight", icon: "highlight", tooltip: qsTr("Focus Spotlight (F)") }
+        { id: "spotlight", icon: "highlight", tooltip: qsTr("Focus Spotlight (F)") },
+        { id: "callout", icon: "zoom_in", tooltip: qsTr("Area Zoom (Z) | Hold Alt for Loupe") }
     ]
 
     readonly property string selectedPreset: pluginData["color_palette_preset"] || "adaptive"
@@ -163,7 +164,8 @@ QtObject {
         { key: "A", tool: "stamp" },
         { key: "S", tool: "highlighter" },
         { key: "D", tool: "eraser" },
-        { key: "F", tool: "spotlight" }
+        { key: "F", tool: "spotlight" },
+        { key: "Z", tool: "callout" }
     ]
 
     readonly property var colorShortcuts: [

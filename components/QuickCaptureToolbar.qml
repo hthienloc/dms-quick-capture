@@ -149,7 +149,7 @@ Rectangle {
                 spacing: Theme.spacingS; anchors.verticalCenter: parent.verticalCenter
                 Text {
                     text: {
-                        if (root.activeToolType === "spotlight") {
+                        if (root.activeToolType === "spotlight" || root.activeToolType === "callout") {
                             return root.strokeWidth + "%";
                         }
                         return root.strokeWidth + "px";
@@ -159,8 +159,8 @@ Rectangle {
                 }
                 DankSlider {
                     id: hSlider
-                    minimum: root.activeToolType === "pixelate" ? 2 : (root.activeToolType === "spotlight" ? 10 : 1)
-                    maximum: root.activeToolType === "pixelate" ? 12 : (root.activeToolType === "text" ? 120 : (root.activeToolType === "spotlight" ? 95 : 50))
+                    minimum: root.activeToolType === "pixelate" ? 2 : (root.activeToolType === "spotlight" ? 10 : (root.activeToolType === "callout" ? 100 : 1))
+                    maximum: root.activeToolType === "pixelate" ? 12 : (root.activeToolType === "text" ? 120 : (root.activeToolType === "spotlight" ? 95 : (root.activeToolType === "callout" ? 500 : 50)))
                     width: 100
                     height: 36
                     showValue: false
@@ -274,7 +274,7 @@ Rectangle {
             // Thickness Text Only
             Text {
                 text: {
-                    if (root.activeToolType === "spotlight") {
+                    if (root.activeToolType === "spotlight" || root.activeToolType === "callout") {
                         return root.strokeWidth + "%";
                     }
                     return root.strokeWidth + "px";
