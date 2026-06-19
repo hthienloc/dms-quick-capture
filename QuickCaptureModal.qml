@@ -1384,7 +1384,8 @@ DankModal {
                                         for (let p of stroke.points) {
                                             orig.push(Qt.point(p.x, p.y));
                                         }
-                                            }
+                                        window.originalPoints = orig;
+                                    }
                                     return;
                                 }
 
