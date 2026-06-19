@@ -1553,6 +1553,53 @@ DankModal {
                                      return;
                                  }
 
+                                 if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "callout") {
+                                     if (window.calloutDestDragging) {
+                                         const currentZoom = window.selectedStroke.width;
+                                         const nextZoom = Math.max(100, Math.min(500, currentZoom + step * 10));
+                                         window.selectedStroke.width = nextZoom;
+                                         window.calloutZoom = nextZoom;
+                                         
+                                         if (window.selectedStroke.points.length === 4 && window.originalPoints.length === 4) {
+                                             const srcP0 = window.selectedStroke.points[0];
+                                             const srcP1 = window.selectedStroke.points[1];
+                                             const dstP0 = window.selectedStroke.points[2];
+                                             
+                                             const rw = srcP1.x - srcP0.x;
+                                             const rh = srcP1.y - srcP0.y;
+                                             const zoom = nextZoom / 100.0;
+                                             const dw = rw * zoom;
+                                             const dh = rh * zoom;
+                                             
+                                             const newPoints = [...window.selectedStroke.points];
+                                             newPoints[3] = Qt.point(dstP0.x + dw, dstP0.y + dh);
+                                             window.selectedStroke.points = newPoints;
+                                             
+                                             window.originalPoints[3] = Qt.point(window.originalPoints[2].x + dw, window.originalPoints[2].y + dh);
+                                         }
+                                     } else {
+                                         const currentBorderWidth = window.selectedStroke.borderWidth !== undefined ? window.selectedStroke.borderWidth : 2;
+                                         const nextBorderWidth = Math.max(1, Math.min(10, currentBorderWidth + step));
+                                         window.selectedStroke.borderWidth = nextBorderWidth;
+                                         window.strokeWidth = nextBorderWidth;
+                                     }
+                                     
+                                     const idx = window.strokes.indexOf(window.selectedStroke);
+                                     if (idx !== -1) {
+                                         window.strokes[idx] = window.selectedStroke;
+                                         window.strokes = [...window.strokes];
+                                     }
+                                     
+                                     window.previewX = wheel.x;
+                                     window.previewY = wheel.y;
+                                     window.showSizePreview = true;
+                                     previewTimer.restart();
+                                     
+                                     drawingCanvas.requestPaint();
+                                     wheel.accepted = true;
+                                     return;
+                                 }
+
                                  const tool = window.effectiveTool;
                                  let multiplier = 1;
                                  if (tool === "text" || tool === "pixelate") multiplier = 2;
@@ -1586,7 +1633,12 @@ DankModal {
                                 } else if (tool === "spotlight") {
                                     base = 100;
                                 } else if (tool === "callout") {
-                                    base = 40; // Small anchor size for text feedback
+                                    if (window.currentTool === "select" && !window.calloutDestDragging && window.selectedStroke) {
+                                        const bw = window.selectedStroke.borderWidth !== undefined ? window.selectedStroke.borderWidth : 2;
+                                        base = bw * 2;
+                                    } else {
+                                        base = 40; // Small anchor size for text feedback
+                                    }
                                 }
                                 return base * window.editScale;
                             }
@@ -1595,11 +1647,25 @@ DankModal {
                                 const tool = window.effectiveTool;
                                 if (tool === "highlighter") return window.roundHighlighter ? width / 2 : 0;
                                 if (tool === "spotlight" || tool === "rect" || tool === "redact") return window.roundRect ? (Theme.cornerRadius * window.editScale) : 0;
-                                if (tool === "pixelate" || tool === "text" || tool === "callout") return 0;
+                                if (tool === "pixelate" || tool === "text") return 0;
+                                if (tool === "callout") {
+                                    if (window.currentTool === "select" && !window.calloutDestDragging && window.selectedStroke) {
+                                        return width / 2;
+                                    }
+                                    return 0;
+                                }
                                 return width / 2;
                             }
                             color: "transparent"
-                            border.color: window.effectiveTool === "callout" ? "transparent" : Theme.primary
+                            border.color: {
+                                if (window.effectiveTool === "callout") {
+                                    if (window.currentTool === "select" && !window.calloutDestDragging && window.selectedStroke) {
+                                        return Theme.primary;
+                                    }
+                                    return "transparent";
+                                }
+                                return Theme.primary;
+                            }
                             border.width: 1.5 / drawingCanvas.scale
                             z: 20
 
@@ -1608,6 +1674,14 @@ DankModal {
                                 anchors.topMargin: 4 / drawingCanvas.scale
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: {
+                                    if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "callout") {
+                                        if (window.calloutDestDragging) {
+                                            return window.selectedStroke.width + "%";
+                                        } else {
+                                            const bw = window.selectedStroke.borderWidth !== undefined ? window.selectedStroke.borderWidth : 2;
+                                            return bw + "px";
+                                        }
+                                    }
                                     const tool = window.effectiveTool;
                                     if (tool === "spotlight" || tool === "callout") {
                                         return window.activeIntensity + "%";

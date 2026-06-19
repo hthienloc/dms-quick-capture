@@ -264,9 +264,11 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
             const dh = dstP1.y - dstP0.y;
 
             if (sw > 0 && sh > 0 && dw > 0 && dh > 0) {
-                // 1. Draw connecting lines (dynamic corners)
-                ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
-                ctx.lineWidth = 1;
+                const bW = stroke.borderWidth !== undefined ? stroke.borderWidth : 2;
+
+                // 1. Draw connecting lines (dynamic corners) using semi-transparent stroke color
+                ctx.strokeStyle = Qt.rgba(rgb.r, rgb.g, rgb.b, 0.6);
+                ctx.lineWidth = bW;
                 ctx.beginPath();
                 
                 // Simple logic: connect closest horizontal corners
@@ -293,15 +295,16 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
                 }
 
                 // 3. Draw borders with high visibility
-                ctx.strokeStyle = "white";
-                ctx.lineWidth = 2;
+                ctx.strokeStyle = stroke.color;
+                ctx.lineWidth = bW;
                 ctx.strokeRect(sx, sy, sw, sh);
                 ctx.strokeRect(dx, dy, dw, dh);
                 
-                ctx.strokeStyle = "rgba(0,0,0,0.5)";
+                // Contrasting outline shadow
+                ctx.strokeStyle = "rgba(0,0,0,0.4)";
                 ctx.lineWidth = 1;
-                ctx.strokeRect(sx-1, sy-1, sw+2, sh+2);
-                ctx.strokeRect(dx-1, dy-1, dw+2, dh+2);
+                ctx.strokeRect(sx - bW/2 - 0.5, sy - bW/2 - 0.5, sw + bW + 1, sh + bW + 1);
+                ctx.strokeRect(dx - bW/2 - 0.5, dy - bW/2 - 0.5, dw + bW + 1, dh + bW + 1);
             }
         }
 
