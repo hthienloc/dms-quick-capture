@@ -227,11 +227,31 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         ctx.fillText(text, pt.x - textW / 2, pt.y + Math.round(fontSize * 0.1));
 
     } else if (stroke.tool === "callout") {
-        if (stroke.points.length === 4) {
-            const srcP0 = stroke.points[0];
-            const srcP1 = stroke.points[1];
-            const dstP0 = stroke.points[2];
-            const dstP1 = stroke.points[3];
+        if (stroke.points.length === 4 || stroke.points.length >= 2) {
+            let srcP0, srcP1, dstP0, dstP1;
+            if (stroke.points.length === 4) {
+                srcP0 = stroke.points[0];
+                srcP1 = stroke.points[1];
+                dstP0 = stroke.points[2];
+                dstP1 = stroke.points[3];
+            } else {
+                const p0 = stroke.points[0];
+                const p1 = stroke.points[stroke.points.length - 1];
+                
+                srcP0 = { x: Math.min(p0.x, p1.x), y: Math.min(p0.y, p1.y) };
+                srcP1 = { x: Math.max(p0.x, p1.x), y: Math.max(p0.y, p1.y) };
+                
+                const rw = srcP1.x - srcP0.x;
+                const rh = srcP1.y - srcP0.y;
+                const zoom = stroke.width / 100.0;
+                const dw = rw * zoom;
+                const dh = rh * zoom;
+                const dx = srcP1.x + 50;
+                const dy = srcP1.y + 50;
+                
+                dstP0 = { x: dx, y: dy };
+                dstP1 = { x: dx + dw, y: dy + dh };
+            }
             
             const sx = srcP0.x;
             const sy = srcP0.y;
