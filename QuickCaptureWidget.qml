@@ -314,7 +314,7 @@ PluginComponent {
                 Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
 
                 DankIcon {
-                    name: root.isDownloading ? "download" : "photo_camera"
+                    name: root.isDownloading ? "download" : "screenshot_region"
                     size: Theme.iconSizeSmall
                     color: draggingOver ? Theme.primary : (root.isCapturing || modal.shouldBeVisible || root.isDownloading ? Theme.primary : Theme.surfaceText)
                     anchors.verticalCenter: parent.verticalCenter
@@ -359,7 +359,7 @@ PluginComponent {
                 Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
 
                 DankIcon {
-                    name: root.isDownloading ? "download" : "photo_camera"
+                    name: root.isDownloading ? "download" : "screenshot_region"
                     size: Theme.iconSizeSmall
                     color: draggingOver ? Theme.primary : (root.isCapturing || modal.shouldBeVisible || root.isDownloading ? Theme.primary : Theme.surfaceText)
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -394,7 +394,7 @@ PluginComponent {
     pillRightClickAction: function() { root.fromClipboard(); }
 
     // Control Center Integration
-    ccWidgetIcon: "photo_camera"
+    ccWidgetIcon: "screenshot_region"
     ccWidgetPrimaryText: "Quick Capture"
     ccWidgetSecondaryText: isCapturing ? "Capturing..." : (modal.shouldBeVisible ? "Annotating" : "Ready")
     ccWidgetIsActive: modal.shouldBeVisible || isCapturing

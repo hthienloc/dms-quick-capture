@@ -3,9 +3,9 @@
     "id": "quickCapture",
     "name": "Quick Capture",
     "description": "Instant screenshot and overlay annotation utility for Wayland",
-    "version": "2.4.1",
+    "version": "2.4.2",
     "author": "Loc Huynh",
-    "icon": "photo_camera",
+    "icon": "screenshot_region",
     "type": "daemon",
     "capabilities": [
         "control-center",
