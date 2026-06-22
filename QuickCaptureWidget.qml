@@ -72,32 +72,45 @@ PluginComponent {
     }
 
     function startActualCapture() {
-        // 0ms debounce (execute instantly)
-        // 60 seconds timeout
-
-        Proc.runCommand("screenshot-trigger", root.screenshotArgs(), (stdout, exitCode) => {
-            if (exitCode === 0) {
-                root.isCapturing = false;
-                root.activeIpcMode = "";
-                root.resolvedDmsPath = "dms"; // reset to default path on success
-                modal.shouldBeVisible = true;
-                modal.openCentered();
-            } else {
-                if (root.resolvedDmsPath === "dms") {
-                    root.resolvedDmsPath = "/usr/local/bin/dms";
-                    root.startActualCapture();
-                } else if (root.resolvedDmsPath === "/usr/local/bin/dms") {
-                    root.resolvedDmsPath = "/usr/bin/dms";
-                    root.startActualCapture();
+        // Delete any existing capture file before taking the screenshot.
+        // This lets us detect ESC cancellation when `dms screenshot region`
+        // incorrectly returns exit code 0 without writing a new file.
+        Proc.runCommand("pre-capture-cleanup", ["rm", "-f", "/tmp/dms_capture_bg.png"], () => {
+            Proc.runCommand("screenshot-trigger", root.screenshotArgs(), (stdout, exitCode) => {
+                if (exitCode === 0) {
+                    // Verify the file was actually written before opening the editor.
+                    // If the user pressed ESC, dms may return 0 but write no file.
+                    Proc.runCommand("verify-capture", ["test", "-f", "/tmp/dms_capture_bg.png"], (_, fileExists) => {
+                        if (fileExists === 0) {
+                            root.isCapturing = false;
+                            root.activeIpcMode = "";
+                            root.resolvedDmsPath = "dms"; // reset to default path on success
+                            modal.shouldBeVisible = true;
+                            modal.openCentered();
+                        } else {
+                            // File not written — user cancelled with ESC. Reset silently.
+                            root.isCapturing = false;
+                            root.activeIpcMode = "";
+                            root.resolvedDmsPath = "dms";
+                        }
+                    });
                 } else {
-                    root.isCapturing = false;
-                    root.activeIpcMode = "";
-                    root.resolvedDmsPath = "dms"; // reset to default path for next attempts
-                    if (typeof ToastService !== "undefined" && ToastService)
-                        ToastService.showError("Screenshot canceled or failed.");
+                    if (root.resolvedDmsPath === "dms") {
+                        root.resolvedDmsPath = "/usr/local/bin/dms";
+                        root.startActualCapture();
+                    } else if (root.resolvedDmsPath === "/usr/local/bin/dms") {
+                        root.resolvedDmsPath = "/usr/bin/dms";
+                        root.startActualCapture();
+                    } else {
+                        root.isCapturing = false;
+                        root.activeIpcMode = "";
+                        root.resolvedDmsPath = "dms"; // reset to default path for next attempts
+                        if (typeof ToastService !== "undefined" && ToastService)
+                            ToastService.showError("Screenshot canceled or failed.");
+                    }
                 }
-            }
-        }, 0, 60000);
+            }, 0, 60000);
+        });
     }
 
     function closeOverlay() {
