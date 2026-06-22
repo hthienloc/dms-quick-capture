@@ -1054,7 +1054,7 @@ PluginSettings {
                         "label": I18n.tr("Pixelate"),
                         "value": "pixelate"
                     }, {
-                        "label": I18n.tr("Redact / Blackout"),
+                        "label": I18n.tr("Redact"),
                         "value": "redact"
                     }, {
                         "label": I18n.tr("Number Stamp"),
@@ -1512,7 +1512,7 @@ PluginSettings {
                 "label": I18n.tr("Pixelate"),
                 "value": "pixelate"
             }, {
-                "label": I18n.tr("Redact / Blackout"),
+                "label": I18n.tr("Redact"),
                 "value": "redact"
             }, {
                 "label": I18n.tr("Number Stamp"),

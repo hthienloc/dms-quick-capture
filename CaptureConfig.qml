@@ -14,7 +14,7 @@ QtObject {
         { id: "ellipse", icon: "radio_button_unchecked", tooltip: qsTr("Ellipse / Circle (Q)") },
         { id: "text", icon: "text_fields", tooltip: qsTr("Text Note (W)") },
         { id: "pixelate", icon: "blur_on", tooltip: qsTr("Pixelate (E)") },
-        { id: "redact", icon: "square", tooltip: qsTr("Redact / Blackout (R)") },
+        { id: "redact", icon: "ad_off", tooltip: qsTr("Redact (R)") },
         { id: "stamp", icon: "looks_one", tooltip: qsTr("Number Stamp (A)") },
         { id: "highlighter", icon: "border_color", tooltip: qsTr("Highlighter (S)") },
         { id: "eraser", icon: "auto_fix_normal", tooltip: qsTr("Eraser (D)") },
