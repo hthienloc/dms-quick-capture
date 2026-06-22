@@ -45,7 +45,7 @@ Rectangle {
 
     color: Theme.withAlpha(Theme.surfaceContainer, 0.95)
     border.color: showBorder ? Theme.primary : Theme.withAlpha(Theme.outline, 0.15)
-    border.width: showBorder ? 2 : 1
+    border.width: showBorder ? 1.5 : 1
 
     Item {
         id: contentLayout
