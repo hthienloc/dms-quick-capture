@@ -23,6 +23,10 @@ PluginComponent {
     readonly property bool isAnnotating: modal.shouldBeVisible
 
     // ── Capture helpers ───────────────────────────────────────────────────────
+    function screenshotMode() {
+        return root.activeIpcMode !== "" ? root.activeIpcMode : root.captureMode;
+    }
+
     function screenshotArgs() {
         const mode = root.activeIpcMode !== "" ? root.activeIpcMode : root.captureMode;
         const format = "png";
@@ -96,7 +100,7 @@ PluginComponent {
                         root.activeIpcMode = "";
                         root.resolvedDmsPath = "dms"; // reset to default path for next attempts
                         if (typeof ToastService !== "undefined" && ToastService)
-                            ToastService.showError("Screenshot canceled or failed.");
+                            ToastService.showError("Screenshot failed (mode: " + root.screenshotMode() + ").");
                     }
                 }
             }, 0, 60000);
