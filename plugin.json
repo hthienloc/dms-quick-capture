@@ -3,17 +3,17 @@
     "id": "quickCapture",
     "name": "Quick Capture",
     "description": "Instant screenshot and overlay annotation utility for Wayland",
-    "version": "2.4.2",
+    "version": "2.5.0",
     "author": "Loc Huynh",
     "icon": "screenshot_region",
-    "type": "daemon",
+    "type": "composite",
     "capabilities": [
+        "daemon",
         "control-center",
         "dankbar-widget"
     ],
-    "component": "./QuickCaptureWidget.qml",
     "components": {
-        "daemon": "./QuickCaptureWidget.qml",
+        "daemon": "./QuickCaptureDaemon.qml",
         "widget": "./QuickCaptureWidget.qml"
     },
     "settings": "./QuickCaptureSettings.qml",
