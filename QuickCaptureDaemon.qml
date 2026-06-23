@@ -65,7 +65,16 @@ PluginComponent {
         // Delete any existing capture file before taking the screenshot.
         // This lets us detect ESC cancellation when `dms screenshot region`
         // incorrectly returns exit code 0 without writing a new file.
-        Proc.runCommand("pre-capture-cleanup", ["rm", "-f", "/tmp/dms_capture_bg.png"], () => {
+        //
+        // For region mode, sleep 400ms first so the bar layer-shell releases
+        // mouse/keyboard input before dms screenshot tries to show its overlay.
+        const captureMode = root.activeIpcMode !== "" ? root.activeIpcMode : root.captureMode;
+        const needsInputRelease = (captureMode === "region" || captureMode === "");
+        const cleanupAndShoot = needsInputRelease
+            ? ["sh", "-c", "sleep 0.4 && rm -f /tmp/dms_capture_bg.png"]
+            : ["rm", "-f", "/tmp/dms_capture_bg.png"];
+
+        Proc.runCommand("pre-capture-cleanup", cleanupAndShoot, () => {
             Proc.runCommand("screenshot-trigger", root.screenshotArgs(), (stdout, exitCode) => {
                 if (exitCode === 0) {
                     // Verify the file was actually written before opening the editor.
