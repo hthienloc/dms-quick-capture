@@ -62,30 +62,39 @@ PluginComponent {
     }
 
     function startActualCapture() {
-        // 0ms debounce (execute instantly), 60s timeout
-        Proc.runCommand("screenshot-trigger", root.screenshotArgs(), (stdout, exitCode) => {
-            if (exitCode === 0) {
-                root.isCapturing = false;
-                root.activeIpcMode = "";
-                root.resolvedDmsPath = "dms";
-                modal.shouldBeVisible = true;
-                modal.openCentered();
-            } else {
-                if (root.resolvedDmsPath === "dms") {
-                    root.resolvedDmsPath = "/usr/local/bin/dms";
-                    root.startActualCapture();
-                } else if (root.resolvedDmsPath === "/usr/local/bin/dms") {
-                    root.resolvedDmsPath = "/usr/bin/dms";
-                    root.startActualCapture();
+        Proc.runCommand("pre-capture-cleanup", ["rm", "-f", "/tmp/dms_capture_bg.png"], () => {
+            Proc.runCommand("screenshot-trigger", root.screenshotArgs(), (stdout, exitCode) => {
+                if (exitCode === 0) {
+                    Proc.runCommand("verify-capture", ["test", "-f", "/tmp/dms_capture_bg.png"], (_, fileExists) => {
+                        if (fileExists === 0) {
+                            root.isCapturing = false;
+                            root.activeIpcMode = "";
+                            root.resolvedDmsPath = "dms";
+                            modal.shouldBeVisible = true;
+                            modal.openCentered();
+                        } else {
+                            root.isCapturing = false;
+                            root.activeIpcMode = "";
+                            root.resolvedDmsPath = "dms";
+                        }
+                    });
                 } else {
-                    root.isCapturing = false;
-                    root.activeIpcMode = "";
-                    root.resolvedDmsPath = "dms";
-                    if (typeof ToastService !== "undefined" && ToastService)
-                        ToastService.showError("Screenshot canceled or failed.");
+                    if (root.resolvedDmsPath === "dms") {
+                        root.resolvedDmsPath = "/usr/local/bin/dms";
+                        root.startActualCapture();
+                    } else if (root.resolvedDmsPath === "/usr/local/bin/dms") {
+                        root.resolvedDmsPath = "/usr/bin/dms";
+                        root.startActualCapture();
+                    } else {
+                        root.isCapturing = false;
+                        root.activeIpcMode = "";
+                        root.resolvedDmsPath = "dms";
+                        if (typeof ToastService !== "undefined" && ToastService)
+                            ToastService.showError("Screenshot canceled or failed.");
+                    }
                 }
-            }
-        }, 0, 60000);
+            }, 0, 60000);
+        });
     }
 
     function closeOverlay() {
@@ -109,34 +118,11 @@ PluginComponent {
                 root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
             } else if (output.startsWith("TEXT:")) {
                 let text = output.substring(5).trim();
-                if (text.startsWith("file://")) {
-                    text = text.substring(7);
-                }
-                if (text.startsWith("http://") || text.startsWith("https://")) {
-                    root.isDownloading = true;
-                    Proc.runCommand("download-image", ["curl", "-s", "-L", "-o", "/tmp/dms_capture_bg.png", text], (stdout, exitCode) => {
-                        root.isDownloading = false;
-                        if (exitCode === 0) {
-                            root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
-                        } else {
-                            if (typeof ToastService !== "undefined" && ToastService) {
-                                ToastService.showError("Failed to download image from URL.");
-                            }
-                        }
-                    });
-                } else if (text.startsWith("/") || text.length > 0) {
-                    Proc.runCommand("copy-image", ["cp", "-f", text, "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
-                        if (exitCode === 0) {
-                            root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
-                        } else {
-                            if (typeof ToastService !== "undefined" && ToastService) {
-                                ToastService.showError("Failed to copy image from local path.");
-                            }
-                        }
-                    });
-                } else {
+                if (text === "") {
                     if (typeof ToastService !== "undefined" && ToastService)
                         ToastService.showError("Clipboard text is not a valid URL or path.");
+                } else {
+                    root.loadImageFromUri(text);
                 }
             } else {
                 if (typeof ToastService !== "undefined" && ToastService)
@@ -178,6 +164,31 @@ PluginComponent {
         });
     }
 
+    function loadImageFromUri(uri) {
+        if (uri.startsWith("file://"))
+            uri = uri.substring(7);
+
+        if (uri.startsWith("http://") || uri.startsWith("https://")) {
+            root.isDownloading = true;
+            Proc.runCommand("download-image", ["curl", "-s", "-L", "-o", "/tmp/dms_capture_bg.png", uri], (stdout, exitCode) => {
+                root.isDownloading = false;
+                if (exitCode === 0) {
+                    root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
+                } else if (typeof ToastService !== "undefined" && ToastService) {
+                    ToastService.showError("Failed to download image.");
+                }
+            });
+        } else {
+            Proc.runCommand("copy-image", ["cp", "-f", uri, "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
+                if (exitCode === 0) {
+                    root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
+                } else if (typeof ToastService !== "undefined" && ToastService) {
+                    ToastService.showError("Failed to copy image.");
+                }
+            });
+        }
+    }
+
     function handleDrop(drop) {
         root.restoringFromFloat = false;
         let urlStr = "";
@@ -197,40 +208,7 @@ PluginComponent {
             return;
         }
 
-        if (urlStr.startsWith("http://") || urlStr.startsWith("https://")) {
-            root.isDownloading = true;
-            Proc.runCommand("download-image", ["curl", "-s", "-L", "-o", "/tmp/dms_capture_bg.png", urlStr], (stdout, exitCode) => {
-                root.isDownloading = false;
-                if (exitCode === 0) {
-                    validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
-                } else {
-                    if (typeof ToastService !== "undefined" && ToastService) {
-                        ToastService.showError("Failed to download dropped image.");
-                    }
-                }
-            });
-        } else if (urlStr.startsWith("file://")) {
-            const path = urlStr.substring(7);
-            Proc.runCommand("copy-image", ["cp", "-f", path, "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
-                if (exitCode === 0) {
-                    validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
-                } else {
-                    if (typeof ToastService !== "undefined" && ToastService) {
-                        ToastService.showError("Failed to copy local image.");
-                    }
-                }
-            });
-        } else {
-            Proc.runCommand("copy-image", ["cp", "-f", urlStr, "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
-                if (exitCode === 0) {
-                    validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
-                } else {
-                    if (typeof ToastService !== "undefined" && ToastService) {
-                        ToastService.showError("Failed to copy local image.");
-                    }
-                }
-            });
-        }
+        root.loadImageFromUri(urlStr);
     }
 
     // ── Plugin identity ───────────────────────────────────────────────────────
@@ -259,28 +237,11 @@ PluginComponent {
         }
 
         function openImage(path: string) : string {
-            if (path.startsWith("file://")) {
-                path = path.substring(7);
-            }
+            root.restoringFromFloat = (path === "/tmp/dms_capture_float.png");
             if (path === "/tmp/dms_capture_bg.png" || path === "/tmp/dms_capture_float.png") {
-                root.restoringFromFloat = (path === "/tmp/dms_capture_float.png");
                 root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
-            } else if (path.startsWith("http://") || path.startsWith("https://")) {
-                root.restoringFromFloat = false;
-                root.isDownloading = true;
-                Proc.runCommand("download-image", ["curl", "-s", "-L", "-o", "/tmp/dms_capture_bg.png", path], (stdout, exitCode) => {
-                    root.isDownloading = false;
-                    if (exitCode === 0) {
-                        root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
-                    }
-                });
             } else {
-                root.restoringFromFloat = false;
-                Proc.runCommand("copy-image", ["cp", "-f", path, "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
-                    if (exitCode === 0) {
-                        root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
-                    }
-                });
+                root.loadImageFromUri(path);
             }
             return "SUCCESS";
         }
