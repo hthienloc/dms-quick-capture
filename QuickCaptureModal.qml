@@ -724,7 +724,7 @@ DankModal {
         let startThickness = 6;
         let startColor = Theme.primary;
 
-        const defaultToolMode = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.defaultToolMode || "custom") : "custom";
+        const defaultToolMode = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.defaultToolMode || "preset") : "preset";
         if (defaultToolMode === "preset") {
             const presetIdxRaw = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.defaultPresetIndex || "0") : "0";
             const presetIdx = parseInt(presetIdxRaw, 10);
@@ -747,12 +747,7 @@ DankModal {
             }
         }
 
-        const captureMode = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.captureMode || "region") : "region";
-        if (captureMode === "region") {
-            window.currentTool = startTool;
-        } else {
-            window.currentTool = "crop";
-        }
+        window.currentTool = startTool;
         window.toolbarVisible = window.configShowToolbar;
         window.strokeWidth = startThickness;
         window.currentColor = startColor;
