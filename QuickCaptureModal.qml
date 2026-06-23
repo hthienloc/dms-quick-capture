@@ -724,27 +724,23 @@ DankModal {
         let startThickness = 6;
         let startColor = Theme.primary;
 
-        const defaultToolMode = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.defaultToolMode || "preset") : "preset";
+        const defaultToolMode = config.pluginData.defaultToolMode || "preset";
         if (defaultToolMode === "preset") {
-            const presetIdxRaw = window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.defaultPresetIndex || "0") : "0";
+            const presetIdxRaw = config.pluginData.defaultPresetIndex || "0";
             const presetIdx = parseInt(presetIdxRaw, 10);
-            const t = window.parentWidget && window.parentWidget.pluginData ? window.parentWidget.pluginData["preset_" + presetIdx + "_tool"] : undefined;
+            const t = config.pluginData["preset_" + presetIdx + "_tool"];
             if (t && t !== "none") {
                 startTool = t;
-                const rawColor = window.parentWidget.pluginData["preset_" + presetIdx + "_color"] || Theme.primary;
+                const rawColor = config.pluginData["preset_" + presetIdx + "_color"] || Theme.primary;
                 startColor = config.resolveColor(rawColor);
-                startThickness = window.parentWidget.pluginData["preset_" + presetIdx + "_thickness"] || 6;
+                startThickness = config.pluginData["preset_" + presetIdx + "_thickness"] || 6;
             } else {
-                if (window.parentWidget && window.parentWidget.pluginData) {
-                    startTool = window.parentWidget.pluginData.defaultTool || "pen";
-                    startThickness = window.parentWidget.pluginData.defaultThickness || 6;
-                }
+                startTool = config.pluginData.defaultTool || "pen";
+                startThickness = config.pluginData.defaultThickness || 6;
             }
         } else {
-            if (window.parentWidget && window.parentWidget.pluginData) {
-                startTool = window.parentWidget.pluginData.defaultTool || "pen";
-                startThickness = window.parentWidget.pluginData.defaultThickness || 6;
-            }
+            startTool = config.pluginData.defaultTool || "pen";
+            startThickness = config.pluginData.defaultThickness || 6;
         }
 
         window.currentTool = startTool;
