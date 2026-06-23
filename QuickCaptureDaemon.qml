@@ -344,4 +344,21 @@ PluginComponent {
             close();
         }
     }
+
+    // ── Lifecycle: register self so widget surface can delegate to daemon ─────
+    Component.onCompleted: {
+        if (pluginService && pluginId) {
+            const newInstances = Object.assign({}, pluginService.pluginInstances);
+            newInstances[pluginId] = root;
+            pluginService.pluginInstances = newInstances;
+        }
+    }
+
+    Component.onDestruction: {
+        if (pluginService && pluginService.pluginInstances[pluginId] === root) {
+            const newInstances = Object.assign({}, pluginService.pluginInstances);
+            delete newInstances[pluginId];
+            pluginService.pluginInstances = newInstances;
+        }
+    }
 }

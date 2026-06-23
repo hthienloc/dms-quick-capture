@@ -1,6 +1,5 @@
 import "./dms-common"
 import QtQuick
-import QtQuick.Controls
 import Quickshell
 import qs.Common
 import qs.Modules.Plugins
