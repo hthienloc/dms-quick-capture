@@ -786,6 +786,10 @@ DankModal {
                                 if (s.isItalic !== undefined) stroke.isItalic = s.isItalic;
                                 if (s.isUnderline !== undefined) stroke.isUnderline = s.isUnderline;
                                 if (s.counter !== undefined) stroke.counter = s.counter;
+                                if (s.format !== undefined) stroke.format = s.format;
+                                if (s.hasBackground !== undefined) stroke.hasBackground = s.hasBackground;
+                                if (s.cornerRadius !== undefined) stroke.cornerRadius = s.cornerRadius;
+                                if (s.borderWidth !== undefined) stroke.borderWidth = s.borderWidth;
                                 restoredStrokes.push(stroke);
                             }
                             window.strokes = restoredStrokes;

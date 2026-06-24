@@ -317,6 +317,10 @@ QtObject {
                     if (s.isItalic !== undefined) newStroke.isItalic = s.isItalic;
                     if (s.isUnderline !== undefined) newStroke.isUnderline = s.isUnderline;
                     if (s.counter !== undefined) newStroke.counter = s.counter;
+                    if (s.format !== undefined) newStroke.format = s.format;
+                    if (s.hasBackground !== undefined) newStroke.hasBackground = s.hasBackground;
+                    if (s.cornerRadius !== undefined) newStroke.cornerRadius = s.cornerRadius;
+                    if (s.borderWidth !== undefined) newStroke.borderWidth = s.borderWidth;
                     serializedStrokes.push(newStroke);
                 }
 

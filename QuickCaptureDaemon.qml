@@ -247,6 +247,8 @@ PluginComponent {
         }
 
         function openImage(path: string) : string {
+            if (path.startsWith("file://"))
+                path = path.substring(7);
             root.restoringFromFloat = (path === "/tmp/dms_capture_float.png");
             if (path === "/tmp/dms_capture_bg.png" || path === "/tmp/dms_capture_float.png") {
                 root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
