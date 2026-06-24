@@ -247,12 +247,33 @@ PluginComponent {
         }
 
         function openImage(path: string) : string {
-            if (path.startsWith("file://"))
+            if (path.startsWith("file://")) {
                 path = path.substring(7);
-            root.restoringFromFloat = (path === "/tmp/dms_capture_float.png");
-            if (path === "/tmp/dms_capture_bg.png" || path === "/tmp/dms_capture_float.png") {
+            }
+            if (path === "/tmp/dms_capture_bg.png") {
+                root.restoringFromFloat = false;
                 root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
+            } else if (path.startsWith("/tmp/dms_capture_float/")) {
+                const floatBase = path.replace(/\.png$/, "");
+                const bgPath = floatBase + "_bg.png";
+                const strokesPath = floatBase + "_strokes.json";
+                Proc.runCommand("check-float-bg", ["test", "-f", bgPath], (_, bgExists) => {
+                    if (bgExists === 0) {
+                        Proc.runCommand("cp-float-bg", ["cp", "-f", bgPath, "/tmp/dms_capture_bg.png"], () => {
+                            Proc.runCommand("cp-float-strokes", ["cp", "-f", strokesPath, "/tmp/dms_capture_strokes.json"], () => {
+                                root.restoringFromFloat = true;
+                                root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
+                            });
+                        });
+                    } else {
+                        Proc.runCommand("cp-float-img", ["cp", "-f", path, "/tmp/dms_capture_bg.png"], () => {
+                            root.restoringFromFloat = false;
+                            root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
+                        });
+                    }
+                });
             } else {
+                root.restoringFromFloat = false;
                 root.loadImageFromUri(path);
             }
             return "SUCCESS";

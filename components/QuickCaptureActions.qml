@@ -337,16 +337,23 @@ QtObject {
                     }
                     
                     // 4. Float the baked image
-                    const cmd = "cp -f -- " + shellPathExpression(finalPath) + " /tmp/dms_capture_float.png" +
-                                " && dms ipc call floaty floatFromUrl file:///tmp/dms_capture_float.png";
-                    Proc.runCommand("float-capture", ["sh", "-c", cmd], (stdout, exitCode) => {
-                        if (exitCode === 0) {
-                            root.closeRequested();
-                        } else {
-                            notifyError("Failed to float image (make sure dms-floaty is running).");
-                        }
-                        cleanupTemp(finalPath);
-                        if (originalPng) cleanupTemp(originalPng);
+                    const floatDest = "/tmp/dms_capture_float/" + Date.now() + ".png";
+                    const floatBase = floatDest.replace(/\.png$/, "");
+
+                    Proc.runCommand("mkdir-float-dir", ["mkdir", "-p", "/tmp/dms_capture_float"], () => {
+                        Proc.runCommand("cp-float", ["cp", "-f", finalPath, floatDest], () => {
+                            Proc.runCommand("cp-float-bg", ["cp", "-f", "/tmp/dms_capture_bg.png", floatBase + "_bg.png"]);
+                            Proc.runCommand("cp-float-strokes", ["cp", "-f", "/tmp/dms_capture_strokes.json", floatBase + "_strokes.json"]);
+                            Proc.runCommand("float-capture", ["dms", "ipc", "call", "floaty", "floatFromUrl", "file://" + floatDest], (stdout, exitCode) => {
+                                if (exitCode === 0) {
+                                    root.closeRequested();
+                                } else {
+                                    notifyError("Failed to float image (make sure dms-floaty is running).");
+                                }
+                                cleanupTemp(finalPath);
+                                if (originalPng) cleanupTemp(originalPng);
+                            });
+                        });
                     });
                 });
             });
