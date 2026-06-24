@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Services
+import "StrokeProperties.js" as StrokeProps
 
 QtObject {
     id: root
@@ -310,17 +311,7 @@ QtObject {
                             newStroke.points.push({ x: s.points[j].x, y: s.points[j].y });
                         }
                     }
-                    if (s.text !== undefined) newStroke.text = s.text;
-                    if (s.isMonospace !== undefined) newStroke.isMonospace = s.isMonospace;
-                    if (s.fontFamily !== undefined) newStroke.fontFamily = s.fontFamily;
-                    if (s.isBold !== undefined) newStroke.isBold = s.isBold;
-                    if (s.isItalic !== undefined) newStroke.isItalic = s.isItalic;
-                    if (s.isUnderline !== undefined) newStroke.isUnderline = s.isUnderline;
-                    if (s.counter !== undefined) newStroke.counter = s.counter;
-                    if (s.format !== undefined) newStroke.format = s.format;
-                    if (s.hasBackground !== undefined) newStroke.hasBackground = s.hasBackground;
-                    if (s.cornerRadius !== undefined) newStroke.cornerRadius = s.cornerRadius;
-                    if (s.borderWidth !== undefined) newStroke.borderWidth = s.borderWidth;
+                    StrokeProps.copyStrokeProperties(s, newStroke);
                     serializedStrokes.push(newStroke);
                 }
 
