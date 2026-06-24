@@ -10,6 +10,7 @@ import "./dms-common"
 import "components"
 import "components/Helpers.js" as Helpers
 import "components/DrawingRenderer.js" as DrawingRenderer
+import "components/StrokeProperties.js" as StrokeProps
 
 DankModal {
     id: window
@@ -310,10 +311,9 @@ DankModal {
             tool: window.copiedStroke.tool,
             color: window.copiedStroke.color,
             width: window.copiedStroke.width,
-            points: newPoints,
-            counter: window.copiedStroke.counter
+            points: newPoints
         };
-        
+        StrokeProps.copyStrokeProperties(window.copiedStroke, pasted);
         window.pushStroke(pasted);
         
         if (window.currentTool === "select") {
@@ -610,9 +610,9 @@ DankModal {
                     tool: window.selectedStroke.tool,
                     color: window.selectedStroke.color.toString(),
                     width: window.selectedStroke.width,
-                    points: window.selectedStroke.points.map(p => Qt.point(p.x, p.y)),
-                    counter: window.selectedStroke.counter
+                    points: window.selectedStroke.points.map(p => Qt.point(p.x, p.y))
                 };
+                StrokeProps.copyStrokeProperties(window.selectedStroke, window.copiedStroke);
                 window.performPasteAction();
                 event.accepted = true;
                 return;
@@ -779,13 +779,7 @@ DankModal {
                                         stroke.points.push(Qt.point(s.points[j].x, s.points[j].y));
                                     }
                                 }
-                                if (s.text !== undefined) stroke.text = s.text;
-                                if (s.isMonospace !== undefined) stroke.isMonospace = s.isMonospace;
-                                if (s.fontFamily !== undefined) stroke.fontFamily = s.fontFamily;
-                                if (s.isBold !== undefined) stroke.isBold = s.isBold;
-                                if (s.isItalic !== undefined) stroke.isItalic = s.isItalic;
-                                if (s.isUnderline !== undefined) stroke.isUnderline = s.isUnderline;
-                                if (s.counter !== undefined) stroke.counter = s.counter;
+                                StrokeProps.copyStrokeProperties(s, stroke);
                                 restoredStrokes.push(stroke);
                             }
                             window.strokes = restoredStrokes;
