@@ -1156,6 +1156,8 @@ DankModal {
                                 bgImageItem: window.bgImageItem,
                                 canvasWidth: window.canvasWidth,
                                 canvasHeight: window.canvasHeight,
+                                canvasMinX: (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.x : 0,
+                                canvasMinY: (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.y : 0,
                             });
                         }
 
@@ -1515,33 +1517,38 @@ DankModal {
                                         const dw = rw * zoom;
                                         const dh = rh * zoom;
 
-                                        // Smart placement: place destination on the opposite side
-                                        // of the source relative to the canvas center
+                                        // Visible canvas bounds in absolute coordinates
+                                        const visX = (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.x : 0;
+                                        const visY = (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.y : 0;
+                                        const visW = window.canvasWidth;
+                                        const visH = window.canvasHeight;
+
+                                        // Smart placement: opposite side of source relative to visible area center
                                         const srcMinX = Math.min(p0.x, p1.x);
                                         const srcMaxX = Math.max(p0.x, p1.x);
                                         const srcMinY = Math.min(p0.y, p1.y);
                                         const srcMaxY = Math.max(p0.y, p1.y);
                                         const srcCx = (srcMinX + srcMaxX) / 2;
                                         const srcCy = (srcMinY + srcMaxY) / 2;
-                                        const canvasCx = window.canvasWidth / 2;
-                                        const canvasCy = window.canvasHeight / 2;
+                                        const visCx = visX + visW / 2;
+                                        const visCy = visY + visH / 2;
 
-                                        // Direction from source center toward canvas center
-                                        const dirX = canvasCx - srcCx >= 0 ? 1 : -1; // 1 = right, -1 = left
-                                        const dirY = canvasCy - srcCy >= 0 ? 1 : -1; // 1 = down,  -1 = up
+                                        const dirX = visCx - srcCx >= 0 ? 1 : -1;
+                                        const dirY = visCy - srcCy >= 0 ? 1 : -1;
 
                                         let dx = dirX > 0 ? srcMaxX + margin : srcMinX - dw - margin;
                                         let dy = dirY > 0 ? srcMaxY + margin : srcMinY - dh - margin;
 
-                                        // Clamp to canvas bounds
-                                        dx = Math.max(margin, Math.min(dx, window.canvasWidth - dw - margin));
-                                        dy = Math.max(margin, Math.min(dy, window.canvasHeight - dh - margin));
+                                        const rightBound = visX + visW - dw - margin;
+                                        const bottomBound = visY + visH - dh - margin;
+                                        dx = Math.max(visX + margin, Math.min(dx, rightBound));
+                                        dy = Math.max(visY + margin, Math.min(dy, bottomBound));
                                         
                                         stroke.points = [
-                                            Qt.point(srcMinX, srcMinY), // Source TL
-                                            Qt.point(srcMaxX, srcMaxY), // Source BR
-                                            Qt.point(dx, dy), // Dest TL
-                                            Qt.point(dx + dw, dy + dh) // Dest BR
+                                            Qt.point(srcMinX, srcMinY),
+                                            Qt.point(srcMaxX, srcMaxY),
+                                            Qt.point(dx, dy),
+                                            Qt.point(dx + dw, dy + dh)
                                         ];
                                     } else {
                                         window.currentStroke = null;
