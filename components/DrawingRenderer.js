@@ -286,12 +286,26 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
 
                 // 2. Draw destination image (magnified)
                 if (config.bgImageItem && config.bgImageItem.status === 1) {
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.rect(dx, dy, dw, dh);
-                    ctx.clip();
-                    ctx.drawImage(config.bgImageItem, sx, sy, sw, sh, dx, dy, dw, dh);
-                    ctx.restore();
+                    const imgW = config.bgImageItem.sourceSize
+                        ? config.bgImageItem.sourceSize.width
+                        : (config.bgImageItem.width || 0);
+                    const imgH = config.bgImageItem.sourceSize
+                        ? config.bgImageItem.sourceSize.height
+                        : (config.bgImageItem.height || 0);
+                    if (imgW > 0 && imgH > 0) {
+                        const clampSX = Math.max(0, Math.min(sx, imgW - 1));
+                        const clampSY = Math.max(0, Math.min(sy, imgH - 1));
+                        const clampSW = Math.min(sw, imgW - clampSX);
+                        const clampSH = Math.min(sh, imgH - clampSY);
+                        if (clampSW > 0 && clampSH > 0) {
+                            ctx.save();
+                            ctx.beginPath();
+                            ctx.rect(dx, dy, dw, dh);
+                            ctx.clip();
+                            ctx.drawImage(config.bgImageItem, clampSX, clampSY, clampSW, clampSH, dx, dy, dw, dh);
+                            ctx.restore();
+                        }
+                    }
                 }
 
                 // 3. Draw borders with high visibility
