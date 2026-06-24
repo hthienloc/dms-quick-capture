@@ -246,8 +246,20 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
                 const zoom = stroke.width / 100.0;
                 const dw = rw * zoom;
                 const dh = rh * zoom;
-                const dx = srcP1.x + 50;
-                const dy = srcP1.y + 50;
+
+                // Smart placement: opposite side of source relative to canvas center
+                const srcCx = (srcP0.x + srcP1.x) / 2;
+                const srcCy = (srcP0.y + srcP1.y) / 2;
+                const cvW = config.canvasWidth || 1920;
+                const cvH = config.canvasHeight || 1080;
+                const dirX = (cvW / 2) - srcCx >= 0 ? 1 : -1;
+                const dirY = (cvH / 2) - srcCy >= 0 ? 1 : -1;
+                const margin = 50;
+
+                let dx = dirX > 0 ? srcP1.x + margin : srcP0.x - dw - margin;
+                let dy = dirY > 0 ? srcP1.y + margin : srcP0.y - dh - margin;
+                dx = Math.max(margin, Math.min(dx, cvW - dw - margin));
+                dy = Math.max(margin, Math.min(dy, cvH - dh - margin));
                 
                 dstP0 = { x: dx, y: dy };
                 dstP1 = { x: dx + dw, y: dy + dh };
