@@ -62,7 +62,7 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 
 - **Thickness:** Scroll **Mouse Wheel** to scale brush / font size.
 - **Quick Erase:** **Middle-click** on any element to delete it.
-- **Copy / Duplicate:** Select a vector with the **Select** tool (`V`), then press **C** to duplicate. Pressing **C** without a selection pastes the last copied vector at cursor.
+- **Copy / Duplicate:** Select a vector with the **Select** tool (`V`), then press **C** to duplicate. Pressing **C** without a selection pastes the last copied vector at the cursor.
 - **Undo:** `Ctrl + Z`.
 - **Shift Constraint:** Hold **Shift** while drawing to constrain shapes:
 
@@ -90,6 +90,8 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 - **Text Tool:** Supports Bold, Italic, Underline, and auto-contrast Background via the radial menu.
 
 ## Keyboard Shortcuts
+
+> Tool selection shortcuts (`1`, `2`, … , `V`, `Tab`) are listed in the [Annotation Tools](#annotation-tools) section above.
 
 | Key | Action |
 |-----|--------|
