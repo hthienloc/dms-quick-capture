@@ -19,7 +19,7 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 ## Features
 
 - **High-Performance Capture:** Decoupled rendering layers for smooth 60fps interaction even on 4K displays.
-- **Radial Menu:** Right-click anywhere during capture to access 8 customizable tool presets instantly.
+- **Radial Menu:** Right-click anywhere during capture to access 8 customizable tool presets instantly. **Shift+Right-click** to open the active tool's dedicated radial menu (e.g., Stamp counter format, Text formatting toggles).
 - **Rich Annotation Suite:** Pen, highlighter, lines, arrows, shapes, text notes, stamps, redaction, and pixelation.
 - **Workflow Focused:** One-key tool switching, mouse-wheel thickness control, and customizable "Enter" actions.
 - **Seamless Integration:** IPC, Control Center, and Niri-ready keybindings.
@@ -41,8 +41,8 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
    - **Switch Tools:** Use keyboard shortcuts (**1-4**, **Q-R**, **A-F**, **V** for Select, or **Tab** to toggle latest presets).
    - **Copy/Duplicate Vector:** Press **V** to switch to the select tool, click a vector to grab it, then press **C** to duplicate it instantly. Pressing **C** without a selection will paste the last copied vector at the cursor position.
    - **Radial Menu:** **Right-click** on the canvas to open custom presets.
-   - **Text Options:** **Right-click** on the Text tool icon in the toolbar to toggle **Bold**, **Italic**, **Underline**, and **Background** (with automatic high-contrast coloring).
-   - **Stamp Options:** **Right-click** on the Stamp tool icon in the toolbar to switch between **Numeric** (1, 2, 3), **Alphabetic** (A, B, C), and **Roman** (I, II, III) formats.
+   - **Text Options:** **Right-click** on the Text tool icon in the toolbar (or **Shift+Right-click** on the canvas while Text tool is active) to toggle **Bold**, **Italic**, **Underline**, and **Background** (with automatic high-contrast coloring).
+   - **Stamp Options:** **Right-click** on the Stamp tool icon in the toolbar (or **Shift+Right-click** on the canvas while Stamp tool is active) to switch between **Numeric** (1, 2, 3), **Alphabetic** (A, B, C), and **Roman** (I, II, III) formats.
    - **Thickness:** Use the **Mouse Wheel** to scale the brush size.
    - **Magnifier Lens:** Hold **B** to activate the magnifying circular lens under the cursor, and scroll the **Mouse Wheel** while holding **B** to adjust the zoom factor (1.5x - 4x).
    - **Area Zoom (Callout):** Press **Z** (or select the Zoom icon) to draw a magnified callout box for a particular area. Adjust its zoom level (100%-500%) using the scroll wheel.
@@ -52,6 +52,7 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
      - **Highlighter, Line, Arrow**: Locks and snaps the drawing angle to 45-degree increments.
      - **Ellipse**: Constrains the shape to draw a perfect circle.
      - **Rectangle, Redact, Pixelate**: Constrains the shape to draw a perfect square.
+     - **Shift+Right-click** on canvas to open tool-specific radial menus (Stamp counter format, Text formatting) at cursor position.
 4. **Finish:**
    - Press **Ctrl + S** to force save, **Ctrl + C** to copy to clipboard, or **Ctrl + A** to copy and save simultaneously.
    - Press **Ctrl + F** to float the image on your desktop.
