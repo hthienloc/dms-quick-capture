@@ -1321,6 +1321,16 @@ DankModal {
 
                                 if (mouse.button === Qt.RightButton) {
                                     const mapped = drawMouseArea.mapToItem(radialMenu.parent, mouse.x, mouse.y);
+                                    if (mouse.modifiers & Qt.ShiftModifier) {
+                                        radialMenu.close();
+                                        if (window.currentTool === "stamp") {
+                                            stampOptionsRadialMenu.open(mapped.x, mapped.y);
+                                            return;
+                                        } else if (window.currentTool === "text") {
+                                            textOptionsRadialMenu.open(mapped.x, mapped.y);
+                                            return;
+                                        }
+                                    }
                                     radialMenu.open(mapped.x, mapped.y);
                                     return;
                                 }
