@@ -46,6 +46,41 @@ Rectangle {
     signal rotateRequested()
     signal mirrorRequested()
 
+    component MoreToolsMenu: Menu {
+        background: Rectangle {
+            implicitWidth: 100
+            color: Theme.withAlpha(Theme.surface, Theme.popupTransparency)
+            border.color: Theme.withAlpha(Theme.outline, 0.2)
+            radius: Theme.cornerRadiusS
+        }
+
+        MenuItem {
+            text: qsTr("Rotate")
+            contentItem: StyledText {
+                text: parent.text
+                color: parent.hovered ? Theme.primary : Theme.surfaceText
+                font.pixelSize: Theme.fontSizeSmall
+            }
+            background: Rectangle {
+                color: parent.hovered ? Theme.withAlpha(Theme.primary, 0.1) : "transparent"
+            }
+            onTriggered: root.rotateRequested()
+        }
+
+        MenuItem {
+            text: qsTr("Mirror")
+            contentItem: StyledText {
+                text: parent.text
+                color: parent.hovered ? Theme.primary : Theme.surfaceText
+                font.pixelSize: Theme.fontSizeSmall
+            }
+            background: Rectangle {
+                color: parent.hovered ? Theme.withAlpha(Theme.primary, 0.1) : "transparent"
+            }
+            onTriggered: root.mirrorRequested()
+        }
+    }
+
     readonly property var toolbarPalette: {
         const p1 = root.pluginData["toolbar_color_primary"] || "primary";
         const slot1 = p1 === "primary" ? Theme.primary : p1;
@@ -164,42 +199,9 @@ Rectangle {
                     tooltipText: qsTr("More Tools")
                     onClicked: moreActionsMenu.open()
                     
-                    Menu {
+                    MoreToolsMenu {
                         id: moreActionsMenu
                         y: parent.height
-                        
-                        background: Rectangle {
-                            implicitWidth: 100
-                            color: Theme.withAlpha(Theme.surface, Theme.popupTransparency)
-                            border.color: Theme.withAlpha(Theme.outline, 0.2)
-                            radius: Theme.cornerRadiusS
-                        }
-
-                        MenuItem {
-                            text: qsTr("Rotate")
-                            contentItem: StyledText {
-                                text: parent.text
-                                color: parent.hovered ? Theme.primary : Theme.surfaceText
-                                font.pixelSize: Theme.fontSizeSmall
-                            }
-                            background: Rectangle {
-                                color: parent.hovered ? Theme.withAlpha(Theme.primary, 0.1) : "transparent"
-                            }
-                            onTriggered: root.rotateRequested()
-                        }
-
-                        MenuItem {
-                            text: qsTr("Mirror")
-                            contentItem: StyledText {
-                                text: parent.text
-                                color: parent.hovered ? Theme.primary : Theme.surfaceText
-                                font.pixelSize: Theme.fontSizeSmall
-                            }
-                            background: Rectangle {
-                                color: parent.hovered ? Theme.withAlpha(Theme.primary, 0.1) : "transparent"
-                            }
-                            onTriggered: root.mirrorRequested()
-                        }
                     }
                 }
             }
@@ -337,43 +339,10 @@ Rectangle {
                     tooltipText: qsTr("More Tools")
                     onClicked: moreActionsVerticalMenu.open()
                     
-                    Menu {
+                    MoreToolsMenu {
                         id: moreActionsVerticalMenu
                         x: parent.width
                         y: 0
-                        
-                        background: Rectangle {
-                            implicitWidth: 100
-                            color: Theme.withAlpha(Theme.surface, Theme.popupTransparency)
-                            border.color: Theme.withAlpha(Theme.outline, 0.2)
-                            radius: Theme.cornerRadiusS
-                        }
-
-                        MenuItem {
-                            text: qsTr("Rotate")
-                            contentItem: StyledText {
-                                text: parent.text
-                                color: parent.hovered ? Theme.primary : Theme.surfaceText
-                                font.pixelSize: Theme.fontSizeSmall
-                            }
-                            background: Rectangle {
-                                color: parent.hovered ? Theme.withAlpha(Theme.primary, 0.1) : "transparent"
-                            }
-                            onTriggered: root.rotateRequested()
-                        }
-
-                        MenuItem {
-                            text: qsTr("Mirror")
-                            contentItem: StyledText {
-                                text: parent.text
-                                color: parent.hovered ? Theme.primary : Theme.surfaceText
-                                font.pixelSize: Theme.fontSizeSmall
-                            }
-                            background: Rectangle {
-                                color: parent.hovered ? Theme.withAlpha(Theme.primary, 0.1) : "transparent"
-                            }
-                            onTriggered: root.mirrorRequested()
-                        }
                     }
                 }
             }

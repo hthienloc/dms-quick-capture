@@ -424,24 +424,38 @@ DankModal {
     }
 
     function rotateScreenshot() {
-        const oldW = screenshotWidth;
-        const oldH = screenshotHeight;
+        const originalW = window.bgImageItem ? window.bgImageItem.sourceSize.width : 1;
+        const originalH = window.bgImageItem ? window.bgImageItem.sourceSize.height : 1;
 
-        Proc.runCommand("rotate-image", ["mogrify", "-rotate", "90", "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
+        let bgPath = "/tmp/dms_capture_bg.png";
+        if (window.bgImageSource) {
+            let srcStr = window.bgImageSource.toString();
+            const qIdx = srcStr.indexOf("?");
+            if (qIdx !== -1) {
+                srcStr = srcStr.substring(0, qIdx);
+            }
+            if (srcStr.startsWith("file://")) {
+                bgPath = srcStr.substring(7);
+            } else if (srcStr.startsWith("/")) {
+                bgPath = srcStr;
+            }
+        }
+
+        Proc.runCommand("rotate-image", ["mogrify", "-rotate", "90", bgPath], (stdout, exitCode) => {
             if (exitCode === 0) {
                 if (window.hasSelection) {
                     const cx = window.cropRect.x;
                     const cy = window.cropRect.y;
                     const cw = window.cropRect.width;
                     const ch = window.cropRect.height;
-                    window.cropRect = Qt.rect(oldH - (cy + ch), cx, ch, cw);
+                    window.cropRect = Qt.rect(originalH - (cy + ch), cx, ch, cw);
                 }
 
                 const list = [...window.strokes];
                 for (let s of list) {
                     if (s.points) {
                         s.points = s.points.map(p => ({
-                            x: oldH - p.y,
+                            x: originalH - p.y,
                             y: p.x
                         }));
                     }
@@ -449,29 +463,43 @@ DankModal {
                 window.strokes = list;
 
                 window.bgImageSource = "";
-                window.bgImageSource = "file:///tmp/dms_capture_bg.png";
+                window.bgImageSource = "file://" + bgPath + "?t=" + Date.now();
             }
         });
     }
 
     function mirrorScreenshot() {
-        const oldW = screenshotWidth;
+        const originalW = window.bgImageItem ? window.bgImageItem.sourceSize.width : 1;
 
-        Proc.runCommand("mirror-image", ["mogrify", "-flop", "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
+        let bgPath = "/tmp/dms_capture_bg.png";
+        if (window.bgImageSource) {
+            let srcStr = window.bgImageSource.toString();
+            const qIdx = srcStr.indexOf("?");
+            if (qIdx !== -1) {
+                srcStr = srcStr.substring(0, qIdx);
+            }
+            if (srcStr.startsWith("file://")) {
+                bgPath = srcStr.substring(7);
+            } else if (srcStr.startsWith("/")) {
+                bgPath = srcStr;
+            }
+        }
+
+        Proc.runCommand("mirror-image", ["mogrify", "-flop", bgPath], (stdout, exitCode) => {
             if (exitCode === 0) {
                 if (window.hasSelection) {
                     const cx = window.cropRect.x;
                     const cy = window.cropRect.y;
                     const cw = window.cropRect.width;
                     const ch = window.cropRect.height;
-                    window.cropRect = Qt.rect(oldW - (cx + cw), cy, cw, ch);
+                    window.cropRect = Qt.rect(originalW - (cx + cw), cy, cw, ch);
                 }
 
                 const list = [...window.strokes];
                 for (let s of list) {
                     if (s.points) {
                         s.points = s.points.map(p => ({
-                            x: oldW - p.x,
+                            x: originalW - p.x,
                             y: p.y
                         }));
                     }
@@ -479,7 +507,7 @@ DankModal {
                 window.strokes = list;
 
                 window.bgImageSource = "";
-                window.bgImageSource = "file:///tmp/dms_capture_bg.png";
+                window.bgImageSource = "file://" + bgPath + "?t=" + Date.now();
             }
         });
     }
