@@ -28,6 +28,9 @@ Rectangle {
     property int backdropCornerRadius: 12
     property int backdropShadowStrength: 50
     property string backdropAspectRatio: "auto"
+    
+    readonly property var aspectRatios: ["auto", "1:1", "16:9", "4:3"]
+    readonly property var aspectRatioLabels: ["AUTO", "1:1", "16:9", "4:3"]
 
     property string gradientActiveSlot: "start"
 
@@ -380,12 +383,11 @@ Rectangle {
                 buttonPadding: Theme.spacingS
                 checkEnabled: false
                 textSize: 10
-                model: ["AUTO", "1:1", "16:9", "4:3"]
-                currentIndex: ["auto", "1:1", "16:9", "4:3"].indexOf(root.backdropAspectRatio)
+                model: root.aspectRatioLabels
+                currentIndex: root.aspectRatios.indexOf(root.backdropAspectRatio)
                 onSelectionChanged: (index, selected) => {
                     if (selected) {
-                        const ratios = ["auto", "1:1", "16:9", "4:3"];
-                        root.changeBackdropAspectRatio(ratios[index]);
+                        root.changeBackdropAspectRatio(root.aspectRatios[index]);
                     }
                 }
             }
@@ -560,7 +562,8 @@ Rectangle {
                 spacing: Theme.spacingXS
                 anchors.horizontalCenter: parent.horizontalCenter
                 Repeater {
-                    model: ["auto", "1:1", "16:9", "4:3"]
+                    id: verticalRatioRepeater
+                    model: root.aspectRatios
                     delegate: Rectangle {
                         id: verticalSegment
                         width: 36
@@ -569,7 +572,7 @@ Rectangle {
                         property bool selected: root.backdropAspectRatio === modelData
                         property bool hovered: verticalMouseArea.containsMouse
                         property bool isFirst: index === 0
-                        property bool isLast: index === 3
+                        property bool isLast: index === (verticalRatioRepeater.count - 1)
                         
                         color: {
                             if (selected) {
