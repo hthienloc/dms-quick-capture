@@ -539,8 +539,8 @@ DankModal {
         if (!activeCanvas || !bgImageItem || !boardContainerItem) return 1.0;
         const maxW = boardContainerItem.width;
         const maxH = boardContainerItem.height;
-        const targetW = (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.width : bgImageItem.sourceSize.width;
-        const targetH = (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.height : bgImageItem.sourceSize.height;
+        const targetW = window.canvasWidth;
+        const targetH = window.canvasHeight;
         if (targetW <= 0 || targetH <= 0) return 1.0;
         const scaleX = maxW / targetW;
         const scaleY = maxH / targetH;
