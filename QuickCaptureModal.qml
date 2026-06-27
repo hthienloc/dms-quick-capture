@@ -66,12 +66,11 @@ DankModal {
     }
 
     // Backdrop State Variables
-    property string backdropMode: "none" // none, solid, gradient, image
+    property string backdropMode: "none" // none, solid, gradient
     property color backdropSolidColor: Theme.primary
     property color backdropGradientStart: Theme.primary
     property color backdropGradientEnd: Theme.secondary
     property int backdropGradientAngle: 45
-    property string backdropImageSource: ""
     property int backdropPadding: 40
     property int backdropCornerRadius: 12
     property int backdropShadowStrength: 50
@@ -170,8 +169,61 @@ DankModal {
         return window.bgImageItem ? window.bgImageItem.sourceSize.height : 1;
     }
 
-    readonly property real canvasWidth: screenshotWidth
-    readonly property real canvasHeight: screenshotHeight
+    readonly property real canvasWidth: {
+        if (window.effectiveBackdropMode === "none" || window.backdropAspectRatio === "auto") {
+            return screenshotWidth;
+        }
+        if (window.backdropAspectRatio === "1:1") {
+            return Math.max(screenshotWidth, screenshotHeight);
+        }
+        if (window.backdropAspectRatio === "16:9") {
+            const targetRatio = 16 / 9;
+            const currentRatio = screenshotWidth / screenshotHeight;
+            if (currentRatio > targetRatio) {
+                return screenshotWidth;
+            } else {
+                return screenshotHeight * targetRatio;
+            }
+        }
+        if (window.backdropAspectRatio === "4:3") {
+            const targetRatio = 4 / 3;
+            const currentRatio = screenshotWidth / screenshotHeight;
+            if (currentRatio > targetRatio) {
+                return screenshotWidth;
+            } else {
+                return screenshotHeight * targetRatio;
+            }
+        }
+        return screenshotWidth;
+    }
+
+    readonly property real canvasHeight: {
+        if (window.effectiveBackdropMode === "none" || window.backdropAspectRatio === "auto") {
+            return screenshotHeight;
+        }
+        if (window.backdropAspectRatio === "1:1") {
+            return Math.max(screenshotWidth, screenshotHeight);
+        }
+        if (window.backdropAspectRatio === "16:9") {
+            const targetRatio = 16 / 9;
+            const currentRatio = screenshotWidth / screenshotHeight;
+            if (currentRatio > targetRatio) {
+                return screenshotWidth / targetRatio;
+            } else {
+                return screenshotHeight;
+            }
+        }
+        if (window.backdropAspectRatio === "4:3") {
+            const targetRatio = 4 / 3;
+            const currentRatio = screenshotWidth / screenshotHeight;
+            if (currentRatio > targetRatio) {
+                return screenshotWidth / targetRatio;
+            } else {
+                return screenshotHeight;
+            }
+        }
+        return screenshotHeight;
+    }
 
     readonly property real backdropScaleFactor: {
         if (window.effectiveBackdropMode === "none") return 1.0;
@@ -179,7 +231,7 @@ DankModal {
         const boxW = canvasWidth - 2 * pad;
         const boxH = canvasHeight - 2 * pad;
         if (boxW <= 0 || boxH <= 0) return 1.0;
-        return Math.min(boxW / canvasWidth, boxH / canvasHeight);
+        return Math.min(boxW / screenshotWidth, boxH / screenshotHeight);
     }
 
     readonly property real screenshotXOffset: window.effectiveBackdropMode === "none" ? 0 : (canvasWidth - screenshotWidth * backdropScaleFactor) / 2
@@ -199,9 +251,6 @@ DankModal {
             grad.addColorStop(0, window.backdropGradientStart.toString());
             grad.addColorStop(1, window.backdropGradientEnd.toString());
             ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, w, h);
-        } else if (window.backdropMode === "image") {
-            ctx.fillStyle = Theme.surface.toString();
             ctx.fillRect(0, 0, w, h);
         }
     }
@@ -250,9 +299,12 @@ DankModal {
     }
 
     function drawScreenshotImage(ctx, imgSource) {
+        if (!imgSource || imgSource.status !== Image.Ready) return;
         ctx.save();
         ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = "high";
+        if (ctx.imageSmoothingQuality !== undefined) {
+            ctx.imageSmoothingQuality = "high";
+        }
         
         const r = window.backdropCornerRadius * window.backdropScaleFactor;
         const x = window.screenshotXOffset;
@@ -770,7 +822,13 @@ DankModal {
 
         const toolShortcut = config.findByKey(config.toolShortcuts, token);
         if (toolShortcut) {
-            window.currentTool = toolShortcut.tool;
+            if (window.currentTool === toolShortcut.tool) {
+                if (toolShortcut.tool === "backdrop" || toolShortcut.tool === "crop") {
+                    window.currentTool = window.lastActiveTool;
+                }
+            } else {
+                window.currentTool = toolShortcut.tool;
+            }
             event.accepted = true;
         }
     }
@@ -1215,11 +1273,10 @@ DankModal {
 
                                         const spotlightOpacity = activeInt / 100.0;
                                         
-                                        const isCroppedMode = window.currentTool !== "crop" && window.hasSelection;
-                                        const dimmingX = isCroppedMode ? window.cropRect.x : 0;
-                                        const dimmingY = isCroppedMode ? window.cropRect.y : 0;
-                                        const dimmingW = isCroppedMode ? window.cropRect.width : window.canvasWidth;
-                                        const dimmingH = isCroppedMode ? window.cropRect.height : window.canvasHeight;
+                                        const dimmingX = 0;
+                                        const dimmingY = 0;
+                                        const dimmingW = window.screenshotWidth;
+                                        const dimmingH = window.screenshotHeight;
 
                                         ctx.beginPath();
                                         // Outer rectangle covering the whole view
@@ -1256,7 +1313,7 @@ DankModal {
                                         
                                         ctx.clip("evenodd");
                                         ctx.fillStyle = "rgba(0, 0, 0, " + spotlightOpacity + ")";
-                                        ctx.fillRect(dimmingX, dimmingY, dimmingW, dimmingH);
+                                        ctx.fillRect(0, 0, window.screenshotWidth, window.screenshotHeight);
                                         ctx.restore();
                                     }
                                 }
@@ -2253,9 +2310,7 @@ DankModal {
                                     const spotlightOpacity = activeInt / 100.0;
 
                                     ctx.beginPath();
-                                    const cropX = hasCropSelection ? window.cropRect.x : 0;
-                                    const cropY = hasCropSelection ? window.cropRect.y : 0;
-                                    ctx.rect(cropX, cropY, window.screenshotWidth, window.screenshotHeight);
+                                    ctx.rect(0, 0, window.screenshotWidth, window.screenshotHeight);
                                     
                                     for (let s of spotlights) {
                                         if (s.points.length >= 2) {
@@ -2288,7 +2343,7 @@ DankModal {
                                     
                                     ctx.clip("evenodd");
                                     ctx.fillStyle = "rgba(0, 0, 0, " + spotlightOpacity + ")";
-                                    ctx.fillRect(cropX, cropY, window.screenshotWidth, window.screenshotHeight);
+                                    ctx.fillRect(0, 0, window.screenshotWidth, window.screenshotHeight);
                                     ctx.restore();
                                 }
                             }
