@@ -267,13 +267,13 @@ DankModal {
         const w = window.screenshotWidth * window.backdropScaleFactor;
         const h = window.screenshotHeight * window.backdropScaleFactor;
         
-        const opacity = (window.backdropShadowStrength / 100.0) * 0.15;
+        const opacity = (window.backdropShadowStrength / 100.0) * 0.45;
         
         // Draw 4 concentric shadow layers for a soft, fast shadow effect without Gaussian blur CPU cost
         for (let i = 1; i <= 4; i++) {
             ctx.fillStyle = "rgba(0, 0, 0, " + (opacity / i) + ")";
-            const offset = i * 2;
-            const blur = i * 3;
+            const offset = i * 3.5;
+            const blur = i * 5;
             
             const sx = x - blur/2;
             const sy = y - blur/2 + offset;
