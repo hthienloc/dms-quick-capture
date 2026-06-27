@@ -1208,6 +1208,7 @@ DankModal {
                     }
 
                     onToolSelected: (tool) => {
+                        moreToolsMenu.close();
                         if (tool === "back") {
                             window.currentTool = window.lastActiveTool;
                         } else if (tool === "crop" && window.currentTool === "crop") {
@@ -1216,21 +1217,64 @@ DankModal {
                             window.currentTool = tool;
                         }
                     }
-                    onColorSelected: (color) => window.currentColor = color
-                    onStrokeWidthSelected: (width) => window.updateActiveIntensity(width)
-                    onUndoRequested: window.performUndo()
+                    onColorSelected: (color) => {
+                        moreToolsMenu.close();
+                        window.currentColor = color;
+                    }
+                    onStrokeWidthSelected: (width) => {
+                        moreToolsMenu.close();
+                        window.updateActiveIntensity(width);
+                    }
+                    onUndoRequested: {
+                        moreToolsMenu.close();
+                        window.performUndo();
+                    }
                     onAnnotationsToggled: window.showAnnotations = !window.showAnnotations
 
-                    onFloatRequested: captureActions.performFloatAction()
-                    onSaveRequested: captureActions.performSaveOnly()
+                    onFloatRequested: {
+                        moreToolsMenu.close();
+                        captureActions.performFloatAction();
+                    }
+                    onSaveRequested: {
+                        moreToolsMenu.close();
+                        captureActions.performSaveOnly();
+                    }
 
-                    onCopyRequested: captureActions.performCopyOnly()
-                    onCopyAndSaveRequested: captureActions.performCopyAndSave()
-                    onCloseRequested: window.discardAndClose()
-                    onTextToolRightClicked: (globalX, globalY) => textOptionsRadialMenu.open(globalX, globalY)
-                    onStampToolRightClicked: (globalX, globalY) => stampOptionsRadialMenu.open(globalX, globalY)
-                    onRotateRequested: window.rotateScreenshot()
-                    onMirrorRequested: window.mirrorScreenshot()
+                    onCopyRequested: {
+                        moreToolsMenu.close();
+                        captureActions.performCopyOnly();
+                    }
+                    onCopyAndSaveRequested: {
+                        moreToolsMenu.close();
+                        captureActions.performCopyAndSave();
+                    }
+                    onCloseRequested: {
+                        moreToolsMenu.close();
+                        window.discardAndClose();
+                    }
+                    onTextToolRightClicked: (globalX, globalY) => {
+                        moreToolsMenu.close();
+                        textOptionsRadialMenu.open(globalX, globalY);
+                    }
+                    onStampToolRightClicked: (globalX, globalY) => {
+                        moreToolsMenu.close();
+                        stampOptionsRadialMenu.open(globalX, globalY);
+                    }
+                    onMoreToolsClicked: (buttonItem) => {
+                        if (moreToolsMenu.opened) {
+                            moreToolsMenu.close();
+                        } else {
+                            var pt = buttonItem.mapToItem(contentRoot, 0, 0);
+                            if (toolbarCard.isVertical) {
+                                moreToolsMenu.x = pt.x + buttonItem.width + Theme.spacingS;
+                                moreToolsMenu.y = pt.y;
+                            } else {
+                                moreToolsMenu.x = pt.x;
+                                moreToolsMenu.y = pt.y + buttonItem.height + Theme.spacingS;
+                            }
+                            moreToolsMenu.open();
+                        }
+                    }
                 }
 
                 // 2. Centered Canvas Board
@@ -1683,8 +1727,8 @@ DankModal {
                             }
 
                             onPressed: (mouse) => {
-                                if (toolbarCard.moreToolsMenuOpened) {
-                                    toolbarCard.moreToolsMenuForceClose = true;
+                                if (moreToolsMenu.opened) {
+                                    moreToolsMenu.close();
                                     return;
                                 }
 
@@ -2547,6 +2591,12 @@ DankModal {
                         window.currentTool = "stamp";
                         stampOptionsRadialMenu.close();
                     }
+                }
+
+                MoreToolsMenu {
+                    id: moreToolsMenu
+                    onRotateRequested: window.rotateScreenshot()
+                    onMirrorRequested: window.mirrorScreenshot()
                 }
 
                 Canvas {
