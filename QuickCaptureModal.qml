@@ -1021,6 +1021,7 @@ DankModal {
                 onStatusChanged: {
                     if (status === Image.Ready) {
                         if (window.activeCanvas) {
+                            window.activeCanvas.unloadImage(source);
                             window.activeCanvas.loadImage(source);
                         }
                         if (!window.hasSampledContrast) {
