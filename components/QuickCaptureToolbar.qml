@@ -379,6 +379,7 @@ Rectangle {
                 Repeater {
                     model: ["auto", "1:1", "16:9", "4:3"]
                     delegate: Button {
+                        focusPolicy: Qt.NoFocus
                         text: modelData.toUpperCase()
                         flat: true
                         font.pixelSize: 10
@@ -573,6 +574,7 @@ Rectangle {
                 Repeater {
                     model: ["auto", "1:1", "16:9", "4:3"]
                     delegate: Button {
+                        focusPolicy: Qt.NoFocus
                         text: modelData.toUpperCase()
                         flat: true
                         font.pixelSize: 9
