@@ -1231,6 +1231,11 @@ DankModal {
                     onStampToolRightClicked: (globalX, globalY) => stampOptionsRadialMenu.open(globalX, globalY)
                     onRotateRequested: window.rotateScreenshot()
                     onMirrorRequested: window.mirrorScreenshot()
+                    onMenuClosed: {
+                        if (modalFocusScope) {
+                            modalFocusScope.forceActiveFocus();
+                        }
+                    }
                 }
 
                 // 2. Centered Canvas Board

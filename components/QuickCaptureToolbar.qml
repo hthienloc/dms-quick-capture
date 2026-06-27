@@ -45,8 +45,11 @@ Rectangle {
     signal changeBackdropAspectRatio(string ratio)
     signal rotateRequested()
     signal mirrorRequested()
+    signal menuClosed()
 
     component MoreToolsMenu: Menu {
+        onClosed: root.menuClosed()
+
         background: Rectangle {
             implicitWidth: 100
             color: Theme.withAlpha(Theme.surface, Theme.popupTransparency)
