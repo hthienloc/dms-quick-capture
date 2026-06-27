@@ -484,13 +484,13 @@ Rectangle {
                         width: 24; height: 24; radius: 4; color: root.backdropGradientStart
                         border.color: root.gradientActiveSlot === "start" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
                         border.width: root.gradientActiveSlot === "start" ? 2 : 1
-                        MouseArea { anchors.fill: parent; onClicked: root.gradientActiveSlot = "start" }
+                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.gradientActiveSlot = "start" }
                     }
                     Rectangle {
                         width: 24; height: 24; radius: 4; color: root.backdropGradientEnd
                         border.color: root.gradientActiveSlot === "end" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
                         border.width: root.gradientActiveSlot === "end" ? 2 : 1
-                        MouseArea { anchors.fill: parent; onClicked: root.gradientActiveSlot = "end" }
+                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.gradientActiveSlot = "end" }
                     }
                 }
                 
@@ -716,13 +716,13 @@ Rectangle {
                         width: 18; height: 18; radius: 3; color: root.backdropGradientStart
                         border.color: root.gradientActiveSlot === "start" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
                         border.width: root.gradientActiveSlot === "start" ? 1.5 : 1
-                        MouseArea { anchors.fill: parent; onClicked: root.gradientActiveSlot = "start" }
+                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.gradientActiveSlot = "start" }
                     }
                     Rectangle {
                         width: 18; height: 18; radius: 3; color: root.backdropGradientEnd
                         border.color: root.gradientActiveSlot === "end" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
                         border.width: root.gradientActiveSlot === "end" ? 1.5 : 1
-                        MouseArea { anchors.fill: parent; onClicked: root.gradientActiveSlot = "end" }
+                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.gradientActiveSlot = "end" }
                     }
                 }
                 
