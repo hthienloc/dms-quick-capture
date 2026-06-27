@@ -18,6 +18,29 @@ Rectangle {
     property bool isVertical: false
     property bool showAnnotations: true
 
+    // Backdrop configuration properties
+    property string backdropMode: "none"
+    property color backdropSolidColor: Theme.primary
+    property color backdropGradientStart: Theme.primary
+    property color backdropGradientEnd: Theme.secondary
+    property int backdropGradientAngle: 45
+    property int backdropPadding: 40
+    property int backdropCornerRadius: 12
+    property int backdropShadowStrength: 50
+    property string backdropAspectRatio: "auto"
+
+    property string gradientActiveSlot: "start"
+
+    signal changeBackdropMode(string mode)
+    signal changeBackdropSolidColor(color col)
+    signal changeBackdropGradientStart(color col)
+    signal changeBackdropGradientEnd(color col)
+    signal changeBackdropGradientAngle(int angle)
+    signal changeBackdropPadding(int padding)
+    signal changeBackdropCornerRadius(int radius)
+    signal changeBackdropShadowStrength(int strength)
+    signal changeBackdropAspectRatio(string ratio)
+
     readonly property var toolbarPalette: {
         const p1 = root.pluginData["toolbar_color_primary"] || "primary";
         const slot1 = p1 === "primary" ? Theme.primary : p1;
@@ -56,7 +79,12 @@ Rectangle {
         Loader {
             id: toolbarLoader
             anchors.centerIn: parent
-            sourceComponent: root.isVertical ? verticalLayout : horizontalLayout
+            sourceComponent: {
+                if (root.currentTool === "backdrop") {
+                    return root.isVertical ? backdropVerticalLayout : backdropHorizontalLayout;
+                }
+                return root.isVertical ? verticalLayout : horizontalLayout;
+            }
         }
     }
 
@@ -288,6 +316,394 @@ Rectangle {
                 spacing: Theme.spacingXS; anchors.horizontalCenter: parent.horizontalCenter
                 DankActionButton { iconName: "undo"; buttonSize: 36; iconSize: 18; enabled: root.canUndo; opacity: enabled ? 1.0 : 0.4; onClicked: root.undoRequested() }
                 DankActionButton { iconName: "done_all"; buttonSize: 36; iconSize: 18; tooltipText: "Copy & Save (Enter)"; backgroundColor: Theme.withAlpha(Theme.primary, 0.1); iconColor: Theme.primary; onClicked: root.copyAndSaveRequested() }
+            }
+        }
+    }
+
+    Component {
+        id: backdropHorizontalLayout
+        Row {
+            spacing: Theme.spacingL
+            anchors.verticalCenter: parent.verticalCenter
+            
+            // Back button
+            DankActionButton {
+                iconName: "arrow_back"
+                buttonSize: 36
+                iconSize: 18
+                tooltipText: qsTr("Back to Annotation (B)")
+                onClicked: root.toolSelected("back")
+            }
+            
+            Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
+            
+            // Mode selection
+            Row {
+                spacing: Theme.spacingXS
+                anchors.verticalCenter: parent.verticalCenter
+                DankActionButton {
+                    iconName: "blur_off"
+                    buttonSize: 36
+                    iconSize: 18
+                    tooltipText: qsTr("No Backdrop")
+                    backgroundColor: root.backdropMode === "none" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.backdropMode === "none" ? Theme.primary : Theme.surfaceText
+                    onClicked: root.changeBackdropMode("none")
+                }
+                DankActionButton {
+                    iconName: "format_color_fill"
+                    buttonSize: 36
+                    iconSize: 18
+                    tooltipText: qsTr("Solid Color")
+                    backgroundColor: root.backdropMode === "solid" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.backdropMode === "solid" ? Theme.primary : Theme.surfaceText
+                    onClicked: root.changeBackdropMode("solid")
+                }
+                DankActionButton {
+                    iconName: "gradient"
+                    buttonSize: 36
+                    iconSize: 18
+                    tooltipText: qsTr("Linear Gradient")
+                    backgroundColor: root.backdropMode === "gradient" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.backdropMode === "gradient" ? Theme.primary : Theme.surfaceText
+                    onClicked: root.changeBackdropMode("gradient")
+                }
+            }
+            
+            Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
+            
+            // Aspect Ratio selection
+            Row {
+                spacing: Theme.spacingXS
+                anchors.verticalCenter: parent.verticalCenter
+                Repeater {
+                    model: ["auto", "1:1", "16:9", "4:3"]
+                    delegate: Button {
+                        text: modelData.toUpperCase()
+                        flat: true
+                        font.pixelSize: 10
+                        font.bold: true
+                        implicitWidth: 42
+                        implicitHeight: 36
+                        contentItem: Text {
+                            text: parent.text
+                            font: parent.font
+                            color: root.backdropAspectRatio === modelData ? Theme.primary : Theme.surfaceText
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        background: Rectangle {
+                            color: root.backdropAspectRatio === modelData ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                            radius: Theme.cornerRadiusS
+                        }
+                        onClicked: root.changeBackdropAspectRatio(modelData)
+                    }
+                }
+            }
+            
+            Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
+            
+            // Sliders Row
+            Row {
+                spacing: Theme.spacingM
+                anchors.verticalCenter: parent.verticalCenter
+                
+                Row {
+                    spacing: Theme.spacingXS
+                    Text { text: qsTr("Padding:") + " " + root.backdropPadding + "px"; color: Theme.surfaceText; font.pixelSize: 10; font.bold: true; anchors.verticalCenter: parent.verticalCenter }
+                    DankSlider {
+                        minimum: 10
+                        maximum: 150
+                        width: 80
+                        height: 36
+                        value: root.backdropPadding
+                        showValue: false
+                        onSliderValueChanged: val => root.changeBackdropPadding(val)
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+                
+                Row {
+                    spacing: Theme.spacingXS
+                    Text { text: qsTr("Radius:") + " " + root.backdropCornerRadius + "px"; color: Theme.surfaceText; font.pixelSize: 10; font.bold: true; anchors.verticalCenter: parent.verticalCenter }
+                    DankSlider {
+                        minimum: 0
+                        maximum: 60
+                        width: 80
+                        height: 36
+                        value: root.backdropCornerRadius
+                        showValue: false
+                        onSliderValueChanged: val => root.changeBackdropCornerRadius(val)
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+                
+                Row {
+                    spacing: Theme.spacingXS
+                    Text { text: qsTr("Shadow:") + " " + root.backdropShadowStrength + "%"; color: Theme.surfaceText; font.pixelSize: 10; font.bold: true; anchors.verticalCenter: parent.verticalCenter }
+                    DankSlider {
+                        minimum: 0
+                        maximum: 100
+                        width: 80
+                        height: 36
+                        value: root.backdropShadowStrength
+                        showValue: false
+                        onSliderValueChanged: val => root.changeBackdropShadowStrength(val)
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+            }
+            
+            Rectangle { 
+                visible: root.backdropMode !== "none"
+                width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter 
+            }
+            
+            // Colors (Solid or Gradient)
+            Row {
+                visible: root.backdropMode !== "none"
+                spacing: Theme.spacingS
+                anchors.verticalCenter: parent.verticalCenter
+                
+                Row {
+                    visible: root.backdropMode === "gradient"
+                    spacing: Theme.spacingXS
+                    anchors.verticalCenter: parent.verticalCenter
+                    
+                    Rectangle {
+                        width: 24; height: 24; radius: 4; color: root.backdropGradientStart
+                        border.color: root.gradientActiveSlot === "start" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
+                        border.width: root.gradientActiveSlot === "start" ? 2 : 1
+                        MouseArea { anchors.fill: parent; onClicked: root.gradientActiveSlot = "start" }
+                    }
+                    Rectangle {
+                        width: 24; height: 24; radius: 4; color: root.backdropGradientEnd
+                        border.color: root.gradientActiveSlot === "end" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
+                        border.width: root.gradientActiveSlot === "end" ? 2 : 1
+                        MouseArea { anchors.fill: parent; onClicked: root.gradientActiveSlot = "end" }
+                    }
+                }
+                
+                Grid {
+                    rows: 2; columns: 4; spacing: 4; anchors.verticalCenter: parent.verticalCenter
+                    Repeater {
+                        model: root.toolbarPalette
+                        delegate: Rectangle {
+                            width: 16; height: 16; radius: 8; color: modelData
+                            border.color: Theme.withAlpha(Theme.outline, 0.3)
+                            border.width: 1
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    if (root.backdropMode === "solid") {
+                                        root.changeBackdropSolidColor(modelData);
+                                    } else if (root.backdropMode === "gradient") {
+                                        if (root.gradientActiveSlot === "start") {
+                                            root.changeBackdropGradientStart(modelData);
+                                        } else {
+                                            root.changeBackdropGradientEnd(modelData);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: backdropVerticalLayout
+        Column {
+            spacing: Theme.spacingL
+            anchors.horizontalCenter: parent.horizontalCenter
+            
+            // Back button
+            DankActionButton {
+                iconName: "arrow_back"
+                buttonSize: 36
+                iconSize: 18
+                tooltipText: qsTr("Back to Annotation (B)")
+                onClicked: root.toolSelected("back")
+            }
+            
+            Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
+            
+            // Mode selection
+            Column {
+                spacing: Theme.spacingXS
+                anchors.horizontalCenter: parent.horizontalCenter
+                DankActionButton {
+                    iconName: "blur_off"
+                    buttonSize: 36
+                    iconSize: 18
+                    tooltipText: qsTr("No Backdrop")
+                    backgroundColor: root.backdropMode === "none" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.backdropMode === "none" ? Theme.primary : Theme.surfaceText
+                    onClicked: root.changeBackdropMode("none")
+                }
+                DankActionButton {
+                    iconName: "format_color_fill"
+                    buttonSize: 36
+                    iconSize: 18
+                    tooltipText: qsTr("Solid Color")
+                    backgroundColor: root.backdropMode === "solid" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.backdropMode === "solid" ? Theme.primary : Theme.surfaceText
+                    onClicked: root.changeBackdropMode("solid")
+                }
+                DankActionButton {
+                    iconName: "gradient"
+                    buttonSize: 36
+                    iconSize: 18
+                    tooltipText: qsTr("Linear Gradient")
+                    backgroundColor: root.backdropMode === "gradient" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.backdropMode === "gradient" ? Theme.primary : Theme.surfaceText
+                    onClicked: root.changeBackdropMode("gradient")
+                }
+            }
+            
+            Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
+            
+            // Aspect Ratio selection
+            Column {
+                spacing: Theme.spacingXS
+                anchors.horizontalCenter: parent.horizontalCenter
+                Repeater {
+                    model: ["auto", "1:1", "16:9", "4:3"]
+                    delegate: Button {
+                        text: modelData.toUpperCase()
+                        flat: true
+                        font.pixelSize: 9
+                        font.bold: true
+                        implicitWidth: 36
+                        implicitHeight: 32
+                        contentItem: Text {
+                            text: parent.text
+                            font: parent.font
+                            color: root.backdropAspectRatio === modelData ? Theme.primary : Theme.surfaceText
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        background: Rectangle {
+                            color: root.backdropAspectRatio === modelData ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                            radius: Theme.cornerRadiusS
+                        }
+                        onClicked: root.changeBackdropAspectRatio(modelData)
+                    }
+                }
+            }
+            
+            Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
+            
+            // Sliders
+            Column {
+                spacing: Theme.spacingS
+                anchors.horizontalCenter: parent.horizontalCenter
+                
+                Column {
+                    spacing: 2
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text { text: qsTr("Pad:") + " " + root.backdropPadding + "px"; color: Theme.surfaceText; font.pixelSize: 9; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter }
+                    DankSlider {
+                        minimum: 10
+                        maximum: 150
+                        width: 42
+                        height: 24
+                        value: root.backdropPadding
+                        showValue: false
+                        onSliderValueChanged: val => root.changeBackdropPadding(val)
+                    }
+                }
+                
+                Column {
+                    spacing: 2
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text { text: qsTr("Rad:") + " " + root.backdropCornerRadius + "px"; color: Theme.surfaceText; font.pixelSize: 9; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter }
+                    DankSlider {
+                        minimum: 0
+                        maximum: 60
+                        width: 42
+                        height: 24
+                        value: root.backdropCornerRadius
+                        showValue: false
+                        onSliderValueChanged: val => root.changeBackdropCornerRadius(val)
+                    }
+                }
+                
+                Column {
+                    spacing: 2
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text { text: qsTr("Shd:") + " " + root.backdropShadowStrength + "%"; color: Theme.surfaceText; font.pixelSize: 9; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter }
+                    DankSlider {
+                        minimum: 0
+                        maximum: 100
+                        width: 42
+                        height: 24
+                        value: root.backdropShadowStrength
+                        showValue: false
+                        onSliderValueChanged: val => root.changeBackdropShadowStrength(val)
+                    }
+                }
+            }
+            
+            Rectangle { 
+                visible: root.backdropMode !== "none"
+                width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter 
+            }
+            
+            // Colors (Solid or Gradient)
+            Column {
+                visible: root.backdropMode !== "none"
+                spacing: Theme.spacingS
+                anchors.horizontalCenter: parent.horizontalCenter
+                
+                Row {
+                    visible: root.backdropMode === "gradient"
+                    spacing: Theme.spacingXS
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    
+                    Rectangle {
+                        width: 18; height: 18; radius: 3; color: root.backdropGradientStart
+                        border.color: root.gradientActiveSlot === "start" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
+                        border.width: root.gradientActiveSlot === "start" ? 1.5 : 1
+                        MouseArea { anchors.fill: parent; onClicked: root.gradientActiveSlot = "start" }
+                    }
+                    Rectangle {
+                        width: 18; height: 18; radius: 3; color: root.backdropGradientEnd
+                        border.color: root.gradientActiveSlot === "end" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
+                        border.width: root.gradientActiveSlot === "end" ? 1.5 : 1
+                        MouseArea { anchors.fill: parent; onClicked: root.gradientActiveSlot = "end" }
+                    }
+                }
+                
+                Grid {
+                    columns: 2; spacing: 4; anchors.horizontalCenter: parent.horizontalCenter
+                    Repeater {
+                        model: root.toolbarPalette
+                        delegate: Rectangle {
+                            width: 14; height: 14; radius: 7; color: modelData
+                            border.color: Theme.withAlpha(Theme.outline, 0.3)
+                            border.width: 1
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    if (root.backdropMode === "solid") {
+                                        root.changeBackdropSolidColor(modelData);
+                                    } else if (root.backdropMode === "gradient") {
+                                        if (root.gradientActiveSlot === "start") {
+                                            root.changeBackdropGradientStart(modelData);
+                                        } else {
+                                            root.changeBackdropGradientEnd(modelData);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
