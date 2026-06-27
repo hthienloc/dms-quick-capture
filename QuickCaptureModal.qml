@@ -50,20 +50,32 @@ DankModal {
     property var parentWidget: null
 
     // State Variables
-    property string currentTool: "crop" // crop, select, pen, line, arrow, rect, ellipse, text, pixelate, redact, stamp, highlighter, eraser, spotlight
+    property string currentTool: "crop" // crop, select, pen, line, arrow, rect, ellipse, text, pixelate, redact, stamp, highlighter, eraser, spotlight, backdrop
     property string lastActiveTool: "pen"
     readonly property real dpr: Screen.devicePixelRatio || 1.0
     onCurrentToolChanged: {
         if (currentTool !== "text" && window.isTyping) {
             window.commitTypingText();
         }
-        if (currentTool !== "crop") {
+        if (currentTool !== "crop" && currentTool !== "backdrop") {
             lastActiveTool = currentTool;
         }
         if (window.activeCanvas) {
             window.activeCanvas.requestPaint();
         }
     }
+
+    // Backdrop State Variables
+    property string backdropMode: "none" // none, solid, gradient, image
+    property color backdropSolidColor: Theme.primary
+    property color backdropGradientStart: Theme.primary
+    property color backdropGradientEnd: Theme.secondary
+    property int backdropGradientAngle: 45
+    property string backdropImageSource: ""
+    property int backdropPadding: 40
+    property int backdropCornerRadius: 12
+    property int backdropShadowStrength: 50
+    property string backdropAspectRatio: "auto" // auto, 1:1, 16:9, 4:3
 
     // Intensity Management
     property int strokeWidth: 8
@@ -143,17 +155,134 @@ DankModal {
         return maxEditDimension / max;
     }
 
-    readonly property real canvasWidth: {
+    readonly property string effectiveBackdropMode: window.currentTool === "crop" ? "none" : window.backdropMode
+
+    readonly property real screenshotWidth: {
         if (window.currentTool !== "crop" && window.hasSelection) {
             return window.cropRect.width;
         }
         return window.bgImageItem ? window.bgImageItem.sourceSize.width : 1;
     }
-    readonly property real canvasHeight: {
+    readonly property real screenshotHeight: {
         if (window.currentTool !== "crop" && window.hasSelection) {
             return window.cropRect.height;
         }
         return window.bgImageItem ? window.bgImageItem.sourceSize.height : 1;
+    }
+
+    readonly property real canvasWidth: screenshotWidth
+    readonly property real canvasHeight: screenshotHeight
+
+    readonly property real backdropScaleFactor: {
+        if (window.effectiveBackdropMode === "none") return 1.0;
+        const pad = window.backdropPadding;
+        const boxW = canvasWidth - 2 * pad;
+        const boxH = canvasHeight - 2 * pad;
+        if (boxW <= 0 || boxH <= 0) return 1.0;
+        return Math.min(boxW / canvasWidth, boxH / canvasHeight);
+    }
+
+    readonly property real screenshotXOffset: window.effectiveBackdropMode === "none" ? 0 : (canvasWidth - screenshotWidth * backdropScaleFactor) / 2
+    readonly property real screenshotYOffset: window.effectiveBackdropMode === "none" ? 0 : (canvasHeight - screenshotHeight * backdropScaleFactor) / 2
+
+    function drawBackdropBackground(ctx, w, h) {
+        if (window.backdropMode === "solid") {
+            ctx.fillStyle = window.backdropSolidColor.toString();
+            ctx.fillRect(0, 0, w, h);
+        } else if (window.backdropMode === "gradient") {
+            const angleRad = (window.backdropGradientAngle * Math.PI) / 180;
+            const x1 = w / 2 - Math.cos(angleRad) * w / 2;
+            const y1 = h / 2 - Math.sin(angleRad) * h / 2;
+            const x2 = w / 2 + Math.cos(angleRad) * w / 2;
+            const y2 = h / 2 + Math.sin(angleRad) * h / 2;
+            const grad = ctx.createLinearGradient(x1, y1, x2, y2);
+            grad.addColorStop(0, window.backdropGradientStart.toString());
+            grad.addColorStop(1, window.backdropGradientEnd.toString());
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+        } else if (window.backdropMode === "image") {
+            ctx.fillStyle = Theme.surface.toString();
+            ctx.fillRect(0, 0, w, h);
+        }
+    }
+
+    function drawScreenshotShadow(ctx) {
+        if (window.backdropShadowStrength <= 0) return;
+        ctx.save();
+        const r = window.backdropCornerRadius * window.backdropScaleFactor;
+        const x = window.screenshotXOffset;
+        const y = window.screenshotYOffset;
+        const w = window.screenshotWidth * window.backdropScaleFactor;
+        const h = window.screenshotHeight * window.backdropScaleFactor;
+        
+        const opacity = (window.backdropShadowStrength / 100.0) * 0.15;
+        
+        // Draw 4 concentric shadow layers for a soft, fast shadow effect without Gaussian blur CPU cost
+        for (let i = 1; i <= 4; i++) {
+            ctx.fillStyle = "rgba(0, 0, 0, " + (opacity / i) + ")";
+            const offset = i * 2;
+            const blur = i * 3;
+            
+            const sx = x - blur/2;
+            const sy = y - blur/2 + offset;
+            const sw = w + blur;
+            const sh = h + blur;
+            const sr = r + blur/2;
+            
+            ctx.beginPath();
+            if (sr > 0) {
+                ctx.moveTo(sx + sr, sy);
+                ctx.lineTo(sx + sw - sr, sy);
+                ctx.arcTo(sx + sw, sy, sx + sw, sy + sr, sr);
+                ctx.lineTo(sx + sw, sy + sh - sr);
+                ctx.arcTo(sx + sw, sy + sh, sx + sw - sr, sy + sh, sr);
+                ctx.lineTo(sx + sr, sy + sh);
+                ctx.arcTo(sx, sy + sh, sx, sy + sh - sr, sr);
+                ctx.lineTo(sx, sy + sr);
+                ctx.arcTo(sx, sy, sx + sr, sy, sr);
+            } else {
+                ctx.rect(sx, sy, sw, sh);
+            }
+            ctx.closePath();
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+
+    function drawScreenshotImage(ctx, imgSource) {
+        ctx.save();
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        
+        const r = window.backdropCornerRadius * window.backdropScaleFactor;
+        const x = window.screenshotXOffset;
+        const y = window.screenshotYOffset;
+        const w = window.screenshotWidth * window.backdropScaleFactor;
+        const h = window.screenshotHeight * window.backdropScaleFactor;
+        
+        ctx.beginPath();
+        if (r > 0) {
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.arcTo(x + w, y, x + w, y + r, r);
+            ctx.lineTo(x + w, y + h - r);
+            ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+            ctx.lineTo(x + r, y + h);
+            ctx.arcTo(x, y + h, x, y + h - r, r);
+            ctx.lineTo(x, y + r);
+            ctx.arcTo(x, y, x + r, y, r);
+        } else {
+            ctx.rect(x, y, w, h);
+        }
+        ctx.closePath();
+        ctx.clip();
+        
+        if (window.hasSelection) {
+            ctx.drawImage(imgSource, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, x, y, w, h);
+        } else {
+            ctx.drawImage(imgSource, x, y, w, h);
+        }
+        ctx.restore();
     }
 
     property bool isZoomPressed: false
@@ -680,7 +809,7 @@ DankModal {
             event.accepted = true;
             return;
         }
-        if (event.key === Qt.Key_B) {
+        if (event.key === Qt.Key_G) {
             if (event.isAutoRepeat) {
                 event.accepted = true;
                 return;
@@ -706,7 +835,7 @@ DankModal {
             event.accepted = true;
             return;
         }
-        if (event.key === Qt.Key_B) {
+        if (event.key === Qt.Key_G) {
             if (event.isAutoRepeat) {
                 event.accepted = true;
                 return;
@@ -824,6 +953,8 @@ DankModal {
                 source: window.bgImageSource
                 visible: false
                 cache: false
+                smooth: true
+                mipmap: true
 
                 Component.onCompleted: {
                     window.bgImageItem = bgImage;
@@ -872,7 +1003,62 @@ DankModal {
                     strokeWidth: window.activeIntensity
                     canUndo: window.strokes.length > 0
 
-                    onToolSelected: (tool) => window.currentTool = (tool === "crop" && window.currentTool === "crop") ? window.lastActiveTool : tool
+                    backdropMode: window.backdropMode
+                    backdropSolidColor: window.backdropSolidColor
+                    backdropGradientStart: window.backdropGradientStart
+                    backdropGradientEnd: window.backdropGradientEnd
+                    backdropGradientAngle: window.backdropGradientAngle
+                    backdropPadding: window.backdropPadding
+                    backdropCornerRadius: window.backdropCornerRadius
+                    backdropShadowStrength: window.backdropShadowStrength
+                    backdropAspectRatio: window.backdropAspectRatio
+
+                    onChangeBackdropMode: (mode) => {
+                        window.backdropMode = mode;
+                        if (window.activeCanvas) window.activeCanvas.requestPaint();
+                    }
+                    onChangeBackdropSolidColor: (col) => {
+                        window.backdropSolidColor = col;
+                        if (window.activeCanvas) window.activeCanvas.requestPaint();
+                    }
+                    onChangeBackdropGradientStart: (col) => {
+                        window.backdropGradientStart = col;
+                        if (window.activeCanvas) window.activeCanvas.requestPaint();
+                    }
+                    onChangeBackdropGradientEnd: (col) => {
+                        window.backdropGradientEnd = col;
+                        if (window.activeCanvas) window.activeCanvas.requestPaint();
+                    }
+                    onChangeBackdropGradientAngle: (angle) => {
+                        window.backdropGradientAngle = angle;
+                        if (window.activeCanvas) window.activeCanvas.requestPaint();
+                    }
+                    onChangeBackdropPadding: (pad) => {
+                        window.backdropPadding = pad;
+                        if (window.activeCanvas) window.activeCanvas.requestPaint();
+                    }
+                    onChangeBackdropCornerRadius: (r) => {
+                        window.backdropCornerRadius = r;
+                        if (window.activeCanvas) window.activeCanvas.requestPaint();
+                    }
+                    onChangeBackdropShadowStrength: (s) => {
+                        window.backdropShadowStrength = s;
+                        if (window.activeCanvas) window.activeCanvas.requestPaint();
+                    }
+                    onChangeBackdropAspectRatio: (ratio) => {
+                        window.backdropAspectRatio = ratio;
+                        if (window.activeCanvas) window.activeCanvas.requestPaint();
+                    }
+
+                    onToolSelected: (tool) => {
+                        if (tool === "back") {
+                            window.currentTool = window.lastActiveTool;
+                        } else if (tool === "crop" && window.currentTool === "crop") {
+                            window.currentTool = window.lastActiveTool;
+                        } else {
+                            window.currentTool = tool;
+                        }
+                    }
                     onColorSelected: (color) => window.currentColor = color
                     onStrokeWidthSelected: (width) => window.updateActiveIntensity(width)
                     onUndoRequested: window.performUndo()
@@ -916,6 +1102,7 @@ DankModal {
                         scale: drawingCanvas.scale
                         transformOrigin: drawingCanvas.transformOrigin
                         clip: true
+                        visible: window.effectiveBackdropMode === "none"
 
                         Image {
                             id: staticBgImage
@@ -960,6 +1147,14 @@ DankModal {
                             ctx.save();
                             ctx.scale(window.editScale, window.editScale);
 
+                            // 0. Paint Backdrop (if active)
+                            const isBackdropActive = window.effectiveBackdropMode !== "none";
+                            if (isBackdropActive) {
+                                window.drawBackdropBackground(ctx, window.canvasWidth, window.canvasHeight);
+                                window.drawScreenshotShadow(ctx);
+                                window.drawScreenshotImage(ctx, bgImage);
+                            }
+
                             // 1. Draw Dimming Selection Overlay (only if in crop mode)
                             DrawingRenderer.drawSelectionOverlay(ctx, {
                                 isCropMode: window.currentTool === "crop",
@@ -970,9 +1165,15 @@ DankModal {
 
                             // 2. Draw annotations (translated in edit mode, or clipped in crop mode)
                             ctx.save();
-                            if (window.currentTool !== "crop" && window.hasSelection) {
-                                // Shift context so drawings at absolute screen coords display correctly in cropped canvas view
-                                ctx.translate(-window.cropRect.x, -window.cropRect.y);
+                            const hasCropSelection = window.currentTool !== "crop" && window.hasSelection;
+                            if (isBackdropActive || hasCropSelection) {
+                                const cropX = hasCropSelection ? window.cropRect.x : 0;
+                                const cropY = hasCropSelection ? window.cropRect.y : 0;
+                                ctx.translate(window.screenshotXOffset, window.screenshotYOffset);
+                                if (isBackdropActive) {
+                                    ctx.scale(window.backdropScaleFactor, window.backdropScaleFactor);
+                                }
+                                ctx.translate(-cropX, -cropY);
                             } else if (window.hasSelection) {
                                 ctx.beginPath();
                                 ctx.rect(window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height);
@@ -1175,8 +1376,12 @@ DankModal {
                             acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
 
                             function getAbsolutePoint(mx, my) {
-                                const rx = mx / window.editScale;
-                                const ry = my / window.editScale;
+                                let rx = mx / window.editScale;
+                                let ry = my / window.editScale;
+                                if (window.effectiveBackdropMode !== "none") {
+                                    rx = (rx - window.screenshotXOffset) / window.backdropScaleFactor;
+                                    ry = (ry - window.screenshotYOffset) / window.backdropScaleFactor;
+                                }
                                 if (window.currentTool !== "crop" && window.hasSelection) {
                                     return Qt.point(rx + window.cropRect.x, ry + window.cropRect.y);
                                 }
@@ -1912,17 +2117,38 @@ DankModal {
                                 ctx.translate(-window.cursorX, -window.cursorY);
 
                                 // 1. Draw background image
-                                if (staticBgImage.status === Image.Ready || staticBgImage.width > 0) {
-                                    ctx.drawImage(staticBgImage, 0, 0, window.canvasWidth, window.canvasHeight);
-                                }
-
-                                // 2. Draw annotations
-                                if (window.showAnnotations) {
-                                    for (var i = 0; i < window.strokes.length; i++) {
-                                        drawingCanvas.drawStroke(ctx, window.strokes[i]);
+                                if (window.effectiveBackdropMode !== "none") {
+                                    window.drawBackdropBackground(ctx, window.canvasWidth, window.canvasHeight);
+                                    window.drawScreenshotShadow(ctx);
+                                    window.drawScreenshotImage(ctx, bgImage);
+                                    
+                                    // 2. Draw annotations
+                                    if (window.showAnnotations) {
+                                        ctx.save();
+                                        ctx.translate(window.screenshotXOffset, window.screenshotYOffset);
+                                        ctx.scale(window.backdropScaleFactor, window.backdropScaleFactor);
+                                        const cropX = window.hasSelection ? window.cropRect.x : 0;
+                                        const cropY = window.hasSelection ? window.cropRect.y : 0;
+                                        ctx.translate(-cropX, -cropY);
+                                        for (var i = 0; i < window.strokes.length; i++) {
+                                            drawingCanvas.drawStroke(ctx, window.strokes[i]);
+                                        }
+                                        if (window.currentStroke) {
+                                            drawingCanvas.drawStroke(ctx, window.currentStroke);
+                                        }
+                                        ctx.restore();
                                     }
-                                    if (window.currentStroke) {
-                                        drawingCanvas.drawStroke(ctx, window.currentStroke);
+                                } else {
+                                    if (staticBgImage.status === Image.Ready || staticBgImage.width > 0) {
+                                        ctx.drawImage(staticBgImage, 0, 0, window.canvasWidth, window.canvasHeight);
+                                    }
+                                    if (window.showAnnotations) {
+                                        for (var i = 0; i < window.strokes.length; i++) {
+                                            drawingCanvas.drawStroke(ctx, window.strokes[i]);
+                                        }
+                                        if (window.currentStroke) {
+                                            drawingCanvas.drawStroke(ctx, window.currentStroke);
+                                        }
                                     }
                                 }
 
@@ -1966,24 +2192,44 @@ DankModal {
                         ctx.save();
                         ctx.scale(1 / window.dpr, 1 / window.dpr);
                         
-                        // 1. Draw the background image first
-                        if (bgImage.status === Image.Ready) {
-                             if (window.hasSelection) {
-                                 // Draw the cropped portion of the raw background
-                                 ctx.drawImage(bgImage, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, 0, 0, window.cropRect.width, window.cropRect.height);
-                             } else {
-                                 // Fullscreen background
-                                 ctx.drawImage(bgImage, 0, 0);
-                             }
+                        // 0. Paint Backdrop (if active)
+                        const isBackdropActive = window.effectiveBackdropMode !== "none";
+                        if (isBackdropActive) {
+                            window.drawBackdropBackground(ctx, window.canvasWidth, window.canvasHeight);
+                            window.drawScreenshotShadow(ctx);
+                            window.drawScreenshotImage(ctx, bgImage);
+                        } else {
+                            if (bgImage.status === Image.Ready) {
+                                 if (window.hasSelection) {
+                                     // Draw the cropped portion of the raw background
+                                     ctx.drawImage(bgImage, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, 0, 0, window.cropRect.width, window.cropRect.height);
+                                 } else {
+                                     // Fullscreen background
+                                     ctx.drawImage(bgImage, 0, 0);
+                                 }
+                            }
                         }
 
-                        // 1.5 Overlay the Spotlight Layer
+                        // 1.5 Overlay the Spotlight Layer and Annotations
                         if (window.showAnnotations) {
+                            ctx.save();
+                            const hasCropSelection = window.hasSelection;
+                            if (isBackdropActive || hasCropSelection) {
+                                const cropX = hasCropSelection ? window.cropRect.x : 0;
+                                const cropY = hasCropSelection ? window.cropRect.y : 0;
+                                ctx.translate(window.screenshotXOffset, window.screenshotYOffset);
+                                ctx.scale(window.backdropScaleFactor, window.backdropScaleFactor);
+                                ctx.translate(-cropX, -cropY);
+                            }
+
                             // 1.4 Draw Pixelate BEFORE spotlight layer in export
                             for (let i = 0; i < window.strokes.length; i++) {
                                 if (window.strokes[i].tool === "pixelate") {
                                     window.activeCanvas.drawStroke(ctx, window.strokes[i]);
                                 }
+                            }
+                            if (window.currentStroke && window.currentStroke.tool === "pixelate") {
+                                window.activeCanvas.drawStroke(ctx, window.currentStroke);
                             }
 
                             const isDrawingSpotlight = window.currentStroke && window.currentStroke.tool === "spotlight";
@@ -2002,19 +2248,14 @@ DankModal {
                                     } else {
                                         const lastSpotlight = window.strokes.slice().reverse().find(s => s.tool === "spotlight");
                                         if (lastSpotlight) activeInt = lastSpotlight.width;
-                                        }
-
-                                        const spotlightOpacity = activeInt / 100.0;
-
-                                        ctx.beginPath();
-
-                                    // Cover the entire exported area
-                                    ctx.rect(0, 0, window.canvasWidth, window.canvasHeight);
-                                    
-                                    ctx.save();
-                                    if (window.hasSelection) {
-                                        ctx.translate(-window.cropRect.x, -window.cropRect.y);
                                     }
+
+                                    const spotlightOpacity = activeInt / 100.0;
+
+                                    ctx.beginPath();
+                                    const cropX = hasCropSelection ? window.cropRect.x : 0;
+                                    const cropY = hasCropSelection ? window.cropRect.y : 0;
+                                    ctx.rect(cropX, cropY, window.screenshotWidth, window.screenshotHeight);
                                     
                                     for (let s of spotlights) {
                                         if (s.points.length >= 2) {
@@ -2025,53 +2266,48 @@ DankModal {
                                             const rw = Math.abs(p1.x - p0.x);
                                             const rh = Math.abs(p1.y - p0.y);
                                             
-                                            if (rw > 0 && rh > 0) {
-                                                const radius = window.roundRect ? Math.min(Theme.cornerRadius, Math.min(rw, rh) / 2) : 0;
-                                                if (radius > 0) {
-                                                    ctx.moveTo(rx + radius, ry);
-                                                    ctx.lineTo(rx + rw - radius, ry);
-                                                    ctx.arcTo(rx + rw, ry, rx + rw, ry + radius, radius);
-                                                    ctx.lineTo(rx + rw, ry + rh - radius);
-                                                    ctx.arcTo(rx + rw, ry + rh, rx + rw - radius, ry + rh, radius);
-                                                    ctx.lineTo(rx + radius, ry + rh);
-                                                    ctx.arcTo(rx, ry + rh, rx, ry + rh - radius, radius);
-                                                    ctx.lineTo(rx, ry + radius);
-                                                    ctx.arcTo(rx, ry, rx + radius, ry, radius);
-                                                    ctx.closePath();
-                                                } else {
-                                                    ctx.rect(rx, ry, rw, rh);
-                                                }
-                                            }
+                                             if (rw > 0 && rh > 0) {
+                                                 const radius = window.roundRect ? Math.min(Theme.cornerRadius, Math.min(rw, rh) / 2) : 0;
+                                                 if (radius > 0) {
+                                                     ctx.moveTo(rx + radius, ry);
+                                                     ctx.lineTo(rx + rw - radius, ry);
+                                                     ctx.arcTo(rx + rw, ry, rx + rw, ry + radius, radius);
+                                                     ctx.lineTo(rx + rw, ry + rh - radius);
+                                                     ctx.arcTo(rx + rw, ry + rh, rx + rw - radius, ry + rh, radius);
+                                                     ctx.lineTo(rx + radius, ry + rh);
+                                                     ctx.arcTo(rx, ry + rh, rx, ry + rh - radius, radius);
+                                                     ctx.lineTo(rx, ry + radius);
+                                                     ctx.arcTo(rx, ry, rx + radius, ry, radius);
+                                                     ctx.closePath();
+                                                 } else {
+                                                     ctx.rect(rx, ry, rw, rh);
+                                                 }
+                                             }
                                         }
                                     }
-                                    ctx.restore();
                                     
                                     ctx.clip("evenodd");
                                     ctx.fillStyle = "rgba(0, 0, 0, " + spotlightOpacity + ")";
-                                    ctx.fillRect(0, 0, window.canvasWidth, window.canvasHeight);
+                                    ctx.fillRect(cropX, cropY, window.screenshotWidth, window.screenshotHeight);
                                     ctx.restore();
                                 }
                             }
-                        }
 
-                         // 2. Overlay the annotations at full resolution
-                         if (window.showAnnotations && window.activeCanvas) {
-                              ctx.save();
-                              if (window.hasSelection) {
-                                  ctx.translate(-window.cropRect.x, -window.cropRect.y);
-                              }
-                              // Draw all completed strokes
-                              for (var i = 0; i < window.strokes.length; i++) {
-                                  if (window.strokes[i].tool !== "pixelate") {
-                                      window.activeCanvas.drawStroke(ctx, window.strokes[i]);
-                                  }
-                              }
-                              // Draw current dragging stroke if any
-                              if (window.currentStroke) {
-                                  window.activeCanvas.drawStroke(ctx, window.currentStroke);
-                              }
-                              ctx.restore();
-                         }
+                            // 2. Overlay the annotations at full resolution
+                            if (window.activeCanvas) {
+                                // Draw all completed strokes (except pixelate and spotlight)
+                                for (var i = 0; i < window.strokes.length; i++) {
+                                    if (window.strokes[i].tool !== "pixelate" && window.strokes[i].tool !== "spotlight") {
+                                        window.activeCanvas.drawStroke(ctx, window.strokes[i]);
+                                    }
+                                }
+                                // Draw current dragging stroke if any
+                                if (window.currentStroke && window.currentStroke.tool !== "pixelate" && window.currentStroke.tool !== "spotlight") {
+                                    window.activeCanvas.drawStroke(ctx, window.currentStroke);
+                                }
+                            }
+                            ctx.restore();
+                        }
 
                         // 3. Overlay custom watermark if enabled
                         const pData = (window.parentWidget && window.parentWidget.pluginData) || {};

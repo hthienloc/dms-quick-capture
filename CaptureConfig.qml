@@ -19,7 +19,8 @@ QtObject {
         { id: "highlighter", icon: "border_color", tooltip: qsTr("Highlighter (S)") },
         { id: "eraser", icon: "auto_fix_normal", tooltip: qsTr("Eraser (D)") },
         { id: "spotlight", icon: "highlight", tooltip: qsTr("Focus Spotlight (F)") },
-        { id: "callout", icon: "zoom_in", tooltip: qsTr("Area Zoom (Z) | Hold B for Loupe") }
+        { id: "callout", icon: "zoom_in", tooltip: qsTr("Area Zoom (Z) | Hold G for Loupe") },
+        { id: "backdrop", icon: "wallpaper", tooltip: qsTr("Image Backdrop (B)") }
     ]
 
     readonly property string selectedPreset: pluginData["color_palette_preset"] || "adaptive"
@@ -165,7 +166,8 @@ QtObject {
         { key: "S", tool: "highlighter" },
         { key: "D", tool: "eraser" },
         { key: "F", tool: "spotlight" },
-        { key: "Z", tool: "callout" }
+        { key: "Z", tool: "callout" },
+        { key: "B", tool: "backdrop" }
     ]
 
     readonly property var colorShortcuts: [
