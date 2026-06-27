@@ -57,7 +57,7 @@ DankModal {
         if (currentTool !== "text" && window.isTyping) {
             window.commitTypingText();
         }
-        if (currentTool !== "crop" && currentTool !== "backdrop") {
+        if (currentTool !== "crop" && currentTool !== "backdrop" && currentTool !== "select") {
             lastActiveTool = currentTool;
         }
         if (window.activeCanvas) {
@@ -842,7 +842,11 @@ DankModal {
                 event.accepted = true;
                 return;
             }
-            if (window.presetHistory.length >= 2) {
+            if (window.currentTool === "select") {
+                window.currentTool = window.lastActiveTool;
+            } else if (window.currentTool === window.lastActiveTool) {
+                window.currentTool = "select";
+            } else if (window.presetHistory.length >= 2) {
                 const current = { 
                     tool: window.currentTool, 
                     color: window.currentColor.toString(), 
@@ -863,6 +867,8 @@ DankModal {
                 
                 // Update history so the new current is at the top
                 window.recordPresetUsage(target);
+            } else {
+                window.currentTool = "select";
             }
             event.accepted = true;
             return;
