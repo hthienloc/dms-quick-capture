@@ -571,20 +571,35 @@ Rectangle {
                         property bool isFirst: index === 0
                         property bool isLast: index === 3
                         
-                        color: selected ? Theme.buttonBg : Theme.withAlpha(Theme.surfaceVariant, Theme.popupTransparency)
+                        color: {
+                            if (selected) {
+                                if (verticalMouseArea.pressed) return Theme.buttonPressed;
+                                if (verticalSegment.hovered) return Theme.buttonHover;
+                                return Theme.buttonBg;
+                            } else {
+                                if (verticalMouseArea.pressed || verticalSegment.hovered) return Theme.surfaceTextHover;
+                                return Theme.withAlpha(Theme.surfaceVariant, Theme.popupTransparency);
+                            }
+                        }
                         
-                        topLeftRadius: (isFirst || selected) ? Theme.cornerRadius : Math.min(4, Theme.cornerRadius)
-                        topRightRadius: (isFirst || selected) ? Theme.cornerRadius : Math.min(4, Theme.cornerRadius)
-                        bottomLeftRadius: (isLast || selected) ? Theme.cornerRadius : Math.min(4, Theme.cornerRadius)
-                        bottomRightRadius: (isLast || selected) ? Theme.cornerRadius : Math.min(4, Theme.cornerRadius)
+                        radius: (selected || isFirst || isLast) ? Theme.cornerRadius : 0
 
+                        // Mask bottom corners of the first item when not selected
                         Rectangle {
-                            anchors.fill: parent
-                            topLeftRadius: parent.topLeftRadius
-                            topRightRadius: parent.topRightRadius
-                            bottomLeftRadius: parent.bottomLeftRadius
-                            bottomRightRadius: parent.bottomRightRadius
-                            color: verticalMouseArea.pressed ? (selected ? Theme.buttonPressed : Theme.surfaceTextHover) : (verticalSegment.hovered ? (selected ? Theme.buttonHover : Theme.surfaceTextHover) : "transparent")
+                            anchors.bottom: parent.bottom
+                            width: parent.width
+                            height: parent.radius
+                            color: parent.color
+                            visible: !verticalSegment.selected && verticalSegment.isFirst && parent.radius > 0
+                        }
+
+                        // Mask top corners of the last item when not selected
+                        Rectangle {
+                            anchors.top: parent.top
+                            width: parent.width
+                            height: parent.radius
+                            color: parent.color
+                            visible: !verticalSegment.selected && verticalSegment.isLast && parent.radius > 0
                         }
 
                         StyledText {
