@@ -43,6 +43,8 @@ Rectangle {
     signal changeBackdropCornerRadius(int radius)
     signal changeBackdropShadowStrength(int strength)
     signal changeBackdropAspectRatio(string ratio)
+    signal rotateRequested()
+    signal mirrorRequested()
 
     readonly property var toolbarPalette: {
         const p1 = root.pluginData["toolbar_color_primary"] || "primary";
@@ -152,6 +154,51 @@ Rectangle {
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+                DankActionButton {
+                    iconName: "more_horiz"
+                    buttonSize: 36
+                    iconSize: 18
+                    tooltipText: qsTr("More Tools")
+                    onClicked: moreActionsMenu.open()
+                    
+                    Menu {
+                        id: moreActionsMenu
+                        y: parent.height
+                        
+                        background: Rectangle {
+                            implicitWidth: 100
+                            color: Theme.withAlpha(Theme.surface, Theme.popupTransparency)
+                            border.color: Theme.withAlpha(Theme.outline, 0.2)
+                            radius: Theme.cornerRadiusS
+                        }
+
+                        MenuItem {
+                            text: qsTr("Rotate")
+                            contentItem: StyledText {
+                                text: parent.text
+                                color: parent.hovered ? Theme.primary : Theme.surfaceText
+                                font.pixelSize: Theme.fontSizeSmall
+                            }
+                            background: Rectangle {
+                                color: parent.hovered ? Theme.withAlpha(Theme.primary, 0.1) : "transparent"
+                            }
+                            onTriggered: root.rotateRequested()
+                        }
+
+                        MenuItem {
+                            text: qsTr("Mirror")
+                            contentItem: StyledText {
+                                text: parent.text
+                                color: parent.hovered ? Theme.primary : Theme.surfaceText
+                                font.pixelSize: Theme.fontSizeSmall
+                            }
+                            background: Rectangle {
+                                color: parent.hovered ? Theme.withAlpha(Theme.primary, 0.1) : "transparent"
+                            }
+                            onTriggered: root.mirrorRequested()
                         }
                     }
                 }
@@ -280,6 +327,52 @@ Rectangle {
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+                DankActionButton {
+                    iconName: "more_vert"
+                    buttonSize: 36
+                    iconSize: 18
+                    tooltipText: qsTr("More Tools")
+                    onClicked: moreActionsVerticalMenu.open()
+                    
+                    Menu {
+                        id: moreActionsVerticalMenu
+                        x: parent.width
+                        y: 0
+                        
+                        background: Rectangle {
+                            implicitWidth: 100
+                            color: Theme.withAlpha(Theme.surface, Theme.popupTransparency)
+                            border.color: Theme.withAlpha(Theme.outline, 0.2)
+                            radius: Theme.cornerRadiusS
+                        }
+
+                        MenuItem {
+                            text: qsTr("Rotate")
+                            contentItem: StyledText {
+                                text: parent.text
+                                color: parent.hovered ? Theme.primary : Theme.surfaceText
+                                font.pixelSize: Theme.fontSizeSmall
+                            }
+                            background: Rectangle {
+                                color: parent.hovered ? Theme.withAlpha(Theme.primary, 0.1) : "transparent"
+                            }
+                            onTriggered: root.rotateRequested()
+                        }
+
+                        MenuItem {
+                            text: qsTr("Mirror")
+                            contentItem: StyledText {
+                                text: parent.text
+                                color: parent.hovered ? Theme.primary : Theme.surfaceText
+                                font.pixelSize: Theme.fontSizeSmall
+                            }
+                            background: Rectangle {
+                                color: parent.hovered ? Theme.withAlpha(Theme.primary, 0.1) : "transparent"
+                            }
+                            onTriggered: root.mirrorRequested()
                         }
                     }
                 }

@@ -423,6 +423,67 @@ DankModal {
         open();
     }
 
+    function rotateScreenshot() {
+        const oldW = screenshotWidth;
+        const oldH = screenshotHeight;
+
+        Proc.runCommand("rotate-image", ["mogrify", "-rotate", "90", "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
+            if (exitCode === 0) {
+                if (window.hasSelection) {
+                    const cx = window.cropRect.x;
+                    const cy = window.cropRect.y;
+                    const cw = window.cropRect.width;
+                    const ch = window.cropRect.height;
+                    window.cropRect = Qt.rect(oldH - (cy + ch), cx, ch, cw);
+                }
+
+                const list = [...window.strokes];
+                for (let s of list) {
+                    if (s.points) {
+                        s.points = s.points.map(p => ({
+                            x: oldH - p.y,
+                            y: p.x
+                        }));
+                    }
+                }
+                window.strokes = list;
+
+                window.bgImageSource = "";
+                window.bgImageSource = "file:///tmp/dms_capture_bg.png";
+            }
+        });
+    }
+
+    function mirrorScreenshot() {
+        const oldW = screenshotWidth;
+
+        Proc.runCommand("mirror-image", ["mogrify", "-flop", "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
+            if (exitCode === 0) {
+                if (window.hasSelection) {
+                    const cx = window.cropRect.x;
+                    const cy = window.cropRect.y;
+                    const cw = window.cropRect.width;
+                    const ch = window.cropRect.height;
+                    window.cropRect = Qt.rect(oldW - (cx + cw), cy, cw, ch);
+                }
+
+                const list = [...window.strokes];
+                for (let s of list) {
+                    if (s.points) {
+                        s.points = s.points.map(p => ({
+                            x: oldW - p.x,
+                            y: p.y
+                        }));
+                    }
+                }
+                window.strokes = list;
+
+                window.bgImageSource = "";
+                window.bgImageSource = "file:///tmp/dms_capture_bg.png";
+            }
+        });
+    }
+
     shouldBeVisible: false
     
     // Spacious modal dimensions occupying 90% width and 90% height of the screen
@@ -1140,6 +1201,8 @@ DankModal {
                     onCloseRequested: window.discardAndClose()
                     onTextToolRightClicked: (globalX, globalY) => textOptionsRadialMenu.open(globalX, globalY)
                     onStampToolRightClicked: (globalX, globalY) => stampOptionsRadialMenu.open(globalX, globalY)
+                    onRotateRequested: window.rotateScreenshot()
+                    onMirrorRequested: window.mirrorScreenshot()
                 }
 
                 // 2. Centered Canvas Board
