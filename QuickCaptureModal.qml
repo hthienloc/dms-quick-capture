@@ -1014,42 +1014,47 @@ DankModal {
 
                                         const spotlightOpacity = activeInt / 100.0;
                                         
-                                        ctx.beginPath();
-                                        // Outer rectangle covering the whole view
-                                        ctx.rect(0, 0, window.canvasWidth, window.canvasHeight);
-                                        
-                                        for (let s of spotlights) {
-                                            if (s.points.length >= 2) {
-                                                const p0 = s.points[0];
-                                                const p1 = s.points[s.points.length - 1];
-                                                const rx = Math.min(p0.x, p1.x);
-                                                const ry = Math.min(p0.y, p1.y);
-                                                const rw = Math.abs(p1.x - p0.x);
-                                                const rh = Math.abs(p1.y - p0.y);
-                                                
-                                                if (rw > 0 && rh > 0) {
-                                                    const radius = window.roundRect ? Math.min(Theme.cornerRadius, Math.min(rw, rh) / 2) : 0;
-                                                    if (radius > 0) {
-                                                        ctx.moveTo(rx + radius, ry);
-                                                        ctx.lineTo(rx + rw - radius, ry);
-                                                        ctx.arcTo(rx + rw, ry, rx + rw, ry + radius, radius);
-                                                        ctx.lineTo(rx + rw, ry + rh - radius);
-                                                        ctx.arcTo(rx + rw, ry + rh, rx + rw - radius, ry + rh, radius);
-                                                        ctx.lineTo(rx + radius, ry + rh);
-                                                        ctx.arcTo(rx, ry + rh, rx, ry + rh - radius, radius);
-                                                        ctx.lineTo(rx, ry + radius);
-                                                        ctx.arcTo(rx, ry, rx + radius, ry, radius);
-                                                        ctx.closePath();
-                                                    } else {
-                                                        ctx.rect(rx, ry, rw, rh);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        
-                                        ctx.clip("evenodd");
-                                        ctx.fillStyle = "rgba(0, 0, 0, " + spotlightOpacity + ")";
-                                        ctx.fillRect(0, 0, window.canvasWidth, window.canvasHeight);
+                                         const rectX = (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.x : 0;
+                                         const rectY = (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.y : 0;
+                                         const rectW = (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.width : window.canvasWidth;
+                                         const rectH = (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.height : window.canvasHeight;
+
+                                         ctx.beginPath();
+                                         // Outer rectangle covering the whole view
+                                         ctx.rect(rectX, rectY, rectW, rectH);
+                                         
+                                         for (let s of spotlights) {
+                                             if (s.points.length >= 2) {
+                                                 const p0 = s.points[0];
+                                                 const p1 = s.points[s.points.length - 1];
+                                                 const rx = Math.min(p0.x, p1.x);
+                                                 const ry = Math.min(p0.y, p1.y);
+                                                 const rw = Math.abs(p1.x - p0.x);
+                                                 const rh = Math.abs(p1.y - p0.y);
+                                                 
+                                                 if (rw > 0 && rh > 0) {
+                                                     const radius = window.roundRect ? Math.min(Theme.cornerRadius, Math.min(rw, rh) / 2) : 0;
+                                                     if (radius > 0) {
+                                                         ctx.moveTo(rx + radius, ry);
+                                                         ctx.lineTo(rx + rw - radius, ry);
+                                                         ctx.arcTo(rx + rw, ry, rx + rw, ry + radius, radius);
+                                                         ctx.lineTo(rx + rw, ry + rh - radius);
+                                                         ctx.arcTo(rx + rw, ry + rh, rx + rw - radius, ry + rh, radius);
+                                                         ctx.lineTo(rx + radius, ry + rh);
+                                                         ctx.arcTo(rx, ry + rh, rx, ry + rh - radius, radius);
+                                                         ctx.lineTo(rx, ry + radius);
+                                                         ctx.arcTo(rx, ry, rx + radius, ry, radius);
+                                                         ctx.closePath();
+                                                     } else {
+                                                         ctx.rect(rx, ry, rw, rh);
+                                                     }
+                                                 }
+                                             }
+                                         }
+                                         
+                                         ctx.clip("evenodd");
+                                         ctx.fillStyle = "rgba(0, 0, 0, " + spotlightOpacity + ")";
+                                         ctx.fillRect(rectX, rectY, rectW, rectH);
                                         ctx.restore();
                                     }
                                 }
