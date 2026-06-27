@@ -372,32 +372,20 @@ Rectangle {
             
             Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
             
-            // Aspect Ratio selection
-            Row {
-                spacing: Theme.spacingXS
+            // Aspect Ratio selection (Native DankButtonGroup)
+            DankButtonGroup {
                 anchors.verticalCenter: parent.verticalCenter
-                Repeater {
-                    model: ["auto", "1:1", "16:9", "4:3"]
-                    delegate: Button {
-                        focusPolicy: Qt.NoFocus
-                        text: modelData.toUpperCase()
-                        flat: true
-                        font.pixelSize: 10
-                        font.bold: true
-                        implicitWidth: 42
-                        implicitHeight: 36
-                        contentItem: Text {
-                            text: parent.text
-                            font: parent.font
-                            color: root.backdropAspectRatio === modelData ? Theme.primary : Theme.surfaceText
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        background: Rectangle {
-                            color: root.backdropAspectRatio === modelData ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                            radius: Theme.cornerRadiusS
-                        }
-                        onClicked: root.changeBackdropAspectRatio(modelData)
+                buttonHeight: 28
+                minButtonWidth: 38
+                buttonPadding: Theme.spacingS
+                checkEnabled: false
+                textSize: 10
+                model: ["AUTO", "1:1", "16:9", "4:3"]
+                currentIndex: ["auto", "1:1", "16:9", "4:3"].indexOf(root.backdropAspectRatio)
+                onSelectionChanged: (index, selected) => {
+                    if (selected) {
+                        const ratios = ["auto", "1:1", "16:9", "4:3"];
+                        root.changeBackdropAspectRatio(ratios[index]);
                     }
                 }
             }
@@ -567,32 +555,53 @@ Rectangle {
             
             Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
             
-            // Aspect Ratio selection
+            // Aspect Ratio selection (Vertical Segmented Control)
             Column {
                 spacing: Theme.spacingXS
                 anchors.horizontalCenter: parent.horizontalCenter
                 Repeater {
                     model: ["auto", "1:1", "16:9", "4:3"]
-                    delegate: Button {
-                        focusPolicy: Qt.NoFocus
-                        text: modelData.toUpperCase()
-                        flat: true
-                        font.pixelSize: 9
-                        font.bold: true
-                        implicitWidth: 36
-                        implicitHeight: 32
-                        contentItem: Text {
-                            text: parent.text
-                            font: parent.font
-                            color: root.backdropAspectRatio === modelData ? Theme.primary : Theme.surfaceText
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
+                    delegate: Rectangle {
+                        id: verticalSegment
+                        width: 36
+                        height: 28
+                        
+                        property bool selected: root.backdropAspectRatio === modelData
+                        property bool hovered: verticalMouseArea.containsMouse
+                        property bool isFirst: index === 0
+                        property bool isLast: index === 3
+                        
+                        color: selected ? Theme.buttonBg : Theme.withAlpha(Theme.surfaceVariant, Theme.popupTransparency)
+                        
+                        topLeftRadius: (isFirst || selected) ? Theme.cornerRadius : Math.min(4, Theme.cornerRadius)
+                        topRightRadius: (isFirst || selected) ? Theme.cornerRadius : Math.min(4, Theme.cornerRadius)
+                        bottomLeftRadius: (isLast || selected) ? Theme.cornerRadius : Math.min(4, Theme.cornerRadius)
+                        bottomRightRadius: (isLast || selected) ? Theme.cornerRadius : Math.min(4, Theme.cornerRadius)
+
+                        Rectangle {
+                            anchors.fill: parent
+                            topLeftRadius: parent.topLeftRadius
+                            topRightRadius: parent.topRightRadius
+                            bottomLeftRadius: parent.bottomLeftRadius
+                            bottomRightRadius: parent.bottomRightRadius
+                            color: verticalMouseArea.pressed ? (selected ? Theme.buttonPressed : Theme.surfaceTextHover) : (verticalSegment.hovered ? (selected ? Theme.buttonHover : Theme.surfaceTextHover) : "transparent")
                         }
-                        background: Rectangle {
-                            color: root.backdropAspectRatio === modelData ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                            radius: Theme.cornerRadiusS
+
+                        StyledText {
+                            text: modelData.toUpperCase()
+                            font.pixelSize: 9
+                            font.weight: selected ? Font.Medium : Font.Normal
+                            color: selected ? Theme.buttonText : Theme.surfaceVariantText
+                            anchors.centerIn: parent
                         }
-                        onClicked: root.changeBackdropAspectRatio(modelData)
+
+                        MouseArea {
+                            id: verticalMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.changeBackdropAspectRatio(modelData)
+                        }
                     }
                 }
             }
