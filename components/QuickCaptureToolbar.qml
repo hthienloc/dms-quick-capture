@@ -33,6 +33,8 @@ Rectangle {
     readonly property var aspectRatioLabels: ["AUTO", "1:1", "16:9", "4:3"]
 
     property string gradientActiveSlot: "start"
+    property bool moreToolsMenuForceClose: false
+    property bool moreToolsMenuOpened: false
 
     signal changeBackdropMode(string mode)
     signal changeBackdropSolidColor(color col)
@@ -45,42 +47,155 @@ Rectangle {
     signal changeBackdropAspectRatio(string ratio)
     signal rotateRequested()
     signal mirrorRequested()
-    signal menuClosed()
 
-    component MoreToolsMenu: Menu {
-        onClosed: root.menuClosed()
+    component MoreToolsMenu: Rectangle {
+        id: menuRoot
+        width: 100
+        height: menuColumn.implicitHeight + Theme.spacingS * 2
+        color: Theme.surfaceContainer
+        border.color: Theme.withAlpha(Theme.outline, 0.15)
+        border.width: 1
+        radius: Theme.cornerRadius
+        z: 1000
 
-        background: Rectangle {
-            implicitWidth: 100
-            color: Theme.withAlpha(Theme.surface, Theme.popupTransparency)
-            border.color: Theme.withAlpha(Theme.outline, 0.2)
-            radius: Theme.cornerRadiusS
+        property bool opened: false
+        onOpenedChanged: {
+            if (opened) {
+                root.moreToolsMenuOpened = true;
+            } else {
+                root.moreToolsMenuOpened = false;
+            }
         }
 
-        MenuItem {
-            text: qsTr("Rotate")
-            contentItem: StyledText {
-                text: parent.text
-                color: parent.hovered ? Theme.primary : Theme.surfaceText
-                font.pixelSize: Theme.fontSizeSmall
+        Component.onDestruction: {
+            if (opened) {
+                root.moreToolsMenuOpened = false;
             }
-            background: Rectangle {
-                color: parent.hovered ? Theme.withAlpha(Theme.primary, 0.1) : "transparent"
-            }
-            onTriggered: root.rotateRequested()
         }
 
-        MenuItem {
-            text: qsTr("Mirror")
-            contentItem: StyledText {
-                text: parent.text
-                color: parent.hovered ? Theme.primary : Theme.surfaceText
-                font.pixelSize: Theme.fontSizeSmall
+        visible: opacity > 0
+        opacity: 0
+        scale: 0.9
+
+        states: [
+            State {
+                name: "visible"
+                when: menuRoot.opened
+                PropertyChanges { target: menuRoot; opacity: 1.0; scale: 1.0 }
             }
-            background: Rectangle {
-                color: parent.hovered ? Theme.withAlpha(Theme.primary, 0.1) : "transparent"
+        ]
+
+        transitions: [
+            Transition {
+                NumberAnimation { properties: "opacity,scale"; duration: 120; easing.type: Easing.OutQuad }
             }
-            onTriggered: root.mirrorRequested()
+        ]
+
+        function open() {
+            root.moreToolsMenuForceClose = false;
+            menuRoot.opened = true;
+        }
+
+        function close() {
+            menuRoot.opened = false;
+        }
+
+        Connections {
+            target: root
+            function onMoreToolsMenuForceCloseChanged() {
+                if (root.moreToolsMenuForceClose) {
+                    menuRoot.opened = false;
+                }
+            }
+        }
+
+        Column {
+            id: menuColumn
+            anchors.fill: parent
+            anchors.margins: Theme.spacingS
+            spacing: 2
+
+            // Rotate Option
+            Rectangle {
+                width: parent.width
+                height: 28
+                radius: Theme.cornerRadius - 2
+                color: rotateMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+
+                Row {
+                    anchors.fill: parent
+                    anchors.leftMargin: Theme.spacingS
+                    anchors.rightMargin: Theme.spacingS
+                    spacing: Theme.spacingS
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    DankIcon {
+                        name: "rotate_right"
+                        size: 14
+                        color: Theme.surfaceText
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    StyledText {
+                        text: qsTr("Rotate")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceText
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                MouseArea {
+                    id: rotateMouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        menuRoot.close();
+                        root.rotateRequested();
+                    }
+                }
+            }
+
+            // Mirror Option
+            Rectangle {
+                width: parent.width
+                height: 28
+                radius: Theme.cornerRadius - 2
+                color: mirrorMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+
+                Row {
+                    anchors.fill: parent
+                    anchors.leftMargin: Theme.spacingS
+                    anchors.rightMargin: Theme.spacingS
+                    spacing: Theme.spacingS
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    DankIcon {
+                        name: "flip"
+                        size: 14
+                        color: Theme.surfaceText
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    StyledText {
+                        text: qsTr("Mirror")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceText
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                MouseArea {
+                    id: mirrorMouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        menuRoot.close();
+                        root.mirrorRequested();
+                    }
+                }
+            }
         }
     }
 
@@ -200,7 +315,13 @@ Rectangle {
                     buttonSize: 36
                     iconSize: 18
                     tooltipText: qsTr("More Tools")
-                    onClicked: moreActionsMenu.open()
+                    onClicked: {
+                        if (moreActionsMenu.opened) {
+                            moreActionsMenu.close();
+                        } else {
+                            moreActionsMenu.open();
+                        }
+                    }
                     
                     MoreToolsMenu {
                         id: moreActionsMenu
@@ -340,7 +461,13 @@ Rectangle {
                     buttonSize: 36
                     iconSize: 18
                     tooltipText: qsTr("More Tools")
-                    onClicked: moreActionsVerticalMenu.open()
+                    onClicked: {
+                        if (moreActionsVerticalMenu.opened) {
+                            moreActionsVerticalMenu.close();
+                        } else {
+                            moreActionsVerticalMenu.open();
+                        }
+                    }
                     
                     MoreToolsMenu {
                         id: moreActionsVerticalMenu
