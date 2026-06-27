@@ -1014,9 +1014,15 @@ DankModal {
 
                                         const spotlightOpacity = activeInt / 100.0;
                                         
+                                        const isCroppedMode = window.currentTool !== "crop" && window.hasSelection;
+                                        const dimmingX = isCroppedMode ? window.cropRect.x : 0;
+                                        const dimmingY = isCroppedMode ? window.cropRect.y : 0;
+                                        const dimmingW = isCroppedMode ? window.cropRect.width : window.canvasWidth;
+                                        const dimmingH = isCroppedMode ? window.cropRect.height : window.canvasHeight;
+
                                         ctx.beginPath();
                                         // Outer rectangle covering the whole view
-                                        ctx.rect(0, 0, window.canvasWidth, window.canvasHeight);
+                                        ctx.rect(dimmingX, dimmingY, dimmingW, dimmingH);
                                         
                                         for (let s of spotlights) {
                                             if (s.points.length >= 2) {
@@ -1049,7 +1055,7 @@ DankModal {
                                         
                                         ctx.clip("evenodd");
                                         ctx.fillStyle = "rgba(0, 0, 0, " + spotlightOpacity + ")";
-                                        ctx.fillRect(0, 0, window.canvasWidth, window.canvasHeight);
+                                        ctx.fillRect(dimmingX, dimmingY, dimmingW, dimmingH);
                                         ctx.restore();
                                     }
                                 }
