@@ -28,6 +28,9 @@ Rectangle {
     property int backdropCornerRadius: 12
     property int backdropShadowStrength: 50
     property string backdropAspectRatio: "auto"
+    
+    readonly property var aspectRatios: ["auto", "1:1", "16:9", "4:3"]
+    readonly property var aspectRatioLabels: ["AUTO", "1:1", "16:9", "4:3"]
 
     property string gradientActiveSlot: "start"
 
@@ -372,31 +375,19 @@ Rectangle {
             
             Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
             
-            // Aspect Ratio selection
-            Row {
-                spacing: Theme.spacingXS
+            // Aspect Ratio selection (Native DankButtonGroup)
+            DankButtonGroup {
                 anchors.verticalCenter: parent.verticalCenter
-                Repeater {
-                    model: ["auto", "1:1", "16:9", "4:3"]
-                    delegate: Button {
-                        text: modelData.toUpperCase()
-                        flat: true
-                        font.pixelSize: 10
-                        font.bold: true
-                        implicitWidth: 42
-                        implicitHeight: 36
-                        contentItem: Text {
-                            text: parent.text
-                            font: parent.font
-                            color: root.backdropAspectRatio === modelData ? Theme.primary : Theme.surfaceText
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        background: Rectangle {
-                            color: root.backdropAspectRatio === modelData ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                            radius: Theme.cornerRadiusS
-                        }
-                        onClicked: root.changeBackdropAspectRatio(modelData)
+                buttonHeight: 28
+                minButtonWidth: 38
+                buttonPadding: Theme.spacingS
+                checkEnabled: false
+                textSize: 10
+                model: root.aspectRatioLabels
+                currentIndex: root.aspectRatios.indexOf(root.backdropAspectRatio)
+                onSelectionChanged: (index, selected) => {
+                    if (selected) {
+                        root.changeBackdropAspectRatio(root.aspectRatios[index]);
                     }
                 }
             }
@@ -566,31 +557,69 @@ Rectangle {
             
             Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
             
-            // Aspect Ratio selection
+            // Aspect Ratio selection (Vertical Segmented Control)
             Column {
                 spacing: Theme.spacingXS
                 anchors.horizontalCenter: parent.horizontalCenter
                 Repeater {
-                    model: ["auto", "1:1", "16:9", "4:3"]
-                    delegate: Button {
-                        text: modelData.toUpperCase()
-                        flat: true
-                        font.pixelSize: 9
-                        font.bold: true
-                        implicitWidth: 36
-                        implicitHeight: 32
-                        contentItem: Text {
-                            text: parent.text
-                            font: parent.font
-                            color: root.backdropAspectRatio === modelData ? Theme.primary : Theme.surfaceText
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
+                    id: verticalRatioRepeater
+                    model: root.aspectRatios
+                    delegate: Rectangle {
+                        id: verticalSegment
+                        width: 36
+                        height: 28
+                        
+                        property bool selected: root.backdropAspectRatio === modelData
+                        property bool hovered: verticalMouseArea.containsMouse
+                        property bool isFirst: index === 0
+                        property bool isLast: index === (verticalRatioRepeater.count - 1)
+                        
+                        color: {
+                            if (selected) {
+                                if (verticalMouseArea.pressed) return Theme.buttonPressed;
+                                if (verticalSegment.hovered) return Theme.buttonHover;
+                                return Theme.buttonBg;
+                            } else {
+                                if (verticalMouseArea.pressed || verticalSegment.hovered) return Theme.surfaceTextHover;
+                                return Theme.withAlpha(Theme.surfaceVariant, Theme.popupTransparency);
+                            }
                         }
-                        background: Rectangle {
-                            color: root.backdropAspectRatio === modelData ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                            radius: Theme.cornerRadiusS
+                        
+                        radius: (selected || isFirst || isLast) ? Theme.cornerRadius : 0
+
+                        // Mask bottom corners of the first item when not selected
+                        Rectangle {
+                            anchors.bottom: parent.bottom
+                            width: parent.width
+                            height: parent.radius
+                            color: parent.color
+                            visible: !verticalSegment.selected && verticalSegment.isFirst && parent.radius > 0
                         }
-                        onClicked: root.changeBackdropAspectRatio(modelData)
+
+                        // Mask top corners of the last item when not selected
+                        Rectangle {
+                            anchors.top: parent.top
+                            width: parent.width
+                            height: parent.radius
+                            color: parent.color
+                            visible: !verticalSegment.selected && verticalSegment.isLast && parent.radius > 0
+                        }
+
+                        StyledText {
+                            text: modelData.toUpperCase()
+                            font.pixelSize: 9
+                            font.weight: selected ? Font.Medium : Font.Normal
+                            color: selected ? Theme.buttonText : Theme.surfaceVariantText
+                            anchors.centerIn: parent
+                        }
+
+                        MouseArea {
+                            id: verticalMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.changeBackdropAspectRatio(modelData)
+                        }
                     }
                 }
             }
