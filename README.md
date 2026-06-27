@@ -151,6 +151,15 @@ binds {
 - [x] Adjustable text background roundness
 - [x] Stamp counter formats (Numeric / Alphabetic / Roman)
 
+### Planned Backdrop Features (inspired by Gradia)
+- [ ] **Linear Gradient Direction:** Adjustable angle/direction controller in the UI for linear gradients.
+- [ ] **Radial & Conic Gradients:** Support for radial and conic gradient backdrop modes.
+- [ ] **Custom Aspect Ratios:** Define custom canvas aspect ratios alongside standard presets (16:9, 4:3, etc.).
+- [ ] **Image Backdrop Mode:** Support setting a custom image file as the screenshot background.
+- [ ] **Customizable Drop Shadows:** Adjust shadow offset, blur radius, and color/opacity.
+- [ ] **Auto Color Balance:** Analyze the screenshot's dominant colors to automatically generate matching backdrop palettes.
+- [ ] **Interactive Padding Resizing:** Visual handles on the backdrop canvas to resize padding dynamically.
+
 ## License
 
 MIT
