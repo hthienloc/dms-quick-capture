@@ -170,72 +170,75 @@ DankModal {
     }
 
     readonly property real canvasWidth: {
-        if (window.effectiveBackdropMode === "none" || window.backdropAspectRatio === "auto") {
+        if (window.effectiveBackdropMode === "none") {
             return screenshotWidth;
         }
+        const baseW = screenshotWidth + 2 * window.backdropPadding;
+        const baseH = screenshotHeight + 2 * window.backdropPadding;
+        if (window.backdropAspectRatio === "auto") {
+            return baseW;
+        }
         if (window.backdropAspectRatio === "1:1") {
-            return Math.max(screenshotWidth, screenshotHeight);
+            return Math.max(baseW, baseH);
         }
         if (window.backdropAspectRatio === "16:9") {
             const targetRatio = 16 / 9;
-            const currentRatio = screenshotWidth / screenshotHeight;
+            const currentRatio = baseW / baseH;
             if (currentRatio > targetRatio) {
-                return screenshotWidth;
+                return baseW;
             } else {
-                return screenshotHeight * targetRatio;
+                return baseH * targetRatio;
             }
         }
         if (window.backdropAspectRatio === "4:3") {
             const targetRatio = 4 / 3;
-            const currentRatio = screenshotWidth / screenshotHeight;
+            const currentRatio = baseW / baseH;
             if (currentRatio > targetRatio) {
-                return screenshotWidth;
+                return baseW;
             } else {
-                return screenshotHeight * targetRatio;
+                return baseH * targetRatio;
             }
         }
-        return screenshotWidth;
+        return baseW;
     }
 
     readonly property real canvasHeight: {
-        if (window.effectiveBackdropMode === "none" || window.backdropAspectRatio === "auto") {
+        if (window.effectiveBackdropMode === "none") {
             return screenshotHeight;
         }
+        const baseW = screenshotWidth + 2 * window.backdropPadding;
+        const baseH = screenshotHeight + 2 * window.backdropPadding;
+        if (window.backdropAspectRatio === "auto") {
+            return baseH;
+        }
         if (window.backdropAspectRatio === "1:1") {
-            return Math.max(screenshotWidth, screenshotHeight);
+            return Math.max(baseW, baseH);
         }
         if (window.backdropAspectRatio === "16:9") {
             const targetRatio = 16 / 9;
-            const currentRatio = screenshotWidth / screenshotHeight;
+            const currentRatio = baseW / baseH;
             if (currentRatio > targetRatio) {
-                return screenshotWidth / targetRatio;
+                return baseW / targetRatio;
             } else {
-                return screenshotHeight;
+                return baseH;
             }
         }
         if (window.backdropAspectRatio === "4:3") {
             const targetRatio = 4 / 3;
-            const currentRatio = screenshotWidth / screenshotHeight;
+            const currentRatio = baseW / baseH;
             if (currentRatio > targetRatio) {
-                return screenshotWidth / targetRatio;
+                return baseW / targetRatio;
             } else {
-                return screenshotHeight;
+                return baseH;
             }
         }
-        return screenshotHeight;
+        return baseH;
     }
 
-    readonly property real backdropScaleFactor: {
-        if (window.effectiveBackdropMode === "none") return 1.0;
-        const pad = window.backdropPadding;
-        const boxW = canvasWidth - 2 * pad;
-        const boxH = canvasHeight - 2 * pad;
-        if (boxW <= 0 || boxH <= 0) return 1.0;
-        return Math.min(boxW / screenshotWidth, boxH / screenshotHeight);
-    }
+    readonly property real backdropScaleFactor: 1.0
 
-    readonly property real screenshotXOffset: window.effectiveBackdropMode === "none" ? 0 : (canvasWidth - screenshotWidth * backdropScaleFactor) / 2
-    readonly property real screenshotYOffset: window.effectiveBackdropMode === "none" ? 0 : (canvasHeight - screenshotHeight * backdropScaleFactor) / 2
+    readonly property real screenshotXOffset: window.effectiveBackdropMode === "none" ? 0 : (canvasWidth - screenshotWidth) / 2
+    readonly property real screenshotYOffset: window.effectiveBackdropMode === "none" ? 0 : (canvasHeight - screenshotHeight) / 2
 
     function drawBackdropBackground(ctx, w, h) {
         if (window.backdropMode === "solid") {
