@@ -34,7 +34,7 @@ To draw precise geometric shapes, the engine implements a Constraint Helper. Whe
 
 ## 3. Magnifier Lens & Area Zoom (Callout)
 
-### Magnifier Lens (Hold B)
+### Magnifier Lens (Hold G)
 The Magnifier Lens renders a magnified view of the cursor's current position:
 - **Concept:** It captures the raw screenshot canvas area around the mouse, scales it by a zoom factor (configurable via mouse wheel, 1.5× to 4.0×), and draws it in a floating circular component centered on the cursor.
 - **Auto-Contrast Circle:** The outer ring of the lens adjusts its border color dynamically based on the pixel colors under the cursor to remain visible.

@@ -54,6 +54,7 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 | `D` | Eraser |
 | `F` | Spotlight |
 | `Z` | Area Zoom (Callout) |
+| `B` | Backdrop Options |
 | `V` | Select |
 | `X` | Toggle Hide/Show Annotations |
 | `Tab` | Toggle between 2 latest radial presets |
@@ -85,7 +86,7 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 
 ### Special Tools
 
-- **Magnifier Lens:** Hold **B** to activate a magnifying circular lens. Scroll **Mouse Wheel** while holding **B** to adjust zoom (1.5× – 4×).
+- **Magnifier Lens:** Hold **G** to activate a magnifying circular lens. Scroll **Mouse Wheel** while holding **G** to adjust zoom (1.5× – 4×).
 - **Area Zoom (Callout):** Press **Z** to draw a magnified callout box. Adjust zoom (100%–500%) with scroll wheel.
 - **Text Tool:** Supports Bold, Italic, Underline, and auto-contrast Background via the radial menu.
 
@@ -143,7 +144,7 @@ binds {
 - [x] Dynamic high-contrast canvas boundary
 - [x] Disjoint Copy vs Save pipelines
 - [x] Click-to-Type text annotation
-- [x] Magnifier Lens (hold B)
+- [x] Magnifier Lens (hold G)
 - [x] Area Zoom (Callout)
 - [x] Watermark overlay
 - [x] Pin-to-desktop (dms-floaty integration)

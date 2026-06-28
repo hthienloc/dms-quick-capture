@@ -61,6 +61,8 @@ Pressing these keys changes the active tool:
 - `F`: Spotlight (Darken background outside selection)
 - `Z`: Area Zoom / Callout box
 - `V`: Select / Move tool
+- `B`: Backdrop options
+- `G` (hold): Magnifier Lens (Cursor zoom)
 - `Tab`: Swap between the two most recently used tool presets.
 
 ### Action Controls
