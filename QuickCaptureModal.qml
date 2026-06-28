@@ -1275,6 +1275,54 @@ DankModal {
                             moreToolsMenu.open();
                         }
                     }
+                    onBackdropControlHovered: (type, controlItem) => {
+                        var pt = controlItem.mapToItem(contentRoot, 0, 0);
+                        var popover;
+                        if (type === "padding") popover = backdropPaddingPopover;
+                        else if (type === "radius") popover = backdropRadiusPopover;
+                        else if (type === "shadow") popover = backdropShadowPopover;
+                        
+                        if (popover) {
+                            if (toolbarCard.isVertical) {
+                                if (window.toolbarPosition === "right") {
+                                    popover.x = pt.x - popover.width - Theme.spacingXS;
+                                } else {
+                                    popover.x = pt.x + controlItem.width + Theme.spacingXS;
+                                }
+                                popover.y = pt.y + (controlItem.height - popover.height) / 2;
+                            } else {
+                                popover.x = pt.x + (controlItem.width - popover.width) / 2;
+                                if (window.toolbarPosition === "bottom") {
+                                    popover.y = pt.y - popover.height - Theme.spacingXS;
+                                } else {
+                                    popover.y = pt.y + controlItem.height + Theme.spacingXS;
+                                }
+                            }
+                            popover.open();
+                        }
+                    }
+                    onBackdropControlExited: (type) => {
+                        var popover;
+                        if (type === "padding") popover = backdropPaddingPopover;
+                        else if (type === "radius") popover = backdropRadiusPopover;
+                        else if (type === "shadow") popover = backdropShadowPopover;
+                        
+                        if (popover) {
+                            popover.startCloseTimer();
+                        }
+                    }
+                    onBackdropControlWheel: (type, delta) => {
+                        let step = delta > 0 ? 5 : -5;
+                        if (type === "padding") {
+                            window.backdropPadding = Math.max(10, Math.min(150, window.backdropPadding + step));
+                        } else if (type === "radius") {
+                            let rStep = delta > 0 ? 2 : -2;
+                            window.backdropCornerRadius = Math.max(0, Math.min(60, window.backdropCornerRadius + rStep));
+                        } else if (type === "shadow") {
+                            window.backdropShadowStrength = Math.max(0, Math.min(100, window.backdropShadowStrength + step));
+                        }
+                        if (window.activeCanvas) window.activeCanvas.requestPaint();
+                    }
                 }
 
                 // 2. Centered Canvas Board
@@ -2597,6 +2645,40 @@ DankModal {
                     id: moreToolsMenu
                     onRotateRequested: window.rotateScreenshot()
                     onMirrorRequested: window.mirrorScreenshot()
+                }
+
+                HoverSliderPopover {
+                    id: backdropPaddingPopover
+                    minimum: 10
+                    maximum: 150
+                    value: window.backdropPadding
+                    onUserValueChanged: (val) => {
+                        window.backdropPadding = val;
+                        if (window.activeCanvas) window.activeCanvas.requestPaint();
+                    }
+                }
+
+                HoverSliderPopover {
+                    id: backdropRadiusPopover
+                    minimum: 0
+                    maximum: 60
+                    stepSize: 2
+                    value: window.backdropCornerRadius
+                    onUserValueChanged: (val) => {
+                        window.backdropCornerRadius = val;
+                        if (window.activeCanvas) window.activeCanvas.requestPaint();
+                    }
+                }
+
+                HoverSliderPopover {
+                    id: backdropShadowPopover
+                    minimum: 0
+                    maximum: 100
+                    value: window.backdropShadowStrength
+                    onUserValueChanged: (val) => {
+                        window.backdropShadowStrength = val;
+                        if (window.activeCanvas) window.activeCanvas.requestPaint();
+                    }
                 }
 
                 Canvas {
