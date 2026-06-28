@@ -46,6 +46,9 @@ Rectangle {
     signal rotateRequested()
     signal mirrorRequested()
     signal moreToolsClicked(var buttonItem)
+    signal backdropControlHovered(string type, var controlItem)
+    signal backdropControlExited(string type)
+    signal backdropControlWheel(string type, int delta)
 
     readonly property var toolbarPalette: {
         const p1 = root.pluginData["toolbar_color_primary"] || "primary";
@@ -414,52 +417,114 @@ Rectangle {
             Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
             
             // Sliders Row
+            // Sliders Row (Hover to reveal slider)
+            // Sliders Row (Hover to reveal popup slider)
             Row {
                 spacing: Theme.spacingM
                 anchors.verticalCenter: parent.verticalCenter
                 
-                Row {
-                    spacing: Theme.spacingXS
-                    Text { text: qsTr("Padding:") + " " + root.backdropPadding + "px"; color: Theme.surfaceText; font.pixelSize: 10; font.bold: true; anchors.verticalCenter: parent.verticalCenter }
-                    DankSlider {
-                        minimum: 10
-                        maximum: 150
-                        width: 80
-                        height: 36
-                        value: root.backdropPadding
-                        showValue: false
-                        onSliderValueChanged: val => root.changeBackdropPadding(val)
+                // Padding Control
+                Item {
+                    id: padControl
+                    width: padRow.implicitWidth
+                    height: 36
+                    anchors.verticalCenter: parent.verticalCenter
+                    
+                    Row {
+                        id: padRow
+                        spacing: Theme.spacingXS
                         anchors.verticalCenter: parent.verticalCenter
+                        DankIcon {
+                            name: "padding"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        StyledText {
+                            text: root.backdropPadding + "px"
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+                    MouseArea {
+                        id: padMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onEntered: root.backdropControlHovered("padding", padControl)
+                        onExited: root.backdropControlExited("padding")
+                        onWheel: (wheel) => root.backdropControlWheel("padding", wheel.angleDelta.y)
                     }
                 }
-                
-                Row {
-                    spacing: Theme.spacingXS
-                    Text { text: qsTr("Radius:") + " " + root.backdropCornerRadius + "px"; color: Theme.surfaceText; font.pixelSize: 10; font.bold: true; anchors.verticalCenter: parent.verticalCenter }
-                    DankSlider {
-                        minimum: 0
-                        maximum: 60
-                        width: 80
-                        height: 36
-                        value: root.backdropCornerRadius
-                        showValue: false
-                        onSliderValueChanged: val => root.changeBackdropCornerRadius(val)
+
+                // Corner Radius Control
+                Item {
+                    id: radControl
+                    width: radRow.implicitWidth
+                    height: 36
+                    anchors.verticalCenter: parent.verticalCenter
+                    
+                    Row {
+                        id: radRow
+                        spacing: Theme.spacingXS
                         anchors.verticalCenter: parent.verticalCenter
+                        DankIcon {
+                            name: "rounded_corner"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        StyledText {
+                            text: root.backdropCornerRadius + "px"
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+                    MouseArea {
+                        id: radMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onEntered: root.backdropControlHovered("radius", radControl)
+                        onExited: root.backdropControlExited("radius")
+                        onWheel: (wheel) => root.backdropControlWheel("radius", wheel.angleDelta.y)
                     }
                 }
-                
-                Row {
-                    spacing: Theme.spacingXS
-                    Text { text: qsTr("Shadow:") + " " + root.backdropShadowStrength + "%"; color: Theme.surfaceText; font.pixelSize: 10; font.bold: true; anchors.verticalCenter: parent.verticalCenter }
-                    DankSlider {
-                        minimum: 0
-                        maximum: 100
-                        width: 80
-                        height: 36
-                        value: root.backdropShadowStrength
-                        showValue: false
-                        onSliderValueChanged: val => root.changeBackdropShadowStrength(val)
+
+                // Shadow Control
+                Item {
+                    id: shadowControl
+                    width: shadowRow.implicitWidth
+                    height: 36
+                    anchors.verticalCenter: parent.verticalCenter
+                    
+                    Row {
+                        id: shadowRow
+                        spacing: Theme.spacingXS
                         anchors.verticalCenter: parent.verticalCenter
+                        DankIcon {
+                            name: "blur_on"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        StyledText {
+                            text: root.backdropShadowStrength + "%"
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+                    MouseArea {
+                        id: shadowMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onEntered: root.backdropControlHovered("shadow", shadowControl)
+                        onExited: root.backdropControlExited("shadow")
+                        onWheel: (wheel) => root.backdropControlWheel("shadow", wheel.angleDelta.y)
                     }
                 }
             }
@@ -645,53 +710,110 @@ Rectangle {
             
             Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
             
-            // Sliders
+            // Sliders (Hover to reveal popover)
             Column {
                 spacing: Theme.spacingS
                 anchors.horizontalCenter: parent.horizontalCenter
                 
-                Column {
-                    spacing: 2
+                // Padding Control
+                Item {
+                    id: padControlVert
+                    width: 36
+                    height: 28
                     anchors.horizontalCenter: parent.horizontalCenter
-                    Text { text: qsTr("Pad:") + " " + root.backdropPadding + "px"; color: Theme.surfaceText; font.pixelSize: 9; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter }
-                    DankSlider {
-                        minimum: 10
-                        maximum: 150
-                        width: 42
-                        height: 24
-                        value: root.backdropPadding
-                        showValue: false
-                        onSliderValueChanged: val => root.changeBackdropPadding(val)
+                    
+                    Row {
+                        spacing: 2
+                        anchors.centerIn: parent
+                        DankIcon {
+                            name: "padding"
+                            size: 14
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        StyledText {
+                            text: root.backdropPadding
+                            font.pixelSize: 9
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+                    MouseArea {
+                        id: padMouseAreaVert
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onEntered: root.backdropControlHovered("padding", padControlVert)
+                        onExited: root.backdropControlExited("padding")
+                        onWheel: (wheel) => root.backdropControlWheel("padding", wheel.angleDelta.y)
                     }
                 }
-                
-                Column {
-                    spacing: 2
+
+                // Corner Radius Control
+                Item {
+                    id: radControlVert
+                    width: 36
+                    height: 28
                     anchors.horizontalCenter: parent.horizontalCenter
-                    Text { text: qsTr("Rad:") + " " + root.backdropCornerRadius + "px"; color: Theme.surfaceText; font.pixelSize: 9; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter }
-                    DankSlider {
-                        minimum: 0
-                        maximum: 60
-                        width: 42
-                        height: 24
-                        value: root.backdropCornerRadius
-                        showValue: false
-                        onSliderValueChanged: val => root.changeBackdropCornerRadius(val)
+                    
+                    Row {
+                        spacing: 2
+                        anchors.centerIn: parent
+                        DankIcon {
+                            name: "rounded_corner"
+                            size: 14
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        StyledText {
+                            text: root.backdropCornerRadius
+                            font.pixelSize: 9
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+                    MouseArea {
+                        id: radMouseAreaVert
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onEntered: root.backdropControlHovered("radius", radControlVert)
+                        onExited: root.backdropControlExited("radius")
+                        onWheel: (wheel) => root.backdropControlWheel("radius", wheel.angleDelta.y)
                     }
                 }
-                
-                Column {
-                    spacing: 2
+
+                // Shadow Control
+                Item {
+                    id: shadowControlVert
+                    width: 36
+                    height: 28
                     anchors.horizontalCenter: parent.horizontalCenter
-                    Text { text: qsTr("Shd:") + " " + root.backdropShadowStrength + "%"; color: Theme.surfaceText; font.pixelSize: 9; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter }
-                    DankSlider {
-                        minimum: 0
-                        maximum: 100
-                        width: 42
-                        height: 24
-                        value: root.backdropShadowStrength
-                        showValue: false
-                        onSliderValueChanged: val => root.changeBackdropShadowStrength(val)
+                    
+                    Row {
+                        spacing: 2
+                        anchors.centerIn: parent
+                        DankIcon {
+                            name: "blur_on"
+                            size: 14
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        StyledText {
+                            text: root.backdropShadowStrength
+                            font.pixelSize: 9
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+                    MouseArea {
+                        id: shadowMouseAreaVert
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onEntered: root.backdropControlHovered("shadow", shadowControlVert)
+                        onExited: root.backdropControlExited("shadow")
+                        onWheel: (wheel) => root.backdropControlWheel("shadow", wheel.angleDelta.y)
                     }
                 }
             }
