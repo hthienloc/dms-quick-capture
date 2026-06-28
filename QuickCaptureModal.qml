@@ -1284,11 +1284,19 @@ DankModal {
                         
                         if (popover) {
                             if (toolbarCard.isVertical) {
-                                popover.x = pt.x + controlItem.width + Theme.spacingXS;
+                                if (window.toolbarPosition === "right") {
+                                    popover.x = pt.x - popover.width - Theme.spacingXS;
+                                } else {
+                                    popover.x = pt.x + controlItem.width + Theme.spacingXS;
+                                }
                                 popover.y = pt.y + (controlItem.height - popover.height) / 2;
                             } else {
                                 popover.x = pt.x + (controlItem.width - popover.width) / 2;
-                                popover.y = pt.y + controlItem.height + Theme.spacingXS;
+                                if (window.toolbarPosition === "bottom") {
+                                    popover.y = pt.y - popover.height - Theme.spacingXS;
+                                } else {
+                                    popover.y = pt.y + controlItem.height + Theme.spacingXS;
+                                }
                             }
                             popover.open();
                         }
@@ -2654,6 +2662,7 @@ DankModal {
                     id: backdropRadiusPopover
                     minimum: 0
                     maximum: 60
+                    stepSize: 2
                     value: window.backdropCornerRadius
                     onUserValueChanged: (val) => {
                         window.backdropCornerRadius = val;

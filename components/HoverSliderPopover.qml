@@ -15,6 +15,7 @@ Rectangle {
     property int minimum: 0
     property int maximum: 100
     property int value: 0
+    property int stepSize: 5
     property bool opened: false
 
     signal userValueChanged(int val)
@@ -68,7 +69,7 @@ Rectangle {
         onExited: popoverRoot.startCloseTimer()
         
         onWheel: (wheel) => {
-            let step = wheel.angleDelta.y > 0 ? 5 : -5;
+            let step = wheel.angleDelta.y > 0 ? popoverRoot.stepSize : -popoverRoot.stepSize;
             let newVal = Math.max(popoverRoot.minimum, Math.min(popoverRoot.maximum, popoverRoot.value + step));
             popoverRoot.userValueChanged(newVal);
         }
