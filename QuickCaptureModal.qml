@@ -2151,7 +2151,7 @@ DankModal {
                         border.width: 1.5 / drawingCanvas.scale
                         radius: Theme.cornerRadius / drawingCanvas.scale
                         z: 10
-                        visible: config.pluginData["showCanvasBorder"] !== undefined ? config.pluginData["showCanvasBorder"] : true
+                        visible: (config.pluginData["showCanvasBorder"] !== undefined ? config.pluginData["showCanvasBorder"] : true) && (window.effectiveBackdropMode === "none")
                     }
 
                     Item {
