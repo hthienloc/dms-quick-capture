@@ -26,3 +26,7 @@ Welcome to the official developer and user documentation for **DMS Quick Capture
    - Code conventions, directory layout, and styling.
    - Tutorial: Adding a new drawing tool.
    - Debugging, profiling, and QML testing techniques.
+
+5. **[AI Implementation Guide](ai-guide.md)**
+   - Internal technical map for AI agents.
+   - Canvas reactivity rules, popout clipping fixes, and coordinate mapping formulas.
