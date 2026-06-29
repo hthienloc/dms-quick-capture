@@ -541,44 +541,16 @@ Rectangle {
                 spacing: Theme.spacingS
                 anchors.verticalCenter: parent.verticalCenter
                 
-                Row {
-                    spacing: Theme.spacingXS
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    Rectangle {
-                        visible: root.backdropMode === "solid"
-                        width: 24; height: 24; radius: 4; color: root.backdropSolidColor
-                        border.color: Theme.withAlpha(Theme.outline, 0.3)
-                        border.width: 1
-                    }
-
-                    Row {
-                        visible: root.backdropMode === "gradient"
-                        spacing: Theme.spacingXS
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        Rectangle {
-                            width: 24; height: 24; radius: 4; color: root.backdropGradientStart
-                            border.color: root.gradientActiveSlot === "start" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
-                            border.width: root.gradientActiveSlot === "start" ? 2 : 1
-                            MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.gradientActiveSlot = "start" }
-                        }
-                        Rectangle {
-                            width: 24; height: 24; radius: 4; color: root.backdropGradientEnd
-                            border.color: root.gradientActiveSlot === "end" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
-                            border.width: root.gradientActiveSlot === "end" ? 2 : 1
-                            MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.gradientActiveSlot = "end" }
-                        }
-                    }
-
-                    DankActionButton {
-                        buttonSize: 24
-                        iconName: "auto_awesome"
-                        iconSize: 14
-                        backgroundColor: "transparent"
-                        iconColor: Theme.primary
-                        onClicked: root.autoColorBalanceRequested()
-                    }
+                BackdropColorSelectors {
+                    backdropMode: root.backdropMode
+                    backdropSolidColor: root.backdropSolidColor
+                    backdropGradientStart: root.backdropGradientStart
+                    backdropGradientEnd: root.backdropGradientEnd
+                    gradientActiveSlot: root.gradientActiveSlot
+                    itemSize: 24
+                    iconSize: 14
+                    onSetGradientActiveSlot: (slot) => root.gradientActiveSlot = slot
+                    onAutoColorBalanceRequested: root.autoColorBalanceRequested()
                 }
                 
                 Grid {
@@ -851,44 +823,16 @@ Rectangle {
                 spacing: Theme.spacingS
                 anchors.horizontalCenter: parent.horizontalCenter
                 
-                Row {
-                    spacing: Theme.spacingXS
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    Rectangle {
-                        visible: root.backdropMode === "solid"
-                        width: 18; height: 18; radius: 3; color: root.backdropSolidColor
-                        border.color: Theme.withAlpha(Theme.outline, 0.3)
-                        border.width: 1
-                    }
-
-                    Row {
-                        visible: root.backdropMode === "gradient"
-                        spacing: Theme.spacingXS
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        Rectangle {
-                            width: 18; height: 18; radius: 3; color: root.backdropGradientStart
-                            border.color: root.gradientActiveSlot === "start" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
-                            border.width: root.gradientActiveSlot === "start" ? 1.5 : 1
-                            MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.gradientActiveSlot = "start" }
-                        }
-                        Rectangle {
-                            width: 18; height: 18; radius: 3; color: root.backdropGradientEnd
-                            border.color: root.gradientActiveSlot === "end" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
-                            border.width: root.gradientActiveSlot === "end" ? 1.5 : 1
-                            MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.gradientActiveSlot = "end" }
-                        }
-                    }
-
-                    DankActionButton {
-                        buttonSize: 18
-                        iconName: "auto_awesome"
-                        iconSize: 10
-                        backgroundColor: "transparent"
-                        iconColor: Theme.primary
-                        onClicked: root.autoColorBalanceRequested()
-                    }
+                BackdropColorSelectors {
+                    backdropMode: root.backdropMode
+                    backdropSolidColor: root.backdropSolidColor
+                    backdropGradientStart: root.backdropGradientStart
+                    backdropGradientEnd: root.backdropGradientEnd
+                    gradientActiveSlot: root.gradientActiveSlot
+                    itemSize: 18
+                    iconSize: 10
+                    onSetGradientActiveSlot: (slot) => root.gradientActiveSlot = slot
+                    onAutoColorBalanceRequested: root.autoColorBalanceRequested()
                 }
                 
                 Grid {

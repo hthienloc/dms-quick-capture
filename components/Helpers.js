@@ -225,6 +225,14 @@ function formatWatermarkText(pattern, Quickshell) {
  * @returns {object} { start, end } QML color values.
  */
 function extractDominantColors(imgData, Qt) {
+    var fallback = {
+        start: Qt.rgba(0.2, 0.33, 0.47, 1),
+        end: Qt.rgba(0.07, 0.13, 0.2, 1)
+    };
+    if (!imgData || !imgData.data || imgData.data.length < 64) {
+        return fallback;
+    }
+
     var pixels = [];
     for (var i = 0; i < 16; i++) {
         var r = imgData.data[i * 4];

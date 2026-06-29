@@ -1044,6 +1044,7 @@ DankModal {
         window.bgImageSource = "file:///tmp/dms_capture_bg.png";
         window.isScreenshotDark = false;
         window.hasSampledContrast = false;
+        window.hasUserCustomizedBackdrop = false;
         window.cropRect = Qt.rect(0, 0, 0, 0);
         window.hasSelection = false;
         window.activeHandle = "none";
@@ -1122,7 +1123,6 @@ DankModal {
 
                 onStatusChanged: {
                     if (status === Image.Ready) {
-                        window.hasUserCustomizedBackdrop = false;
                         window.hasSampledContrast = false;
                         if (window.activeCanvas) {
                             window.activeCanvas.unloadImage(source);
