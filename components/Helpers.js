@@ -217,3 +217,72 @@ function formatWatermarkText(pattern, Quickshell) {
         .replace(/\{mm\}/g, mm)
         .replace(/\{ss\}/gi, ss);
 }
+
+/**
+ * Downsamples screenshot pixels to extract a matching backdrop gradient.
+ * @param {object} imgData - Canvas getImageData object of size 4x4.
+ * @param {object} Qt - The Qt object.
+ * @returns {object} { start, end } QML color values.
+ */
+function extractDominantColors(imgData, Qt) {
+    var pixels = [];
+    for (var i = 0; i < 16; i++) {
+        var r = imgData.data[i * 4];
+        var g = imgData.data[i * 4 + 1];
+        var b = imgData.data[i * 4 + 2];
+        
+        // Calculate saturation: max(r,g,b) - min(r,g,b)
+        var max = Math.max(r, g, b);
+        var min = Math.min(r, g, b);
+        var sat = max - min;
+        
+        pixels.push({ r: r, g: g, b: b, sat: sat, max: max });
+    }
+    
+    // Sort by saturation descending to prefer vibrant colors
+    pixels.sort(function(a, b) { return b.sat - a.sat; });
+    
+    var colorStart, colorEnd;
+    
+    // If the image is extremely grey/monochromatic (saturation < 15)
+    if (pixels[0].sat < 15) {
+        var avg = 0;
+        for (var i = 0; i < 16; i++) {
+            avg += (pixels[i].r + pixels[i].g + pixels[i].b) / 3;
+        }
+        avg = Math.round(avg / 16);
+        // Fallback: use a nice muted grey-blue gradient based on the average brightness
+        colorStart = Qt.rgba(Math.max(0, avg - 20)/255, Math.max(0, avg - 10)/255, Math.min(255, avg + 10)/255, 1);
+        colorEnd = Qt.rgba(Math.min(255, avg + 20)/255, Math.min(255, avg + 10)/255, Math.max(0, avg - 10)/255, 1);
+    } else {
+        // Start color: the most vibrant color
+        var pStart = pixels[0];
+        colorStart = Qt.rgba(pStart.r/255, pStart.g/255, pStart.b/255, 1);
+        
+        // End color: find a pixel that is sufficiently different from start color in RGB space
+        var pEnd = null;
+        var maxDist = -1;
+        for (var j = 1; j < pixels.length; j++) {
+            var pj = pixels[j];
+            var dist = Math.sqrt(Math.pow(pj.r - pStart.r, 2) + Math.pow(pj.g - pStart.g, 2) + Math.pow(pj.b - pStart.b, 2));
+            if (dist > maxDist) {
+                maxDist = dist;
+                pEnd = pj;
+            }
+        }
+        
+        if (pEnd && maxDist > 40) {
+            colorEnd = Qt.rgba(pEnd.r/255, pEnd.g/255, pEnd.b/255, 1);
+        } else {
+            // Generate a complementary/analogous color if no distinct color is found
+            colorEnd = Qt.rgba(
+                Math.min(255, Math.round(pStart.r * 0.7 + 50))/255,
+                Math.min(255, Math.round(pStart.g * 0.7 + 30))/255,
+                Math.min(255, Math.round(pStart.b * 1.2))/255,
+                1
+            );
+        }
+    }
+    
+    return { start: colorStart, end: colorEnd };
+}

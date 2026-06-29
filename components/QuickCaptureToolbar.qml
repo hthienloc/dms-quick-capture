@@ -49,6 +49,7 @@ Rectangle {
     signal backdropControlHovered(string type, var controlItem)
     signal backdropControlExited(string type)
     signal backdropControlWheel(string type, int delta)
+    signal autoColorBalanceRequested()
 
     readonly property var toolbarPalette: {
         const p1 = root.pluginData["toolbar_color_primary"] || "primary";
@@ -557,6 +558,14 @@ Rectangle {
                         border.width: root.gradientActiveSlot === "end" ? 2 : 1
                         MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.gradientActiveSlot = "end" }
                     }
+                    DankActionButton {
+                        buttonSize: 24
+                        iconName: "auto_awesome"
+                        iconSize: 14
+                        backgroundColor: "transparent"
+                        iconColor: Theme.primary
+                        onClicked: root.autoColorBalanceRequested()
+                    }
                 }
                 
                 Grid {
@@ -845,6 +854,14 @@ Rectangle {
                         border.color: root.gradientActiveSlot === "end" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
                         border.width: root.gradientActiveSlot === "end" ? 1.5 : 1
                         MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.gradientActiveSlot = "end" }
+                    }
+                    DankActionButton {
+                        buttonSize: 18
+                        iconName: "auto_awesome"
+                        iconSize: 10
+                        backgroundColor: "transparent"
+                        iconColor: Theme.primary
+                        onClicked: root.autoColorBalanceRequested()
                     }
                 }
                 

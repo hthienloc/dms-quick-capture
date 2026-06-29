@@ -75,6 +75,10 @@ DankModal {
     property int backdropCornerRadius: 12
     property int backdropShadowStrength: 50
     property string backdropAspectRatio: "auto" // auto, 1:1, 16:9, 4:3
+    property bool hasUserCustomizedBackdrop: false
+    property color autoBackdropGradientStart: Theme.primary
+    property color autoBackdropGradientEnd: Theme.secondary
+    property color autoBackdropSolidColor: Theme.primary
 
     // Intensity Management
     property int strokeWidth: 8
@@ -1118,13 +1122,13 @@ DankModal {
 
                 onStatusChanged: {
                     if (status === Image.Ready) {
+                        window.hasUserCustomizedBackdrop = false;
+                        window.hasSampledContrast = false;
                         if (window.activeCanvas) {
                             window.activeCanvas.unloadImage(source);
                             window.activeCanvas.loadImage(source);
                         }
-                        if (!window.hasSampledContrast) {
-                            contrastSampler.requestPaint();
-                        }
+                        contrastSampler.requestPaint();
                     }
                 }
 
@@ -1176,14 +1180,17 @@ DankModal {
                     }
                     onChangeBackdropSolidColor: (col) => {
                         window.backdropSolidColor = col;
+                        window.hasUserCustomizedBackdrop = true;
                         if (window.activeCanvas) window.activeCanvas.requestPaint();
                     }
                     onChangeBackdropGradientStart: (col) => {
                         window.backdropGradientStart = col;
+                        window.hasUserCustomizedBackdrop = true;
                         if (window.activeCanvas) window.activeCanvas.requestPaint();
                     }
                     onChangeBackdropGradientEnd: (col) => {
                         window.backdropGradientEnd = col;
+                        window.hasUserCustomizedBackdrop = true;
                         if (window.activeCanvas) window.activeCanvas.requestPaint();
                     }
                     onChangeBackdropGradientAngle: (angle) => {
@@ -1204,6 +1211,13 @@ DankModal {
                     }
                     onChangeBackdropAspectRatio: (ratio) => {
                         window.backdropAspectRatio = ratio;
+                        if (window.activeCanvas) window.activeCanvas.requestPaint();
+                    }
+                    onAutoColorBalanceRequested: {
+                        window.backdropGradientStart = window.autoBackdropGradientStart;
+                        window.backdropGradientEnd = window.autoBackdropGradientEnd;
+                        window.backdropSolidColor = window.autoBackdropSolidColor;
+                        window.hasUserCustomizedBackdrop = true;
                         if (window.activeCanvas) window.activeCanvas.requestPaint();
                     }
 
@@ -2684,19 +2698,32 @@ DankModal {
                 Canvas {
                     id: contrastSampler
                     visible: false
-                    width: 1
-                    height: 1
+                    width: 4
+                    height: 4
                     onPaint: {
                         var ctx = contrastSampler.getContext("2d");
-                        ctx.drawImage(bgImage, 0, 0, 1, 1, 0, 0, 1, 1);
-                        var imgData = ctx.getImageData(0, 0, 1, 1);
+                        ctx.drawImage(bgImage, 0, 0, 4, 4, 0, 0, 4, 4);
+                        var imgData = ctx.getImageData(0, 0, 4, 4);
                         if (imgData && imgData.data) {
-                            var r = imgData.data[0];
-                            var g = imgData.data[1];
-                            var b = imgData.data[2];
+                            // Sample center pixel (index 5) for luminance
+                            var r = imgData.data[5 * 4];
+                            var g = imgData.data[5 * 4 + 1];
+                            var b = imgData.data[5 * 4 + 2];
                             var brightness = Helpers.getLuminance({ r: r/255, g: g/255, b: b/255 });
                             window.isScreenshotDark = (brightness < 0.35);
                             window.hasSampledContrast = true;
+
+                            // Extract auto-balanced colors
+                            var colors = Helpers.extractDominantColors(imgData, Qt);
+                            window.autoBackdropGradientStart = colors.start;
+                            window.autoBackdropGradientEnd = colors.end;
+                            window.autoBackdropSolidColor = colors.start;
+
+                            if (!window.hasUserCustomizedBackdrop) {
+                                window.backdropGradientStart = colors.start;
+                                window.backdropGradientEnd = colors.end;
+                                window.backdropSolidColor = colors.start;
+                            }
                         }
                     }
                 }
