@@ -528,6 +528,42 @@ Rectangle {
                         onWheel: (wheel) => root.backdropControlWheel("shadow", wheel.angleDelta.y)
                     }
                 }
+
+                // Angle Control (Gradient only)
+                Item {
+                    id: angleControl
+                    visible: root.backdropMode === "gradient"
+                    width: visible ? angleRow.implicitWidth : 0
+                    height: 36
+                    anchors.verticalCenter: parent.verticalCenter
+                    
+                    Row {
+                        id: angleRow
+                        spacing: Theme.spacingXS
+                        anchors.verticalCenter: parent.verticalCenter
+                        DankIcon {
+                            name: "rotate_right"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        StyledText {
+                            text: root.backdropGradientAngle + "°"
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+                    MouseArea {
+                        id: angleMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onEntered: root.backdropControlHovered("angle", angleControl)
+                        onExited: root.backdropControlExited("angle")
+                        onWheel: (wheel) => root.backdropControlWheel("angle", wheel.angleDelta.y)
+                    }
+                }
             }
             
             Rectangle { 
@@ -808,6 +844,41 @@ Rectangle {
                         onEntered: root.backdropControlHovered("shadow", shadowControlVert)
                         onExited: root.backdropControlExited("shadow")
                         onWheel: (wheel) => root.backdropControlWheel("shadow", wheel.angleDelta.y)
+                    }
+                }
+
+                // Angle Control (Gradient only)
+                Item {
+                    id: angleControlVert
+                    visible: root.backdropMode === "gradient"
+                    width: 36
+                    height: visible ? 28 : 0
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    
+                    Row {
+                        spacing: 2
+                        anchors.centerIn: parent
+                        DankIcon {
+                            name: "rotate_right"
+                            size: 14
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        StyledText {
+                            text: root.backdropGradientAngle
+                            font.pixelSize: 9
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+                    MouseArea {
+                        id: angleMouseAreaVert
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onEntered: root.backdropControlHovered("angle", angleControlVert)
+                        onExited: root.backdropControlExited("angle")
+                        onWheel: (wheel) => root.backdropControlWheel("angle", wheel.angleDelta.y)
                     }
                 }
             }

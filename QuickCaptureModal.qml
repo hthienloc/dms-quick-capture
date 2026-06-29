@@ -1295,7 +1295,8 @@ DankModal {
                         if (type === "padding") popover = backdropPaddingPopover;
                         else if (type === "radius") popover = backdropRadiusPopover;
                         else if (type === "shadow") popover = backdropShadowPopover;
-                        
+                        else if (type === "angle") popover = backdropAnglePopover;
+
                         if (popover) {
                             if (toolbarCard.isVertical) {
                                 if (window.toolbarPosition === "right") {
@@ -1320,7 +1321,8 @@ DankModal {
                         if (type === "padding") popover = backdropPaddingPopover;
                         else if (type === "radius") popover = backdropRadiusPopover;
                         else if (type === "shadow") popover = backdropShadowPopover;
-                        
+                        else if (type === "angle") popover = backdropAnglePopover;
+
                         if (popover) {
                             popover.startCloseTimer();
                         }
@@ -1334,6 +1336,9 @@ DankModal {
                             window.backdropCornerRadius = Math.max(0, Math.min(60, window.backdropCornerRadius + rStep));
                         } else if (type === "shadow") {
                             window.backdropShadowStrength = Math.max(0, Math.min(100, window.backdropShadowStrength + step));
+                        } else if (type === "angle") {
+                            let aStep = delta > 0 ? 15 : -15;
+                            window.backdropGradientAngle = (window.backdropGradientAngle + aStep + 360) % 360;
                         }
                         if (window.activeCanvas) window.activeCanvas.requestPaint();
                     }
@@ -2691,6 +2696,18 @@ DankModal {
                     value: window.backdropShadowStrength
                     onUserValueChanged: (val) => {
                         window.backdropShadowStrength = val;
+                        if (window.activeCanvas) window.activeCanvas.requestPaint();
+                    }
+                }
+
+                HoverSliderPopover {
+                    id: backdropAnglePopover
+                    minimum: 0
+                    maximum: 360
+                    stepSize: 15
+                    value: window.backdropGradientAngle
+                    onUserValueChanged: (val) => {
+                        window.backdropGradientAngle = val;
                         if (window.activeCanvas) window.activeCanvas.requestPaint();
                     }
                 }
