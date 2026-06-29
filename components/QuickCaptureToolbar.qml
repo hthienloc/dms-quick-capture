@@ -29,8 +29,10 @@ Rectangle {
     property int backdropShadowStrength: 50
     property string backdropAspectRatio: "auto"
     
-    readonly property var aspectRatios: ["auto", "1:1", "16:9", "4:3"]
-    readonly property var aspectRatioLabels: ["AUTO", "1:1", "16:9", "4:3"]
+    property real customAspectRatio: 1.50
+
+    readonly property var aspectRatios: ["auto", "1:1", "16:9", "9:16", "4:3", "3:2", "21:9", "custom"]
+    readonly property var aspectRatioLabels: ["AUTO", "1:1", "16:9", "9:16", "4:3", "3:2", "21:9", "CUSTOM"]
 
     property string gradientActiveSlot: "start"
 
@@ -43,6 +45,7 @@ Rectangle {
     signal changeBackdropCornerRadius(int radius)
     signal changeBackdropShadowStrength(int strength)
     signal changeBackdropAspectRatio(string ratio)
+    signal changeCustomAspectRatio(real ratio)
     signal rotateRequested()
     signal mirrorRequested()
     signal moreToolsClicked(var buttonItem)
@@ -538,6 +541,42 @@ Rectangle {
                         onWheel: (wheel) => root.backdropControlWheel("angle", wheel.angleDelta.y)
                     }
                 }
+
+                // Custom Aspect Ratio Control
+                Item {
+                    id: customRatioControl
+                    visible: root.backdropAspectRatio === "custom"
+                    width: visible ? customRatioRow.implicitWidth : 0
+                    height: 36
+                    anchors.verticalCenter: parent.verticalCenter
+                    
+                    Row {
+                        id: customRatioRow
+                        spacing: Theme.spacingXS
+                        anchors.verticalCenter: parent.verticalCenter
+                        DankIcon {
+                            name: "aspect_ratio"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        StyledText {
+                            text: root.customAspectRatio.toFixed(2)
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+                    MouseArea {
+                        id: customRatioMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onEntered: root.backdropControlHovered("customRatio", customRatioControl)
+                        onExited: root.backdropControlExited("customRatio")
+                        onWheel: (wheel) => root.backdropControlWheel("customRatio", wheel.angleDelta.y)
+                    }
+                }
             }
             
             Rectangle { 
@@ -827,6 +866,41 @@ Rectangle {
                         onEntered: root.backdropControlHovered("angle", angleControlVert)
                         onExited: root.backdropControlExited("angle")
                         onWheel: (wheel) => root.backdropControlWheel("angle", wheel.angleDelta.y)
+                    }
+                }
+
+                // Custom Aspect Ratio Control
+                Item {
+                    id: customRatioControlVert
+                    visible: root.backdropAspectRatio === "custom"
+                    width: 36
+                    height: visible ? 28 : 0
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    
+                    Row {
+                        spacing: 2
+                        anchors.centerIn: parent
+                        DankIcon {
+                            name: "aspect_ratio"
+                            size: 14
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        StyledText {
+                            text: root.customAspectRatio.toFixed(2)
+                            font.pixelSize: 9
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+                    MouseArea {
+                        id: customRatioMouseAreaVert
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onEntered: root.backdropControlHovered("customRatio", customRatioControlVert)
+                        onExited: root.backdropControlExited("customRatio")
+                        onWheel: (wheel) => root.backdropControlWheel("customRatio", wheel.angleDelta.y)
                     }
                 }
             }
