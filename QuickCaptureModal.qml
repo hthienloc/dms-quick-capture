@@ -958,6 +958,9 @@ DankModal {
                 }
             } else {
                 window.currentTool = toolShortcut.tool;
+                if (toolShortcut.tool === "backdrop" && window.backdropMode === "none") {
+                    window.backdropMode = "solid";
+                }
             }
             event.accepted = true;
         }
@@ -1067,6 +1070,9 @@ DankModal {
         }
 
         window.currentTool = startTool;
+        if (startTool === "backdrop" && window.backdropMode === "none") {
+            window.backdropMode = "solid";
+        }
         window.toolbarVisible = window.configShowToolbar;
         window.strokeWidth = startThickness;
         window.currentColor = startColor;
@@ -1268,6 +1274,9 @@ DankModal {
                             window.currentTool = window.lastActiveTool;
                         } else {
                             window.currentTool = tool;
+                            if (tool === "backdrop" && window.backdropMode === "none") {
+                                window.backdropMode = "solid";
+                            }
                         }
                     }
                     onColorSelected: (color) => {
@@ -1335,7 +1344,7 @@ DankModal {
                         else if (type === "radius") popover = backdropRadiusPopover;
                         else if (type === "shadow") popover = backdropShadowPopover;
                         else if (type === "angle") popover = backdropAnglePopover;
-                        else if (type === "customRatio") popover = backdropCustomRatioPopover;
+                        else if (type === "aspectRatio") popover = backdropAspectRatioPopover;
 
                         if (popover) {
                             if (toolbarCard.isVertical) {
@@ -1362,7 +1371,7 @@ DankModal {
                         else if (type === "radius") popover = backdropRadiusPopover;
                         else if (type === "shadow") popover = backdropShadowPopover;
                         else if (type === "angle") popover = backdropAnglePopover;
-                        else if (type === "customRatio") popover = backdropCustomRatioPopover;
+                        else if (type === "aspectRatio") popover = backdropAspectRatioPopover;
 
                         if (popover) {
                             popover.startCloseTimer();
@@ -1380,9 +1389,11 @@ DankModal {
                         } else if (type === "angle") {
                             let aStep = delta > 0 ? 15 : -15;
                             window.backdropGradientAngle = (window.backdropGradientAngle + aStep + 360) % 360;
-                        } else if (type === "customRatio") {
-                            let ratioStep = delta > 0 ? 0.05 : -0.05;
-                            window.customAspectRatio = Math.max(0.5, Math.min(2.5, window.customAspectRatio + ratioStep));
+                        } else if (type === "aspectRatio") {
+                            if (window.backdropAspectRatio === "custom") {
+                                let ratioStep = delta > 0 ? 0.05 : -0.05;
+                                window.customAspectRatio = Math.max(0.5, Math.min(2.5, window.customAspectRatio + ratioStep));
+                            }
                         }
                         if (window.activeCanvas) window.activeCanvas.requestPaint();
                     }
@@ -2756,13 +2767,16 @@ DankModal {
                     }
                 }
 
-                HoverSliderPopover {
-                    id: backdropCustomRatioPopover
-                    minimum: 50
-                    maximum: 250
-                    value: Math.round(window.customAspectRatio * 100)
-                    onUserValueChanged: (val) => {
-                        window.customAspectRatio = val / 100.0;
+                BackdropAspectRatioPopover {
+                    id: backdropAspectRatioPopover
+                    backdropAspectRatio: window.backdropAspectRatio
+                    customAspectRatio: window.customAspectRatio
+                    onChangeBackdropAspectRatio: (ratio) => {
+                        window.backdropAspectRatio = ratio;
+                        if (window.activeCanvas) window.activeCanvas.requestPaint();
+                    }
+                    onChangeCustomAspectRatio: (ratio) => {
+                        window.customAspectRatio = ratio;
                         if (window.activeCanvas) window.activeCanvas.requestPaint();
                     }
                 }
