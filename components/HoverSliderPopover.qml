@@ -4,8 +4,11 @@ import qs.Widgets
 
 Rectangle {
     id: popoverRoot
+
+    ToolbarConstants { id: tc }
+
     width: 120
-    height: 36
+    height: tc.btnSize
     color: Theme.surfaceContainer
     border.color: Theme.withAlpha(Theme.outline, 0.15)
     border.width: 1

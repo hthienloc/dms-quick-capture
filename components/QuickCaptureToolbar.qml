@@ -8,6 +8,7 @@ Rectangle {
     id: root
 
     property var pluginData: ({})
+    ToolbarConstants { id: tc }
     CaptureConfig { id: config; pluginData: root.pluginData }
 
     property string currentTool: "crop"
@@ -30,9 +31,6 @@ Rectangle {
     property string backdropAspectRatio: "auto"
     
     property real customAspectRatio: 1.50
-
-    readonly property var aspectRatios: ["auto", "1:1", "16:9", "9:16", "4:3", "3:2", "21:9", "custom"]
-    readonly property var aspectRatioLabels: ["AUTO", "1:1", "16:9", "9:16", "4:3", "3:2", "21:9", "CUSTOM"]
 
     property string gradientActiveSlot: "start"
 
@@ -111,28 +109,28 @@ Rectangle {
             Row {
                 spacing: Theme.spacingXS; anchors.verticalCenter: parent.verticalCenter
                 DankActionButton {
-                    iconName: "near_me"; buttonSize: 36; iconSize: 18; tooltipText: "Select (Tab)"
+                    iconName: "near_me"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Select (Tab)"
                     backgroundColor: root.currentTool === "select" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                     iconColor: root.currentTool === "select" ? Theme.primary : Theme.surfaceText
                     onClicked: root.toolSelected("select")
                 }
                 DankActionButton {
                     iconName: root.showAnnotations ? "visibility" : "visibility_off"
-                    buttonSize: 36; iconSize: 18
+                    buttonSize: tc.btnSize; iconSize: tc.iconSize
                     tooltipText: root.showAnnotations ? "Hide Annotations (X)" : "Show Annotations (X)"
                     iconColor: root.showAnnotations ? Theme.primary : Theme.surfaceText
                     backgroundColor: "transparent"
                     onClicked: root.annotationsToggled()
                 }
                 DankActionButton {
-                    iconName: "crop"; buttonSize: 36; iconSize: 18; tooltipText: "Crop (Ctrl+X)"
+                    iconName: "crop"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Crop (Ctrl+X)"
                     backgroundColor: root.currentTool === "crop" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                     iconColor: root.currentTool === "crop" ? Theme.primary : Theme.surfaceText
                     onClicked: root.toolSelected("crop")
                 }
             }
 
-            Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
+            Rectangle { width: tc.separatorThickness; height: tc.separatorLength; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
             // Tools
             Row {
@@ -140,11 +138,11 @@ Rectangle {
                 Repeater {
                     model: config.toolButtons
                     delegate: Item {
-                        width: 36
-                        height: 36
+                        width: tc.btnSize
+                        height: tc.btnSize
                         DankActionButton {
                             anchors.fill: parent
-                            iconName: modelData.icon; buttonSize: 36; iconSize: 18; tooltipText: modelData.tooltip
+                            iconName: modelData.icon; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: modelData.tooltip
                             backgroundColor: root.currentTool === modelData.id ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                             iconColor: root.currentTool === modelData.id ? Theme.primary : Theme.surfaceText
                             onClicked: root.toolSelected(modelData.id)
@@ -168,22 +166,22 @@ Rectangle {
                 DankActionButton {
                     id: moreActionsBtn
                     iconName: "more_horiz"
-                    buttonSize: 36
-                    iconSize: 18
+                    buttonSize: tc.btnSize
+                    iconSize: tc.iconSize
                     tooltipText: qsTr("More Tools")
                     onClicked: root.moreToolsClicked(moreActionsBtn)
                 }
             }
 
-            Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
+            Rectangle { width: tc.separatorThickness; height: tc.separatorLength; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
             // Colors
             Grid {
-                rows: 2; columns: 4; spacing: 4; anchors.verticalCenter: parent.verticalCenter
+                rows: 2; columns: 4; spacing: tc.gridSpacing; anchors.verticalCenter: parent.verticalCenter
                 Repeater {
                     model: root.toolbarPalette
                     delegate: Rectangle {
-                        width: 20; height: 20; radius: 10; color: modelData
+                        width: tc.swatchSize; height: tc.swatchSize; radius: tc.swatchRadius; color: modelData
                         border.color: Qt.colorEqual(root.currentColor, modelData) ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
                         border.width: Qt.colorEqual(root.currentColor, modelData) ? 2 : 1
                         MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.colorSelected(modelData) }
@@ -191,7 +189,7 @@ Rectangle {
                 }
             }
 
-            Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
+            Rectangle { width: tc.separatorThickness; height: tc.separatorLength; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
             // Thickness Section
             Row {
@@ -210,8 +208,8 @@ Rectangle {
                     id: hSlider
                     minimum: root.activeToolType === "pixelate" ? 2 : (root.activeToolType === "spotlight" ? 10 : (root.activeToolType === "callout" ? 100 : 1))
                     maximum: root.activeToolType === "pixelate" ? 12 : (root.activeToolType === "text" ? 120 : (root.activeToolType === "spotlight" ? 95 : (root.activeToolType === "callout" ? 500 : 50)))
-                    width: 100
-                    height: 36
+                    width: tc.sliderWidth
+                    height: tc.btnSize
                     showValue: false
                     onSliderValueChanged: newValue => root.strokeWidthSelected(newValue)
                     anchors.verticalCenter: parent.verticalCenter
@@ -224,17 +222,17 @@ Rectangle {
                 }
             }
 
-            Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
+            Rectangle { width: tc.separatorThickness; height: tc.separatorLength; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
             // Actions
             Row {
                 spacing: Theme.spacingXS; anchors.verticalCenter: parent.verticalCenter
-                DankActionButton { iconName: "undo"; buttonSize: 36; iconSize: 18; enabled: root.canUndo; opacity: enabled ? 1.0 : 0.4; onClicked: root.undoRequested() }
-                DankActionButton { iconName: "picture_in_picture"; buttonSize: 36; iconSize: 18; tooltipText: "Float Window (Ctrl+F)"; onClicked: root.floatRequested() }
-                DankActionButton { iconName: "save"; buttonSize: 36; iconSize: 18; tooltipText: "Save to File (Ctrl+S)"; onClicked: root.saveRequested() }
-                DankActionButton { iconName: "content_copy"; buttonSize: 36; iconSize: 18; tooltipText: "Copy to Clipboard (Ctrl+C)"; onClicked: root.copyRequested() }
-                DankActionButton { iconName: "done_all"; buttonSize: 36; iconSize: 18; tooltipText: "Copy & Save (Enter)"; backgroundColor: Theme.withAlpha(Theme.primary, 0.1); iconColor: Theme.primary; onClicked: root.copyAndSaveRequested() }
-                DankActionButton { iconName: "close"; buttonSize: 36; iconSize: 18; iconColor: Theme.error; onClicked: root.closeRequested() }
+                DankActionButton { iconName: "undo"; buttonSize: tc.btnSize; iconSize: tc.iconSize; enabled: root.canUndo; opacity: enabled ? 1.0 : 0.4; onClicked: root.undoRequested() }
+                DankActionButton { iconName: "picture_in_picture"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Float Window (Ctrl+F)"; onClicked: root.floatRequested() }
+                DankActionButton { iconName: "save"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Save to File (Ctrl+S)"; onClicked: root.saveRequested() }
+                DankActionButton { iconName: "content_copy"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Copy to Clipboard (Ctrl+C)"; onClicked: root.copyRequested() }
+                DankActionButton { iconName: "done_all"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Copy & Save (Enter)"; backgroundColor: Theme.withAlpha(Theme.primary, 0.1); iconColor: Theme.primary; onClicked: root.copyAndSaveRequested() }
+                DankActionButton { iconName: "close"; buttonSize: tc.btnSize; iconSize: tc.iconSize; iconColor: Theme.error; onClicked: root.closeRequested() }
             }
         }
     }
@@ -248,39 +246,39 @@ Rectangle {
             Column {
                 spacing: Theme.spacingXS; anchors.horizontalCenter: parent.horizontalCenter
                 DankActionButton {
-                    iconName: "near_me"; buttonSize: 36; iconSize: 18; tooltipText: "Select (Tab)"
+                    iconName: "near_me"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Select (Tab)"
                     backgroundColor: root.currentTool === "select" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                     iconColor: root.currentTool === "select" ? Theme.primary : Theme.surfaceText
                     onClicked: root.toolSelected("select")
                 }
                 DankActionButton {
                     iconName: root.showAnnotations ? "visibility" : "visibility_off"
-                    buttonSize: 36; iconSize: 18
+                    buttonSize: tc.btnSize; iconSize: tc.iconSize
                     tooltipText: root.showAnnotations ? "Hide Annotations (X)" : "Show Annotations (X)"
                     iconColor: root.showAnnotations ? Theme.primary : Theme.surfaceText
                     backgroundColor: "transparent"
                     onClicked: root.annotationsToggled()
                 }
                 DankActionButton {
-                    iconName: "crop"; buttonSize: 36; iconSize: 18; tooltipText: "Crop (Ctrl+X)"
+                    iconName: "crop"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Crop (Ctrl+X)"
                     backgroundColor: root.currentTool === "crop" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                     iconColor: root.currentTool === "crop" ? Theme.primary : Theme.surfaceText
                     onClicked: root.toolSelected("crop")
                 }
             }
 
-            Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
+            Rectangle { width: tc.separatorLength; height: tc.separatorThickness; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
 
             Grid {
                 columns: 1; spacing: Theme.spacingXS; anchors.horizontalCenter: parent.horizontalCenter
                 Repeater {
                     model: config.toolButtons
                     delegate: Item {
-                        width: 36
-                        height: 36
+                        width: tc.btnSize
+                        height: tc.btnSize
                         DankActionButton {
                             anchors.fill: parent
-                            iconName: modelData.icon; buttonSize: 36; iconSize: 18
+                            iconName: modelData.icon; buttonSize: tc.btnSize; iconSize: tc.iconSize
                             backgroundColor: root.currentTool === modelData.id ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                             iconColor: root.currentTool === modelData.id ? Theme.primary : Theme.surfaceText
                             onClicked: root.toolSelected(modelData.id)
@@ -304,21 +302,21 @@ Rectangle {
                 DankActionButton {
                     id: moreActionsVerticalBtn
                     iconName: "more_vert"
-                    buttonSize: 36
-                    iconSize: 18
+                    buttonSize: tc.btnSize
+                    iconSize: tc.iconSize
                     tooltipText: qsTr("More Tools")
                     onClicked: root.moreToolsClicked(moreActionsVerticalBtn)
                 }
             }
 
-            Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
+            Rectangle { width: tc.separatorLength; height: tc.separatorThickness; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
 
             Grid {
-                columns: 2; spacing: 6; anchors.horizontalCenter: parent.horizontalCenter
+                columns: 2; spacing: tc.gridSpacing + 2; anchors.horizontalCenter: parent.horizontalCenter
                 Repeater {
                     model: root.toolbarPalette
                     delegate: Rectangle {
-                        width: 18; height: 18; radius: 9; color: modelData
+                        width: tc.swatchSizeVert; height: tc.swatchSizeVert; radius: tc.swatchRadiusVert; color: modelData
                         border.color: Qt.colorEqual(root.currentColor, modelData) ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
                         border.width: 1
                         MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.colorSelected(modelData) }
@@ -326,7 +324,7 @@ Rectangle {
                 }
             }
 
-            Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
+            Rectangle { width: tc.separatorLength; height: tc.separatorThickness; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
 
             // Thickness Text Only
             Text {
@@ -339,12 +337,12 @@ Rectangle {
                 color: Theme.surfaceText; font.pixelSize: 10; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter
             }
 
-            Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
+            Rectangle { width: tc.separatorLength; height: tc.separatorThickness; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
 
             Column {
                 spacing: Theme.spacingXS; anchors.horizontalCenter: parent.horizontalCenter
-                DankActionButton { iconName: "undo"; buttonSize: 36; iconSize: 18; enabled: root.canUndo; opacity: enabled ? 1.0 : 0.4; onClicked: root.undoRequested() }
-                DankActionButton { iconName: "done_all"; buttonSize: 36; iconSize: 18; tooltipText: "Copy & Save (Enter)"; backgroundColor: Theme.withAlpha(Theme.primary, 0.1); iconColor: Theme.primary; onClicked: root.copyAndSaveRequested() }
+                DankActionButton { iconName: "undo"; buttonSize: tc.btnSize; iconSize: tc.iconSize; enabled: root.canUndo; opacity: enabled ? 1.0 : 0.4; onClicked: root.undoRequested() }
+                DankActionButton { iconName: "done_all"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Copy & Save (Enter)"; backgroundColor: Theme.withAlpha(Theme.primary, 0.1); iconColor: Theme.primary; onClicked: root.copyAndSaveRequested() }
             }
         }
     }
@@ -358,13 +356,13 @@ Rectangle {
             // Back button
             DankActionButton {
                 iconName: "arrow_back"
-                buttonSize: 36
-                iconSize: 18
+                buttonSize: tc.btnSize
+                iconSize: tc.iconSize
                 tooltipText: qsTr("Back to Annotation (B)")
                 onClicked: root.toolSelected("back")
             }
             
-            Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
+            Rectangle { width: tc.separatorThickness; height: tc.separatorLength; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
             
             BackdropModeSelectors {
                 backdropMode: root.backdropMode
@@ -382,7 +380,7 @@ Rectangle {
                 Item {
                     id: padControl
                     width: padRow.implicitWidth
-                    height: 36
+                    height: tc.btnSize
                     anchors.verticalCenter: parent.verticalCenter
                     
                     Row {
@@ -391,7 +389,7 @@ Rectangle {
                         anchors.verticalCenter: parent.verticalCenter
                         DankIcon {
                             name: "padding"
-                            size: 16
+                            size: tc.backdropIconSize
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -417,7 +415,7 @@ Rectangle {
                 Item {
                     id: radControl
                     width: radRow.implicitWidth
-                    height: 36
+                    height: tc.btnSize
                     anchors.verticalCenter: parent.verticalCenter
                     
                     Row {
@@ -426,7 +424,7 @@ Rectangle {
                         anchors.verticalCenter: parent.verticalCenter
                         DankIcon {
                             name: "rounded_corner"
-                            size: 16
+                            size: tc.backdropIconSize
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -452,7 +450,7 @@ Rectangle {
                 Item {
                     id: shadowControl
                     width: shadowRow.implicitWidth
-                    height: 36
+                    height: tc.btnSize
                     anchors.verticalCenter: parent.verticalCenter
                     
                     Row {
@@ -461,7 +459,7 @@ Rectangle {
                         anchors.verticalCenter: parent.verticalCenter
                         DankIcon {
                             name: "blur_on"
-                            size: 16
+                            size: tc.backdropIconSize
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -488,7 +486,7 @@ Rectangle {
                     id: angleControl
                     visible: root.backdropMode === "gradient" || root.backdropMode === "conic"
                     width: visible ? angleRow.implicitWidth : 0
-                    height: 36
+                    height: tc.btnSize
                     anchors.verticalCenter: parent.verticalCenter
                     
                     Row {
@@ -497,7 +495,7 @@ Rectangle {
                         anchors.verticalCenter: parent.verticalCenter
                         DankIcon {
                             name: "rotate_right"
-                            size: 16
+                            size: tc.backdropIconSize
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -520,49 +518,21 @@ Rectangle {
                 }
 
                 // Aspect Ratio Control (Hover to reveal preset grid + custom slider popover)
-                Item {
+                AspectRatioControl {
                     id: aspectControl
-                    width: aspectRow.implicitWidth
-                    height: 36
+                    backdropAspectRatio: root.backdropAspectRatio
+                    customAspectRatio: root.customAspectRatio
+                    compact: false
                     anchors.verticalCenter: parent.verticalCenter
-                    
-                    Row {
-                        id: aspectRow
-                        spacing: Theme.spacingXS
-                        anchors.verticalCenter: parent.verticalCenter
-                        DankIcon {
-                            name: "aspect_ratio"
-                            size: 16
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                        StyledText {
-                            text: {
-                                if (root.backdropAspectRatio === "custom") {
-                                    return root.customAspectRatio.toFixed(2);
-                                }
-                                return root.backdropAspectRatio.toUpperCase();
-                            }
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
-                    MouseArea {
-                        id: aspectMouseArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onEntered: root.backdropControlHovered("aspectRatio", aspectControl)
-                        onExited: root.backdropControlExited("aspectRatio")
-                        onWheel: (wheel) => root.backdropControlWheel("aspectRatio", wheel.angleDelta.y)
-                    }
+                    onHovered: root.backdropControlHovered("aspectRatio", aspectControl)
+                    onExited: root.backdropControlExited("aspectRatio")
+                    onWheeled: (delta) => root.backdropControlWheel("aspectRatio", delta)
                 }
             }
             
             Rectangle { 
                 visible: root.backdropMode !== "none"
-                width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter 
+                width: tc.separatorThickness; height: tc.separatorLength; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter 
             }
             
             // Colors (Solid or Gradient)
@@ -584,11 +554,11 @@ Rectangle {
                 }
                 
                 Grid {
-                    rows: 2; columns: 4; spacing: 4; anchors.verticalCenter: parent.verticalCenter
+                    rows: 2; columns: 4; spacing: tc.gridSpacing; anchors.verticalCenter: parent.verticalCenter
                     Repeater {
                         model: root.toolbarPalette
                         delegate: Rectangle {
-                            width: 16; height: 16; radius: 8; color: modelData
+                            width: tc.swatchSizeSmall; height: tc.swatchSizeSmall; radius: tc.swatchRadiusSmall; color: modelData
                             border.color: Theme.withAlpha(Theme.outline, 0.3)
                             border.width: 1
                             MouseArea {
@@ -622,13 +592,13 @@ Rectangle {
             // Back button
             DankActionButton {
                 iconName: "arrow_back"
-                buttonSize: 36
-                iconSize: 18
+                buttonSize: tc.btnSize
+                iconSize: tc.iconSize
                 tooltipText: qsTr("Back to Annotation (B)")
                 onClicked: root.toolSelected("back")
             }
             
-            Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
+            Rectangle { width: tc.separatorLength; height: tc.separatorThickness; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
             
             BackdropModeSelectors {
                 backdropMode: root.backdropMode
@@ -637,7 +607,7 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
             }
             
-            Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
+            Rectangle { width: tc.separatorLength; height: tc.separatorThickness; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
             
             // Sliders (Hover to reveal popover)
             Column {
@@ -647,22 +617,22 @@ Rectangle {
                 // Padding Control
                 Item {
                     id: padControlVert
-                    width: 36
-                    height: 28
+                    width: tc.btnSize
+                    height: tc.btnSizeCompact
                     anchors.horizontalCenter: parent.horizontalCenter
                     
                     Row {
-                        spacing: 2
+                        spacing: tc.spacingCompact
                         anchors.centerIn: parent
                         DankIcon {
                             name: "padding"
-                            size: 14
+                            size: tc.iconSizeCompact
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         StyledText {
                             text: root.backdropPadding
-                            font.pixelSize: 9
+                            font.pixelSize: tc.fontSizeCompact
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -681,22 +651,22 @@ Rectangle {
                 // Corner Radius Control
                 Item {
                     id: radControlVert
-                    width: 36
-                    height: 28
+                    width: tc.btnSize
+                    height: tc.btnSizeCompact
                     anchors.horizontalCenter: parent.horizontalCenter
                     
                     Row {
-                        spacing: 2
+                        spacing: tc.spacingCompact
                         anchors.centerIn: parent
                         DankIcon {
                             name: "rounded_corner"
-                            size: 14
+                            size: tc.iconSizeCompact
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         StyledText {
                             text: root.backdropCornerRadius
-                            font.pixelSize: 9
+                            font.pixelSize: tc.fontSizeCompact
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -715,22 +685,22 @@ Rectangle {
                 // Shadow Control
                 Item {
                     id: shadowControlVert
-                    width: 36
-                    height: 28
+                    width: tc.btnSize
+                    height: tc.btnSizeCompact
                     anchors.horizontalCenter: parent.horizontalCenter
                     
                     Row {
-                        spacing: 2
+                        spacing: tc.spacingCompact
                         anchors.centerIn: parent
                         DankIcon {
                             name: "blur_on"
-                            size: 14
+                            size: tc.iconSizeCompact
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         StyledText {
                             text: root.backdropShadowStrength
-                            font.pixelSize: 9
+                            font.pixelSize: tc.fontSizeCompact
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -750,22 +720,22 @@ Rectangle {
                 Item {
                     id: angleControlVert
                     visible: root.backdropMode === "gradient" || root.backdropMode === "conic"
-                    width: 36
+                    width: tc.btnSize
                     height: visible ? 28 : 0
                     anchors.horizontalCenter: parent.horizontalCenter
                     
                     Row {
-                        spacing: 2
+                        spacing: tc.spacingCompact
                         anchors.centerIn: parent
                         DankIcon {
                             name: "rotate_right"
-                            size: 14
+                            size: tc.iconSizeCompact
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         StyledText {
                             text: root.backdropGradientAngle
-                            font.pixelSize: 9
+                            font.pixelSize: tc.fontSizeCompact
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -782,43 +752,21 @@ Rectangle {
                 }
 
                 // Custom Aspect Ratio Control
-                Item {
+                AspectRatioControl {
                     id: aspectControlVert
-                    width: 36
-                    height: 28
+                    backdropAspectRatio: root.backdropAspectRatio
+                    customAspectRatio: root.customAspectRatio
+                    compact: true
                     anchors.horizontalCenter: parent.horizontalCenter
-                    
-                    Row {
-                        spacing: 2
-                        anchors.centerIn: parent
-                        DankIcon {
-                            name: "aspect_ratio"
-                            size: 14
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                        StyledText {
-                            text: root.backdropAspectRatio === "custom" ? root.customAspectRatio.toFixed(2) : root.backdropAspectRatio.toUpperCase()
-                            font.pixelSize: 9
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
-                    MouseArea {
-                        id: aspectMouseAreaVert
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onEntered: root.backdropControlHovered("aspectRatio", aspectControlVert)
-                        onExited: root.backdropControlExited("aspectRatio")
-                        onWheel: (wheel) => root.backdropControlWheel("aspectRatio", wheel.angleDelta.y)
-                    }
+                    onHovered: root.backdropControlHovered("aspectRatio", aspectControlVert)
+                    onExited: root.backdropControlExited("aspectRatio")
+                    onWheeled: (delta) => root.backdropControlWheel("aspectRatio", delta)
                 }
             }
             
             Rectangle { 
                 visible: root.backdropMode !== "none"
-                width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter 
+                width: tc.separatorLength; height: tc.separatorThickness; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter 
             }
             
             // Colors (Solid or Gradient)
@@ -840,11 +788,11 @@ Rectangle {
                 }
                 
                 Grid {
-                    columns: 2; spacing: 4; anchors.horizontalCenter: parent.horizontalCenter
+                    columns: 2; spacing: tc.gridSpacing; anchors.horizontalCenter: parent.horizontalCenter
                     Repeater {
                         model: root.toolbarPalette
                         delegate: Rectangle {
-                            width: 14; height: 14; radius: 7; color: modelData
+                            width: tc.swatchSizeVertSmall; height: tc.swatchSizeVertSmall; radius: tc.swatchRadiusVertSmall; color: modelData
                             border.color: Theme.withAlpha(Theme.outline, 0.3)
                             border.width: 1
                             MouseArea {

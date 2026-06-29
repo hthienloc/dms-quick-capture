@@ -5,17 +5,24 @@ import qs.Widgets
 Rectangle {
     id: popoverRoot
 
+    ToolbarConstants { id: tc }
+
     property string backdropAspectRatio: "auto"
     property real customAspectRatio: 1.50
+    property real customRatioMin: 0.50
+    property real customRatioMax: 2.50
+    property var presets: []
     property bool opened: false
 
     signal changeBackdropAspectRatio(string ratio)
     signal changeCustomAspectRatio(real ratio)
 
     readonly property bool customActive: backdropAspectRatio === "custom"
+    readonly property int _sliderMin: Math.round(customRatioMin * 100)
+    readonly property int _sliderMax: Math.round(customRatioMax * 100)
 
     width: customActive ? 340 : 220
-    height: 72
+    height: tc.popoverHeight
     color: Theme.surfaceContainer
     border.color: Theme.withAlpha(Theme.outline, 0.15)
     border.width: 1
@@ -73,8 +80,9 @@ Rectangle {
         onWheel: (wheel) => {
             if (popoverRoot.customActive) {
                 let step = wheel.angleDelta.y > 0 ? 5 : -5;
-                let newVal = Math.max(50, Math.min(250, Math.round(popoverRoot.customAspectRatio * 100) + step));
-                popoverRoot.changeCustomAspectRatio(newVal / 100.0);
+                let scaled = Math.round(popoverRoot.customAspectRatio * 100) + step;
+                let newVal = Math.max(popoverRoot._sliderMin, Math.min(popoverRoot._sliderMax, scaled)) / 100.0;
+                popoverRoot.changeCustomAspectRatio(newVal);
             }
         }
 
@@ -90,22 +98,12 @@ Rectangle {
                 spacing: 4
                 anchors.verticalCenter: parent.verticalCenter
 
-                readonly property var presets: [
-                    { value: "auto", label: "AUTO" },
-                    { value: "1:1", label: "1:1" },
-                    { value: "16:9", label: "16:9" },
-                    { value: "9:16", label: "9:16" },
-                    { value: "4:3", label: "4:3" },
-                    { value: "3:2", label: "3:2" },
-                    { value: "21:9", label: "21:9" },
-                    { value: "custom", label: "CUST" }
-                ]
-
                 Repeater {
-                    model: parent.presets
+                    model: popoverRoot.presets
                     delegate: Rectangle {
-                        width: 44
-                        height: 24
+                        required property var modelData
+                        width: tc.presetBtnWidth
+                        height: tc.presetBtnHeight
                         radius: Theme.cornerRadiusXS
                         color: popoverRoot.backdropAspectRatio === modelData.value ? Theme.primary : Theme.withAlpha(Theme.surfaceVariant, 0.4)
                         border.color: popoverRoot.backdropAspectRatio === modelData.value ? "transparent" : Theme.withAlpha(Theme.outline, 0.15)
@@ -113,7 +111,7 @@ Rectangle {
 
                         StyledText {
                             text: modelData.label
-                            font.pixelSize: 10
+                            font.pixelSize: tc.presetFontSize
                             font.weight: popoverRoot.backdropAspectRatio === modelData.value ? Font.DemiBold : Font.Normal
                             color: popoverRoot.backdropAspectRatio === modelData.value ? Theme.onPrimary : Theme.surfaceVariantText
                             anchors.centerIn: parent
@@ -131,8 +129,8 @@ Rectangle {
             // Separator when custom is active
             Rectangle {
                 visible: popoverRoot.customActive
-                width: 1
-                height: 36
+                width: tc.separatorThickness
+                height: tc.btnSize
                 color: Theme.withAlpha(Theme.outline, 0.2)
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -149,19 +147,24 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
 
                     StyledText {
-                        text: "Ratio"
+                        text: I18n.tr("Ratio")
                         font.pixelSize: 8
                         color: Theme.surfaceVariantText
                     }
 
                     DankSlider {
                         id: slider
-                        minimum: 50
-                        maximum: 250
-                        width: 100
-                        value: Math.round(popoverRoot.customAspectRatio * 100)
+                        minimum: popoverRoot._sliderMin
+                        maximum: popoverRoot._sliderMax
+                        width: tc.sliderWidth
                         showValue: false
                         onSliderValueChanged: val => popoverRoot.changeCustomAspectRatio(val / 100.0)
+
+                        Binding {
+                            target: slider
+                            property: "value"
+                            value: Math.round(popoverRoot.customAspectRatio * 100)
+                        }
                     }
                 }
 

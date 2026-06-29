@@ -4,6 +4,9 @@ import qs.Widgets
 
 Rectangle {
     id: menuRoot
+
+    ToolbarConstants { id: tc }
+
     width: 120
     height: menuColumn.implicitHeight + Theme.spacingS * 2
     color: Theme.surfaceContainer
@@ -46,7 +49,7 @@ Rectangle {
         id: menuColumn
         anchors.fill: parent
         anchors.margins: Theme.spacingS
-        spacing: 2
+        spacing: tc.spacingCompact
 
         // Rotate Option
         Rectangle {
