@@ -10,6 +10,8 @@ Grid {
 
     signal changeBackdropMode(string mode)
 
+    ToolbarConstants { id: tc }
+
     rows: isVertical ? 5 : 1
     columns: isVertical ? 1 : 5
     spacing: Theme.spacingXS
@@ -26,8 +28,8 @@ Grid {
         model: controlRoot.modes
         delegate: DankActionButton {
             iconName: modelData.icon
-            buttonSize: 36
-            iconSize: 18
+            buttonSize: tc.btnSize
+            iconSize: tc.iconSize
             tooltipText: modelData.tooltip
             backgroundColor: controlRoot.backdropMode === modelData.mode ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
             iconColor: controlRoot.backdropMode === modelData.mode ? Theme.primary : Theme.surfaceText

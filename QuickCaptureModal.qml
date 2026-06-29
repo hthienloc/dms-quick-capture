@@ -60,6 +60,9 @@ DankModal {
         if (currentTool !== "crop" && currentTool !== "backdrop" && currentTool !== "select") {
             lastActiveTool = currentTool;
         }
+        if (currentTool === "backdrop" && window.backdropMode === "none") {
+            window.backdropMode = "solid";
+        }
         if (window.activeCanvas) {
             window.activeCanvas.requestPaint();
         }
@@ -76,6 +79,19 @@ DankModal {
     property int backdropShadowStrength: 50
     property string backdropAspectRatio: "auto"
     property real customAspectRatio: 1.50
+    readonly property real customRatioMin: 0.50
+    readonly property real customRatioMax: 2.50
+    readonly property real customRatioStep: 0.05
+    readonly property var aspectPresets: [
+        { value: "auto", label: I18n.tr("AUTO") },
+        { value: "1:1", label: "1:1" },
+        { value: "16:9", label: "16:9" },
+        { value: "9:16", label: "9:16" },
+        { value: "4:3", label: "4:3" },
+        { value: "3:2", label: "3:2" },
+        { value: "21:9", label: "21:9" },
+        { value: "custom", label: I18n.tr("CUST") }
+    ]
     property bool hasUserCustomizedBackdrop: false
     property color autoBackdropGradientStart: Theme.primary
     property color autoBackdropGradientEnd: Theme.secondary
@@ -175,13 +191,17 @@ DankModal {
     }
 
     function getTargetRatio(ratioStr) {
+        if (ratioStr === "auto") return 0.0;
         if (ratioStr === "1:1") return 1.0;
         if (ratioStr === "16:9") return 16.0 / 9.0;
         if (ratioStr === "9:16") return 9.0 / 16.0;
         if (ratioStr === "4:3") return 4.0 / 3.0;
         if (ratioStr === "3:2") return 3.0 / 2.0;
         if (ratioStr === "21:9") return 21.0 / 9.0;
-        if (ratioStr === "custom") return window.customAspectRatio;
+        if (ratioStr === "custom") {
+            const val = window.customAspectRatio;
+            return (isFinite(val) && val > 0) ? val : 1.0;
+        }
         return 0.0;
     }
 
@@ -195,7 +215,7 @@ DankModal {
             return baseW;
         }
         const targetRatio = getTargetRatio(window.backdropAspectRatio);
-        if (targetRatio <= 0.0) {
+        if (!(targetRatio > 0.0)) {
             return baseW;
         }
         const currentRatio = baseW / baseH;
@@ -216,7 +236,7 @@ DankModal {
             return baseH;
         }
         const targetRatio = getTargetRatio(window.backdropAspectRatio);
-        if (targetRatio <= 0.0) {
+        if (!(targetRatio > 0.0)) {
             return baseH;
         }
         const currentRatio = baseW / baseH;
@@ -958,9 +978,6 @@ DankModal {
                 }
             } else {
                 window.currentTool = toolShortcut.tool;
-                if (toolShortcut.tool === "backdrop" && window.backdropMode === "none") {
-                    window.backdropMode = "solid";
-                }
             }
             event.accepted = true;
         }
@@ -1070,9 +1087,6 @@ DankModal {
         }
 
         window.currentTool = startTool;
-        if (startTool === "backdrop" && window.backdropMode === "none") {
-            window.backdropMode = "solid";
-        }
         window.toolbarVisible = window.configShowToolbar;
         window.strokeWidth = startThickness;
         window.currentColor = startColor;
@@ -1274,9 +1288,6 @@ DankModal {
                             window.currentTool = window.lastActiveTool;
                         } else {
                             window.currentTool = tool;
-                            if (tool === "backdrop" && window.backdropMode === "none") {
-                                window.backdropMode = "solid";
-                            }
                         }
                     }
                     onColorSelected: (color) => {
@@ -1391,8 +1402,9 @@ DankModal {
                             window.backdropGradientAngle = (window.backdropGradientAngle + aStep + 360) % 360;
                         } else if (type === "aspectRatio") {
                             if (window.backdropAspectRatio === "custom") {
-                                let ratioStep = delta > 0 ? 0.05 : -0.05;
-                                window.customAspectRatio = Math.max(0.5, Math.min(2.5, window.customAspectRatio + ratioStep));
+                                let ratioStep = delta > 0 ? 5 : -5;
+                                let scaled = Math.round(window.customAspectRatio * 100) + ratioStep;
+                                window.customAspectRatio = Math.max(50, Math.min(250, scaled)) / 100.0;
                             }
                         }
                         if (window.activeCanvas) window.activeCanvas.requestPaint();
@@ -2771,6 +2783,7 @@ DankModal {
                     id: backdropAspectRatioPopover
                     backdropAspectRatio: window.backdropAspectRatio
                     customAspectRatio: window.customAspectRatio
+                    presets: window.aspectPresets
                     onChangeBackdropAspectRatio: (ratio) => {
                         window.backdropAspectRatio = ratio;
                         if (window.activeCanvas) window.activeCanvas.requestPaint();
