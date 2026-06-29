@@ -29,8 +29,10 @@ Rectangle {
     property int backdropShadowStrength: 50
     property string backdropAspectRatio: "auto"
     
-    readonly property var aspectRatios: ["auto", "1:1", "16:9", "4:3"]
-    readonly property var aspectRatioLabels: ["AUTO", "1:1", "16:9", "4:3"]
+    property real customAspectRatio: 1.50
+
+    readonly property var aspectRatios: ["auto", "1:1", "16:9", "9:16", "4:3", "3:2", "21:9", "custom"]
+    readonly property var aspectRatioLabels: ["AUTO", "1:1", "16:9", "9:16", "4:3", "3:2", "21:9", "CUSTOM"]
 
     property string gradientActiveSlot: "start"
 
@@ -43,6 +45,7 @@ Rectangle {
     signal changeBackdropCornerRadius(int radius)
     signal changeBackdropShadowStrength(int strength)
     signal changeBackdropAspectRatio(string ratio)
+    signal changeCustomAspectRatio(real ratio)
     signal rotateRequested()
     signal mirrorRequested()
     signal moreToolsClicked(var buttonItem)
@@ -370,30 +373,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
             }
             
-            Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
-            
-            // Aspect Ratio selection (Native DankButtonGroup)
-            DankButtonGroup {
-                anchors.verticalCenter: parent.verticalCenter
-                buttonHeight: 28
-                minButtonWidth: 38
-                buttonPadding: Theme.spacingS
-                checkEnabled: false
-                textSize: 10
-                model: root.aspectRatioLabels
-                currentIndex: root.aspectRatios.indexOf(root.backdropAspectRatio)
-                onSelectionChanged: (index, selected) => {
-                    if (selected) {
-                        root.changeBackdropAspectRatio(root.aspectRatios[index]);
-                    }
-                }
-            }
-            
-            Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
-            
-            // Sliders Row
-            // Sliders Row (Hover to reveal slider)
-            // Sliders Row (Hover to reveal popup slider)
+            // Sliders Row (Hover to reveal popup controls)
             Row {
                 spacing: Theme.spacingM
                 anchors.verticalCenter: parent.verticalCenter
@@ -538,6 +518,46 @@ Rectangle {
                         onWheel: (wheel) => root.backdropControlWheel("angle", wheel.angleDelta.y)
                     }
                 }
+
+                // Aspect Ratio Control (Hover to reveal preset grid + custom slider popover)
+                Item {
+                    id: aspectControl
+                    width: aspectRow.implicitWidth
+                    height: 36
+                    anchors.verticalCenter: parent.verticalCenter
+                    
+                    Row {
+                        id: aspectRow
+                        spacing: Theme.spacingXS
+                        anchors.verticalCenter: parent.verticalCenter
+                        DankIcon {
+                            name: "aspect_ratio"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        StyledText {
+                            text: {
+                                if (root.backdropAspectRatio === "custom") {
+                                    return root.customAspectRatio.toFixed(2);
+                                }
+                                return root.backdropAspectRatio.toUpperCase();
+                            }
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+                    MouseArea {
+                        id: aspectMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onEntered: root.backdropControlHovered("aspectRatio", aspectControl)
+                        onExited: root.backdropControlExited("aspectRatio")
+                        onWheel: (wheel) => root.backdropControlWheel("aspectRatio", wheel.angleDelta.y)
+                    }
+                }
             }
             
             Rectangle { 
@@ -615,75 +635,6 @@ Rectangle {
                 isVertical: true
                 onChangeBackdropMode: (mode) => root.changeBackdropMode(mode)
                 anchors.horizontalCenter: parent.horizontalCenter
-            }
-            
-            Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
-            
-            // Aspect Ratio selection (Vertical Segmented Control)
-            Column {
-                spacing: Theme.spacingXS
-                anchors.horizontalCenter: parent.horizontalCenter
-                Repeater {
-                    id: verticalRatioRepeater
-                    model: root.aspectRatios
-                    delegate: Rectangle {
-                        id: verticalSegment
-                        width: 36
-                        height: 28
-                        
-                        property bool selected: root.backdropAspectRatio === modelData
-                        property bool hovered: verticalMouseArea.containsMouse
-                        property bool isFirst: index === 0
-                        property bool isLast: index === (verticalRatioRepeater.count - 1)
-                        
-                        color: {
-                            if (selected) {
-                                if (verticalMouseArea.pressed) return Theme.buttonPressed;
-                                if (verticalSegment.hovered) return Theme.buttonHover;
-                                return Theme.buttonBg;
-                            } else {
-                                if (verticalMouseArea.pressed || verticalSegment.hovered) return Theme.surfaceTextHover;
-                                return Theme.withAlpha(Theme.surfaceVariant, Theme.popupTransparency);
-                            }
-                        }
-                        
-                        radius: (selected || isFirst || isLast) ? Theme.cornerRadius : 0
-
-                        // Mask bottom corners of the first item when not selected
-                        Rectangle {
-                            anchors.bottom: parent.bottom
-                            width: parent.width
-                            height: parent.radius
-                            color: parent.color
-                            visible: !verticalSegment.selected && verticalSegment.isFirst && parent.radius > 0
-                        }
-
-                        // Mask top corners of the last item when not selected
-                        Rectangle {
-                            anchors.top: parent.top
-                            width: parent.width
-                            height: parent.radius
-                            color: parent.color
-                            visible: !verticalSegment.selected && verticalSegment.isLast && parent.radius > 0
-                        }
-
-                        StyledText {
-                            text: modelData.toUpperCase()
-                            font.pixelSize: 9
-                            font.weight: selected ? Font.Medium : Font.Normal
-                            color: selected ? Theme.buttonText : Theme.surfaceVariantText
-                            anchors.centerIn: parent
-                        }
-
-                        MouseArea {
-                            id: verticalMouseArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: root.changeBackdropAspectRatio(modelData)
-                        }
-                    }
-                }
             }
             
             Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
@@ -827,6 +778,40 @@ Rectangle {
                         onEntered: root.backdropControlHovered("angle", angleControlVert)
                         onExited: root.backdropControlExited("angle")
                         onWheel: (wheel) => root.backdropControlWheel("angle", wheel.angleDelta.y)
+                    }
+                }
+
+                // Custom Aspect Ratio Control
+                Item {
+                    id: aspectControlVert
+                    width: 36
+                    height: 28
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    
+                    Row {
+                        spacing: 2
+                        anchors.centerIn: parent
+                        DankIcon {
+                            name: "aspect_ratio"
+                            size: 14
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        StyledText {
+                            text: root.backdropAspectRatio === "custom" ? root.customAspectRatio.toFixed(2) : root.backdropAspectRatio.toUpperCase()
+                            font.pixelSize: 9
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+                    MouseArea {
+                        id: aspectMouseAreaVert
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onEntered: root.backdropControlHovered("aspectRatio", aspectControlVert)
+                        onExited: root.backdropControlExited("aspectRatio")
+                        onWheel: (wheel) => root.backdropControlWheel("aspectRatio", wheel.angleDelta.y)
                     }
                 }
             }
