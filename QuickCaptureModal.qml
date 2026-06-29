@@ -259,6 +259,52 @@ DankModal {
             grad.addColorStop(1, window.backdropGradientEnd.toString());
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, w, h);
+        } else if (window.backdropMode === "radial") {
+            const cx = w / 2;
+            const cy = h / 2;
+            const r = Math.hypot(cx, cy);
+            const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+            grad.addColorStop(0, window.backdropGradientStart.toString());
+            grad.addColorStop(1, window.backdropGradientEnd.toString());
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+        } else if (window.backdropMode === "conic") {
+            const cx = w / 2;
+            const cy = h / 2;
+            const r = Math.hypot(cx, cy);
+            const startAngle = (window.backdropGradientAngle * Math.PI) / 180;
+            const numSlices = 240;
+
+            // Cache color components to avoid JS-to-C++ property boundary crossing cost
+            const startCol = window.backdropGradientStart;
+            const endCol = window.backdropGradientEnd;
+            const sr = startCol.r * 255;
+            const sg = startCol.g * 255;
+            const sb = startCol.b * 255;
+            const sa = startCol.a;
+            const er = endCol.r * 255;
+            const eg = endCol.g * 255;
+            const eb = endCol.b * 255;
+            const ea = endCol.a;
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            for (let i = 0; i < numSlices; i++) {
+                const angle1 = startAngle + (i / numSlices) * Math.PI * 2;
+                const angle2 = startAngle + ((i + 1.01) / numSlices) * Math.PI * 2;
+                const t = i / numSlices;
+                const rComp = Math.round(sr * (1 - t) + er * t);
+                const gComp = Math.round(sg * (1 - t) + eg * t);
+                const bComp = Math.round(sb * (1 - t) + eb * t);
+                const aComp = sa * (1 - t) + ea * t;
+                ctx.fillStyle = "rgba(" + rComp + "," + gComp + "," + bComp + "," + aComp + ")";
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, r, angle1, angle2);
+                ctx.closePath();
+                ctx.fill();
+            }
+            ctx.restore();
         }
     }
 

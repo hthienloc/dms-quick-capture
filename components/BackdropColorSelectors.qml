@@ -27,8 +27,10 @@ Row {
         border.width: 1
     }
 
+    readonly property bool isGradient: backdropMode === "gradient" || backdropMode === "radial" || backdropMode === "conic"
+
     Row {
-        visible: controlRoot.backdropMode === "gradient"
+        visible: controlRoot.isGradient
         spacing: Theme.spacingXS
         anchors.verticalCenter: parent.verticalCenter
 

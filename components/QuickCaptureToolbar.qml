@@ -363,37 +363,11 @@ Rectangle {
             
             Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
             
-            // Mode selection
-            Row {
-                spacing: Theme.spacingXS
+            BackdropModeSelectors {
+                backdropMode: root.backdropMode
+                isVertical: false
+                onChangeBackdropMode: (mode) => root.changeBackdropMode(mode)
                 anchors.verticalCenter: parent.verticalCenter
-                DankActionButton {
-                    iconName: "blur_off"
-                    buttonSize: 36
-                    iconSize: 18
-                    tooltipText: qsTr("No Backdrop")
-                    backgroundColor: root.backdropMode === "none" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                    iconColor: root.backdropMode === "none" ? Theme.primary : Theme.surfaceText
-                    onClicked: root.changeBackdropMode("none")
-                }
-                DankActionButton {
-                    iconName: "format_color_fill"
-                    buttonSize: 36
-                    iconSize: 18
-                    tooltipText: qsTr("Solid Color")
-                    backgroundColor: root.backdropMode === "solid" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                    iconColor: root.backdropMode === "solid" ? Theme.primary : Theme.surfaceText
-                    onClicked: root.changeBackdropMode("solid")
-                }
-                DankActionButton {
-                    iconName: "gradient"
-                    buttonSize: 36
-                    iconSize: 18
-                    tooltipText: qsTr("Linear Gradient")
-                    backgroundColor: root.backdropMode === "gradient" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                    iconColor: root.backdropMode === "gradient" ? Theme.primary : Theme.surfaceText
-                    onClicked: root.changeBackdropMode("gradient")
-                }
             }
             
             Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
@@ -529,10 +503,10 @@ Rectangle {
                     }
                 }
 
-                // Angle Control (Gradient only)
+                // Angle Control (Linear and Conic gradients)
                 Item {
                     id: angleControl
-                    visible: root.backdropMode === "gradient"
+                    visible: root.backdropMode === "gradient" || root.backdropMode === "conic"
                     width: visible ? angleRow.implicitWidth : 0
                     height: 36
                     anchors.verticalCenter: parent.verticalCenter
@@ -603,7 +577,7 @@ Rectangle {
                                 onClicked: {
                                     if (root.backdropMode === "solid") {
                                         root.changeBackdropSolidColor(modelData);
-                                    } else if (root.backdropMode === "gradient") {
+                                    } else if (root.backdropMode === "gradient" || root.backdropMode === "radial" || root.backdropMode === "conic") {
                                         if (root.gradientActiveSlot === "start") {
                                             root.changeBackdropGradientStart(modelData);
                                         } else {
@@ -636,37 +610,11 @@ Rectangle {
             
             Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
             
-            // Mode selection
-            Column {
-                spacing: Theme.spacingXS
+            BackdropModeSelectors {
+                backdropMode: root.backdropMode
+                isVertical: true
+                onChangeBackdropMode: (mode) => root.changeBackdropMode(mode)
                 anchors.horizontalCenter: parent.horizontalCenter
-                DankActionButton {
-                    iconName: "blur_off"
-                    buttonSize: 36
-                    iconSize: 18
-                    tooltipText: qsTr("No Backdrop")
-                    backgroundColor: root.backdropMode === "none" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                    iconColor: root.backdropMode === "none" ? Theme.primary : Theme.surfaceText
-                    onClicked: root.changeBackdropMode("none")
-                }
-                DankActionButton {
-                    iconName: "format_color_fill"
-                    buttonSize: 36
-                    iconSize: 18
-                    tooltipText: qsTr("Solid Color")
-                    backgroundColor: root.backdropMode === "solid" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                    iconColor: root.backdropMode === "solid" ? Theme.primary : Theme.surfaceText
-                    onClicked: root.changeBackdropMode("solid")
-                }
-                DankActionButton {
-                    iconName: "gradient"
-                    buttonSize: 36
-                    iconSize: 18
-                    tooltipText: qsTr("Linear Gradient")
-                    backgroundColor: root.backdropMode === "gradient" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                    iconColor: root.backdropMode === "gradient" ? Theme.primary : Theme.surfaceText
-                    onClicked: root.changeBackdropMode("gradient")
-                }
             }
             
             Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
@@ -847,10 +795,10 @@ Rectangle {
                     }
                 }
 
-                // Angle Control (Gradient only)
+                // Angle Control (Linear and Conic gradients)
                 Item {
                     id: angleControlVert
-                    visible: root.backdropMode === "gradient"
+                    visible: root.backdropMode === "gradient" || root.backdropMode === "conic"
                     width: 36
                     height: visible ? 28 : 0
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -920,7 +868,7 @@ Rectangle {
                                 onClicked: {
                                     if (root.backdropMode === "solid") {
                                         root.changeBackdropSolidColor(modelData);
-                                    } else if (root.backdropMode === "gradient") {
+                                    } else if (root.backdropMode === "gradient" || root.backdropMode === "radial" || root.backdropMode === "conic") {
                                         if (root.gradientActiveSlot === "start") {
                                             root.changeBackdropGradientStart(modelData);
                                         } else {
