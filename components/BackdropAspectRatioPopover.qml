@@ -95,7 +95,7 @@ Rectangle {
             Grid {
                 columns: 4
                 rows: 2
-                spacing: 4
+                spacing: tc.gridSpacing
                 anchors.verticalCenter: parent.verticalCenter
 
                 Repeater {
@@ -143,12 +143,12 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
 
                 Column {
-                    spacing: 2
+                    spacing: tc.spacingCompact
                     anchors.verticalCenter: parent.verticalCenter
 
                     StyledText {
                         text: I18n.tr("Ratio")
-                        font.pixelSize: 8
+                        font.pixelSize: tc.fontSizeCompact
                         color: Theme.surfaceVariantText
                     }
 
@@ -170,7 +170,7 @@ Rectangle {
 
                 StyledText {
                     text: popoverRoot.customAspectRatio.toFixed(2)
-                    font.pixelSize: 13
+                    font.pixelSize: tc.fontSizeCompact
                     font.weight: Font.Medium
                     color: Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter

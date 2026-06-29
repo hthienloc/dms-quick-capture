@@ -201,7 +201,7 @@ Rectangle {
                         }
                         return root.strokeWidth + "px";
                     }
-                    width: 32; horizontalAlignment: Text.AlignRight
+                    width: tc.btnSize; horizontalAlignment: Text.AlignRight
                     color: Theme.surfaceText; font.pixelSize: 11; font.bold: true; anchors.verticalCenter: parent.verticalCenter
                 }
                 DankSlider {
@@ -721,7 +721,7 @@ Rectangle {
                     id: angleControlVert
                     visible: root.backdropMode === "gradient" || root.backdropMode === "conic"
                     width: tc.btnSize
-                    height: visible ? 28 : 0
+                    height: visible ? tc.btnSizeCompact : 0
                     anchors.horizontalCenter: parent.horizontalCenter
                     
                     Row {

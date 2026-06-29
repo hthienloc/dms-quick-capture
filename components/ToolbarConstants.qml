@@ -12,6 +12,8 @@ QtObject {
     readonly property int separatorThickness: 1
     readonly property int separatorLength: 24
 
+    readonly property int gridSpacing: 4
+
     readonly property int backdropIconSize: 16
 
     readonly property int sliderWidth: 100
