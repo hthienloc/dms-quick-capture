@@ -363,55 +363,11 @@ Rectangle {
             
             Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
             
-            // Mode selection
-            Row {
-                spacing: Theme.spacingXS
+            BackdropModeSelectors {
+                backdropMode: root.backdropMode
+                isVertical: false
+                onChangeBackdropMode: (mode) => root.changeBackdropMode(mode)
                 anchors.verticalCenter: parent.verticalCenter
-                DankActionButton {
-                    iconName: "blur_off"
-                    buttonSize: 36
-                    iconSize: 18
-                    tooltipText: qsTr("No Backdrop")
-                    backgroundColor: root.backdropMode === "none" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                    iconColor: root.backdropMode === "none" ? Theme.primary : Theme.surfaceText
-                    onClicked: root.changeBackdropMode("none")
-                }
-                DankActionButton {
-                    iconName: "format_color_fill"
-                    buttonSize: 36
-                    iconSize: 18
-                    tooltipText: qsTr("Solid Color")
-                    backgroundColor: root.backdropMode === "solid" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                    iconColor: root.backdropMode === "solid" ? Theme.primary : Theme.surfaceText
-                    onClicked: root.changeBackdropMode("solid")
-                }
-                DankActionButton {
-                    iconName: "gradient"
-                    buttonSize: 36
-                    iconSize: 18
-                    tooltipText: qsTr("Linear Gradient")
-                    backgroundColor: root.backdropMode === "gradient" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                    iconColor: root.backdropMode === "gradient" ? Theme.primary : Theme.surfaceText
-                    onClicked: root.changeBackdropMode("gradient")
-                }
-                DankActionButton {
-                    iconName: "filter_tilt_shift"
-                    buttonSize: 36
-                    iconSize: 18
-                    tooltipText: qsTr("Radial Gradient")
-                    backgroundColor: root.backdropMode === "radial" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                    iconColor: root.backdropMode === "radial" ? Theme.primary : Theme.surfaceText
-                    onClicked: root.changeBackdropMode("radial")
-                }
-                DankActionButton {
-                    iconName: "timelapse"
-                    buttonSize: 36
-                    iconSize: 18
-                    tooltipText: qsTr("Conic Gradient")
-                    backgroundColor: root.backdropMode === "conic" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                    iconColor: root.backdropMode === "conic" ? Theme.primary : Theme.surfaceText
-                    onClicked: root.changeBackdropMode("conic")
-                }
             }
             
             Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
@@ -654,55 +610,11 @@ Rectangle {
             
             Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
             
-            // Mode selection
-            Column {
-                spacing: Theme.spacingXS
+            BackdropModeSelectors {
+                backdropMode: root.backdropMode
+                isVertical: true
+                onChangeBackdropMode: (mode) => root.changeBackdropMode(mode)
                 anchors.horizontalCenter: parent.horizontalCenter
-                DankActionButton {
-                    iconName: "blur_off"
-                    buttonSize: 36
-                    iconSize: 18
-                    tooltipText: qsTr("No Backdrop")
-                    backgroundColor: root.backdropMode === "none" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                    iconColor: root.backdropMode === "none" ? Theme.primary : Theme.surfaceText
-                    onClicked: root.changeBackdropMode("none")
-                }
-                DankActionButton {
-                    iconName: "format_color_fill"
-                    buttonSize: 36
-                    iconSize: 18
-                    tooltipText: qsTr("Solid Color")
-                    backgroundColor: root.backdropMode === "solid" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                    iconColor: root.backdropMode === "solid" ? Theme.primary : Theme.surfaceText
-                    onClicked: root.changeBackdropMode("solid")
-                }
-                DankActionButton {
-                    iconName: "gradient"
-                    buttonSize: 36
-                    iconSize: 18
-                    tooltipText: qsTr("Linear Gradient")
-                    backgroundColor: root.backdropMode === "gradient" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                    iconColor: root.backdropMode === "gradient" ? Theme.primary : Theme.surfaceText
-                    onClicked: root.changeBackdropMode("gradient")
-                }
-                DankActionButton {
-                    iconName: "filter_tilt_shift"
-                    buttonSize: 36
-                    iconSize: 18
-                    tooltipText: qsTr("Radial Gradient")
-                    backgroundColor: root.backdropMode === "radial" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                    iconColor: root.backdropMode === "radial" ? Theme.primary : Theme.surfaceText
-                    onClicked: root.changeBackdropMode("radial")
-                }
-                DankActionButton {
-                    iconName: "timelapse"
-                    buttonSize: 36
-                    iconSize: 18
-                    tooltipText: qsTr("Conic Gradient")
-                    backgroundColor: root.backdropMode === "conic" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                    iconColor: root.backdropMode === "conic" ? Theme.primary : Theme.surfaceText
-                    onClicked: root.changeBackdropMode("conic")
-                }
             }
             
             Rectangle { width: 24; height: 1; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
