@@ -49,6 +49,7 @@ Rectangle {
     signal backdropControlHovered(string type, var controlItem)
     signal backdropControlExited(string type)
     signal backdropControlWheel(string type, int delta)
+    signal autoColorBalanceRequested()
 
     readonly property var toolbarPalette: {
         const p1 = root.pluginData["toolbar_color_primary"] || "primary";
@@ -540,23 +541,16 @@ Rectangle {
                 spacing: Theme.spacingS
                 anchors.verticalCenter: parent.verticalCenter
                 
-                Row {
-                    visible: root.backdropMode === "gradient"
-                    spacing: Theme.spacingXS
-                    anchors.verticalCenter: parent.verticalCenter
-                    
-                    Rectangle {
-                        width: 24; height: 24; radius: 4; color: root.backdropGradientStart
-                        border.color: root.gradientActiveSlot === "start" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
-                        border.width: root.gradientActiveSlot === "start" ? 2 : 1
-                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.gradientActiveSlot = "start" }
-                    }
-                    Rectangle {
-                        width: 24; height: 24; radius: 4; color: root.backdropGradientEnd
-                        border.color: root.gradientActiveSlot === "end" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
-                        border.width: root.gradientActiveSlot === "end" ? 2 : 1
-                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.gradientActiveSlot = "end" }
-                    }
+                BackdropColorSelectors {
+                    backdropMode: root.backdropMode
+                    backdropSolidColor: root.backdropSolidColor
+                    backdropGradientStart: root.backdropGradientStart
+                    backdropGradientEnd: root.backdropGradientEnd
+                    gradientActiveSlot: root.gradientActiveSlot
+                    itemSize: 24
+                    iconSize: 14
+                    onSetGradientActiveSlot: (slot) => root.gradientActiveSlot = slot
+                    onAutoColorBalanceRequested: root.autoColorBalanceRequested()
                 }
                 
                 Grid {
@@ -829,23 +823,16 @@ Rectangle {
                 spacing: Theme.spacingS
                 anchors.horizontalCenter: parent.horizontalCenter
                 
-                Row {
-                    visible: root.backdropMode === "gradient"
-                    spacing: Theme.spacingXS
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    
-                    Rectangle {
-                        width: 18; height: 18; radius: 3; color: root.backdropGradientStart
-                        border.color: root.gradientActiveSlot === "start" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
-                        border.width: root.gradientActiveSlot === "start" ? 1.5 : 1
-                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.gradientActiveSlot = "start" }
-                    }
-                    Rectangle {
-                        width: 18; height: 18; radius: 3; color: root.backdropGradientEnd
-                        border.color: root.gradientActiveSlot === "end" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
-                        border.width: root.gradientActiveSlot === "end" ? 1.5 : 1
-                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.gradientActiveSlot = "end" }
-                    }
+                BackdropColorSelectors {
+                    backdropMode: root.backdropMode
+                    backdropSolidColor: root.backdropSolidColor
+                    backdropGradientStart: root.backdropGradientStart
+                    backdropGradientEnd: root.backdropGradientEnd
+                    gradientActiveSlot: root.gradientActiveSlot
+                    itemSize: 18
+                    iconSize: 10
+                    onSetGradientActiveSlot: (slot) => root.gradientActiveSlot = slot
+                    onAutoColorBalanceRequested: root.autoColorBalanceRequested()
                 }
                 
                 Grid {
