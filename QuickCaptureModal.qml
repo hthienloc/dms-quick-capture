@@ -259,6 +259,42 @@ DankModal {
             grad.addColorStop(1, window.backdropGradientEnd.toString());
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, w, h);
+        } else if (window.backdropMode === "radial") {
+            const cx = w / 2;
+            const cy = h / 2;
+            const r = Math.sqrt(cx * cx + cy * cy);
+            const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+            grad.addColorStop(0, window.backdropGradientStart.toString());
+            grad.addColorStop(1, window.backdropGradientEnd.toString());
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+        } else if (window.backdropMode === "conic") {
+            const cx = w / 2;
+            const cy = h / 2;
+            const r = Math.sqrt(cx * cx + cy * cy);
+            const startAngle = (window.backdropGradientAngle * Math.PI) / 180;
+            const numSlices = 360;
+            const startCol = window.backdropGradientStart;
+            const endCol = window.backdropGradientEnd;
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            for (let i = 0; i < numSlices; i++) {
+                const angle1 = startAngle + (i / numSlices) * Math.PI * 2;
+                const angle2 = startAngle + ((i + 1.1) / numSlices) * Math.PI * 2;
+                const t = i / numSlices;
+                const rComp = Math.round(startCol.r * 255 * (1 - t) + endCol.r * 255 * t);
+                const gComp = Math.round(startCol.g * 255 * (1 - t) + endCol.g * 255 * t);
+                const bComp = Math.round(startCol.b * 255 * (1 - t) + endCol.b * 255 * t);
+                const aComp = startCol.a * (1 - t) + endCol.a * t;
+                ctx.fillStyle = "rgba(" + rComp + "," + gComp + "," + bComp + "," + aComp + ")";
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, r, angle1, angle2);
+                ctx.closePath();
+                ctx.fill();
+            }
+            ctx.restore();
         }
     }
 

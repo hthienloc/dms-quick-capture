@@ -394,6 +394,24 @@ Rectangle {
                     iconColor: root.backdropMode === "gradient" ? Theme.primary : Theme.surfaceText
                     onClicked: root.changeBackdropMode("gradient")
                 }
+                DankActionButton {
+                    iconName: "filter_tilt_shift"
+                    buttonSize: 36
+                    iconSize: 18
+                    tooltipText: qsTr("Radial Gradient")
+                    backgroundColor: root.backdropMode === "radial" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.backdropMode === "radial" ? Theme.primary : Theme.surfaceText
+                    onClicked: root.changeBackdropMode("radial")
+                }
+                DankActionButton {
+                    iconName: "timelapse"
+                    buttonSize: 36
+                    iconSize: 18
+                    tooltipText: qsTr("Conic Gradient")
+                    backgroundColor: root.backdropMode === "conic" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.backdropMode === "conic" ? Theme.primary : Theme.surfaceText
+                    onClicked: root.changeBackdropMode("conic")
+                }
             }
             
             Rectangle { width: 1; height: 24; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
@@ -529,10 +547,10 @@ Rectangle {
                     }
                 }
 
-                // Angle Control (Gradient only)
+                // Angle Control (Linear and Conic gradients)
                 Item {
                     id: angleControl
-                    visible: root.backdropMode === "gradient"
+                    visible: root.backdropMode === "gradient" || root.backdropMode === "conic"
                     width: visible ? angleRow.implicitWidth : 0
                     height: 36
                     anchors.verticalCenter: parent.verticalCenter
@@ -603,7 +621,7 @@ Rectangle {
                                 onClicked: {
                                     if (root.backdropMode === "solid") {
                                         root.changeBackdropSolidColor(modelData);
-                                    } else if (root.backdropMode === "gradient") {
+                                    } else if (root.backdropMode === "gradient" || root.backdropMode === "radial" || root.backdropMode === "conic") {
                                         if (root.gradientActiveSlot === "start") {
                                             root.changeBackdropGradientStart(modelData);
                                         } else {
@@ -666,6 +684,24 @@ Rectangle {
                     backgroundColor: root.backdropMode === "gradient" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                     iconColor: root.backdropMode === "gradient" ? Theme.primary : Theme.surfaceText
                     onClicked: root.changeBackdropMode("gradient")
+                }
+                DankActionButton {
+                    iconName: "filter_tilt_shift"
+                    buttonSize: 36
+                    iconSize: 18
+                    tooltipText: qsTr("Radial Gradient")
+                    backgroundColor: root.backdropMode === "radial" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.backdropMode === "radial" ? Theme.primary : Theme.surfaceText
+                    onClicked: root.changeBackdropMode("radial")
+                }
+                DankActionButton {
+                    iconName: "timelapse"
+                    buttonSize: 36
+                    iconSize: 18
+                    tooltipText: qsTr("Conic Gradient")
+                    backgroundColor: root.backdropMode === "conic" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.backdropMode === "conic" ? Theme.primary : Theme.surfaceText
+                    onClicked: root.changeBackdropMode("conic")
                 }
             }
             
@@ -847,10 +883,10 @@ Rectangle {
                     }
                 }
 
-                // Angle Control (Gradient only)
+                // Angle Control (Linear and Conic gradients)
                 Item {
                     id: angleControlVert
-                    visible: root.backdropMode === "gradient"
+                    visible: root.backdropMode === "gradient" || root.backdropMode === "conic"
                     width: 36
                     height: visible ? 28 : 0
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -920,7 +956,7 @@ Rectangle {
                                 onClicked: {
                                     if (root.backdropMode === "solid") {
                                         root.changeBackdropSolidColor(modelData);
-                                    } else if (root.backdropMode === "gradient") {
+                                    } else if (root.backdropMode === "gradient" || root.backdropMode === "radial" || root.backdropMode === "conic") {
                                         if (root.gradientActiveSlot === "start") {
                                             root.changeBackdropGradientStart(modelData);
                                         } else {
