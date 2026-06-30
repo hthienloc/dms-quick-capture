@@ -1919,7 +1919,8 @@ DankModal {
                                                  const L = Math.sqrt(dx * dx + dy * dy);
                                                  if (L > 0) {
                                                      const angle = Math.atan2(dy, dx);
-                                                     const snappedAngle = Math.round(angle / (Math.PI / 12)) * (Math.PI / 12);
+                                                     const SNAP_STEP = Math.PI / 12; // 15 degrees
+                                                     const snappedAngle = Math.round(angle / SNAP_STEP) * SNAP_STEP;
                                                      finalPt = Qt.point(p0.x + L * Math.cos(snappedAngle), p0.y + L * Math.sin(snappedAngle));
                                                  }
                                              }
