@@ -70,7 +70,7 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
   | Tool | Shift Behavior |
   |------|----------------|
   | Pen | Draws straight lines |
-  | Line, Arrow, Highlighter | Snaps angle to 45° increments |
+  | Line, Arrow, Highlighter | Snaps angle to 15° increments |
   | Ellipse | Perfect circle |
   | Rectangle, Redact, Pixelate | Perfect square |
 

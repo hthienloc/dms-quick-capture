@@ -1911,7 +1911,7 @@ DankModal {
                                          
                                          let finalPt = absPt;
                                          if ((mouse.modifiers & Qt.ShiftModifier) && (window.currentTool === "line" || window.currentTool === "arrow" || window.currentTool === "highlighter")) {
-                                             // Snapping angle calculation (8 directions / 45 degrees)
+                                             // Snapping angle calculation (24 directions / 15 degrees)
                                              const p0 = window.currentStroke.points[0];
                                              if (p0) {
                                                  const dx = absPt.x - p0.x;
@@ -1919,7 +1919,7 @@ DankModal {
                                                  const L = Math.sqrt(dx * dx + dy * dy);
                                                  if (L > 0) {
                                                      const angle = Math.atan2(dy, dx);
-                                                     const snappedAngle = Math.round(angle / (Math.PI / 4)) * (Math.PI / 4);
+                                                     const snappedAngle = Math.round(angle / (Math.PI / 12)) * (Math.PI / 12);
                                                      finalPt = Qt.point(p0.x + L * Math.cos(snappedAngle), p0.y + L * Math.sin(snappedAngle));
                                                  }
                                              }

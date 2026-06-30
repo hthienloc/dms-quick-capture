@@ -28,8 +28,17 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         ctx.lineJoin = "round";
         ctx.beginPath();
         ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-        for (var i = 1; i < stroke.points.length; i++) {
-            ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+        if (stroke.points.length === 1) {
+            ctx.lineTo(stroke.points[0].x, stroke.points[0].y);
+        } else if (stroke.points.length === 2) {
+            ctx.lineTo(stroke.points[1].x, stroke.points[1].y);
+        } else {
+            for (var i = 1; i < stroke.points.length - 1; i++) {
+                const xc = (stroke.points[i].x + stroke.points[i + 1].x) / 2;
+                const yc = (stroke.points[i].y + stroke.points[i + 1].y) / 2;
+                ctx.quadraticCurveTo(stroke.points[i].x, stroke.points[i].y, xc, yc);
+            }
+            ctx.lineTo(stroke.points[stroke.points.length - 1].x, stroke.points[stroke.points.length - 1].y);
         }
         ctx.stroke();
 
