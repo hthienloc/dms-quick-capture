@@ -596,38 +596,48 @@ DankModal {
         const iw = Math.round(r.width);
         const ih = Math.round(r.height);
 
-        let bgPath = window.bgImageSource.toString();
+        let bgPath = decodeURIComponent(window.bgImageSource.toString());
         if (bgPath.startsWith("file://")) bgPath = bgPath.substring(7);
         const qIdx = bgPath.indexOf("?");
         if (qIdx !== -1) bgPath = bgPath.substring(0, qIdx);
         let ocrLang = "eng";
 
-        Proc.runCommand("run-ocr", ["sh", "-c", "magick '"+bgPath+"' -crop "+iw+"x"+ih+"+"+ix+"+"+iy+" png:- | tesseract - - -l "+ocrLang], (stdout, exitCode) => {
-            if (exitCode === 0) {
-                const result = stdout.trim();
-                if (result) {
-                    DMSService.sendRequest("clipboard.copy", { "text": result }, function(response) {
-                        if (typeof ToastService !== "undefined" && ToastService) {
-                            ToastService.showInfo(I18n.tr("OCR: %1 chars copied to clipboard").arg(result.length));
+        const tempCropPath = "/tmp/dms_ocr_crop.png";
+        Proc.runCommand("crop-ocr-temp", ["magick", bgPath, "-crop", iw + "x" + ih + "+" + ix + "+" + iy, tempCropPath], (stdout1, exitCode1) => {
+            if (exitCode1 === 0) {
+                Proc.runCommand("run-ocr", ["tesseract", tempCropPath, "-", "-l", ocrLang], (stdout2, exitCode2) => {
+                    Proc.runCommand("cleanup-ocr-temp", ["rm", "-f", tempCropPath]);
+
+                    if (exitCode2 === 0) {
+                        const result = stdout2.trim();
+                        if (result) {
+                            DMSService.sendRequest("clipboard.copy", { "text": result }, function(response) {
+                                if (typeof ToastService !== "undefined" && ToastService) {
+                                    ToastService.showInfo(I18n.tr("OCR: %1 chars copied to clipboard").arg(result.length));
+                                }
+                            });
+                        } else {
+                            if (typeof ToastService !== "undefined" && ToastService) {
+                                ToastService.showInfo(I18n.tr("OCR: No text detected"));
+                            }
                         }
-                    });
-                } else {
-                    if (typeof ToastService !== "undefined" && ToastService) {
-                        ToastService.showInfo(I18n.tr("OCR: No text detected"));
+                    } else {
+                        if (typeof ToastService !== "undefined" && ToastService) {
+                            ToastService.showError(I18n.tr("OCR failed during text extraction"));
+                        }
                     }
-                }
+                    window.currentTool = window.lastActiveTool;
+                    window.ocrRect = Qt.rect(0, 0, 0, 0);
+                    if (window.activeCanvas) window.activeCanvas.requestPaint();
+                });
             } else {
                 if (typeof ToastService !== "undefined" && ToastService) {
-                    if (stdout && stdout.includes("Invalid")) {
-                        ToastService.showError(I18n.tr("OCR: Unsupported image format"));
-                    } else {
-                        ToastService.showError(I18n.tr("OCR failed. Is Tesseract and ImageMagick installed?"));
-                    }
+                    ToastService.showError(I18n.tr("OCR failed: Could not crop image"));
                 }
+                window.currentTool = window.lastActiveTool;
+                window.ocrRect = Qt.rect(0, 0, 0, 0);
+                if (window.activeCanvas) window.activeCanvas.requestPaint();
             }
-            window.currentTool = window.lastActiveTool;
-            window.ocrRect = Qt.rect(0, 0, 0, 0);
-            if (window.activeCanvas) window.activeCanvas.requestPaint();
         });
     }
 
