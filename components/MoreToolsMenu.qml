@@ -22,6 +22,7 @@ Rectangle {
 
     signal rotateRequested()
     signal mirrorRequested()
+    signal ocrRequested()
 
     states: [
         State {
@@ -129,6 +130,54 @@ Rectangle {
                 onClicked: {
                     menuRoot.close();
                     menuRoot.mirrorRequested();
+                }
+            }
+        }
+
+        // Separator
+        Rectangle {
+            width: parent.width
+            height: 1
+            color: Theme.withAlpha(Theme.outline, 0.15)
+        }
+
+        // OCR Option
+        Rectangle {
+            width: parent.width
+            height: 32
+            radius: Theme.cornerRadius - 2
+            color: ocrMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+
+            Row {
+                anchors.fill: parent
+                anchors.leftMargin: Theme.spacingS
+                anchors.rightMargin: Theme.spacingS
+                spacing: Theme.spacingS
+                anchors.verticalCenter: parent.verticalCenter
+
+                DankIcon {
+                    name: "document_scanner"
+                    size: 16
+                    color: Theme.surfaceText
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                StyledText {
+                    text: qsTr("OCR")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceText
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+
+            MouseArea {
+                id: ocrMouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    menuRoot.close();
+                    menuRoot.ocrRequested();
                 }
             }
         }

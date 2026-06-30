@@ -409,56 +409,65 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
  * @param {object} Theme - The Theme object.
  */
 function drawSelectionOverlay(ctx, options, Theme) {
-    if (!options.isCropMode) return;
+    if (!options.isCropMode && !options.isOcrMode) return;
 
     ctx.save();
-    if (options.cropRect.width > 0 && options.cropRect.height > 0) {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
-        const cr = options.cropRect;
+    const rect = options.isOcrMode ? options.ocrRect : options.cropRect;
+    const borderColor = options.isOcrMode ? "#4CAF50" : Theme.primary;
+    const overlayColor = options.isOcrMode ? "rgba(76, 175, 80, 0.15)" : "rgba(0, 0, 0, 0.4)";
+
+
+
+    if (rect.width > 0 && rect.height > 0) {
+        ctx.fillStyle = overlayColor;
+        const cr = rect;
         const cw = options.canvasWidth;
         const ch = options.canvasHeight;
 
-        // Left
-        ctx.fillRect(0, 0, cr.x, ch);
-        // Right
-        ctx.fillRect(cr.x + cr.width, 0, cw - (cr.x + cr.width), ch);
-        // Top
-        ctx.fillRect(cr.x, 0, cr.width, cr.y);
-        // Bottom
-        ctx.fillRect(cr.x, cr.y + cr.height, cr.width, ch - (cr.y + cr.height));
+        if (!options.isOcrMode) {
+            // Dim outside selection (crop mode)
+            ctx.fillRect(0, 0, cr.x, ch);
+            ctx.fillRect(cr.x + cr.width, 0, cw - (cr.x + cr.width), ch);
+            ctx.fillRect(cr.x, 0, cr.width, cr.y);
+            ctx.fillRect(cr.x, cr.y + cr.height, cr.width, ch - (cr.y + cr.height));
+        } else {
+            // Highlight selection (OCR mode)
+            ctx.fillRect(0, 0, cw, ch);
+            ctx.clearRect(cr.x, cr.y, cr.width, cr.height);
+        }
 
         // Selection border
-        ctx.strokeStyle = Theme.primary;
-        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = borderColor;
+        ctx.lineWidth = options.isOcrMode ? 2 : 1.5;
+        ctx.setLineDash(options.isOcrMode ? [6, 4] : []);
         ctx.strokeRect(cr.x, cr.y, cr.width, cr.height);
+        ctx.setLineDash([]);
 
-        // 4 Corner resize handles
-        const hs = 10;
-        const hh = hs / 2;
-        ctx.fillStyle = Theme.primary;
-        ctx.strokeStyle = "#ffffff";
-        ctx.lineWidth = 1.5;
+        if (!options.isOcrMode) {
+            // 4 Corner resize handles (crop mode only)
+            const hs = 10;
+            const hh = hs / 2;
+            ctx.fillStyle = Theme.primary;
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 1.5;
 
-        const x1 = cr.x;
-        const y1 = cr.y;
-        const x2 = cr.x + cr.width;
-        const y2 = cr.y + cr.height;
+            const x1 = cr.x;
+            const y1 = cr.y;
+            const x2 = cr.x + cr.width;
+            const y2 = cr.y + cr.height;
 
-        // TL
-        ctx.fillRect(x1 - hh, y1 - hh, hs, hs);
-        ctx.strokeRect(x1 - hh, y1 - hh, hs, hs);
-        // TR
-        ctx.fillRect(x2 - hh, y1 - hh, hs, hs);
-        ctx.strokeRect(x2 - hh, y1 - hh, hs, hs);
-        // BL
-        ctx.fillRect(x1 - hh, y2 - hh, hs, hs);
-        ctx.strokeRect(x1 - hh, y2 - hh, hs, hs);
-        // BR
-        ctx.fillRect(x2 - hh, y2 - hh, hs, hs);
-        ctx.strokeRect(x2 - hh, y2 - hh, hs, hs);
+            ctx.fillRect(x1 - hh, y1 - hh, hs, hs);
+            ctx.strokeRect(x1 - hh, y1 - hh, hs, hs);
+            ctx.fillRect(x2 - hh, y1 - hh, hs, hs);
+            ctx.strokeRect(x2 - hh, y1 - hh, hs, hs);
+            ctx.fillRect(x1 - hh, y2 - hh, hs, hs);
+            ctx.strokeRect(x1 - hh, y2 - hh, hs, hs);
+            ctx.fillRect(x2 - hh, y2 - hh, hs, hs);
+            ctx.strokeRect(x2 - hh, y2 - hh, hs, hs);
+        }
     } else {
         // Dim full canvas slightly before selection
-        ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+        ctx.fillStyle = overlayColor;
         ctx.fillRect(0, 0, options.canvasWidth, options.canvasHeight);
     }
     ctx.restore();
