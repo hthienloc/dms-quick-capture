@@ -139,27 +139,11 @@ binds {
 
 ## Roadmap
 
-- [x] Vector straight-line drawing with Shift constraint
-- [x] Mouse wheel stroke / font scaling
-- [x] Dynamic high-contrast canvas boundary
-- [x] Disjoint Copy vs Save pipelines
-- [x] Click-to-Type text annotation
-- [x] Magnifier Lens (hold G)
-- [x] Area Zoom (Callout)
-- [x] Watermark overlay
-- [x] Pin-to-desktop (dms-floaty integration)
-- [x] Text formatting radial menu
-- [x] Adjustable text background roundness
-- [x] Stamp counter formats (Numeric / Alphabetic / Roman)
-
-### Planned Backdrop Features (inspired by Gradia)
-- [x] **Linear Gradient Direction:** Adjustable angle/direction controller in the UI for linear gradients.
-- [x] **Radial & Conic Gradients:** Support for radial and conic gradient backdrop modes.
-- [x] **Custom Aspect Ratios:** Define custom canvas aspect ratios alongside standard presets (16:9, 4:3, etc.).
-- [ ] **Image Backdrop Mode:** Support setting a custom image file as the screenshot background.
-- [x] **Customizable Drop Shadows:** Adjust shadow offset, blur radius, and color/opacity.
-- [x] **Auto Color Balance:** Analyze the screenshot's dominant colors to automatically generate matching backdrop palettes.
-- [x] **Interactive Padding Resizing:** Visual handles on the backdrop canvas to resize padding dynamically.
+- [x] OCR (Optical Character Recognition) text scanner
+- [ ] QR Code Scanner
+- [ ] Canvas Color Picker
+- [ ] Image Filters (Grayscale, negative, brightness/contrast)
+- [ ] Image Backdrop Mode: Support setting a custom image file as the screenshot background
 
 ## License
 
