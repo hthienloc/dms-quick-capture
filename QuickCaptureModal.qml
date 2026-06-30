@@ -6,6 +6,7 @@ import Quickshell
 import qs.Common
 import qs.Widgets
 import qs.Modals.Common
+import qs.Services
 import "./dms-common"
 import "components"
 import "components/Helpers.js" as Helpers
@@ -570,6 +571,66 @@ DankModal {
         });
     }
 
+    function runOcr() {
+        window.ocrRect = Qt.rect(0, 0, 0, 0);
+        window.currentTool = "ocr";
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
+        if (typeof ToastService !== "undefined" && ToastService) {
+            ToastService.showInfo(I18n.tr("OCR: Draw a rectangle on the image to scan"));
+        }
+    }
+
+    function executeOcr() {
+        const r = window.ocrRect;
+        if (r.width < 10 || r.height < 10) {
+            window.ocrRect = Qt.rect(0, 0, 0, 0);
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+            return;
+        }
+
+        // Account for crop offset when mapping to source image coordinates
+        const cropOffsetX = window.hasSelection ? window.cropRect.x : 0;
+        const cropOffsetY = window.hasSelection ? window.cropRect.y : 0;
+        const ix = Math.round(r.x + cropOffsetX);
+        const iy = Math.round(r.y + cropOffsetY);
+        const iw = Math.round(r.width);
+        const ih = Math.round(r.height);
+
+        let bgPath = window.bgImageSource.toString();
+        if (bgPath.startsWith("file://")) bgPath = bgPath.substring(7);
+        const qIdx = bgPath.indexOf("?");
+        if (qIdx !== -1) bgPath = bgPath.substring(0, qIdx);
+        let ocrLang = "eng";
+
+        Proc.runCommand("run-ocr", ["sh", "-c", "magick '"+bgPath+"' -crop "+iw+"x"+ih+"+"+ix+"+"+iy+" png:- | tesseract - - -l "+ocrLang], (stdout, exitCode) => {
+            if (exitCode === 0) {
+                const result = stdout.trim();
+                if (result) {
+                    DMSService.sendRequest("clipboard.copy", { "text": result }, function(response) {
+                        if (typeof ToastService !== "undefined" && ToastService) {
+                            ToastService.showInfo(I18n.tr("OCR: %1 chars copied to clipboard").arg(result.length));
+                        }
+                    });
+                } else {
+                    if (typeof ToastService !== "undefined" && ToastService) {
+                        ToastService.showInfo(I18n.tr("OCR: No text detected"));
+                    }
+                }
+            } else {
+                if (typeof ToastService !== "undefined" && ToastService) {
+                    if (stdout && stdout.includes("Invalid")) {
+                        ToastService.showError(I18n.tr("OCR: Unsupported image format"));
+                    } else {
+                        ToastService.showError(I18n.tr("OCR failed. Is Tesseract and ImageMagick installed?"));
+                    }
+                }
+            }
+            window.currentTool = window.lastActiveTool;
+            window.ocrRect = Qt.rect(0, 0, 0, 0);
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+        });
+    }
+
     shouldBeVisible: false
     
     // Spacious modal dimensions occupying 90% width and 90% height of the screen
@@ -701,11 +762,11 @@ DankModal {
     // Crop Selection State
     property rect cropRect: Qt.rect(0, 0, 0, 0)
     property bool hasSelection: false
-
     readonly property bool roundRect: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.roundRect !== undefined ? window.parentWidget.pluginData.roundRect : true
     readonly property bool roundHighlighter: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.roundHighlighter !== undefined ? window.parentWidget.pluginData.roundHighlighter : false
     property string activeHandle: "none" // "tl", "tr", "bl", "br", "new", "none"
     property point selectStart: Qt.point(0, 0)
+    property rect ocrRect: Qt.rect(0, 0, 0, 0)
     property var exportCallback: null
 
     QuickCaptureActions {
@@ -887,6 +948,13 @@ DankModal {
         const hasCtrl = event.modifiers & Qt.ControlModifier;
 
         if (event.key === Qt.Key_Escape) {
+            if (window.currentTool === "ocr") {
+                window.currentTool = window.lastActiveTool;
+                window.ocrRect = Qt.rect(0, 0, 0, 0);
+                if (window.activeCanvas) window.activeCanvas.requestPaint();
+                event.accepted = true;
+                return;
+            }
             window.discardAndClose();
             event.accepted = true;
             return;
@@ -1495,7 +1563,9 @@ DankModal {
                             // 1. Draw Dimming Selection Overlay (only if in crop mode)
                             DrawingRenderer.drawSelectionOverlay(ctx, {
                                 isCropMode: window.currentTool === "crop",
+                                isOcrMode: window.currentTool === "ocr",
                                 cropRect: window.cropRect,
+                                ocrRect: window.ocrRect,
                                 canvasWidth: window.canvasWidth,
                                 canvasHeight: window.canvasHeight
                             }, Theme);
@@ -1795,11 +1865,22 @@ DankModal {
                                             newW = Math.max(10, origX - cr.x);
                                             newH = Math.max(10, origY - cr.y);
                                         }
-
                                         window.cropRect = Qt.rect(newX, newY, newW, newH);
                                         drawingCanvas.requestPaint();
                                         return;
                                     }
+                                } else if (window.currentTool === "ocr") {
+                                    if (window.activeHandle === "ocr") {
+                                        const ox = mouse.x / window.editScale;
+                                        const oy = mouse.y / window.editScale;
+                                        const x1 = Math.min(window.selectStart.x, ox);
+                                        const y1 = Math.min(window.selectStart.y, oy);
+                                        const w = Math.abs(ox - window.selectStart.x);
+                                        const h = Math.abs(oy - window.selectStart.y);
+                                        window.ocrRect = Qt.rect(x1, y1, w, h);
+                                        drawingCanvas.requestPaint();
+                                    }
+                                    return;
                                 } else {
                                     // Standard stroke drawing positions update
                                     if (!window.currentStroke) return;
@@ -1945,6 +2026,13 @@ DankModal {
                                             orig.push(Qt.point(p.x, p.y));
                                         }
                                         window.originalPoints = orig;
+
+                                        // Bring selected stroke to front (move to end of strokes array)
+                                        const reorder = [...window.strokes];
+                                        reorder.splice(strokeIdx, 1);
+                                        reorder.push(stroke);
+                                        window.strokes = reorder;
+                                        if (window.activeCanvas) window.activeCanvas.requestPaint();
                                     }
                                     return;
                                 }
@@ -1963,6 +2051,16 @@ DankModal {
                                     window.selectStart = Qt.point(ox, oy);
                                     window.cropRect = Qt.rect(ox, oy, 0, 0);
                                     window.hasSelection = false;
+                                    drawingCanvas.requestPaint();
+                                    return;
+                                }
+
+                                if (window.currentTool === "ocr") {
+                                    const ox = mouse.x / window.editScale;
+                                    const oy = mouse.y / window.editScale;
+                                    window.selectStart = Qt.point(ox, oy);
+                                    window.ocrRect = Qt.rect(ox, oy, 0, 0);
+                                    window.activeHandle = "ocr";
                                     drawingCanvas.requestPaint();
                                     return;
                                 }
@@ -2062,6 +2160,12 @@ DankModal {
                                     }
                                     window.activeHandle = "none";
                                     drawingCanvas.requestPaint();
+                                    return;
+                                }
+
+                                if (window.currentTool === "ocr") {
+                                    window.activeHandle = "none";
+                                    window.executeOcr();
                                     return;
                                 }
 
@@ -2731,6 +2835,7 @@ DankModal {
                     id: moreToolsMenu
                     onRotateRequested: window.rotateScreenshot()
                     onMirrorRequested: window.mirrorScreenshot()
+                    onOcrRequested: window.runOcr()
                 }
 
                 HoverSliderPopover {
