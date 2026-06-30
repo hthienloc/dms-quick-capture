@@ -27,10 +27,28 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
         ctx.beginPath();
-        ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-        for (var i = 1; i < stroke.points.length; i++) {
-            ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+        
+        const pts = stroke.points;
+        const len = pts.length;
+        ctx.moveTo(pts[0].x, pts[0].y);
+
+        if (len === 1) {
+            ctx.lineTo(pts[0].x, pts[0].y);
+            ctx.stroke();
+            return;
         }
+        if (len === 2) {
+            ctx.lineTo(pts[1].x, pts[1].y);
+            ctx.stroke();
+            return;
+        }
+
+        for (let i = 1; i < len - 2; i++) {
+            const xc = (pts[i].x + pts[i + 1].x) / 2;
+            const yc = (pts[i].y + pts[i + 1].y) / 2;
+            ctx.quadraticCurveTo(pts[i].x, pts[i].y, xc, yc);
+        }
+        ctx.quadraticCurveTo(pts[len - 2].x, pts[len - 2].y, pts[len - 1].x, pts[len - 1].y);
         ctx.stroke();
 
     } else if (stroke.tool === "line") {
