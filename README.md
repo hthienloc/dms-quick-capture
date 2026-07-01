@@ -74,15 +74,13 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
   | Ellipse | Perfect circle |
   | Rectangle, Redact, Pixelate | Perfect square |
 
-### Radial Menus
+### Popover Toolbars & Radial Menus
 
-| Interaction | Menu |
-|-------------|------|
+| Interaction | Menu / Popover |
+|-------------|----------------|
 | **Right-click** on canvas | 8 customizable tool presets |
-| **Shift+Right-click** (Stamp active) | Counter format: Numeric, Alphabetic, Roman |
-| **Shift+Right-click** (Text active) | Toggle Bold, Italic, Underline, Background |
-| **Right-click** on toolbar Stamp icon | Counter format selector |
-| **Right-click** on toolbar Text icon | Text formatting toggles |
+| **Shift+Right-click** (Stamp active) | Open Stamp Options mini-toolbar (Numeric, Alphabetic, Roman) |
+| **Shift+Right-click** (Text active) | Open Text Options mini-toolbar (Bold, Italic, Underline, Background) |
 
 ### Special Tools
 
@@ -144,6 +142,11 @@ binds {
 - [ ] Canvas Color Picker
 - [ ] Image Filters (Grayscale, negative, brightness/contrast)
 - [ ] Image Backdrop Mode: Support setting a custom image file as the screenshot background
+- [ ] Expanded tool option popovers:
+  - **Arrow tool**: Double-headed arrows
+  - **Line tool**: Dimension lines, line style (dashed, dotted)
+  - **Rectangle tool**: Border style (dashed, dotted)
+  - **Redact tool**: Gaussian blur, automatic text-color match background (clean text eraser)
 
 ## License
 
