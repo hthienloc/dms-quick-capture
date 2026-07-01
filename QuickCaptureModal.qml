@@ -602,7 +602,8 @@ DankModal {
         if (qIdx !== -1) bgPath = bgPath.substring(0, qIdx);
         let ocrLang = "eng";
 
-        const tempCropPath = "/tmp/dms_ocr_crop.png";
+        const uniqueId = Date.now() + "_" + Math.floor(Math.random() * 1000000);
+        const tempCropPath = "/tmp/dms_ocr_crop_" + uniqueId + ".png";
         Proc.runCommand("crop-ocr-temp", ["magick", bgPath, "-crop", iw + "x" + ih + "+" + ix + "+" + iy, tempCropPath], (stdout1, exitCode1) => {
             if (exitCode1 === 0) {
                 Proc.runCommand("run-ocr", ["tesseract", tempCropPath, "-", "-l", ocrLang], (stdout2, exitCode2) => {
@@ -671,7 +672,8 @@ DankModal {
         const qIdx = bgPath.indexOf("?");
         if (qIdx !== -1) bgPath = bgPath.substring(0, qIdx);
 
-        const tempCropPath = "/tmp/dms_qr_crop.png";
+        const uniqueId = Date.now() + "_" + Math.floor(Math.random() * 1000000);
+        const tempCropPath = "/tmp/dms_qr_crop_" + uniqueId + ".png";
         Proc.runCommand("crop-qr-temp", ["magick", bgPath, "-crop", iw + "x" + ih + "+" + ix + "+" + iy, tempCropPath], (stdout1, exitCode1) => {
             if (exitCode1 === 0) {
                 Proc.runCommand("run-qr-scan", ["zbarimg", "--raw", "-q", tempCropPath], (stdout2, exitCode2) => {
@@ -690,9 +692,13 @@ DankModal {
                                 ToastService.showInfo(I18n.tr("QR Scan: No QR code detected"));
                             }
                         }
+                    } else if (exitCode2 === 4) {
+                        if (typeof ToastService !== "undefined" && ToastService) {
+                            ToastService.showInfo(I18n.tr("QR Scan: No QR code detected"));
+                        }
                     } else {
                         if (typeof ToastService !== "undefined" && ToastService) {
-                            ToastService.showError(I18n.tr("QR Scan failed or no QR code found"));
+                            ToastService.showError(I18n.tr("QR Scan failed or command execution error"));
                         }
                     }
                     window.currentTool = window.lastActiveTool;
