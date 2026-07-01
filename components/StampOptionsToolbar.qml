@@ -56,6 +56,7 @@ Item {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         onPressed: (mouse) => {
             root.close();
+            mouse.accepted = false;
         }
     }
 
@@ -63,12 +64,12 @@ Item {
         id: menuContent
         width: contentRow.implicitWidth + Theme.spacingM * 2
         height: tc.subToolbarHeight
-        x: Math.max(10, Math.min(parent.width - width - 10, root.menuX - width / 2))
+        x: Math.max(10, Math.min(root.width - width - 10, root.menuX - width / 2))
         y: {
             if (root.toolbarPosition === "bottom") {
-                return Math.max(10, Math.min(parent.height - height - 10, root.menuY - height - 20));
+                return Math.max(10, Math.min(root.height - height - 10, root.menuY - height - 20));
             } else {
-                return Math.max(10, Math.min(parent.height - height - 10, root.menuY + 20));
+                return Math.max(10, Math.min(root.height - height - 10, root.menuY + 20));
             }
         }
         scale: 0.95
@@ -85,9 +86,9 @@ Item {
 
             Repeater {
                 model: [
-                    { icon: "looks_one", label: qsTr("Numeric"), format: "numeric" },
-                    { icon: "title", label: qsTr("Alphabetic"), format: "alpha" },
-                    { icon: "tag", label: qsTr("Roman"), format: "roman" }
+                    { icon: "looks_one", format: "numeric" },
+                    { icon: "title", format: "alpha" },
+                    { icon: "tag", format: "roman" }
                 ]
 
                 delegate: Rectangle {

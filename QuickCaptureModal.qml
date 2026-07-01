@@ -1478,14 +1478,6 @@ DankModal {
                         moreToolsMenu.close();
                         window.discardAndClose();
                     }
-                    onTextToolRightClicked: (globalX, globalY) => {
-                        moreToolsMenu.close();
-                        textOptionsToolbar.open(globalX, globalY);
-                    }
-                    onStampToolRightClicked: (globalX, globalY) => {
-                        moreToolsMenu.close();
-                        stampOptionsToolbar.open(globalX, globalY);
-                    }
                     onMoreToolsClicked: (buttonItem) => {
                         if (moreToolsMenu.opened) {
                             moreToolsMenu.close();

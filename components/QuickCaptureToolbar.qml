@@ -67,8 +67,6 @@ Rectangle {
     signal copyRequested()
     signal copyAndSaveRequested()
     signal closeRequested()
-    signal textToolRightClicked(real globalX, real globalY)
-    signal stampToolRightClicked(real globalX, real globalY)
     signal annotationsToggled()
 
     width: isVertical ? 56 : (contentLayout.width + Theme.spacingM * 2)
