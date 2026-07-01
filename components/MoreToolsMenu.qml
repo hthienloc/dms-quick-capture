@@ -23,6 +23,7 @@ Rectangle {
     signal rotateRequested()
     signal mirrorRequested()
     signal ocrRequested()
+    signal qrScanRequested()
 
     states: [
         State {
@@ -178,6 +179,47 @@ Rectangle {
                 onClicked: {
                     menuRoot.close();
                     menuRoot.ocrRequested();
+                }
+            }
+        }
+
+        // QR Scanner Option
+        Rectangle {
+            width: parent.width
+            height: 32
+            radius: Theme.cornerRadius - 2
+            color: qrMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+
+            Row {
+                anchors.fill: parent
+                anchors.leftMargin: Theme.spacingS
+                anchors.rightMargin: Theme.spacingS
+                spacing: Theme.spacingS
+                anchors.verticalCenter: parent.verticalCenter
+
+                DankIcon {
+                    name: "qr_code"
+                    size: 16
+                    color: Theme.surfaceText
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                StyledText {
+                    text: qsTr("Scan QR")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceText
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+
+            MouseArea {
+                id: qrMouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    menuRoot.close();
+                    menuRoot.qrScanRequested();
                 }
             }
         }
