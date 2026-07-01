@@ -5,12 +5,16 @@ on:
   pull_request:
     types: [opened, reopened]
 
+env:
+  ASSIGNEE: hthienloc
+
 jobs:
   assign:
-    # Fork PR runs get a read-only GITHUB_TOKEN; skip external forks cleanly
+    # Fork PR runs get a read-only GITHUB_TOKEN; skip external forks cleanly.
+    # Gate the pull_request check to prevent evaluation errors on issue events.
     if: >-
       github.event_name == 'issues' ||
-      github.event.pull_request.head.repo.full_name == github.repository
+      (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -26,5 +30,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              assignees: ['hthienloc']
+              assignees: [process.env.ASSIGNEE]
             })

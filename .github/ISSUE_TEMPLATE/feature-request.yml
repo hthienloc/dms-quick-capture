@@ -1,6 +1,8 @@
 name: 💡 Feature Request
 description: Suggest an idea or enhancement for DMS Quick Capture
+title: "[Feature]: "
 labels: ["enhancement"]
+assignees: ["hthienloc"]
 body:
   - type: textarea
     id: problem
