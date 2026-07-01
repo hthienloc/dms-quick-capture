@@ -31,4 +31,9 @@ QtObject {
     readonly property int presetBtnHeight: 24
     readonly property int presetFontSize: 10
     readonly property int popoverHeight: 72
+
+    // Sub-options popover dimensions
+    readonly property int subToolbarHeight: 48
+    readonly property int subToolbarBtnSize: 36
+    readonly property int subToolbarIconSize: 20
 }

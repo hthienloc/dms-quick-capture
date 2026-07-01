@@ -147,20 +147,7 @@ Rectangle {
                             iconColor: root.currentTool === modelData.id ? Theme.primary : Theme.surfaceText
                             onClicked: root.toolSelected(modelData.id)
                         }
-                        MouseArea {
-                            anchors.fill: parent
-                            acceptedButtons: Qt.RightButton
-                            onClicked: (mouse) => {
-                                if (mouse.button === Qt.RightButton) {
-                                    var pt = mapToItem(null, 18, 18);
-                                    if (modelData.id === "text") {
-                                        root.textToolRightClicked(pt.x, pt.y);
-                                    } else if (modelData.id === "stamp") {
-                                        root.stampToolRightClicked(pt.x, pt.y);
-                                    }
-                                }
-                            }
-                        }
+
                     }
                 }
                 DankActionButton {
@@ -283,20 +270,7 @@ Rectangle {
                             iconColor: root.currentTool === modelData.id ? Theme.primary : Theme.surfaceText
                             onClicked: root.toolSelected(modelData.id)
                         }
-                        MouseArea {
-                            anchors.fill: parent
-                            acceptedButtons: Qt.RightButton
-                            onClicked: (mouse) => {
-                                if (mouse.button === Qt.RightButton) {
-                                    var pt = mapToItem(null, 18, 18);
-                                    if (modelData.id === "text") {
-                                        root.textToolRightClicked(pt.x, pt.y);
-                                    } else if (modelData.id === "stamp") {
-                                        root.stampToolRightClicked(pt.x, pt.y);
-                                    }
-                                }
-                            }
-                        }
+
                     }
                 }
                 DankActionButton {

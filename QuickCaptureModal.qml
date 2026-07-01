@@ -1480,11 +1480,11 @@ DankModal {
                     }
                     onTextToolRightClicked: (globalX, globalY) => {
                         moreToolsMenu.close();
-                        textOptionsRadialMenu.open(globalX, globalY);
+                        textOptionsToolbar.open(globalX, globalY);
                     }
                     onStampToolRightClicked: (globalX, globalY) => {
                         moreToolsMenu.close();
-                        stampOptionsRadialMenu.open(globalX, globalY);
+                        stampOptionsToolbar.open(globalX, globalY);
                     }
                     onMoreToolsClicked: (buttonItem) => {
                         if (moreToolsMenu.opened) {
@@ -2043,10 +2043,10 @@ DankModal {
                                     if (mouse.modifiers & Qt.ShiftModifier) {
                                         radialMenu.close();
                                         if (window.currentTool === "stamp") {
-                                            stampOptionsRadialMenu.open(mapped.x, mapped.y);
+                                            stampOptionsToolbar.open(mapped.x, mapped.y);
                                             return;
                                         } else if (window.currentTool === "text") {
-                                            textOptionsRadialMenu.open(mapped.x, mapped.y);
+                                            textOptionsToolbar.open(mapped.x, mapped.y);
                                             return;
                                         }
                                     }
@@ -2897,8 +2897,9 @@ DankModal {
                     }
                 }
 
-                TextOptionsRadialMenu {
-                    id: textOptionsRadialMenu
+                TextOptionsToolbar {
+                    id: textOptionsToolbar
+                    toolbarPosition: window.toolbarPosition
                     boldActive: window.textBold
                     italicActive: window.textItalic
                     underlineActive: window.textUnderline
@@ -2907,20 +2908,13 @@ DankModal {
                     onItalicToggled: window.textItalic = !window.textItalic
                     onUnderlineToggled: window.textUnderline = !window.textUnderline
                     onBackgroundToggled: window.textBackground = !window.textBackground
-                    onCenterClicked: {
-                        window.currentTool = "text";
-                        textOptionsRadialMenu.close();
-                    }
                 }
 
-                StampOptionsRadialMenu {
-                    id: stampOptionsRadialMenu
+                StampOptionsToolbar {
+                    id: stampOptionsToolbar
+                    toolbarPosition: window.toolbarPosition
                     currentFormat: window.stampCounterFormat
                     onFormatSelected: (format) => window.stampCounterFormat = format
-                    onCenterClicked: {
-                        window.currentTool = "stamp";
-                        stampOptionsRadialMenu.close();
-                    }
                 }
 
                 MoreToolsMenu {
