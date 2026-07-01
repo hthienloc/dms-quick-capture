@@ -31,6 +31,7 @@ QtObject {
         };
 
         const yyyy = now.getFullYear();
+        const yy = yyyy % 1000
         const MM = pad(now.getMonth() + 1);
         const dd = pad(now.getDate());
         const HH = pad(now.getHours());
@@ -40,6 +41,7 @@ QtObject {
 
         let filename = pattern
             .replace(/%Y/g, yyyy)
+            .replace(/%y/g, yy)
             .replace(/%m/g, MM)
             .replace(/%d/g, dd)
             .replace(/%H/g, HH)
