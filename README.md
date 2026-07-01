@@ -140,7 +140,7 @@ binds {
 ## Roadmap
 
 - [x] OCR (Optical Character Recognition) text scanner
-- [ ] QR Code Scanner
+- [x] QR Code Scanner
 - [ ] Canvas Color Picker
 - [ ] Image Filters (Grayscale, negative, brightness/contrast)
 - [ ] Image Backdrop Mode: Support setting a custom image file as the screenshot background

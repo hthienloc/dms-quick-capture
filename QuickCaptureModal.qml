@@ -641,6 +641,75 @@ DankModal {
         });
     }
 
+    function runQrScan() {
+        window.ocrRect = Qt.rect(0, 0, 0, 0);
+        window.currentTool = "qr";
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
+        if (typeof ToastService !== "undefined" && ToastService) {
+            ToastService.showInfo(I18n.tr("QR Scan: Draw a rectangle on the image to scan"));
+        }
+    }
+
+    function executeQrScan() {
+        const r = window.ocrRect;
+        if (r.width < 10 || r.height < 10) {
+            window.ocrRect = Qt.rect(0, 0, 0, 0);
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+            return;
+        }
+
+        // Account for crop offset when mapping to source image coordinates
+        const cropOffsetX = window.hasSelection ? window.cropRect.x : 0;
+        const cropOffsetY = window.hasSelection ? window.cropRect.y : 0;
+        const ix = Math.round(r.x + cropOffsetX);
+        const iy = Math.round(r.y + cropOffsetY);
+        const iw = Math.round(r.width);
+        const ih = Math.round(r.height);
+
+        let bgPath = decodeURIComponent(window.bgImageSource.toString());
+        if (bgPath.startsWith("file://")) bgPath = bgPath.substring(7);
+        const qIdx = bgPath.indexOf("?");
+        if (qIdx !== -1) bgPath = bgPath.substring(0, qIdx);
+
+        const tempCropPath = "/tmp/dms_qr_crop.png";
+        Proc.runCommand("crop-qr-temp", ["magick", bgPath, "-crop", iw + "x" + ih + "+" + ix + "+" + iy, tempCropPath], (stdout1, exitCode1) => {
+            if (exitCode1 === 0) {
+                Proc.runCommand("run-qr-scan", ["zbarimg", "--raw", "-q", tempCropPath], (stdout2, exitCode2) => {
+                    Proc.runCommand("cleanup-qr-temp", ["rm", "-f", tempCropPath]);
+
+                    if (exitCode2 === 0) {
+                        const result = stdout2.trim();
+                        if (result) {
+                            DMSService.sendRequest("clipboard.copy", { "text": result }, function(response) {
+                                if (typeof ToastService !== "undefined" && ToastService) {
+                                    ToastService.showInfo(I18n.tr("QR Decoded: Copied to clipboard"));
+                                }
+                            });
+                        } else {
+                            if (typeof ToastService !== "undefined" && ToastService) {
+                                ToastService.showInfo(I18n.tr("QR Scan: No QR code detected"));
+                            }
+                        }
+                    } else {
+                        if (typeof ToastService !== "undefined" && ToastService) {
+                            ToastService.showError(I18n.tr("QR Scan failed or no QR code found"));
+                        }
+                    }
+                    window.currentTool = window.lastActiveTool;
+                    window.ocrRect = Qt.rect(0, 0, 0, 0);
+                    if (window.activeCanvas) window.activeCanvas.requestPaint();
+                });
+            } else {
+                if (typeof ToastService !== "undefined" && ToastService) {
+                    ToastService.showError(I18n.tr("QR Scan failed: Could not crop image"));
+                }
+                window.currentTool = window.lastActiveTool;
+                window.ocrRect = Qt.rect(0, 0, 0, 0);
+                if (window.activeCanvas) window.activeCanvas.requestPaint();
+            }
+        });
+    }
+
     shouldBeVisible: false
     
     // Spacious modal dimensions occupying 90% width and 90% height of the screen
@@ -958,7 +1027,7 @@ DankModal {
         const hasCtrl = event.modifiers & Qt.ControlModifier;
 
         if (event.key === Qt.Key_Escape) {
-            if (window.currentTool === "ocr") {
+            if (window.currentTool === "ocr" || window.currentTool === "qr") {
                 window.currentTool = window.lastActiveTool;
                 window.ocrRect = Qt.rect(0, 0, 0, 0);
                 if (window.activeCanvas) window.activeCanvas.requestPaint();
@@ -1573,7 +1642,7 @@ DankModal {
                             // 1. Draw Dimming Selection Overlay (only if in crop mode)
                             DrawingRenderer.drawSelectionOverlay(ctx, {
                                 isCropMode: window.currentTool === "crop",
-                                isOcrMode: window.currentTool === "ocr",
+                                isOcrMode: window.currentTool === "ocr" || window.currentTool === "qr",
                                 cropRect: window.cropRect,
                                 ocrRect: window.ocrRect,
                                 canvasWidth: window.canvasWidth,
@@ -1879,8 +1948,8 @@ DankModal {
                                         drawingCanvas.requestPaint();
                                         return;
                                     }
-                                } else if (window.currentTool === "ocr") {
-                                    if (window.activeHandle === "ocr") {
+                                } else if (window.currentTool === "ocr" || window.currentTool === "qr") {
+                                    if (window.activeHandle === "ocr" || window.activeHandle === "qr") {
                                         const ox = mouse.x / window.editScale;
                                         const oy = mouse.y / window.editScale;
                                         const x1 = Math.min(window.selectStart.x, ox);
@@ -2066,12 +2135,12 @@ DankModal {
                                     return;
                                 }
 
-                                if (window.currentTool === "ocr") {
+                                if (window.currentTool === "ocr" || window.currentTool === "qr") {
                                     const ox = mouse.x / window.editScale;
                                     const oy = mouse.y / window.editScale;
                                     window.selectStart = Qt.point(ox, oy);
                                     window.ocrRect = Qt.rect(ox, oy, 0, 0);
-                                    window.activeHandle = "ocr";
+                                    window.activeHandle = window.currentTool;
                                     drawingCanvas.requestPaint();
                                     return;
                                 }
@@ -2177,6 +2246,12 @@ DankModal {
                                 if (window.currentTool === "ocr") {
                                     window.activeHandle = "none";
                                     window.executeOcr();
+                                    return;
+                                }
+
+                                if (window.currentTool === "qr") {
+                                    window.activeHandle = "none";
+                                    window.executeQrScan();
                                     return;
                                 }
 
@@ -2847,6 +2922,7 @@ DankModal {
                     onRotateRequested: window.rotateScreenshot()
                     onMirrorRequested: window.mirrorScreenshot()
                     onOcrRequested: window.runOcr()
+                    onQrScanRequested: window.runQrScan()
                 }
 
                 HoverSliderPopover {
