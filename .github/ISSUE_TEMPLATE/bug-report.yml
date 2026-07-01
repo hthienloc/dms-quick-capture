@@ -2,7 +2,6 @@ name: 🐛 Bug Report
 description: Report a bug or unexpected behavior in DMS Quick Capture
 title: "[Bug]: "
 labels: ["bug"]
-assignees: ["hthienloc"]
 body:
   - type: markdown
     attributes:
