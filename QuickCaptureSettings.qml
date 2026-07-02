@@ -731,12 +731,16 @@ PluginSettings {
                     { label: I18n.tr("Focused Screen"), value: "focused" },
                     { label: I18n.tr("Primary Screen (Index 0)"), value: "primary" }
                 ];
-                for (let i = 0; i < Quickshell.screens.length; i++) {
-                    const scr = Quickshell.screens[i];
-                    list.push({
-                        label: I18n.tr("Screen: %1 (%2x%3)").arg(scr.name).arg(scr.width).arg(scr.height),
-                        value: scr.name
-                    });
+                if (Quickshell.screens) {
+                    for (let i = 0; i < Quickshell.screens.length; i++) {
+                        const scr = Quickshell.screens[i];
+                        if (scr) {
+                            list.push({
+                                label: I18n.tr("Screen: %1 (%2x%3)").arg(scr.name).arg(scr.width).arg(scr.height),
+                                value: scr.name
+                            });
+                        }
+                    }
                 }
                 return list;
             }
