@@ -31,7 +31,7 @@ QtObject {
         };
 
         const yyyy = now.getFullYear();
-        const yy = yyyy % 1000
+        const yy = pad(yyyy % 100);
         const MM = pad(now.getMonth() + 1);
         const dd = pad(now.getDate());
         const HH = pad(now.getHours());
