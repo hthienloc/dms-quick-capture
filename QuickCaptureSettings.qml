@@ -1730,7 +1730,7 @@ PluginSettings {
             options: [
                 { label: I18n.tr("Text"), value: "text" },
                 { label: I18n.tr("Image"), value: "image" },
-                { label: I18n.tr("Hybrid"), value: "hybrid" }
+                { label: I18n.tr("Image + Text"), value: "hybrid" }
             ]
             defaultValue: "text"
             visible: enableWatermark.value
