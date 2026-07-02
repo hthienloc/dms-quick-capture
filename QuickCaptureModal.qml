@@ -979,9 +979,51 @@ DankModal {
                 if (dist <= radius) return i;
             } else if (stroke.tool === "text") {
                 const p0 = stroke.points[0];
-                const h = stroke.width * 4 + 10;
-                const w = Math.max(40, stroke.text.length * stroke.width * 2 + 10);
-                if (mx >= p0.x - 5 && mx <= p0.x + w && my >= p0.y - 5 && my <= p0.y + h) {
+                const isMonospace = stroke.isMonospace === true;
+                const isBold = stroke.isBold === true;
+                const fontSize = stroke.width;
+
+                // Character-by-character proportional font width estimation
+                let estWidth = 0;
+                const txt = stroke.text || "";
+                let charWidthRatio = isMonospace ? 0.6 : 0.52;
+                if (isBold) charWidthRatio += 0.05;
+
+                for (let c = 0; c < txt.length; c++) {
+                    const charCode = txt.charCodeAt(c);
+                    if (charCode > 255) {
+                        estWidth += fontSize * 0.85;
+                    } else if (isMonospace) {
+                        estWidth += fontSize * charWidthRatio;
+                    } else {
+                        const char = txt.charAt(c);
+                        if (/[iIlldt1|()\[\]{}]/.test(char)) {
+                            estWidth += fontSize * 0.28;
+                        } else if (/[mwMW]/.test(char)) {
+                            estWidth += fontSize * 0.8;
+                        } else if (/[A-Z]/.test(char)) {
+                            estWidth += fontSize * 0.65;
+                        } else {
+                            estWidth += fontSize * charWidthRatio;
+                        }
+                    }
+                }
+
+                let textW = Math.max(40, estWidth);
+                let textH = fontSize;
+                let textY = p0.y;
+                let textX = p0.x;
+
+                if (stroke.hasBackground) {
+                    const padX = fontSize * 0.3;
+                    const padY = fontSize * 0.15;
+                    textX -= padX;
+                    textY -= padY;
+                    textW += padX * 2;
+                    textH += padY * 2;
+                }
+
+                if (mx >= textX - 8 && mx <= textX + textW + 8 && my >= textY - 8 && my <= textY + textH + 8) {
                     return i;
                 }
             } else if (stroke.tool === "callout" && stroke.points.length === 4) {
