@@ -713,13 +713,40 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Styles")
             icon: "aspect_ratio"
-            showReset: modalOpacity.isDirty || showCanvasBorder.isDirty || editQuality.isDirty
+            showReset: modalOpacity.isDirty || showCanvasBorder.isDirty || editQuality.isDirty || modalDisplayTarget.isDirty
             onResetClicked: {
                 modalOpacity.resetToDefault();
                 showCanvasBorder.resetToDefault();
                 editQuality.resetToDefault();
+                modalDisplayTarget.resetToDefault();
             }
         }
+
+        SelectionSettingPlus {
+            id: modalDisplayTarget
+            settingKey: "modalDisplayTarget"
+            label: I18n.tr("Modal Display Screen")
+            options: {
+                const list = [
+                    { label: I18n.tr("Focused Screen"), value: "focused" }
+                ];
+                if (Quickshell.screens) {
+                    for (let i = 0; i < Quickshell.screens.length; i++) {
+                        const scr = Quickshell.screens[i];
+                        if (scr) {
+                            list.push({
+                                label: I18n.tr("Screen: %1 (%2x%3)").arg(scr.name).arg(scr.width).arg(scr.height),
+                                value: scr.name
+                            });
+                        }
+                    }
+                }
+                return list;
+            }
+            defaultValue: "focused"
+        }
+
+        Separator {}
 
         SliderSettingPlus {
             id: modalOpacity

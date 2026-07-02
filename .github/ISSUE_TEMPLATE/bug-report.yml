@@ -18,7 +18,7 @@ body:
     id: plugin_version
     attributes:
       label: Quick Capture Plugin Version
-      placeholder: e.g. 2.7.4
+      placeholder: e.g. 2.7.5
     validations:
       required: true
   - type: input
