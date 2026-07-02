@@ -2,7 +2,7 @@ name: Auto Assign Issues & PRs
 on:
   issues:
     types: [opened]
-  pull_request:
+  pull_request_target:
     types: [opened, reopened]
 
 env:
@@ -10,12 +10,9 @@ env:
 
 jobs:
   assign:
-    # Fork PR runs get a read-only GITHUB_TOKEN; skip external forks cleanly.
-    # Gate the pull_request check and prevent triggering if the actor is hthienloc.
-    if: >-
-      (github.event_name == 'issues' ||
-      (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) &&
-      github.actor != 'hthienloc'
+    # Gate trigger to prevent running if the actor is hthienloc.
+    # pull_request_target runs in target context with write permissions, supporting forks safely.
+    if: github.actor != 'hthienloc'
     runs-on: ubuntu-latest
     permissions:
       contents: read
