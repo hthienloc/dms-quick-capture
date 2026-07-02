@@ -205,4 +205,5 @@ QtObject {
     }
 
     function formatWatermarkText(pattern) { return Helpers.formatWatermarkText(pattern, Quickshell); }
+    readonly property string modalDisplayTarget: pluginData["modalDisplayTarget"] || "focused"
 }

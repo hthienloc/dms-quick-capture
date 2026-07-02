@@ -719,10 +719,23 @@ DankModal {
     shouldBeVisible: false
     
     // Spacious modal dimensions occupying 90% width and 90% height of the screen
-    modalWidth: Math.round(Quickshell.screens[0].width * 0.9)
-    modalHeight: Math.round(Quickshell.screens[0].height * 0.9)
+    modalWidth: Math.round(window.screenWidth * 0.9)
+    modalHeight: Math.round(window.screenHeight * 0.9)
     enableShadow: true
     positioning: "center"
+
+    targetScreen: {
+        const mode = config.modalDisplayTarget;
+        if (mode === "focused") {
+            return CompositorService.getFocusedScreen() ?? Quickshell.screens[0];
+        }
+        if (mode === "primary") {
+            return Quickshell.screens[0];
+        }
+        // Specific screen name matching
+        const found = Array.from(Quickshell.screens.values()).find(s => s.name === mode);
+        return found ?? (CompositorService.getFocusedScreen() ?? Quickshell.screens[0]);
+    }
 
     // Component scope bridging properties
     property string bgImageSource: ""
