@@ -905,6 +905,54 @@ DankModal {
         return Helpers.constrainSquarePoint(start, point, Qt);
     }
 
+    function estimateTextWidth(text, fontSize, isBold, isMonospace) {
+        if (!text) return 0;
+        let charWidthRatio = isMonospace ? 0.6 : 0.52;
+        if (isBold) charWidthRatio += 0.05;
+
+        let estWidth = 0;
+        for (let c = 0; c < text.length; c++) {
+            const charCode = text.charCodeAt(c);
+            if (charCode > 255) {
+                // Treat known CJK and related ranges as wide; fall back to proportional width
+                const isCJKOrWideScript =
+                        // CJK Unified Ideographs
+                        (charCode >= 0x3400 && charCode <= 0x4DBF) ||
+                        (charCode >= 0x4E00 && charCode <= 0x9FFF) ||
+                        (charCode >= 0xF900 && charCode <= 0xFAFF) ||
+                        // Hiragana
+                        (charCode >= 0x3040 && charCode <= 0x309F) ||
+                        // Katakana
+                        (charCode >= 0x30A0 && charCode <= 0x30FF) ||
+                        // Hangul syllables
+                        (charCode >= 0xAC00 && charCode <= 0xD7AF);
+
+                if (isCJKOrWideScript) {
+                    estWidth += fontSize * 0.9;
+                } else {
+                    // Non-ASCII but not CJK (e.g. accented Latin/Vietnamese diacritics): proportional width
+                    estWidth += fontSize * charWidthRatio;
+                }
+            } else if (isMonospace) {
+                estWidth += fontSize * charWidthRatio;
+            } else {
+                const char = text.charAt(c);
+                if ("iIlldt1|()[]{}".indexOf(char) !== -1) {
+                    estWidth += fontSize * 0.28;
+                } else if ("mwMW".indexOf(char) !== -1) {
+                    estWidth += fontSize * 0.8;
+                } else if (char >= "A" && char <= "Z") {
+                    estWidth += fontSize * 0.65;
+                } else {
+                    estWidth += fontSize * charWidthRatio;
+                }
+            }
+        }
+
+        const maxW = fontSize * text.length * (isMonospace ? 1.2 : 1.6);
+        return Math.min(estWidth, maxW);
+    }
+
     function findStrokeAt(mx, my) {
         for (let i = window.strokes.length - 1; i >= 0; i--) {
             const stroke = window.strokes[i];
@@ -979,37 +1027,10 @@ DankModal {
                 if (dist <= radius) return i;
             } else if (stroke.tool === "text") {
                 const p0 = stroke.points[0];
-                const isMonospace = stroke.isMonospace === true;
-                const isBold = stroke.isBold === true;
                 const fontSize = stroke.width;
-
-                // Character-by-character proportional font width estimation
-                let estWidth = 0;
                 const txt = stroke.text || "";
-                let charWidthRatio = isMonospace ? 0.6 : 0.52;
-                if (isBold) charWidthRatio += 0.05;
 
-                for (let c = 0; c < txt.length; c++) {
-                    const charCode = txt.charCodeAt(c);
-                    if (charCode > 255) {
-                        estWidth += fontSize * 0.85;
-                    } else if (isMonospace) {
-                        estWidth += fontSize * charWidthRatio;
-                    } else {
-                        const char = txt.charAt(c);
-                        if (/[iIlldt1|()\[\]{}]/.test(char)) {
-                            estWidth += fontSize * 0.28;
-                        } else if (/[mwMW]/.test(char)) {
-                            estWidth += fontSize * 0.8;
-                        } else if (/[A-Z]/.test(char)) {
-                            estWidth += fontSize * 0.65;
-                        } else {
-                            estWidth += fontSize * charWidthRatio;
-                        }
-                    }
-                }
-
-                let textW = Math.max(40, estWidth);
+                let textW = Math.max(40, window.estimateTextWidth(txt, fontSize, stroke.isBold === true, stroke.isMonospace === true));
                 let textH = fontSize;
                 let textY = p0.y;
                 let textX = p0.x;
