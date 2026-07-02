@@ -148,6 +148,12 @@ binds {
   - **Rectangle tool**: Border style (dashed, dotted)
   - **Redact tool**: Gaussian blur, automatic text-color match background (clean text eraser)
 
+## Credits
+
+- **[Gradia Capture](https://github.com/AlexanderVanhee/gradia-capture)** — Inspiration for the toolbar layout and backdrop algorithms
+- **[Flameshot](https://github.com/flameshot-org/flameshot)** — Inspiration for the radial menu and tool interaction patterns
+- **[Snapzy](https://github.com/duongductrong/Snapzy)** — Inspiration for the float image / continue-editing workflow
+
 ## License
 
 MIT
