@@ -728,8 +728,7 @@ PluginSettings {
             label: I18n.tr("Modal Display Screen")
             options: {
                 const list = [
-                    { label: I18n.tr("Focused Screen"), value: "focused" },
-                    { label: I18n.tr("Primary Screen (Index 0)"), value: "primary" }
+                    { label: I18n.tr("Focused Screen"), value: "focused" }
                 ];
                 if (Quickshell.screens) {
                     for (let i = 0; i < Quickshell.screens.length; i++) {
