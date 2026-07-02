@@ -10,7 +10,7 @@ DMS Quick Capture is an interactive vector annotation and screenshot utility for
 
 - **Plugin ID:** `quickCapture`
 - **Plugin Type:** `composite` (bundles background daemon, bar widget, settings UI)
-- **Current Version:** `2.7.4` (see [plugin.json](file:///home/loccun/Documents/GitHub/dms-quick-capture/plugin.json))
+- **Current Version:** `2.7.5` (see [plugin.json](file:///home/loccun/Documents/GitHub/dms-quick-capture/plugin.json))
 
 ### Core Components Map
 
