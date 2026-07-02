@@ -395,7 +395,7 @@ PluginSettings {
         }
 
         InfoText {
-            text: I18n.tr("Supports formatting: %Y (Year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)")
+            text: I18n.tr("Supports formatting: %Y (Year), %y (Last 2 digits of the year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)")
             opacity: 0.85
         }
 
@@ -1730,7 +1730,7 @@ PluginSettings {
             options: [
                 { label: I18n.tr("Text"), value: "text" },
                 { label: I18n.tr("Image"), value: "image" },
-                { label: I18n.tr("Hybrid"), value: "hybrid" }
+                { label: I18n.tr("Image + Text"), value: "hybrid" }
             ]
             defaultValue: "text"
             visible: enableWatermark.value
@@ -1797,7 +1797,7 @@ PluginSettings {
         }
 
         InfoText {
-            text: I18n.tr("Supports formatting: {user} (Username), \\n (New Line), %Y (Year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)")
+            text: I18n.tr("Supports formatting: {user} (Username), \\n (New Line), %Y (Year), %y (Last 2 digits of the year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)")
             opacity: 0.85
             visible: enableWatermark.value && (watermarkType.value === "text" || watermarkType.value === "hybrid")
             height: visible ? implicitHeight : 0
