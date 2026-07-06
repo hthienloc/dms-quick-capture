@@ -1792,6 +1792,14 @@ DankModal {
                                 window.drawBackdropBackground(ctx, window.canvasWidth, window.canvasHeight);
                                 window.drawScreenshotShadow(ctx);
                                 window.drawScreenshotImage(ctx, bgImage);
+                            } else if (window.currentTool === "colorpicker") {
+                                if (bgImage.status === Image.Ready) {
+                                    if (window.hasSelection) {
+                                        ctx.drawImage(bgImage, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, 0, 0, window.canvasWidth, window.canvasHeight);
+                                    } else {
+                                        ctx.drawImage(bgImage, 0, 0, window.canvasWidth, window.canvasHeight);
+                                    }
+                                }
                             }
 
                             // 1. Draw Dimming Selection Overlay (only if in crop mode)
