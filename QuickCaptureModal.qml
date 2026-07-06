@@ -2778,9 +2778,9 @@ DankModal {
 
                     Rectangle {
                         id: magnifier
-                        width: 140
-                        height: 140
-                        radius: 70
+                        width: 160
+                        height: 160
+                        radius: 80
                         border.color: Theme.primary
                         border.width: 2
                         color: "black"
@@ -2893,7 +2893,7 @@ DankModal {
                             anchors.bottom: parent.bottom
                             anchors.left: parent.left
                             anchors.right: parent.right
-                            height: 48
+                            height: 56
                             color: Theme.withAlpha(Theme.surfaceContainer, 0.9)
                             border.color: Theme.withAlpha(Theme.outline, 0.15)
                             border.width: 1
@@ -2904,9 +2904,9 @@ DankModal {
 
                                 // Color preview swatch
                                 Rectangle {
-                                    width: 16
-                                    height: 16
-                                    radius: 4
+                                    width: 20
+                                    height: 20
+                                    radius: 5
                                     color: window.hoveredColor
                                     border.color: Theme.withAlpha(Theme.outline, 0.3)
                                     border.width: 1
@@ -2919,7 +2919,7 @@ DankModal {
 
                                     StyledText {
                                         text: window.formatHexColor(window.hoveredColor).toUpperCase()
-                                        font.pixelSize: 10
+                                        font.pixelSize: 12
                                         font.bold: true
                                         color: Theme.surfaceText
                                     }
@@ -2931,7 +2931,7 @@ DankModal {
                                             var b = Math.round((window.hoveredColor.b || 0) * 255);
                                             return "RGB: " + r + "," + g + "," + b;
                                         }
-                                        font.pixelSize: 8
+                                        font.pixelSize: 9
                                         color: Theme.surfaceVariantText
                                     }
                                 }
