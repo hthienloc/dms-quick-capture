@@ -395,7 +395,7 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
             const x2 = Math.max(p0.x, p1.x);
             const y1 = Math.min(p0.y, p1.y);
             const y2 = Math.max(p0.y, p1.y);
-            if (mx >= x1 - 5 && mx <= x2 + 5 && my >= y1 - 5 && my <= y2 + 5) {
+            if (mx >= x1 - Constants.rectSelectionPadding && mx <= x2 + Constants.rectSelectionPadding && my >= y1 - Constants.rectSelectionPadding && my <= y2 + Constants.rectSelectionPadding) {
                 return i;
             }
         } else if (stroke.tool === "ellipse") {
@@ -439,14 +439,14 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
             const fontSize = stroke.width;
             const txt = stroke.text || "";
 
-            let textW = Math.max(40, estimateTextWidthFn(txt, fontSize, stroke.isBold === true, stroke.isMonospace === true));
+            let textW = Math.max(Constants.minTextWidth, estimateTextWidthFn(txt, fontSize, stroke.isBold === true, stroke.isMonospace === true));
             let textH = fontSize;
             let textY = p0.y;
             let textX = p0.x;
 
             if (stroke.hasBackground) {
-                const padX = fontSize * 0.3;
-                const padY = fontSize * 0.15;
+                const padX = fontSize * Constants.textPaddingMultiplierX;
+                const padY = fontSize * Constants.textPaddingMultiplierY;
                 textX -= padX;
                 textY -= padY;
                 textW += padX * 2;
@@ -461,8 +461,8 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
             const srcP1 = stroke.points[1];
             const dstP0 = stroke.points[2];
             const dstP1 = stroke.points[3];
-            if ((mx >= srcP0.x - 5 && mx <= srcP1.x + 5 && my >= srcP0.y - 5 && my <= srcP1.y + 5) ||
-                (mx >= dstP0.x - 5 && mx <= dstP1.x + 5 && my >= dstP0.y - 5 && my <= dstP1.y + 5)) {
+            if ((mx >= srcP0.x - Constants.calloutSelectionPadding && mx <= srcP1.x + Constants.calloutSelectionPadding && my >= srcP0.y - Constants.calloutSelectionPadding && my <= srcP1.y + Constants.calloutSelectionPadding) ||
+                (mx >= dstP0.x - Constants.calloutSelectionPadding && mx <= dstP1.x + Constants.calloutSelectionPadding && my >= dstP0.y - Constants.calloutSelectionPadding && my <= dstP1.y + Constants.calloutSelectionPadding)) {
                 return i;
             }
         }

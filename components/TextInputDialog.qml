@@ -17,6 +17,7 @@ Popup {
     anchors.centerIn: parent
 
     required property var window
+    required property var modalFocusScope
 
     background: Rectangle {
         color: "transparent"
@@ -34,8 +35,8 @@ Popup {
             window.isTyping = false;
             window.currentTypingText = "";
             if (window.activeCanvas) window.activeCanvas.requestPaint();
-            if (window.modalFocusScope) {
-                window.modalFocusScope.forceActiveFocus();
+            if (modalFocusScope) {
+                modalFocusScope.forceActiveFocus();
             }
         }
     }

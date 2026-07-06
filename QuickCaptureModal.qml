@@ -2523,6 +2523,7 @@ DankModal {
                     TextInputDialog {
                         id: textInputDialog
                         window: rootWindow
+                        modalFocusScope: modalFocusScope
                     }
 
                     Timer {
