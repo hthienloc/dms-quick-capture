@@ -174,6 +174,16 @@ Rectangle {
                 }
             }
 
+            DankActionButton {
+                iconName: "colorize"
+                buttonSize: tc.btnSize
+                iconSize: tc.iconSize
+                tooltipText: qsTr("Color Picker (I)")
+                backgroundColor: root.currentTool === "colorpicker" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                iconColor: root.currentTool === "colorpicker" ? Theme.primary : Theme.surfaceText
+                onClicked: root.toolSelected("colorpicker-draw")
+            }
+
             Rectangle { width: tc.separatorThickness; height: tc.separatorLength; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
             // Thickness Section
@@ -294,6 +304,17 @@ Rectangle {
                         MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.colorSelected(modelData) }
                     }
                 }
+            }
+
+            DankActionButton {
+                iconName: "colorize"
+                buttonSize: tc.btnSize
+                iconSize: tc.iconSize
+                tooltipText: qsTr("Color Picker (I)")
+                backgroundColor: root.currentTool === "colorpicker" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                iconColor: root.currentTool === "colorpicker" ? Theme.primary : Theme.surfaceText
+                anchors.horizontalCenter: parent.horizontalCenter
+                onClicked: root.toolSelected("colorpicker-draw")
             }
 
             Rectangle { width: tc.separatorLength; height: tc.separatorThickness; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }

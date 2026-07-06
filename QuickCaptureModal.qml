@@ -53,13 +53,24 @@ DankModal {
     // State Variables
     property string currentTool: "crop" // crop, select, pen, line, arrow, rect, ellipse, text, pixelate, redact, stamp, highlighter, eraser, spotlight, backdrop
     property string lastActiveTool: "pen"
+    property string colorPickerMode: "draw" // draw, copy
+    property color hoveredColor: "transparent"
+    property int _lastSampledX: -1
+    property int _lastSampledY: -1
+    property color _lastSampledColor: "transparent"
     readonly property real dpr: Screen.devicePixelRatio || 1.0
     onCurrentToolChanged: {
         if (currentTool !== "text" && window.isTyping) {
             window.commitTypingText();
         }
-        if (currentTool !== "crop" && currentTool !== "backdrop" && currentTool !== "select") {
+        if (currentTool !== "crop" && currentTool !== "backdrop" && currentTool !== "select" && currentTool !== "colorpicker") {
             lastActiveTool = currentTool;
+        }
+        if (currentTool === "colorpicker") {
+            window._lastSampledX = -1;
+            window._lastSampledY = -1;
+            window._lastSampledColor = "transparent";
+            window.hoveredColor = window.sampleCanvasColor(window.cursorX * window.editScale, window.cursorY * window.editScale);
         }
         if (currentTool === "backdrop" && window.backdropMode === "none") {
             window.backdropMode = "solid";
@@ -1082,6 +1093,59 @@ DankModal {
 
     function shortcutToken(key) { return Helpers.shortcutToken(key, Qt); }
 
+    function formatHexColor(color) {
+        var r = Math.round(color.r * 255).toString(16);
+        if (r.length < 2) r = "0" + r;
+        var g = Math.round(color.g * 255).toString(16);
+        if (g.length < 2) g = "0" + g;
+        var b = Math.round(color.b * 255).toString(16);
+        if (b.length < 2) b = "0" + b;
+        return "#" + r + g + b;
+    }
+
+    function sampleCanvasColor(mouseX, mouseY) {
+        if (!window.activeCanvas) return window.currentColor;
+        
+        // Clamp and round coordinates to prevent out-of-bounds errors and ensure integer coordinates in device pixels
+        var x = Math.max(0, Math.min(Math.floor(mouseX * window.dpr), Math.floor(window.activeCanvas.width * window.dpr) - 1));
+        var y = Math.max(0, Math.min(Math.floor(mouseY * window.dpr), Math.floor(window.activeCanvas.height * window.dpr) - 1));
+        
+        // Performance optimization: skip sampling if the pixel coordinates haven't changed
+        if (window._lastSampledX === x && window._lastSampledY === y) {
+            return window._lastSampledColor || window.currentColor;
+        }
+        
+        try {
+            var ctx = window.activeCanvas.getContext("2d");
+            if (!ctx) return window.currentColor;
+            
+            var imgData = ctx.getImageData(x, y, 1, 1);
+            if (imgData && imgData.data && imgData.data.length >= 4) {
+                var r = imgData.data[0];
+                var g = imgData.data[1];
+                var b = imgData.data[2];
+                var a = imgData.data[3];
+                
+                var pickedColor;
+                if (a === 0) {
+                    pickedColor = window.currentColor;
+                } else {
+                    // Force alpha to 1.0 to ensure we always sample an opaque color.
+                    pickedColor = Qt.rgba(r / 255, g / 255, b / 255, 1.0);
+                }
+                
+                window._lastSampledX = x;
+                window._lastSampledY = y;
+                window._lastSampledColor = pickedColor;
+                
+                return pickedColor;
+            }
+        } catch (e) {
+            console.warn("Color picker failed to sample pixel color:", e);
+        }
+        return window.currentColor;
+    }
+
     function shortcutColor(color) {
         return color === "primary" ? Theme.primary : color;
     }
@@ -1210,10 +1274,13 @@ DankModal {
         const toolShortcut = config.findByKey(config.toolShortcuts, token);
         if (toolShortcut) {
             if (window.currentTool === toolShortcut.tool) {
-                if (toolShortcut.tool === "backdrop" || toolShortcut.tool === "crop") {
+                if (toolShortcut.tool === "backdrop" || toolShortcut.tool === "crop" || toolShortcut.tool === "colorpicker") {
                     window.currentTool = window.lastActiveTool;
                 }
             } else {
+                if (toolShortcut.tool === "colorpicker") {
+                    window.colorPickerMode = "draw";
+                }
                 window.currentTool = toolShortcut.tool;
             }
             event.accepted = true;
@@ -1523,6 +1590,12 @@ DankModal {
                             window.currentTool = window.lastActiveTool;
                         } else if (tool === "crop" && window.currentTool === "crop") {
                             window.currentTool = window.lastActiveTool;
+                        } else if (tool === "colorpicker-draw") {
+                            window.colorPickerMode = "draw";
+                            window.currentTool = "colorpicker";
+                        } else if (tool === "colorpicker-copy") {
+                            window.colorPickerMode = "copy";
+                            window.currentTool = "colorpicker";
                         } else {
                             window.currentTool = tool;
                         }
@@ -1719,6 +1792,14 @@ DankModal {
                                 window.drawBackdropBackground(ctx, window.canvasWidth, window.canvasHeight);
                                 window.drawScreenshotShadow(ctx);
                                 window.drawScreenshotImage(ctx, bgImage);
+                            } else if (window.currentTool === "colorpicker") {
+                                if (bgImage.status === Image.Ready) {
+                                    if (window.hasSelection) {
+                                        ctx.drawImage(bgImage, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, 0, 0, window.canvasWidth, window.canvasHeight);
+                                    } else {
+                                        ctx.drawImage(bgImage, 0, 0, window.canvasWidth, window.canvasHeight);
+                                    }
+                                }
                             }
 
                             // 1. Draw Dimming Selection Overlay (only if in crop mode)
@@ -1959,10 +2040,13 @@ DankModal {
                             property string hoveredHandle: "none"
                             property int hoveredStrokeIdx: -1
                             onPositionChanged: (mouse) => {
-                                const origX = mouse.x / window.editScale;
-                                const origY = mouse.y / window.editScale;
-                                window.cursorX = origX;
-                                window.cursorY = origY;
+                                 const origX = mouse.x / window.editScale;
+                                 const origY = mouse.y / window.editScale;
+                                 window.cursorX = origX;
+                                 window.cursorY = origY;
+                                 if (window.currentTool === "colorpicker") {
+                                     window.hoveredColor = window.sampleCanvasColor(mouse.x, mouse.y);
+                                 };
                                 hoveredHandle = window.getHoveredHandle(origX, origY);
 
                                 const absPt = getAbsolutePoint(mouse.x, mouse.y);
@@ -2094,6 +2178,9 @@ DankModal {
                             cursorShape: {
                                 if (hoveredHandle === "tl" || hoveredHandle === "br") return Qt.SizeFDiagCursor;
                                 if (hoveredHandle === "tr" || hoveredHandle === "bl") return Qt.SizeBDiagCursor;
+                                if (window.currentTool === "colorpicker") {
+                                    return Qt.CrossCursor;
+                                }
                                 if (window.currentTool === "select") {
                                     return window.selectedStroke ? Qt.ClosedHandCursor : (drawMouseArea.hoveredStrokeIdx !== -1 ? Qt.OpenHandCursor : Qt.ArrowCursor);
                                 }
@@ -2198,6 +2285,23 @@ DankModal {
                                     }
                                     return;
                                 }
+
+                                 if (window.currentTool === "colorpicker") {
+                                     if (mouse.button === Qt.LeftButton) {
+                                         const pickedColor = window.sampleCanvasColor(mouse.x, mouse.y);
+                                         const hexStr = window.formatHexColor(pickedColor).toUpperCase();
+                                         if (window.colorPickerMode === "copy") {
+                                             Quickshell.execDetached(["dms", "cl", "copy", hexStr]);
+                                             if (typeof ToastService !== "undefined" && ToastService) {
+                                                 ToastService.showInfo(I18n.tr("Color copied to clipboard: %1").arg(hexStr));
+                                             }
+                                         } else {
+                                             window.currentColor = pickedColor;
+                                         }
+                                         window.currentTool = window.lastActiveTool;
+                                     }
+                                     return;
+                                 }
 
                                 if (window.currentTool === "crop") {
                                     const ox = mouse.x / window.editScale;
@@ -2674,13 +2778,13 @@ DankModal {
 
                     Rectangle {
                         id: magnifier
-                        width: 140
-                        height: 140
-                        radius: 70
+                        width: 160
+                        height: 160
+                        radius: 80
                         border.color: Theme.primary
                         border.width: 2
                         color: "black"
-                        visible: window.enableMagnifier && window.isZoomPressed && drawMouseArea.containsMouse
+                        visible: (window.enableMagnifier && window.isZoomPressed && drawMouseArea.containsMouse) || (window.currentTool === "colorpicker" && drawMouseArea.containsMouse)
                         z: 200
                         enabled: false
 
@@ -2780,6 +2884,58 @@ DankModal {
                             width: 1.5
                             height: 16
                             color: Theme.primary
+                        }
+
+                        // Color details banner at the bottom of the magnifier
+                        Rectangle {
+                            id: colorInfoBanner
+                            visible: window.currentTool === "colorpicker" && window.hoveredColor !== Qt.color("transparent")
+                            anchors.bottom: parent.bottom
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            height: 56
+                            color: Theme.withAlpha(Theme.surfaceContainer, 0.9)
+                            border.color: Theme.withAlpha(Theme.outline, 0.15)
+                            border.width: 1
+
+                            Row {
+                                anchors.centerIn: parent
+                                spacing: Theme.spacingS
+
+                                // Color preview swatch
+                                Rectangle {
+                                    width: 20
+                                    height: 20
+                                    radius: 5
+                                    color: window.hoveredColor
+                                    border.color: Theme.withAlpha(Theme.outline, 0.3)
+                                    border.width: 1
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                Column {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 0
+
+                                    StyledText {
+                                        text: window.formatHexColor(window.hoveredColor).toUpperCase()
+                                        font.pixelSize: 12
+                                        font.bold: true
+                                        color: Theme.surfaceText
+                                    }
+
+                                    StyledText {
+                                        text: {
+                                            var r = Math.round((window.hoveredColor.r || 0) * 255);
+                                            var g = Math.round((window.hoveredColor.g || 0) * 255);
+                                            var b = Math.round((window.hoveredColor.b || 0) * 255);
+                                            return "RGB: " + r + "," + g + "," + b;
+                                        }
+                                        font.pixelSize: 9
+                                        color: Theme.surfaceVariantText
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -2999,6 +3155,10 @@ DankModal {
                     onMirrorRequested: window.mirrorScreenshot()
                     onOcrRequested: window.runOcr()
                     onQrScanRequested: window.runQrScan()
+                    onCopyColorRequested: {
+                        window.colorPickerMode = "copy";
+                        window.currentTool = "colorpicker";
+                    }
                 }
 
                 HoverSliderPopover {

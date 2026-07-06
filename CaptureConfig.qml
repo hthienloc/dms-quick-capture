@@ -165,6 +165,7 @@ QtObject {
         { key: "A", tool: "stamp" },
         { key: "S", tool: "highlighter" },
         { key: "D", tool: "eraser" },
+        { key: "I", tool: "colorpicker" },
         { key: "F", tool: "spotlight" },
         { key: "Z", tool: "callout" },
         { key: "B", tool: "backdrop" }
