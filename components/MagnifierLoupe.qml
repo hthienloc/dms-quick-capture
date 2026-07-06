@@ -1,5 +1,9 @@
 import QtQuick
 import QtQuick.Controls
+import qs.Common
+import qs.Widgets
+import qs.Modals.Common
+import qs.Services
 import "../dms-common"
 
 Rectangle {
@@ -20,7 +24,6 @@ Rectangle {
     required property var bgImage
     required property var staticBgImage
     required property var drawMouseArea
-    required property var Theme
 
     x: drawingCanvas.mapToItem(boardContainer, window.cursorX * window.editScale, window.cursorY * window.editScale).x - (width / 2)
     y: drawingCanvas.mapToItem(boardContainer, window.cursorX * window.editScale, window.cursorY * window.editScale).y - (height / 2)
