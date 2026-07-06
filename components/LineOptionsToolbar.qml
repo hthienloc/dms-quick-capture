@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Widgets
 import ".."
@@ -110,9 +109,6 @@ Item {
                             root.styleSelected(modelData.style);
                             root.close();
                         }
-                        ToolTip.visible: containsMouse
-                        ToolTip.delay: 500
-                        ToolTip.text: modelData.tooltip
                     }
                 }
             }
