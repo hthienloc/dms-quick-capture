@@ -178,7 +178,7 @@ Rectangle {
                 iconName: "colorize"
                 buttonSize: tc.btnSize
                 iconSize: tc.iconSize
-                tooltipText: qsTr("Color Picker (I)")
+                tooltipText: qsTr("Color Picker (F)")
                 backgroundColor: root.currentTool === "colorpicker" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                 iconColor: root.currentTool === "colorpicker" ? Theme.primary : Theme.surfaceText
                 onClicked: root.toolSelected("colorpicker-draw")
@@ -310,7 +310,7 @@ Rectangle {
                 iconName: "colorize"
                 buttonSize: tc.btnSize
                 iconSize: tc.iconSize
-                tooltipText: qsTr("Color Picker (I)")
+                tooltipText: qsTr("Color Picker (F)")
                 backgroundColor: root.currentTool === "colorpicker" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                 iconColor: root.currentTool === "colorpicker" ? Theme.primary : Theme.surfaceText
                 anchors.horizontalCenter: parent.horizontalCenter

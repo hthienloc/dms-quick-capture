@@ -248,7 +248,7 @@ Rectangle {
                 }
 
                 StyledText {
-                    text: qsTr("Eraser (D)")
+                    text: qsTr("Eraser (T)")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
