@@ -55,6 +55,21 @@ DankModal {
     property string lastActiveTool: "pen"
     property string colorPickerMode: "draw" // draw, copy
     property color hoveredColor: "transparent"
+    property string activeLineStyle: "solid"
+    onActiveLineStyleChanged: {
+        if (window.selectedStroke && window.selectedStroke.tool === "line") {
+            window.selectedStroke.lineStyle = window.activeLineStyle;
+            const idx = window.strokes.indexOf(window.selectedStroke);
+            if (idx !== -1) {
+                window.strokes[idx] = window.selectedStroke;
+                window.strokes = [...window.strokes];
+            }
+        }
+        if (window.currentStroke && window.currentStroke.tool === "line") {
+            window.currentStroke.lineStyle = window.activeLineStyle;
+        }
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
+    }
     property int _lastSampledX: -1
     property int _lastSampledY: -1
     property color _lastSampledColor: "transparent"
@@ -2211,6 +2226,9 @@ DankModal {
                                         } else if (window.currentTool === "text") {
                                             textOptionsToolbar.open(mapped.x, mapped.y);
                                             return;
+                                        } else if (window.currentTool === "line") {
+                                            lineOptionsToolbar.open(mapped.x, mapped.y);
+                                            return;
                                         }
                                     }
                                     radialMenu.open(mapped.x, mapped.y);
@@ -2250,6 +2268,9 @@ DankModal {
                                         
                                         window.selectedStroke = stroke;
                                         window.currentColor = stroke.color;
+                                        if (stroke.tool === "line" && stroke.lineStyle) {
+                                            window.activeLineStyle = stroke.lineStyle;
+                                        };
 
                                         // Detection for callout destination dragging
                                         if (stroke.tool === "callout" && stroke.points.length === 4) {
@@ -2393,7 +2414,8 @@ DankModal {
                                     tool: window.currentTool,
                                     color: window.currentColor.toString(),
                                     width: window.activeIntensity,
-                                    points: [getAbsolutePoint(mouse.x, mouse.y)]
+                                    points: [getAbsolutePoint(mouse.x, mouse.y)],
+                                    lineStyle: window.currentTool === "line" ? window.activeLineStyle : "solid"
                                 };
                                 drawingCanvas.requestPaint();
                             }
@@ -3147,6 +3169,13 @@ DankModal {
                     toolbarPosition: window.toolbarPosition
                     currentFormat: window.stampCounterFormat
                     onFormatSelected: (format) => window.stampCounterFormat = format
+                }
+
+                LineOptionsToolbar {
+                    id: lineOptionsToolbar
+                    toolbarPosition: window.toolbarPosition
+                    currentStyle: window.activeLineStyle
+                    onStyleSelected: (style) => window.activeLineStyle = style
                 }
 
                 MoreToolsMenu {
