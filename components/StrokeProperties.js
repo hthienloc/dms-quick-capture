@@ -12,4 +12,7 @@ function copyStrokeProperties(source, target) {
     if (source.hasBackground !== undefined) target.hasBackground = source.hasBackground;
     if (source.cornerRadius !== undefined) target.cornerRadius = source.cornerRadius;
     if (source.borderWidth !== undefined) target.borderWidth = source.borderWidth;
+    if (source.lineStyle !== undefined) target.lineStyle = source.lineStyle;
+    if (source.arrowLineStyle !== undefined) target.arrowLineStyle = source.arrowLineStyle;
+    if (source.arrowHeadStyle !== undefined) target.arrowHeadStyle = source.arrowHeadStyle;
 }
