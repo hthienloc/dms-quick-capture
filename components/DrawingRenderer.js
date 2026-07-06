@@ -63,7 +63,7 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         if (stroke.lineStyle === "dashed") {
             ctx.setLineDash([stroke.width * 2.5, stroke.width * 1.5]);
         } else if (stroke.lineStyle === "dotted") {
-            ctx.setLineDash([0, stroke.width * 2]);
+            ctx.setLineDash([0.01, stroke.width * 2]);
         } else {
             ctx.setLineDash([]);
         }
