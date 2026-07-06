@@ -1,4 +1,5 @@
 .pragma library
+.import "Constants.js" as Constants
 
 /**
  * Converts a hex color string to an RGB object { r, g, b } with values 0-1.
@@ -366,7 +367,7 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
         const stroke = strokes[i];
         if (stroke.points.length === 0) continue;
 
-        const threshold = 12 + stroke.width;
+        const threshold = Constants.selectionThresholdBase + stroke.width;
 
         if (stroke.tool === "pen" || stroke.tool === "highlighter") {
             for (let j = 0; j < stroke.points.length - 1; j++) {
@@ -430,7 +431,7 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
             if (dist < threshold) return i;
         } else if (stroke.tool === "stamp") {
             const p0 = stroke.points[0];
-            const radius = stroke.width * 5 + 6;
+            const radius = stroke.width * Constants.stampRadiusMultiplier + Constants.stampSelectThresholdOffset;
             const dist = Math.sqrt((mx - p0.x) * (mx - p0.x) + (my - p0.y) * (my - p0.y));
             if (dist <= radius) return i;
         } else if (stroke.tool === "text") {
@@ -452,7 +453,7 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
                 textH += padY * 2;
             }
 
-            if (mx >= textX - 8 && mx <= textX + textW + 8 && my >= textY - 8 && my <= textY + textH + 8) {
+            if (mx >= textX - Constants.ocrSelectionPadding && mx <= textX + textW + Constants.ocrSelectionPadding && my >= textY - Constants.ocrSelectionPadding && my <= textY + textH + Constants.ocrSelectionPadding) {
                 return i;
             }
         } else if (stroke.tool === "callout" && stroke.points.length === 4) {

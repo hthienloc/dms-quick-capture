@@ -12,6 +12,7 @@ import "components"
 import "components/Helpers.js" as Helpers
 import "components/DrawingRenderer.js" as DrawingRenderer
 import "components/StrokeProperties.js" as StrokeProps
+import "components/Constants.js" as Constants
 
 DankModal {
     id: window
@@ -132,10 +133,10 @@ DankModal {
     property color backdropSolidColor: Theme.primary
     property color backdropGradientStart: Theme.primary
     property color backdropGradientEnd: Theme.secondary
-    property int backdropGradientAngle: 45
-    property int backdropPadding: 40
-    property int backdropCornerRadius: 12
-    property int backdropShadowStrength: 50
+    property int backdropGradientAngle: Constants.defaultBackdropGradientAngle
+    property int backdropPadding: Constants.defaultBackdropPadding
+    property int backdropCornerRadius: Constants.defaultBackdropCornerRadius
+    property int backdropShadowStrength: Constants.defaultBackdropShadowStrength
     property string backdropAspectRatio: "auto"
     property real customAspectRatio: 1.50
     readonly property real customRatioMin: 0.50
