@@ -3184,6 +3184,7 @@ DankModal {
                     onMirrorRequested: window.mirrorScreenshot()
                     onOcrRequested: window.runOcr()
                     onQrScanRequested: window.runQrScan()
+                    onEraserRequested: window.currentTool = "eraser"
                     onCopyColorRequested: {
                         window.colorPickerMode = "copy";
                         window.currentTool = "colorpicker";

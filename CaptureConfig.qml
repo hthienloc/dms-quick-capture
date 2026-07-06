@@ -17,7 +17,6 @@ QtObject {
         { id: "redact", icon: "ad_off", tooltip: qsTr("Redact (R)") },
         { id: "stamp", icon: "looks_one", tooltip: qsTr("Number Stamp (A)") },
         { id: "highlighter", icon: "border_color", tooltip: qsTr("Highlighter (S)") },
-        { id: "eraser", icon: "auto_fix_normal", tooltip: qsTr("Eraser (D)") },
         { id: "spotlight", icon: "highlight", tooltip: qsTr("Focus Spotlight (F)") },
         { id: "callout", icon: "zoom_in", tooltip: qsTr("Area Zoom (Z) | Hold G for Loupe") },
         { id: "backdrop", icon: "wallpaper", tooltip: qsTr("Image Backdrop (B)") }
