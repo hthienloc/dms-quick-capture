@@ -296,3 +296,175 @@ function extractDominantColors(imgData, Qt) {
     
     return { start: colorStart, end: colorEnd };
 }
+
+/**
+ * Estimates text width based on characters and properties.
+ * @param {string} text - The text string.
+ * @param {number} fontSize - Font size in pixels.
+ * @param {boolean} isBold - True if bold.
+ * @param {boolean} isMonospace - True if monospace.
+ * @returns {number} Estimated text width.
+ */
+function estimateTextWidth(text, fontSize, isBold, isMonospace) {
+    if (!text) return 0;
+    let charWidthRatio = isMonospace ? 0.6 : 0.52;
+    if (isBold) charWidthRatio += 0.05;
+
+    let estWidth = 0;
+    for (let c = 0; c < text.length; c++) {
+        const charCode = text.charCodeAt(c);
+        if (charCode > 255) {
+            // Treat known CJK and related ranges as wide; fall back to proportional width
+            const isCJKOrWideScript =
+                    // CJK Unified Ideographs
+                    (charCode >= 0x3400 && charCode <= 0x4DBF) ||
+                    (charCode >= 0x4E00 && charCode <= 0x9FFF) ||
+                    (charCode >= 0xF900 && charCode <= 0xFAFF) ||
+                    // Hiragana
+                    (charCode >= 0x3040 && charCode <= 0x309F) ||
+                    // Katakana
+                    (charCode >= 0x30A0 && charCode <= 0x30FF) ||
+                    // Hangul syllables
+                    (charCode >= 0xAC00 && charCode <= 0xD7AF);
+
+            if (isCJKOrWideScript) {
+                estWidth += fontSize * 0.9;
+            } else {
+                // Non-ASCII but not CJK (e.g. accented Latin/Vietnamese diacritics): proportional width
+                estWidth += fontSize * charWidthRatio;
+            }
+        } else if (isMonospace) {
+            estWidth += fontSize * charWidthRatio;
+        } else {
+            const char = text.charAt(c);
+            if ("iIlldt1|()[]{}".indexOf(char) !== -1) {
+                estWidth += fontSize * 0.28;
+            } else if ("mwMW".indexOf(char) !== -1) {
+                estWidth += fontSize * 0.8;
+            } else if (char >= "A" && char <= "Z") {
+                estWidth += fontSize * 0.65;
+            } else {
+                estWidth += fontSize * charWidthRatio;
+            }
+        }
+    }
+
+    const maxW = fontSize * text.length * (isMonospace ? 1.2 : 1.6);
+    return Math.min(estWidth, maxW);
+}
+
+/**
+ * Finds the index of the stroke under coordinate (mx, my).
+ * @param {number} mx - X coordinate.
+ * @param {number} my - Y coordinate.
+ * @param {array} strokes - List of strokes.
+ * @param {function} estimateTextWidthFn - Text width estimation function.
+ * @returns {number} Stroke index or -1.
+ */
+function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
+    for (let i = strokes.length - 1; i >= 0; i--) {
+        const stroke = strokes[i];
+        if (stroke.points.length === 0) continue;
+
+        const threshold = 12 + stroke.width;
+
+        if (stroke.tool === "pen" || stroke.tool === "highlighter") {
+            for (let j = 0; j < stroke.points.length - 1; j++) {
+                const A = stroke.points[j];
+                const B = stroke.points[j+1];
+                const dx = B.x - A.x;
+                const dy = B.y - A.y;
+                const lenSq = dx * dx + dy * dy;
+                let dist = Infinity;
+                if (lenSq === 0) {
+                    dist = Math.sqrt((mx - A.x) * (mx - A.x) + (my - A.y) * (my - A.y));
+                } else {
+                    let t = ((mx - A.x) * dx + (my - A.y) * dy) / lenSq;
+                    t = Math.max(0, Math.min(1, t));
+                    const px = A.x + t * dx;
+                    const py = A.y + t * dy;
+                    dist = Math.sqrt((mx - px) * (mx - px) + (my - py) * (my - py));
+                }
+                if (dist < threshold) return i;
+            }
+        } else if (stroke.tool === "rect" || stroke.tool === "redact" || stroke.tool === "pixelate" || stroke.tool === "spotlight") {
+            const p0 = stroke.points[0];
+            const p1 = stroke.points[stroke.points.length - 1];
+            const x1 = Math.min(p0.x, p1.x);
+            const x2 = Math.max(p0.x, p1.x);
+            const y1 = Math.min(p0.y, p1.y);
+            const y2 = Math.max(p0.y, p1.y);
+            if (mx >= x1 - 5 && mx <= x2 + 5 && my >= y1 - 5 && my <= y2 + 5) {
+                return i;
+            }
+        } else if (stroke.tool === "ellipse") {
+            const p0 = stroke.points[0];
+            const p1 = stroke.points[stroke.points.length - 1];
+            const x1 = Math.min(p0.x, p1.x);
+            const x2 = Math.max(p0.x, p1.x);
+            const y1 = Math.min(p0.y, p1.y);
+            const y2 = Math.max(p0.y, p1.y);
+            const rx = Math.max((x2 - x1) / 2, 1);
+            const ry = Math.max((y2 - y1) / 2, 1);
+            const cx = x1 + rx;
+            const cy = y1 + ry;
+            const normalized = Math.pow((mx - cx) / rx, 2) + Math.pow((my - cy) / ry, 2);
+            const tolerance = Math.max(0.08, threshold / Math.max(rx, ry));
+            if (Math.abs(normalized - 1) <= tolerance) return i;
+        } else if (stroke.tool === "arrow" || stroke.tool === "line") {
+            const p0 = stroke.points[0];
+            const p1 = stroke.points[stroke.points.length - 1];
+            const dx = p1.x - p0.x;
+            const dy = p1.y - p0.y;
+            const lenSq = dx * dx + dy * dy;
+            let dist = Infinity;
+            if (lenSq === 0) {
+                dist = Math.sqrt((mx - p0.x) * (mx - p0.x) + (my - p0.y) * (my - p0.y));
+            } else {
+                let t = ((mx - p0.x) * dx + (my - p0.y) * dy) / lenSq;
+                t = Math.max(0, Math.min(1, t));
+                const px = p0.x + t * dx;
+                const py = p0.y + t * dy;
+                dist = Math.sqrt((mx - px) * (mx - px) + (my - py) * (my - py));
+            }
+            if (dist < threshold) return i;
+        } else if (stroke.tool === "stamp") {
+            const p0 = stroke.points[0];
+            const radius = stroke.width * 5 + 6;
+            const dist = Math.sqrt((mx - p0.x) * (mx - p0.x) + (my - p0.y) * (my - p0.y));
+            if (dist <= radius) return i;
+        } else if (stroke.tool === "text") {
+            const p0 = stroke.points[0];
+            const fontSize = stroke.width;
+            const txt = stroke.text || "";
+
+            let textW = Math.max(40, estimateTextWidthFn(txt, fontSize, stroke.isBold === true, stroke.isMonospace === true));
+            let textH = fontSize;
+            let textY = p0.y;
+            let textX = p0.x;
+
+            if (stroke.hasBackground) {
+                const padX = fontSize * 0.3;
+                const padY = fontSize * 0.15;
+                textX -= padX;
+                textY -= padY;
+                textW += padX * 2;
+                textH += padY * 2;
+            }
+
+            if (mx >= textX - 8 && mx <= textX + textW + 8 && my >= textY - 8 && my <= textY + textH + 8) {
+                return i;
+            }
+        } else if (stroke.tool === "callout" && stroke.points.length === 4) {
+            const srcP0 = stroke.points[0];
+            const srcP1 = stroke.points[1];
+            const dstP0 = stroke.points[2];
+            const dstP1 = stroke.points[3];
+            if ((mx >= srcP0.x - 5 && mx <= srcP1.x + 5 && my >= srcP0.y - 5 && my <= srcP1.y + 5) ||
+                (mx >= dstP0.x - 5 && mx <= dstP1.x + 5 && my >= dstP0.y - 5 && my <= dstP1.y + 5)) {
+                return i;
+            }
+        }
+    }
+    return -1;
+}
