@@ -1,4 +1,5 @@
 .pragma library
+.import "Constants.js" as Constants
 
 /**
  * DrawingRenderer.js
@@ -61,9 +62,9 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
 
         ctx.save();
         if (stroke.lineStyle === "dashed") {
-            ctx.setLineDash([stroke.width * 2.5, stroke.width * 1.5]);
+            ctx.setLineDash([stroke.width * Constants.lineDashMultiplier, stroke.width * Constants.lineGapMultiplier]);
         } else if (stroke.lineStyle === "dotted") {
-            ctx.setLineDash([0.01, stroke.width * 2]);
+            ctx.setLineDash([0.01, stroke.width * Constants.dottedGapMultiplier]);
         } else {
             ctx.setLineDash([]);
         }
@@ -76,7 +77,7 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
 
     } else if (stroke.tool === "highlighter") {
         ctx.strokeStyle = Qt.rgba(rgb.r, rgb.g, rgb.b, 0.4);
-        ctx.lineWidth = stroke.width * 4;
+        ctx.lineWidth = stroke.width * Constants.highlighterScale;
         ctx.lineCap = config.roundHighlighter ? "round" : "square";
         ctx.lineJoin = config.roundHighlighter ? "round" : "miter";
         ctx.beginPath();
@@ -287,7 +288,7 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
 
     } else if (stroke.tool === "stamp") {
         const pt = stroke.points[0];
-        const radius = stroke.width * 5;
+        const radius = stroke.width * Constants.stampRadiusMultiplier;
         const textColor = Helpers.getContrastingColor(stroke.color, Qt);
 
         ctx.fillStyle = stroke.color;
@@ -295,14 +296,14 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         ctx.arc(pt.x, pt.y, radius, 0, 2 * Math.PI);
         ctx.fill();
 
-        const fontSize = Math.round(radius * 1.2);
+        const fontSize = Math.round(radius * Constants.stampTextFontSizeMultiplier);
         const text = Helpers.formatCounter(stroke.counter, stroke.format || "numeric");
         ctx.fillStyle = textColor;
         ctx.font = "bold " + fontSize + "px sans-serif";
         ctx.textBaseline = "middle";
         ctx.textAlign = "left";
         const textW = ctx.measureText(text).width;
-        ctx.fillText(text, pt.x - textW / 2, pt.y + Math.round(fontSize * 0.1));
+        ctx.fillText(text, pt.x - textW / 2, pt.y + Math.round(fontSize * Constants.stampTextOffsetMultiplier));
 
     } else if (stroke.tool === "callout") {
         if (stroke.points.length === 4 || stroke.points.length >= 2) {

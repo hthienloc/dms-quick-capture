@@ -12,9 +12,12 @@ import "components"
 import "components/Helpers.js" as Helpers
 import "components/DrawingRenderer.js" as DrawingRenderer
 import "components/StrokeProperties.js" as StrokeProps
+import "components/Constants.js" as Constants
 
 DankModal {
     id: window
+
+    readonly property var rootWindow: window
 
     CaptureConfig { 
         id: config 
@@ -130,10 +133,10 @@ DankModal {
     property color backdropSolidColor: Theme.primary
     property color backdropGradientStart: Theme.primary
     property color backdropGradientEnd: Theme.secondary
-    property int backdropGradientAngle: 45
-    property int backdropPadding: 40
-    property int backdropCornerRadius: 12
-    property int backdropShadowStrength: 50
+    property int backdropGradientAngle: Constants.defaultBackdropGradientAngle
+    property int backdropPadding: Constants.defaultBackdropPadding
+    property int backdropCornerRadius: Constants.defaultBackdropCornerRadius
+    property int backdropShadowStrength: Constants.defaultBackdropShadowStrength
     property string backdropAspectRatio: "auto"
     property real customAspectRatio: 1.50
     readonly property real customRatioMin: 0.50
@@ -962,159 +965,11 @@ DankModal {
     }
 
     function estimateTextWidth(text, fontSize, isBold, isMonospace) {
-        if (!text) return 0;
-        let charWidthRatio = isMonospace ? 0.6 : 0.52;
-        if (isBold) charWidthRatio += 0.05;
-
-        let estWidth = 0;
-        for (let c = 0; c < text.length; c++) {
-            const charCode = text.charCodeAt(c);
-            if (charCode > 255) {
-                // Treat known CJK and related ranges as wide; fall back to proportional width
-                const isCJKOrWideScript =
-                        // CJK Unified Ideographs
-                        (charCode >= 0x3400 && charCode <= 0x4DBF) ||
-                        (charCode >= 0x4E00 && charCode <= 0x9FFF) ||
-                        (charCode >= 0xF900 && charCode <= 0xFAFF) ||
-                        // Hiragana
-                        (charCode >= 0x3040 && charCode <= 0x309F) ||
-                        // Katakana
-                        (charCode >= 0x30A0 && charCode <= 0x30FF) ||
-                        // Hangul syllables
-                        (charCode >= 0xAC00 && charCode <= 0xD7AF);
-
-                if (isCJKOrWideScript) {
-                    estWidth += fontSize * 0.9;
-                } else {
-                    // Non-ASCII but not CJK (e.g. accented Latin/Vietnamese diacritics): proportional width
-                    estWidth += fontSize * charWidthRatio;
-                }
-            } else if (isMonospace) {
-                estWidth += fontSize * charWidthRatio;
-            } else {
-                const char = text.charAt(c);
-                if ("iIlldt1|()[]{}".indexOf(char) !== -1) {
-                    estWidth += fontSize * 0.28;
-                } else if ("mwMW".indexOf(char) !== -1) {
-                    estWidth += fontSize * 0.8;
-                } else if (char >= "A" && char <= "Z") {
-                    estWidth += fontSize * 0.65;
-                } else {
-                    estWidth += fontSize * charWidthRatio;
-                }
-            }
-        }
-
-        const maxW = fontSize * text.length * (isMonospace ? 1.2 : 1.6);
-        return Math.min(estWidth, maxW);
+        return Helpers.estimateTextWidth(text, fontSize, isBold, isMonospace);
     }
 
     function findStrokeAt(mx, my) {
-        for (let i = window.strokes.length - 1; i >= 0; i--) {
-            const stroke = window.strokes[i];
-            if (stroke.points.length === 0) continue;
-
-            const threshold = 12 + stroke.width;
-
-            if (stroke.tool === "pen" || stroke.tool === "highlighter") {
-                for (let j = 0; j < stroke.points.length - 1; j++) {
-                    const A = stroke.points[j];
-                    const B = stroke.points[j+1];
-                    const dx = B.x - A.x;
-                    const dy = B.y - A.y;
-                    const lenSq = dx * dx + dy * dy;
-                    let dist = Infinity;
-                    if (lenSq === 0) {
-                        dist = Math.sqrt((mx - A.x) * (mx - A.x) + (my - A.y) * (my - A.y));
-                    } else {
-                        let t = ((mx - A.x) * dx + (my - A.y) * dy) / lenSq;
-                        t = Math.max(0, Math.min(1, t));
-                        const px = A.x + t * dx;
-                        const py = A.y + t * dy;
-                        dist = Math.sqrt((mx - px) * (mx - px) + (my - py) * (my - py));
-                    }
-                    if (dist < threshold) return i;
-                }
-            } else if (stroke.tool === "rect" || stroke.tool === "redact" || stroke.tool === "pixelate" || stroke.tool === "spotlight") {
-                const p0 = stroke.points[0];
-                const p1 = stroke.points[stroke.points.length - 1];
-                const x1 = Math.min(p0.x, p1.x);
-                const x2 = Math.max(p0.x, p1.x);
-                const y1 = Math.min(p0.y, p1.y);
-                const y2 = Math.max(p0.y, p1.y);
-                if (mx >= x1 - 5 && mx <= x2 + 5 && my >= y1 - 5 && my <= y2 + 5) {
-                    return i;
-                }
-            } else if (stroke.tool === "ellipse") {
-                const p0 = stroke.points[0];
-                const p1 = stroke.points[stroke.points.length - 1];
-                const x1 = Math.min(p0.x, p1.x);
-                const x2 = Math.max(p0.x, p1.x);
-                const y1 = Math.min(p0.y, p1.y);
-                const y2 = Math.max(p0.y, p1.y);
-                const rx = Math.max((x2 - x1) / 2, 1);
-                const ry = Math.max((y2 - y1) / 2, 1);
-                const cx = x1 + rx;
-                const cy = y1 + ry;
-                const normalized = Math.pow((mx - cx) / rx, 2) + Math.pow((my - cy) / ry, 2);
-                const tolerance = Math.max(0.08, threshold / Math.max(rx, ry));
-                if (Math.abs(normalized - 1) <= tolerance) return i;
-            } else if (stroke.tool === "arrow" || stroke.tool === "line") {
-                const p0 = stroke.points[0];
-                const p1 = stroke.points[stroke.points.length - 1];
-                const dx = p1.x - p0.x;
-                const dy = p1.y - p0.y;
-                const lenSq = dx * dx + dy * dy;
-                let dist = Infinity;
-                if (lenSq === 0) {
-                    dist = Math.sqrt((mx - p0.x) * (mx - p0.x) + (my - p0.y) * (my - p0.y));
-                } else {
-                    let t = ((mx - p0.x) * dx + (my - p0.y) * dy) / lenSq;
-                    t = Math.max(0, Math.min(1, t));
-                    const px = p0.x + t * dx;
-                    const py = p0.y + t * dy;
-                    dist = Math.sqrt((mx - px) * (mx - px) + (my - py) * (my - py));
-                }
-                if (dist < threshold) return i;
-            } else if (stroke.tool === "stamp") {
-                const p0 = stroke.points[0];
-                const radius = stroke.width * 5 + 6;
-                const dist = Math.sqrt((mx - p0.x) * (mx - p0.x) + (my - p0.y) * (my - p0.y));
-                if (dist <= radius) return i;
-            } else if (stroke.tool === "text") {
-                const p0 = stroke.points[0];
-                const fontSize = stroke.width;
-                const txt = stroke.text || "";
-
-                let textW = Math.max(40, window.estimateTextWidth(txt, fontSize, stroke.isBold === true, stroke.isMonospace === true));
-                let textH = fontSize;
-                let textY = p0.y;
-                let textX = p0.x;
-
-                if (stroke.hasBackground) {
-                    const padX = fontSize * 0.3;
-                    const padY = fontSize * 0.15;
-                    textX -= padX;
-                    textY -= padY;
-                    textW += padX * 2;
-                    textH += padY * 2;
-                }
-
-                if (mx >= textX - 8 && mx <= textX + textW + 8 && my >= textY - 8 && my <= textY + textH + 8) {
-                    return i;
-                }
-            } else if (stroke.tool === "callout" && stroke.points.length === 4) {
-                const srcP0 = stroke.points[0];
-                const srcP1 = stroke.points[1];
-                const dstP0 = stroke.points[2];
-                const dstP1 = stroke.points[3];
-                if ((mx >= srcP0.x - 5 && mx <= srcP1.x + 5 && my >= srcP0.y - 5 && my <= srcP1.y + 5) ||
-                    (mx >= dstP0.x - 5 && mx <= dstP1.x + 5 && my >= dstP0.y - 5 && my <= dstP1.y + 5)) {
-                    return i;
-                }
-            }
-        }
-        return -1;
+        return Helpers.findStrokeAt(mx, my, window.strokes, window.estimateTextWidth);
     }
 
     function exportAndExecute(callback) {
@@ -2629,83 +2484,10 @@ DankModal {
                              }
                         }
 
-                        Rectangle {
+                        SizePreviewCard {
                             id: sizePreviewItem
-                            visible: window.showSizePreview
-                            x: window.previewX - (width / 2)
-                            y: window.previewY - (height / 2)
-                            width: {
-                                let base = window.activeIntensity;
-                                const tool = window.effectiveTool;
-                                if (tool === "highlighter") {
-                                    base = window.activeIntensity * 4;
-                                } else if (tool === "stamp") {
-                                    base = window.activeIntensity * 10;
-                                } else if (tool === "pixelate") {
-                                    base = Math.max(8, Math.min(36, window.activeIntensity * 3));
-                                } else if (tool === "spotlight") {
-                                    base = 100;
-                                } else if (tool === "callout") {
-                                    if (window.currentTool === "select" && !window.calloutDestDragging && window.selectedStroke) {
-                                        const bw = window.selectedStroke.borderWidth !== undefined ? window.selectedStroke.borderWidth : 2;
-                                        base = bw * 2;
-                                    } else {
-                                        base = 40; // Small anchor size for text feedback
-                                    }
-                                }
-                                return base * window.editScale;
-                            }
-                            height: width
-                            radius: {
-                                const tool = window.effectiveTool;
-                                if (tool === "highlighter") return window.roundHighlighter ? width / 2 : 0;
-                                if (tool === "spotlight" || tool === "rect" || tool === "redact") return window.roundRect ? (Theme.cornerRadius * window.editScale) : 0;
-                                if (tool === "pixelate" || tool === "text") return 0;
-                                if (tool === "callout") {
-                                    if (window.currentTool === "select" && !window.calloutDestDragging && window.selectedStroke) {
-                                        return width / 2;
-                                    }
-                                    return 0;
-                                }
-                                return width / 2;
-                            }
-                            color: "transparent"
-                            border.color: {
-                                if (window.effectiveTool === "callout") {
-                                    if (window.currentTool === "select" && !window.calloutDestDragging && window.selectedStroke) {
-                                        return Theme.primary;
-                                    }
-                                    return "transparent";
-                                }
-                                return Theme.primary;
-                            }
-                            border.width: 1.5 / drawingCanvas.scale
-                            z: 20
-
-                            StyledText {
-                                anchors.top: parent.bottom
-                                anchors.topMargin: 4 / drawingCanvas.scale
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                text: {
-                                    if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "callout") {
-                                        if (window.calloutDestDragging) {
-                                            return window.selectedStroke.width + "%";
-                                        } else {
-                                            const bw = window.selectedStroke.borderWidth !== undefined ? window.selectedStroke.borderWidth : 2;
-                                            return bw + "px";
-                                        }
-                                    }
-                                    const tool = window.effectiveTool;
-                                    if (tool === "spotlight" || tool === "callout") {
-                                        return window.activeIntensity + "%";
-                                    }
-                                    return window.activeIntensity + "px";
-                                }
-
-                                color: Theme.primary
-                                font.pixelSize: 10 / drawingCanvas.scale
-                                font.bold: true
-                            }
+                            window: rootWindow
+                            drawingCanvas: drawingCanvas
                         }
                     }
 
@@ -2738,93 +2520,10 @@ DankModal {
                             color: "black"
                         }
                     }
-                    Popup {
+                    TextInputDialog {
                         id: textInputDialog
-                        width: 320
-                        height: 160
-                        padding: 0
-                        modal: false
-                        focus: true
-                        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-                        anchors.centerIn: parent
-
-                        background: Rectangle {
-                            color: "transparent"
-                        }
-
-                        onOpened: {
-                            Qt.callLater(() => {
-                                textInputField.text = "";
-                                textInputField.forceActiveFocus();
-                            });
-                        }
-
-                        onClosed: {
-                            if (window.isTyping) {
-                                window.isTyping = false;
-                                window.currentTypingText = "";
-                                if (window.activeCanvas) window.activeCanvas.requestPaint();
-                                modalFocusScope.forceActiveFocus();
-                            }
-                        }
-
-                        contentItem: Rectangle {
-                            color: Theme.surfaceContainer
-                            radius: Theme.cornerRadius
-                            border.color: Theme.withAlpha(Theme.outline, 0.15)
-                            border.width: 1
-
-                            Column {
-                                anchors.fill: parent
-                                anchors.margins: Theme.spacingM
-                                spacing: Theme.spacingM
-
-                                StyledText {
-                                    text: I18n.tr("Add Text Note")
-                                    font.bold: true
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    color: Theme.surfaceText
-                                }
-
-                                DankTextField {
-                                    id: textInputField
-                                    width: parent.width
-                                    placeholderText: I18n.tr("Type note...")
-                                    focus: true
-                                    onAccepted: {
-                                        window.currentTypingText = textInputField.text;
-                                        textInputDialog.close();
-                                        window.commitTypingText();
-                                    }
-                                }
-
-                                Row {
-                                    width: parent.width
-                                    spacing: Theme.spacingS
-                                    layoutDirection: Qt.RightToLeft
-
-                                    DankButton {
-                                        text: I18n.tr("Add")
-                                        backgroundColor: Theme.primary
-                                        textColor: Theme.primaryText
-                                        onClicked: {
-                                            window.currentTypingText = textInputField.text;
-                                            textInputDialog.close();
-                                            window.commitTypingText();
-                                        }
-                                    }
-
-                                    DankButton {
-                                        text: I18n.tr("Cancel")
-                                        backgroundColor: Theme.surfaceContainerHigh
-                                        textColor: Theme.surfaceText
-                                        onClicked: {
-                                            textInputDialog.close();
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        window: rootWindow
+                        modalFocusScope: modalFocusScope
                     }
 
                     Timer {
@@ -2837,179 +2536,14 @@ DankModal {
                         }
                     }
 
-                    Rectangle {
+                    MagnifierLoupe {
                         id: magnifier
-                        width: 160
-                        height: 160
-                        radius: 80
-                        border.color: Theme.primary
-                        border.width: 2
-                        color: "black"
-                        visible: (window.enableMagnifier && window.isZoomPressed && drawMouseArea.containsMouse) || (window.currentTool === "colorpicker" && drawMouseArea.containsMouse)
-                        z: 200
-                        enabled: false
-
-                        x: drawingCanvas.mapToItem(boardContainer, window.cursorX * window.editScale, window.cursorY * window.editScale).x - (width / 2)
-                        y: drawingCanvas.mapToItem(boardContainer, window.cursorX * window.editScale, window.cursorY * window.editScale).y - (height / 2)
-
-                        property real zoomFactor: 1.5
-
-                        clip: true
-
-                        Canvas {
-                            id: magnifierCanvas
-                            anchors.fill: parent
-
-                            Connections {
-                                target: drawingCanvas
-                                function onPaint() { magnifierCanvas.requestPaint(); }
-                            }
-
-                            Connections {
-                                target: window
-                                function onCursorXChanged() { magnifierCanvas.requestPaint(); }
-                                function onCursorYChanged() { magnifierCanvas.requestPaint(); }
-                            }
-
-                            Connections {
-                                target: magnifier
-                                function onZoomFactorChanged() { magnifierCanvas.requestPaint(); }
-                            }
-
-                            onPaint: {
-                                var ctx = magnifierCanvas.getContext("2d");
-                                ctx.clearRect(0, 0, magnifierCanvas.width, magnifierCanvas.height);
-
-                                ctx.save();
-
-                                // Clip to circle shape to match the parent circle magnifier
-                                ctx.beginPath();
-                                ctx.arc(magnifierCanvas.width / 2, magnifierCanvas.height / 2, magnifierCanvas.width / 2 - 2, 0, 2 * Math.PI);
-                                ctx.clip();
-
-                                // Translate center of magnifier to (0,0)
-                                ctx.translate(magnifierCanvas.width / 2, magnifierCanvas.height / 2);
-                                // Scale zoom factor
-                                ctx.scale(magnifier.zoomFactor, magnifier.zoomFactor);
-                                // Translate cursor to (0,0)
-                                ctx.translate(-window.cursorX, -window.cursorY);
-
-                                // 1. Draw background image
-                                if (window.effectiveBackdropMode !== "none") {
-                                    window.drawBackdropBackground(ctx, window.canvasWidth, window.canvasHeight);
-                                    window.drawScreenshotShadow(ctx);
-                                    
-                                    // Draw screenshot image directly to bypass nested clip path bug in Qt Canvas
-                                    if (bgImage.status === Image.Ready) {
-                                        if (window.hasSelection) {
-                                            ctx.drawImage(bgImage, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, window.screenshotXOffset, window.screenshotYOffset, window.screenshotWidth, window.screenshotHeight);
-                                        } else {
-                                            ctx.drawImage(bgImage, window.screenshotXOffset, window.screenshotYOffset, window.screenshotWidth, window.screenshotHeight);
-                                        }
-                                    }
-                                    
-                                    // 2. Draw annotations
-                                    if (window.showAnnotations) {
-                                        ctx.save();
-                                        ctx.translate(window.screenshotXOffset, window.screenshotYOffset);
-                                        ctx.scale(window.backdropScaleFactor, window.backdropScaleFactor);
-                                        const cropX = window.hasSelection ? window.cropRect.x : 0;
-                                        const cropY = window.hasSelection ? window.cropRect.y : 0;
-                                        ctx.translate(-cropX, -cropY);
-                                        for (var i = 0; i < window.strokes.length; i++) {
-                                            drawingCanvas.drawStroke(ctx, window.strokes[i]);
-                                        }
-                                        if (window.currentStroke) {
-                                            drawingCanvas.drawStroke(ctx, window.currentStroke);
-                                        }
-                                        ctx.restore();
-                                    }
-                                } else {
-                                    if (staticBgImage.status === Image.Ready || staticBgImage.width > 0) {
-                                        if (window.hasSelection) {
-                                            ctx.drawImage(staticBgImage, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, 0, 0, window.canvasWidth, window.canvasHeight);
-                                        } else {
-                                            ctx.drawImage(staticBgImage, 0, 0, window.canvasWidth, window.canvasHeight);
-                                        }
-                                    }
-                                    if (window.showAnnotations) {
-                                        for (var i = 0; i < window.strokes.length; i++) {
-                                            drawingCanvas.drawStroke(ctx, window.strokes[i]);
-                                        }
-                                        if (window.currentStroke) {
-                                            drawingCanvas.drawStroke(ctx, window.currentStroke);
-                                        }
-                                    }
-                                }
-
-                                ctx.restore();
-                            }
-                        }
-
-                        Rectangle {
-                            anchors.centerIn: parent
-                            width: 16
-                            height: 1.5
-                            color: Theme.primary
-                        }
-                        Rectangle {
-                            anchors.centerIn: parent
-                            width: 1.5
-                            height: 16
-                            color: Theme.primary
-                        }
-
-                        // Color details banner at the bottom of the magnifier
-                        Rectangle {
-                            id: colorInfoBanner
-                            visible: window.currentTool === "colorpicker" && window.hoveredColor !== Qt.color("transparent")
-                            anchors.bottom: parent.bottom
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            height: 56
-                            color: Theme.withAlpha(Theme.surfaceContainer, 0.9)
-                            border.color: Theme.withAlpha(Theme.outline, 0.15)
-                            border.width: 1
-
-                            Row {
-                                anchors.centerIn: parent
-                                spacing: Theme.spacingS
-
-                                // Color preview swatch
-                                Rectangle {
-                                    width: 20
-                                    height: 20
-                                    radius: 5
-                                    color: window.hoveredColor
-                                    border.color: Theme.withAlpha(Theme.outline, 0.3)
-                                    border.width: 1
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                Column {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    spacing: 0
-
-                                    StyledText {
-                                        text: window.formatHexColor(window.hoveredColor).toUpperCase()
-                                        font.pixelSize: 12
-                                        font.bold: true
-                                        color: Theme.surfaceText
-                                    }
-
-                                    StyledText {
-                                        text: {
-                                            var r = Math.round((window.hoveredColor.r || 0) * 255);
-                                            var g = Math.round((window.hoveredColor.g || 0) * 255);
-                                            var b = Math.round((window.hoveredColor.b || 0) * 255);
-                                            return "RGB: " + r + "," + g + "," + b;
-                                        }
-                                        font.pixelSize: 9
-                                        color: Theme.surfaceVariantText
-                                    }
-                                }
-                            }
-                        }
+                        window: rootWindow
+                        drawingCanvas: drawingCanvas
+                        boardContainer: boardContainer
+                        bgImage: bgImage
+                        staticBgImage: staticBgImage
+                        drawMouseArea: drawMouseArea
                     }
                 }
 
