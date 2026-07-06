@@ -2229,7 +2229,8 @@ PluginSettings {
                 ShortcutRow { keyText: "V"; actionText: I18n.tr("Select / Move stroke") }
                 ShortcutRow { keyText: "1 - 4"; actionText: I18n.tr("Pen, Line, Arrow, Rect") }
                 ShortcutRow { keyText: "Q - R"; actionText: I18n.tr("Ellipse, Text, Pixelate, Redact (Q, W, E, R)") }
-                ShortcutRow { keyText: "A - D"; actionText: I18n.tr("Stamp, Highlighter, Eraser (A, S, D)") }
+                ShortcutRow { keyText: "A - D"; actionText: I18n.tr("Stamp, Highlighter, Spotlight (A, S, D)") }
+                ShortcutRow { keyText: "F / T"; actionText: I18n.tr("Color Picker, Eraser (F, T)") }
             }
 
             Separator { opacity: 0.1 }

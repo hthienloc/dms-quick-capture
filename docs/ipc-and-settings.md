@@ -51,14 +51,15 @@ Pressing these keys changes the active tool:
 - `2`: Line
 - `3`: Arrow
 - `4`: Rectangle
-- `5` / `S`: Highlighter (Alpha brush)
+- `S`: Highlighter (Alpha brush)
 - `Q`: Ellipse
 - `W`: Text Box
 - `E`: Pixelate (Redaction blur)
 - `R`: Redact (Solid block covering)
 - `A`: Stamp (Incremental counters)
-- `D`: Eraser (Individual vector click eraser)
-- `F`: Spotlight (Darken background outside selection)
+- `D`: Spotlight (Darken background outside selection)
+- `F`: Color Picker (Ink/Eyedropper)
+- `T`: Eraser (Individual vector click eraser)
 - `Z`: Area Zoom / Callout box
 - `V`: Select / Move tool
 - `B`: Backdrop options
@@ -81,6 +82,7 @@ Pressing these keys changes the active tool:
 - **Right-Click on Canvas:** Displays the 8-preset Radial Menu for swift tool/color selection.
 - **Shift + Right-Click (Stamp active):** Changes counter format (Numbers, Alphabetical, Roman numerals).
 - **Shift + Right-Click (Text active):** Standard text decoration toggle (Bold, Italic, Underline, Background).
+- **Shift + Right-Click (Line active):** Changes line style (Solid, Dashed, Dotted).
 
 ---
 
