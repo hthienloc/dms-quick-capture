@@ -56,6 +56,20 @@ DankModal {
     property string colorPickerMode: "draw" // draw, copy
     property color hoveredColor: "transparent"
     property string activeLineStyle: "solid"
+    onActiveLineStyleChanged: {
+        if (window.selectedStroke && window.selectedStroke.tool === "line") {
+            window.selectedStroke.lineStyle = window.activeLineStyle;
+            const idx = window.strokes.indexOf(window.selectedStroke);
+            if (idx !== -1) {
+                window.strokes[idx] = window.selectedStroke;
+                window.strokes = [...window.strokes];
+            }
+        }
+        if (window.currentStroke && window.currentStroke.tool === "line") {
+            window.currentStroke.lineStyle = window.activeLineStyle;
+        }
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
+    }
     property int _lastSampledX: -1
     property int _lastSampledY: -1
     property color _lastSampledColor: "transparent"
@@ -2254,6 +2268,9 @@ DankModal {
                                         
                                         window.selectedStroke = stroke;
                                         window.currentColor = stroke.color;
+                                        if (stroke.tool === "line" && stroke.lineStyle) {
+                                            window.activeLineStyle = stroke.lineStyle;
+                                        };
 
                                         // Detection for callout destination dragging
                                         if (stroke.tool === "callout" && stroke.points.length === 4) {
