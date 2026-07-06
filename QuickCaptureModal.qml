@@ -1106,9 +1106,9 @@ DankModal {
     function sampleCanvasColor(mouseX, mouseY) {
         if (!window.activeCanvas) return window.currentColor;
         
-        // Clamp and round coordinates to prevent out-of-bounds errors and ensure integer coordinates
-        var x = Math.max(0, Math.min(Math.floor(mouseX), window.activeCanvas.width - 1));
-        var y = Math.max(0, Math.min(Math.floor(mouseY), window.activeCanvas.height - 1));
+        // Clamp and round coordinates to prevent out-of-bounds errors and ensure integer coordinates in device pixels
+        var x = Math.max(0, Math.min(Math.floor(mouseX * window.dpr), Math.floor(window.activeCanvas.width * window.dpr) - 1));
+        var y = Math.max(0, Math.min(Math.floor(mouseY * window.dpr), Math.floor(window.activeCanvas.height * window.dpr) - 1));
         
         // Performance optimization: skip sampling if the pixel coordinates haven't changed
         if (window._lastSampledX === x && window._lastSampledY === y) {
