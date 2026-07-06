@@ -55,6 +55,9 @@ DankModal {
     property string lastActiveTool: "pen"
     property string colorPickerMode: "draw" // draw, copy
     property color hoveredColor: "transparent"
+    property int _lastSampledX: -1
+    property int _lastSampledY: -1
+    property color _lastSampledColor: "transparent"
     readonly property real dpr: Screen.devicePixelRatio || 1.0
     onCurrentToolChanged: {
         if (currentTool !== "text" && window.isTyping) {
@@ -62,6 +65,12 @@ DankModal {
         }
         if (currentTool !== "crop" && currentTool !== "backdrop" && currentTool !== "select" && currentTool !== "colorpicker") {
             lastActiveTool = currentTool;
+        }
+        if (currentTool === "colorpicker") {
+            window._lastSampledX = -1;
+            window._lastSampledY = -1;
+            window._lastSampledColor = "transparent";
+            window.hoveredColor = window.sampleCanvasColor(window.cursorX * window.editScale, window.cursorY * window.editScale);
         }
         if (currentTool === "backdrop" && window.backdropMode === "none") {
             window.backdropMode = "solid";
@@ -1084,17 +1093,52 @@ DankModal {
 
     function shortcutToken(key) { return Helpers.shortcutToken(key, Qt); }
 
+    function formatHexColor(color) {
+        var r = Math.round(color.r * 255).toString(16);
+        if (r.length < 2) r = "0" + r;
+        var g = Math.round(color.g * 255).toString(16);
+        if (g.length < 2) g = "0" + g;
+        var b = Math.round(color.b * 255).toString(16);
+        if (b.length < 2) b = "0" + b;
+        return "#" + r + g + b;
+    }
+
     function sampleCanvasColor(mouseX, mouseY) {
         if (!window.activeCanvas) return window.currentColor;
+        
+        // Clamp and round coordinates to prevent out-of-bounds errors and ensure integer coordinates
+        var x = Math.max(0, Math.min(Math.floor(mouseX), window.activeCanvas.width - 1));
+        var y = Math.max(0, Math.min(Math.floor(mouseY), window.activeCanvas.height - 1));
+        
+        // Performance optimization: skip sampling if the pixel coordinates haven't changed
+        if (window._lastSampledX === x && window._lastSampledY === y) {
+            return window._lastSampledColor || window.currentColor;
+        }
+        
         try {
             var ctx = window.activeCanvas.getContext("2d");
-            var imgData = ctx.getImageData(mouseX, mouseY, 1, 1);
+            if (!ctx) return window.currentColor;
+            
+            var imgData = ctx.getImageData(x, y, 1, 1);
             if (imgData && imgData.data && imgData.data.length >= 4) {
                 var r = imgData.data[0];
                 var g = imgData.data[1];
                 var b = imgData.data[2];
                 var a = imgData.data[3];
-                return Qt.rgba(r / 255, g / 255, b / 255, a / 255);
+                
+                var pickedColor;
+                if (a === 0) {
+                    pickedColor = window.currentColor;
+                } else {
+                    // Force alpha to 1.0 to ensure we always sample an opaque color.
+                    pickedColor = Qt.rgba(r / 255, g / 255, b / 255, 1.0);
+                }
+                
+                window._lastSampledX = x;
+                window._lastSampledY = y;
+                window._lastSampledColor = pickedColor;
+                
+                return pickedColor;
             }
         } catch (e) {
             console.warn("Color picker failed to sample pixel color:", e);
@@ -2237,7 +2281,7 @@ DankModal {
                                  if (window.currentTool === "colorpicker") {
                                      if (mouse.button === Qt.LeftButton) {
                                          const pickedColor = window.sampleCanvasColor(mouse.x, mouse.y);
-                                         const hexStr = pickedColor.toString().toUpperCase();
+                                         const hexStr = window.formatHexColor(pickedColor).toUpperCase();
                                          if (window.colorPickerMode === "copy") {
                                              Quickshell.execDetached(["dms", "cl", "copy", hexStr]);
                                              if (typeof ToastService !== "undefined" && ToastService) {
@@ -2837,7 +2881,7 @@ DankModal {
                         // Color details banner at the bottom of the magnifier
                         Rectangle {
                             id: colorInfoBanner
-                            visible: window.currentTool === "colorpicker"
+                            visible: window.currentTool === "colorpicker" && window.hoveredColor !== Qt.color("transparent")
                             anchors.bottom: parent.bottom
                             anchors.left: parent.left
                             anchors.right: parent.right
@@ -2866,7 +2910,7 @@ DankModal {
                                     spacing: 0
 
                                     StyledText {
-                                        text: window.hoveredColor.toString().toUpperCase()
+                                        text: window.formatHexColor(window.hoveredColor).toUpperCase()
                                         font.pixelSize: 8
                                         font.bold: true
                                         color: Theme.surfaceText
@@ -2874,9 +2918,9 @@ DankModal {
 
                                     StyledText {
                                         text: {
-                                            var r = Math.round(window.hoveredColor.r * 255);
-                                            var g = Math.round(window.hoveredColor.g * 255);
-                                            var b = Math.round(window.hoveredColor.b * 255);
+                                            var r = Math.round((window.hoveredColor.r || 0) * 255);
+                                            var g = Math.round((window.hoveredColor.g || 0) * 255);
+                                            var b = Math.round((window.hoveredColor.b || 0) * 255);
                                             return "RGB: " + r + "," + g + "," + b;
                                         }
                                         font.pixelSize: 7
