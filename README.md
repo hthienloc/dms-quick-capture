@@ -51,8 +51,9 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 | `R` | Redact |
 | `A` | Stamp |
 | `S` | Highlighter |
-| `D` | Eraser |
-| `F` | Spotlight |
+| `D` | Focus Spotlight |
+| `F` | Color Picker (Ink/Eyedropper) |
+| `T` | Eraser |
 | `Z` | Area Zoom (Callout) |
 | `B` | Backdrop Options |
 | `V` | Select |
@@ -81,6 +82,7 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 | **Right-click** on canvas | 8 customizable tool presets |
 | **Shift+Right-click** (Stamp active) | Open Stamp Options mini-toolbar (Numeric, Alphabetic, Roman) |
 | **Shift+Right-click** (Text active) | Open Text Options mini-toolbar (Bold, Italic, Underline, Background) |
+| **Shift+Right-click** (Line active) | Open Line Options mini-toolbar (Solid, Dashed, Dotted) |
 
 ### Special Tools
 

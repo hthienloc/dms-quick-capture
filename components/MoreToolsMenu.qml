@@ -25,6 +25,7 @@ Rectangle {
     signal ocrRequested()
     signal qrScanRequested()
     signal copyColorRequested()
+    signal eraserRequested()
 
     states: [
         State {
@@ -221,6 +222,47 @@ Rectangle {
                 onClicked: {
                     menuRoot.close();
                     menuRoot.qrScanRequested();
+                }
+            }
+        }
+
+        // Eraser Option
+        Rectangle {
+            width: parent.width
+            height: 32
+            radius: Theme.cornerRadius - 2
+            color: eraserMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+
+            Row {
+                anchors.fill: parent
+                anchors.leftMargin: Theme.spacingS
+                anchors.rightMargin: Theme.spacingS
+                spacing: Theme.spacingS
+                anchors.verticalCenter: parent.verticalCenter
+
+                DankIcon {
+                    name: "auto_fix_normal"
+                    size: 16
+                    color: Theme.surfaceText
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                StyledText {
+                    text: qsTr("Eraser (T)")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceText
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+
+            MouseArea {
+                id: eraserMouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    menuRoot.close();
+                    menuRoot.eraserRequested();
                 }
             }
         }
