@@ -148,24 +148,73 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         const len = Math.sqrt(dx * dx + dy * dy);
 
         if (len > 0) {
+            const SPREAD_ANGLE = Math.PI / 7;
+            const MIN_HEAD_LENGTH = 15;
+            const HEAD_LENGTH_MULTIPLIER = 4;
+            const BASE_FACTOR = Math.cos(SPREAD_ANGLE); // ~0.9009, matching base of the arrowhead triangle
+
+            const DASH_LENGTH_RATIO = 2.5;
+            const DASH_GAP_RATIO = 1.5;
+            const DOTTED_SEGMENT_LENGTH = 0.01;
+            const DOTTED_GAP_RATIO = 2;
+
             const angle = Math.atan2(dy, dx);
-            const spread = Math.PI / 7;
-            const headLength = Math.max(15, stroke.width * 4);
-            const shaftLength = Math.max(0, len - headLength * 0.8);
-            const shaftEndX = p0.x + shaftLength * Math.cos(angle);
-            const shaftEndY = p0.y + shaftLength * Math.sin(angle);
+            const headLength = Math.max(MIN_HEAD_LENGTH, stroke.width * HEAD_LENGTH_MULTIPLIER);
+            
+            const isDoubleHead = stroke.arrowHeadStyle === "double-filled";
+            const isOpenHead = stroke.arrowHeadStyle === "single-open";
+
+            const startOffset = isDoubleHead ? headLength * BASE_FACTOR : 0;
+            const endOffset = isOpenHead ? 0 : headLength * BASE_FACTOR;
+            const shaftLength = Math.max(0, len - startOffset - endOffset);
+
+            const shaftStartX = p0.x + startOffset * Math.cos(angle);
+            const shaftStartY = p0.y + startOffset * Math.sin(angle);
+            const shaftEndX = shaftStartX + shaftLength * Math.cos(angle);
+            const shaftEndY = shaftStartY + shaftLength * Math.sin(angle);
+
+            // Draw arrow shaft
+            ctx.save();
+            if (stroke.arrowLineStyle === "dashed") {
+                ctx.setLineDash([stroke.width * DASH_LENGTH_RATIO, stroke.width * DASH_GAP_RATIO]);
+            } else if (stroke.arrowLineStyle === "dotted") {
+                ctx.setLineDash([DOTTED_SEGMENT_LENGTH, stroke.width * DOTTED_GAP_RATIO]);
+            } else {
+                ctx.setLineDash([]);
+            }
 
             ctx.beginPath();
-            ctx.moveTo(p0.x, p0.y);
+            ctx.moveTo(shaftStartX, shaftStartY);
             ctx.lineTo(shaftEndX, shaftEndY);
             ctx.stroke();
+            ctx.restore();
 
-            ctx.beginPath();
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p1.x - headLength * Math.cos(angle - spread), p1.y - headLength * Math.sin(angle - spread));
-            ctx.lineTo(p1.x - headLength * Math.cos(angle + spread), p1.y - headLength * Math.sin(angle + spread));
-            ctx.closePath();
-            ctx.fill();
+            // Draw primary head (at p1)
+            if (isOpenHead) {
+                ctx.beginPath();
+                ctx.moveTo(p1.x - headLength * Math.cos(angle - SPREAD_ANGLE), p1.y - headLength * Math.sin(angle - SPREAD_ANGLE));
+                ctx.lineTo(p1.x, p1.y);
+                ctx.lineTo(p1.x - headLength * Math.cos(angle + SPREAD_ANGLE), p1.y - headLength * Math.sin(angle + SPREAD_ANGLE));
+                ctx.stroke();
+            } else {
+                ctx.beginPath();
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(p1.x - headLength * Math.cos(angle - SPREAD_ANGLE), p1.y - headLength * Math.sin(angle - SPREAD_ANGLE));
+                ctx.lineTo(p1.x - headLength * Math.cos(angle + SPREAD_ANGLE), p1.y - headLength * Math.sin(angle + SPREAD_ANGLE));
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            // Draw secondary head (at p0) if double-headed
+            if (isDoubleHead) {
+                const oppositeAngle = angle + Math.PI;
+                ctx.beginPath();
+                ctx.moveTo(p0.x, p0.y);
+                ctx.lineTo(p0.x - headLength * Math.cos(oppositeAngle - SPREAD_ANGLE), p0.y - headLength * Math.sin(oppositeAngle - SPREAD_ANGLE));
+                ctx.lineTo(p0.x - headLength * Math.cos(oppositeAngle + SPREAD_ANGLE), p0.y - headLength * Math.sin(oppositeAngle + SPREAD_ANGLE));
+                ctx.closePath();
+                ctx.fill();
+            }
         }
 
     } else if (stroke.tool === "redact") {
