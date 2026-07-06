@@ -104,7 +104,7 @@ Rectangle {
                         required property var modelData
                         width: tc.presetBtnWidth
                         height: tc.presetBtnHeight
-                        radius: Theme.cornerRadiusXS
+                        radius: Theme.cornerRadius / 2
                         color: popoverRoot.backdropAspectRatio === modelData.value ? Theme.primary : Theme.withAlpha(Theme.surfaceVariant, 0.4)
                         border.color: popoverRoot.backdropAspectRatio === modelData.value ? "transparent" : Theme.withAlpha(Theme.outline, 0.15)
                         border.width: 1
