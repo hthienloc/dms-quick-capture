@@ -58,10 +58,21 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         ctx.lineJoin = "round";
         const p0 = stroke.points[0];
         const p1 = stroke.points[stroke.points.length - 1];
+
+        ctx.save();
+        if (stroke.lineStyle === "dashed") {
+            ctx.setLineDash([stroke.width * 3, stroke.width * 3]);
+        } else if (stroke.lineStyle === "dotted") {
+            ctx.setLineDash([stroke.width, stroke.width * 2]);
+        } else {
+            ctx.setLineDash([]);
+        }
+
         ctx.beginPath();
         ctx.moveTo(p0.x, p0.y);
         ctx.lineTo(p1.x, p1.y);
         ctx.stroke();
+        ctx.restore();
 
     } else if (stroke.tool === "highlighter") {
         ctx.strokeStyle = Qt.rgba(rgb.r, rgb.g, rgb.b, 0.4);
