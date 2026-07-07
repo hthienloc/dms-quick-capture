@@ -1,6 +1,6 @@
 # DMS Quick Capture & Annotate
 
-Interactive Wayland-centric screen capture and instant vector annotation plugin for DankMaterialShell (DMS).
+Screenshot and vector annotation plugin for DankMaterialShell (DMS).
 
 <img src="screenshot.png" width="800" alt="Screenshot">
 
