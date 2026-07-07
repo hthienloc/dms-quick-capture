@@ -7,6 +7,11 @@ Interactive Wayland-centric screen capture and instant vector annotation plugin 
 ## Requirements
 
 - DankMaterialShell >= 1.5
+- **ImageMagick** (provides `magick`/`mogrify`, required for WebP/JPEG exports, rotation/mirroring, and OCR/QR crop)
+- **img2pdf** (required for PDF export)
+- **tesseract** (required for OCR text scanner)
+- **zbar** (provides `zbarimg`, required for QR scanner)
+- **wl-clipboard** (provides `wl-copy`/`wl-paste`, required for clipboard operations)
 
 ## Install
 
@@ -141,14 +146,14 @@ binds {
 
 - [x] OCR (Optical Character Recognition) text scanner
 - [x] QR Code Scanner
-- [ ] Canvas Color Picker
+- [x] Canvas Color Picker (Eyedropper tool)
 - [ ] Image Filters (Grayscale, negative, brightness/contrast)
 - [ ] Image Backdrop Mode: Support setting a custom image file as the screenshot background
-- [ ] Expanded tool option popovers:
-  - **Arrow tool**: Double-headed arrows
-  - **Line tool**: Dimension lines, line style (dashed, dotted)
-  - **Rectangle tool**: Border style (dashed, dotted)
-  - **Redact tool**: Gaussian blur, automatic text-color match background (clean text eraser)
+- [x] Expanded tool option popovers:
+  - **Arrow tool**: Double-headed arrows, line styles (dashed, dotted)
+  - **Line tool**: Line styles (dashed, dotted)
+  - **Rectangle tool**: Border styles (dashed, dotted)
+  - **Redact tool**: Clean text eraser (dominant color/gradient background matcher)
 
 ## Credits
 

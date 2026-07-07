@@ -83,6 +83,8 @@ Pressing these keys changes the active tool:
 - **Shift + Right-Click (Stamp active):** Changes counter format (Numbers, Alphabetical, Roman numerals).
 - **Shift + Right-Click (Text active):** Standard text decoration toggle (Bold, Italic, Underline, Background).
 - **Shift + Right-Click (Line active):** Changes line style (Solid, Dashed, Dotted).
+- **Shift + Right-Click (Arrow active):** Changes arrow line style (Solid, Dashed, Dotted) and head style (Single/Double, Filled/Outline).
+- **Shift + Right-Click (Redact active):** Changes redact mode (Solid Fill, Clean Text Eraser).
 
 ---
 
@@ -101,7 +103,7 @@ The following settings are registered inside DMS settings manager and stored in 
   "settings": {
     "exit_method": "confirm",
     "screenshot_folder": "/home/user/Pictures/Screenshots",
-    "export_format": "png",
+    "export_format": "png", // options: png, webp, jpg, pdf, ppm
     "export_compress": true,
     "delete_screenshots_on_close": false,
     "image_padding": 40,
