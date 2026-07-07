@@ -245,16 +245,8 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
 
             if (mode === "clean" && config.offscreenSampler) {
                 if (stroke.isCurrent) {
-                    // Extremely cheap 1x1 pixel read for 60 FPS real-time preview dragging
-                    try {
-                        const octx = config.offscreenSampler.getContext("2d");
-                        const imgData = octx.getImageData(rx, ry, 1, 1);
-                        ctx.fillStyle = Qt.rgba(imgData.data[0] / 255, imgData.data[1] / 255, imgData.data[2] / 255, 1.0);
-                    } catch (e) {
-                        ctx.fillStyle = "rgba(128, 128, 128, 0.5)";
-                    }
+                    ctx.fillStyle = Helpers.getBoundaryColorOrGradient(ctx, rx, ry, rw, rh, config.offscreenSampler, Qt);
                 } else {
-                    // Compute accurate dominant color exactly once and cache it on the stroke!
                     if (!stroke.cachedCleanColor) {
                         stroke.cachedCleanColor = Helpers.getBoundaryColorOrGradient(ctx, rx, ry, rw, rh, config.offscreenSampler, Qt);
                     }

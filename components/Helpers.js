@@ -474,42 +474,72 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
 function getBoundaryColorOrGradient(ctx, rx, ry, rw, rh, offscreenSampler, Qt) {
     if (!offscreenSampler) return "transparent";
     const octx = offscreenSampler.getContext("2d");
-    
-    const border = 3;
-    const sampleX = Math.max(0, Math.min(offscreenSampler.width - 1, rx - border));
-    const sampleY = Math.max(0, Math.min(offscreenSampler.height - 1, ry - border));
-    const sampleW = Math.max(1, Math.min(offscreenSampler.width - sampleX, rw + border * 2));
-    const sampleH = Math.max(1, Math.min(offscreenSampler.height - sampleY, rh + border * 2));
-    
-    if (sampleW <= 0 || sampleH <= 0) return "transparent";
-    
-    let imgData;
-    try {
-        imgData = octx.getImageData(sampleX, sampleY, sampleW, sampleH);
-    } catch (e) {
-        return "transparent";
-    }
-    const data = imgData.data;
-    
+    const oWidth = offscreenSampler.width;
+    const oHeight = offscreenSampler.height;
+
+    // Mathematically clamp coordinates to [0, oWidth - 1] and [0, oHeight - 1]
+    const topX = Math.max(0, Math.min(oWidth - 1, rx - 3));
+    const topY = Math.max(0, Math.min(oHeight - 1, ry - 3));
+    const bottomX = Math.max(0, Math.min(oWidth - 1, rx - 3));
+    const bottomY = Math.max(0, Math.min(oHeight - 1, ry + rh));
+    const leftX = Math.max(0, Math.min(oWidth - 1, rx - 3));
+    const leftY = Math.max(0, Math.min(oHeight - 1, ry));
+    const rightX = Math.max(0, Math.min(oWidth - 1, rx + rw));
+    const rightY = Math.max(0, Math.min(oHeight - 1, ry));
+
+    const strips = [
+        // Top
+        {
+            x: topX,
+            y: topY,
+            w: Math.max(1, Math.min(rw + 6, oWidth - topX)),
+            h: Math.max(1, Math.min(3, oHeight - topY))
+        },
+        // Bottom
+        {
+            x: bottomX,
+            y: bottomY,
+            w: Math.max(1, Math.min(rw + 6, oWidth - bottomX)),
+            h: Math.max(1, Math.min(3, oHeight - bottomY))
+        },
+        // Left
+        {
+            x: leftX,
+            y: leftY,
+            w: Math.max(1, Math.min(3, oWidth - leftX)),
+            h: Math.max(1, Math.min(rh, oHeight - leftY))
+        },
+        // Right
+        {
+            x: rightX,
+            y: rightY,
+            w: Math.max(1, Math.min(3, oWidth - rightX)),
+            h: Math.max(1, Math.min(rh, oHeight - rightY))
+        }
+    ];
+
     const counts = {};
     let maxCount = 0;
     let dominantColorKey = null;
-    
-    for (let y = 0; y < sampleH; y++) {
-        for (let x = 0; x < sampleW; x++) {
-            const isBorder = (x < border) || (x >= sampleW - border) || (y < border) || (y >= sampleH - border);
-            if (isBorder) {
-                const idx = (y * sampleW + x) * 4;
-                const r = data[idx];
-                const g = data[idx + 1];
-                const b = data[idx + 2];
-                const a = data[idx + 3];
+
+    for (let strip of strips) {
+        if (strip.w <= 0 || strip.h <= 0) continue;
+        try {
+            const imgData = octx.getImageData(strip.x, strip.y, strip.w, strip.h);
+            strip.pixelData = imgData.data; // Cache pixel buffer to avoid second getImageData call
+            const data = strip.pixelData;
+            const len = data.length;
+            for (let i = 0; i < len; i += 4) {
+                const r = data[i];
+                const g = data[i+1];
+                const b = data[i+2];
+                const a = data[i+3];
                 if (a === 0) continue;
-                
+
                 const qr = Math.round(r / 8) * 8;
                 const qg = Math.round(g / 8) * 8;
                 const qb = Math.round(b / 8) * 8;
-                
+
                 const key = (qr << 16) | (qg << 8) | qb;
                 counts[key] = (counts[key] || 0) + 1;
                 if (counts[key] > maxCount) {
@@ -517,41 +547,44 @@ function getBoundaryColorOrGradient(ctx, rx, ry, rw, rh, offscreenSampler, Qt) {
                     dominantColorKey = key;
                 }
             }
+        } catch (e) {
+            console.warn(`[getBoundaryColorOrGradient] getImageData failed: ${e.message}`);
         }
     }
-    
+
     if (dominantColorKey === null) return "transparent";
-    
+
     let rSum = 0, gSum = 0, bSum = 0, count = 0;
-    for (let y = 0; y < sampleH; y++) {
-        for (let x = 0; x < sampleW; x++) {
-            const isBorder = (x < border) || (x >= sampleW - border) || (y < border) || (y >= sampleH - border);
-            if (isBorder) {
-                const idx = (y * sampleW + x) * 4;
-                const r = data[idx];
-                const g = data[idx + 1];
-                const b = data[idx + 2];
-                const a = data[idx + 3];
-                if (a === 0) continue;
-                
-                const qr = Math.round(r / 8) * 8;
-                const qg = Math.round(g / 8) * 8;
-                const qb = Math.round(b / 8) * 8;
-                const key = (qr << 16) | (qg << 8) | qb;
-                if (key === dominantColorKey) {
-                    rSum += r;
-                    gSum += g;
-                    bSum += b;
-                    count++;
-                }
+    for (let strip of strips) {
+        const data = strip.pixelData; // Reuse cached pixel buffer
+        if (!data) continue;
+        const len = data.length;
+        for (let i = 0; i < len; i += 4) {
+            const r = data[i];
+            const g = data[i+1];
+            const b = data[i+2];
+            const a = data[i+3];
+            if (a === 0) continue;
+
+            const qr = Math.round(r / 8) * 8;
+            const qg = Math.round(g / 8) * 8;
+            const qb = Math.round(b / 8) * 8;
+            const key = (qr << 16) | (qg << 8) | qb;
+            if (key === dominantColorKey) {
+                rSum += r;
+                gSum += g;
+                bSum += b;
+                count++;
             }
         }
     }
-    
+
+    if (count === 0) return "transparent";
+
     const finalR = Math.round(rSum / count);
     const finalG = Math.round(gSum / count);
     const finalB = Math.round(bSum / count);
-    
+
     return Qt.rgba(finalR / 255, finalG / 255, finalB / 255, 1.0);
 }
 
