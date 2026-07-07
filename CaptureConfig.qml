@@ -7,19 +7,19 @@ QtObject {
     property var pluginData: ({})
 
     readonly property var toolButtons: [
-        { id: "pen", icon: "edit", tooltip: qsTr("Freehand Pen (1)") },
-        { id: "line", icon: "horizontal_rule", tooltip: qsTr("Straight Line (2)") },
-        { id: "arrow", icon: "trending_flat", tooltip: qsTr("Arrow Vector (3)") },
-        { id: "rect", icon: "crop_square", tooltip: qsTr("Rectangle Outline (4)") },
-        { id: "ellipse", icon: "radio_button_unchecked", tooltip: qsTr("Ellipse / Circle (Q)") },
-        { id: "text", icon: "text_fields", tooltip: qsTr("Text Note (W)") },
-        { id: "pixelate", icon: "blur_on", tooltip: qsTr("Pixelate (E)") },
-        { id: "redact", icon: "ad_off", tooltip: qsTr("Redact (R)") },
-        { id: "stamp", icon: "looks_one", tooltip: qsTr("Number Stamp (A)") },
-        { id: "highlighter", icon: "border_color", tooltip: qsTr("Highlighter (S)") },
-        { id: "spotlight", icon: "highlight", tooltip: qsTr("Focus Spotlight (D)") },
-        { id: "callout", icon: "zoom_in", tooltip: qsTr("Area Zoom (Z) | Hold G for Loupe") },
-        { id: "backdrop", icon: "wallpaper", tooltip: qsTr("Image Backdrop (B)") }
+        { id: "pen", icon: "edit", shortcut: "1", tooltip: qsTr("Freehand Pen (1)") },
+        { id: "line", icon: "horizontal_rule", shortcut: "2", tooltip: qsTr("Straight Line (2)") },
+        { id: "arrow", icon: "trending_flat", shortcut: "3", tooltip: qsTr("Arrow Vector (3)") },
+        { id: "rect", icon: "crop_square", shortcut: "4", tooltip: qsTr("Rectangle Outline (4)") },
+        { id: "ellipse", icon: "radio_button_unchecked", shortcut: "Q", tooltip: qsTr("Ellipse / Circle (Q)") },
+        { id: "text", icon: "text_fields", shortcut: "W", tooltip: qsTr("Text Note (W)") },
+        { id: "pixelate", icon: "blur_on", shortcut: "E", tooltip: qsTr("Pixelate (E)") },
+        { id: "redact", icon: "ad_off", shortcut: "R", tooltip: qsTr("Redact (R)") },
+        { id: "stamp", icon: "looks_one", shortcut: "A", tooltip: qsTr("Number Stamp (A)") },
+        { id: "highlighter", icon: "border_color", shortcut: "S", tooltip: qsTr("Highlighter (S)") },
+        { id: "spotlight", icon: "highlight", shortcut: "D", tooltip: qsTr("Focus Spotlight (D)") },
+        { id: "callout", icon: "zoom_in", shortcut: "Z", tooltip: qsTr("Area Zoom (Z) | Hold G for Loupe") },
+        { id: "backdrop", icon: "wallpaper", shortcut: "B", tooltip: qsTr("Image Backdrop (B)") }
     ]
 
     readonly property string selectedPreset: pluginData["color_palette_preset"] || "adaptive"
