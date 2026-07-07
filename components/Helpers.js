@@ -469,3 +469,89 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
     }
     return -1;
 }
+
+
+function getBoundaryColorOrGradient(ctx, rx, ry, rw, rh, offscreenSampler, Qt) {
+    if (!offscreenSampler) return "transparent";
+    const octx = offscreenSampler.getContext("2d");
+    
+    const border = 3;
+    const sampleX = Math.max(0, Math.min(offscreenSampler.width - 1, rx - border));
+    const sampleY = Math.max(0, Math.min(offscreenSampler.height - 1, ry - border));
+    const sampleW = Math.max(1, Math.min(offscreenSampler.width - sampleX, rw + border * 2));
+    const sampleH = Math.max(1, Math.min(offscreenSampler.height - sampleY, rh + border * 2));
+    
+    if (sampleW <= 0 || sampleH <= 0) return "transparent";
+    
+    let imgData;
+    try {
+        imgData = octx.getImageData(sampleX, sampleY, sampleW, sampleH);
+    } catch (e) {
+        return "transparent";
+    }
+    const data = imgData.data;
+    
+    const counts = {};
+    let maxCount = 0;
+    let dominantColorKey = null;
+    
+    for (let y = 0; y < sampleH; y++) {
+        for (let x = 0; x < sampleW; x++) {
+            const isBorder = (x < border) || (x >= sampleW - border) || (y < border) || (y >= sampleH - border);
+            if (isBorder) {
+                const idx = (y * sampleW + x) * 4;
+                const r = data[idx];
+                const g = data[idx + 1];
+                const b = data[idx + 2];
+                const a = data[idx + 3];
+                if (a === 0) continue;
+                
+                const qr = Math.round(r / 8) * 8;
+                const qg = Math.round(g / 8) * 8;
+                const qb = Math.round(b / 8) * 8;
+                
+                const key = (qr << 16) | (qg << 8) | qb;
+                counts[key] = (counts[key] || 0) + 1;
+                if (counts[key] > maxCount) {
+                    maxCount = counts[key];
+                    dominantColorKey = key;
+                }
+            }
+        }
+    }
+    
+    if (dominantColorKey === null) return "transparent";
+    
+    let rSum = 0, gSum = 0, bSum = 0, count = 0;
+    for (let y = 0; y < sampleH; y++) {
+        for (let x = 0; x < sampleW; x++) {
+            const isBorder = (x < border) || (x >= sampleW - border) || (y < border) || (y >= sampleH - border);
+            if (isBorder) {
+                const idx = (y * sampleW + x) * 4;
+                const r = data[idx];
+                const g = data[idx + 1];
+                const b = data[idx + 2];
+                const a = data[idx + 3];
+                if (a === 0) continue;
+                
+                const qr = Math.round(r / 8) * 8;
+                const qg = Math.round(g / 8) * 8;
+                const qb = Math.round(b / 8) * 8;
+                const key = (qr << 16) | (qg << 8) | qb;
+                if (key === dominantColorKey) {
+                    rSum += r;
+                    gSum += g;
+                    bSum += b;
+                    count++;
+                }
+            }
+        }
+    }
+    
+    const finalR = Math.round(rSum / count);
+    const finalG = Math.round(gSum / count);
+    const finalB = Math.round(bSum / count);
+    
+    return Qt.rgba(finalR / 255, finalG / 255, finalB / 255, 1.0);
+}
+
