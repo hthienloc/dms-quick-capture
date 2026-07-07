@@ -59,6 +59,22 @@ DankModal {
     property string colorPickerMode: "draw" // draw, copy
     property color hoveredColor: "transparent"
     property string activeLineStyle: "solid"
+    property string activeRedactMode: "solid" // solid, blur, clean
+    onActiveRedactModeChanged: {
+        if (window.selectedStroke && window.selectedStroke.tool === "redact") {
+            window.selectedStroke.redactMode = window.activeRedactMode;
+            window.selectedStroke.cachedCleanColor = undefined;
+            const idx = window.strokes.indexOf(window.selectedStroke);
+            if (idx !== -1) {
+                window.strokes[idx] = window.selectedStroke;
+                window.strokes = [...window.strokes];
+            }
+        }
+        if (window.currentStroke && window.currentStroke.tool === "redact") {
+            window.currentStroke.redactMode = window.activeRedactMode;
+        }
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
+    }
     onActiveLineStyleChanged: {
         if (window.selectedStroke && window.selectedStroke.tool === "line") {
             window.selectedStroke.lineStyle = window.activeLineStyle;
@@ -199,6 +215,9 @@ DankModal {
     onCurrentColorChanged: {
         if (window.selectedStroke) {
             window.selectedStroke.color = window.currentColor.toString();
+            if (window.selectedStroke.tool === "redact") {
+                window.selectedStroke.cachedCleanColor = undefined;
+            }
             const idx = window.strokes.indexOf(window.selectedStroke);
             if (idx !== -1) {
                 window.strokes[idx] = window.selectedStroke;
@@ -487,6 +506,7 @@ DankModal {
     property int preGrabSpotlightIntensity: 50
     property int preGrabCalloutZoom: 150
     property color preGrabColor: Theme.primary
+    property string preGrabRedactMode: "solid"
     property point pressCoords: Qt.point(0, 0)
     property var originalPoints: []
 
@@ -876,8 +896,10 @@ DankModal {
         if (window.currentTool === "select") {
             window.preGrabStrokeWidth = window.strokeWidth;
             window.preGrabColor = window.currentColor;
+            window.preGrabRedactMode = window.activeRedactMode;
             window.strokeWidth = pasted.width;
             window.currentColor = pasted.color;
+            if (pasted.tool === "redact" && pasted.redactMode) window.activeRedactMode = pasted.redactMode;
             window.selectedStroke = pasted;
             window.pressCoords = absPt;
             window.originalPoints = newPoints;
@@ -1387,6 +1409,7 @@ DankModal {
                             window.activeCanvas.loadImage(source);
                         }
                         contrastSampler.requestPaint();
+                        offscreenSampler.requestPaint();
                     }
                 }
 
@@ -1909,6 +1932,7 @@ DankModal {
                                 roundRect: window.roundRect,
                                 roundHighlighter: window.roundHighlighter,
                                 bgImageItem: window.bgImageItem,
+                                offscreenSampler: offscreenSampler,
                                 canvasWidth: window.canvasWidth,
                                 canvasHeight: window.canvasHeight,
                                 canvasMinX: (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.x : 0,
@@ -1967,7 +1991,10 @@ DankModal {
                                             }
                                             window.selectedStroke.points = newPoints;
                                         }
-                                        drawingCanvas.requestPaint();
+                                         if (window.selectedStroke.tool === "redact") {
+                                             window.selectedStroke.cachedCleanColor = undefined;
+                                         }
+                                         drawingCanvas.requestPaint();
                                     } else {
                                         hoveredStrokeIdx = window.findStrokeAt(absPt.x, absPt.y);
                                     }
@@ -2117,6 +2144,9 @@ DankModal {
                                         } else if (window.currentTool === "arrow") {
                                             arrowOptionsToolbar.open(mapped.x, mapped.y);
                                             return;
+                                        } else if (window.currentTool === "redact") {
+                                            redactOptionsToolbar.open(mapped.x, mapped.y);
+                                            return;
                                         }
                                     }
                                     radialMenu.open(mapped.x, mapped.y);
@@ -2152,6 +2182,7 @@ DankModal {
                                             window.preGrabSpotlightIntensity = window.spotlightIntensity;
                                             window.preGrabCalloutZoom = window.calloutZoom;
                                             window.preGrabColor = window.currentColor;
+                                            window.preGrabRedactMode = window.activeRedactMode;
                                         }
                                         
                                         window.selectedStroke = stroke;
@@ -2162,6 +2193,9 @@ DankModal {
                                         if (stroke.tool === "arrow") {
                                             if (stroke.arrowLineStyle) window.activeArrowLineStyle = stroke.arrowLineStyle;
                                             if (stroke.arrowHeadStyle) window.activeArrowHeadStyle = stroke.arrowHeadStyle;
+                                        }
+                                        if (stroke.tool === "redact" && stroke.redactMode) {
+                                            window.activeRedactMode = stroke.redactMode;
                                         }
 
                                         // Detection for callout destination dragging
@@ -2301,17 +2335,17 @@ DankModal {
                                     return;
                                 }
 
-                                // Standard drawing stroke
-                                window.currentStroke = {
-                                    tool: window.currentTool,
-                                    color: window.currentColor.toString(),
-                                    width: window.activeIntensity,
-                                    points: [getAbsolutePoint(mouse.x, mouse.y)],
-                                    lineStyle: window.currentTool === "line" ? window.activeLineStyle : "solid",
-                                    arrowLineStyle: window.currentTool === "arrow" ? window.activeArrowLineStyle : "solid",
-                                    arrowHeadStyle: window.currentTool === "arrow" ? window.activeArrowHeadStyle : "single-filled"
-                                };
-                                drawingCanvas.requestPaint();
+                                 window.currentStroke = {
+                                     tool: window.currentTool,
+                                     color: window.currentColor.toString(),
+                                     width: window.activeIntensity,
+                                     points: [getAbsolutePoint(mouse.x, mouse.y)],
+                                     lineStyle: window.currentTool === "line" ? window.activeLineStyle : "solid",
+                                     arrowLineStyle: window.currentTool === "arrow" ? window.activeArrowLineStyle : "solid",
+                                     arrowHeadStyle: window.currentTool === "arrow" ? window.activeArrowHeadStyle : "single-filled",
+                                     redactMode: window.currentTool === "redact" ? window.activeRedactMode : "solid"
+                                 };
+                                 drawingCanvas.requestPaint();
                             }
 
                             onReleased: (mouse) => {
@@ -2323,6 +2357,7 @@ DankModal {
                                      window.spotlightIntensity = window.preGrabSpotlightIntensity;
                                      window.calloutZoom = window.preGrabCalloutZoom;
                                      window.currentColor = window.preGrabColor;
+                                     window.activeRedactMode = window.preGrabRedactMode;
                                      window.calloutDestDragging = false;
                                      window.originalPoints = [];
                                      drawingCanvas.requestPaint();
@@ -2772,6 +2807,13 @@ DankModal {
                     onHeadStyleSelected: (style) => window.activeArrowHeadStyle = style
                 }
 
+                RedactOptionsToolbar {
+                    id: redactOptionsToolbar
+                    toolbarPosition: window.toolbarPosition
+                    currentMode: window.activeRedactMode
+                    onModeSelected: (mode) => window.activeRedactMode = mode
+                }
+
                 MoreToolsMenu {
                     id: moreToolsMenu
                     onRotateRequested: window.rotateScreenshot()
@@ -2876,6 +2918,18 @@ DankModal {
                                 window.backdropSolidColor = colors.start;
                             }
                         }
+                    }
+                }
+
+                Canvas {
+                    id: offscreenSampler
+                    visible: false
+                    width: window.bgImageItem ? window.bgImageItem.sourceSize.width : 1
+                    height: window.bgImageItem ? window.bgImageItem.sourceSize.height : 1
+                    onPaint: {
+                        var ctx = getContext("2d");
+                        ctx.clearRect(0, 0, width, height);
+                        ctx.drawImage(bgImage, 0, 0, width, height);
                     }
                 }
             }

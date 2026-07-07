@@ -221,25 +221,59 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
     } else if (stroke.tool === "redact") {
         const p0 = stroke.points[0];
         const p1 = stroke.points[stroke.points.length - 1];
-        const rx = Math.min(p0.x, p1.x);
-        const ry = Math.min(p0.y, p1.y);
-        const rw = Math.abs(p1.x - p0.x);
-        const rh = Math.abs(p1.y - p0.y);
-        const radius = config.roundRect ? Math.min(Theme.cornerRadius, Math.min(rw, rh) / 2) : 0;
+        const rx = Math.floor(Math.min(p0.x, p1.x));
+        const ry = Math.floor(Math.min(p0.y, p1.y));
+        const rw = Math.floor(Math.abs(p1.x - p0.x));
+        const rh = Math.floor(Math.abs(p1.y - p0.y));
+        
+        if (rw > 0 && rh > 0) {
+            const radius = config.roundRect ? Math.min(Theme.cornerRadius, Math.min(rw, rh) / 2) : 0;
+            const mode = stroke.redactMode || "solid";
 
-        ctx.fillStyle = stroke.color;
-        ctx.beginPath();
-        ctx.moveTo(rx + radius, ry);
-        ctx.lineTo(rx + rw - radius, ry);
-        ctx.arcTo(rx + rw, ry, rx + rw, ry + radius, radius);
-        ctx.lineTo(rx + rw, ry + rh - radius);
-        ctx.arcTo(rx + rw, ry + rh, rx + rw - radius, ry + rh, radius);
-        ctx.lineTo(rx + radius, ry + rh);
-        ctx.arcTo(rx, ry + rh, rx, ry + rh - radius, radius);
-        ctx.lineTo(rx, ry + radius);
-        ctx.arcTo(rx, ry, rx + radius, ry, radius);
-        ctx.closePath();
-        ctx.fill();
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(rx + radius, ry);
+            ctx.lineTo(rx + rw - radius, ry);
+            ctx.arcTo(rx + rw, ry, rx + rw, ry + radius, radius);
+            ctx.lineTo(rx + rw, ry + rh - radius);
+            ctx.arcTo(rx + rw, ry + rh, rx + rw - radius, ry + rh, radius);
+            ctx.lineTo(rx + radius, ry + rh);
+            ctx.arcTo(rx, ry + rh, rx, ry + rh - radius, radius);
+            ctx.lineTo(rx, ry + radius);
+            ctx.arcTo(rx, ry, rx + radius, ry, radius);
+            ctx.closePath();
+
+            if (mode === "clean" && config.offscreenSampler) {
+                if (stroke.isCurrent) {
+                    // Extremely cheap 1x1 pixel read for 60 FPS real-time preview dragging
+                    try {
+                        const octx = config.offscreenSampler.getContext("2d");
+                        const imgData = octx.getImageData(rx, ry, 1, 1);
+                        ctx.fillStyle = Qt.rgba(imgData.data[0] / 255, imgData.data[1] / 255, imgData.data[2] / 255, 1.0);
+                    } catch (e) {
+                        ctx.fillStyle = "rgba(128, 128, 128, 0.5)";
+                    }
+                } else {
+                    // Compute accurate dominant color exactly once and cache it on the stroke!
+                    if (!stroke.cachedCleanColor) {
+                        stroke.cachedCleanColor = Helpers.getBoundaryColorOrGradient(ctx, rx, ry, rw, rh, config.offscreenSampler, Qt);
+                    }
+                    ctx.fillStyle = stroke.cachedCleanColor;
+                }
+                ctx.fill();
+            } else {
+                ctx.fillStyle = stroke.color;
+                ctx.fill();
+            }
+
+            if (stroke.isCurrent) {
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+                ctx.lineWidth = 1;
+                ctx.setLineDash([4, 4]);
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
 
     } else if (stroke.tool === "pixelate") {
         if (stroke.points.length >= 2) {
