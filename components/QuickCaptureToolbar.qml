@@ -18,6 +18,7 @@ Rectangle {
     property bool canUndo: false
     property bool isVertical: false
     property bool showAnnotations: true
+    readonly property bool showShortcutHints: root.pluginData["show_shortcut_hints"] ?? false
 
     // Backdrop configuration properties
     property string backdropMode: "none"
@@ -138,11 +139,13 @@ Rectangle {
                     delegate: Item {
                         width: tc.btnSize
                         height: tc.btnSize
-                        DankActionButton {
+                        DankShortcutActionButton {
                             anchors.fill: parent
                             iconName: modelData.icon; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: modelData.tooltip
                             backgroundColor: root.currentTool === modelData.id ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                             iconColor: root.currentTool === modelData.id ? Theme.primary : Theme.surfaceText
+                            shortcutText: modelData.shortcut || ""
+                            showShortcut: root.showShortcutHints
                             onClicked: root.toolSelected(modelData.id)
                         }
 
@@ -271,11 +274,13 @@ Rectangle {
                     delegate: Item {
                         width: tc.btnSize
                         height: tc.btnSize
-                        DankActionButton {
+                        DankShortcutActionButton {
                             anchors.fill: parent
-                            iconName: modelData.icon; buttonSize: tc.btnSize; iconSize: tc.iconSize
+                            iconName: modelData.icon; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: modelData.tooltip
                             backgroundColor: root.currentTool === modelData.id ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                             iconColor: root.currentTool === modelData.id ? Theme.primary : Theme.surfaceText
+                            shortcutText: modelData.shortcut || ""
+                            showShortcut: root.showShortcutHints
                             onClicked: root.toolSelected(modelData.id)
                         }
 

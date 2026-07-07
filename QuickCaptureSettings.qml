@@ -528,6 +528,20 @@ PluginSettings {
             visible: showToolbar.value
             height: visible ? 36 : 0
         }
+
+        Separator {
+            visible: showToolbar.value
+            height: visible ? 1 : 0
+        }
+
+        ToggleSettingPlus {
+            id: showShortcutHints
+            settingKey: "show_shortcut_hints"
+            label: I18n.tr("Show Keyboard Shortcut Hints")
+            defaultValue: false
+            visible: showToolbar.value
+            height: visible ? 36 : 0
+        }
     }
 
     SettingsCard {
