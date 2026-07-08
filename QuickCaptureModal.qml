@@ -236,6 +236,9 @@ DankModal {
     }
     property int stampCounter: 1
     property string stampCounterFormat: "numeric" // numeric, alpha, roman
+    onStampCounterFormatChanged: {
+        window.reindexStamps();
+    }
     property bool isScreenshotDark: false
     property bool hasSampledContrast: false
     property real previewX: 0
@@ -497,6 +500,9 @@ DankModal {
     property var copiedStroke: null
 
     property var strokes: []
+    onStrokesChanged: {
+        window.reindexStamps();
+    }
     readonly property bool hasSpotlights: {
         for (let i = 0; i < strokes.length; i++) {
             if (strokes[i].tool === "spotlight") return true;
@@ -1023,6 +1029,43 @@ DankModal {
     function shortcutToken(key) { return Helpers.shortcutToken(key, Qt); }
 
     function formatHexColor(color) { return Helpers.formatHexColor(color); }
+
+    function reindexStamps() {
+        let stamps = [];
+        for (let i = 0; i < window.strokes.length; i++) {
+            let stroke = window.strokes[i];
+            if (stroke && stroke.tool === "stamp") {
+                if (stroke.id === undefined) {
+                    stroke.id = Date.now() + (i / 1000000);
+                }
+                stamps.push(stroke);
+            }
+        }
+
+        stamps.sort((a, b) => a.id - b.id);
+
+        let modified = false;
+        for (let i = 0; i < stamps.length; i++) {
+            let stroke = stamps[i];
+            let stampCount = i + 1;
+            if (stroke.counter !== stampCount) {
+                stroke.counter = stampCount;
+                modified = true;
+            }
+            if (stroke.format !== window.stampCounterFormat) {
+                stroke.format = window.stampCounterFormat;
+                modified = true;
+            }
+        }
+
+        const nextCounter = stamps.length + 1;
+        if (window.stampCounter !== nextCounter) {
+            window.stampCounter = nextCounter;
+        }
+        if (modified && window.activeCanvas) {
+            window.activeCanvas.requestPaint();
+        }
+    }
 
     function updateColorSlot(slotIdx, colorValue) {
         const hex = window.formatHexColor(colorValue).toUpperCase();
@@ -2302,11 +2345,8 @@ DankModal {
                                     const strokeIdx = window.findStrokeAt(absPt.x, absPt.y);
                                     if (strokeIdx !== -1) {
                                         const list = [...window.strokes];
-                                        const removed = list.splice(strokeIdx, 1)[0];
+                                        list.splice(strokeIdx, 1);
                                         window.strokes = list;
-                                        if (removed && removed.tool === "stamp" && window.stampCounter > 1) {
-                                            window.stampCounter--;
-                                        }
                                         drawingCanvas.requestPaint();
                                     }
                                     return;
@@ -2435,16 +2475,17 @@ DankModal {
                                 }
 
                                 if (window.currentTool === "stamp") {
-                                    window.pushStroke({
-                                        tool: "stamp",
-                                        color: window.currentColor.toString(),
-                                        width: window.strokeWidth,
-                                        points: [getAbsolutePoint(mouse.x, mouse.y)],
-                                        counter: window.stampCounter,
-                                        format: window.stampCounterFormat
-                                    });
-                                    window.stampCounter++;
-                                    return;
+                                     window.pushStroke({
+                                         id: Date.now() + Math.random(),
+                                         tool: "stamp",
+                                         color: window.currentColor.toString(),
+                                         width: window.strokeWidth,
+                                         points: [getAbsolutePoint(mouse.x, mouse.y)],
+                                         counter: window.stampCounter,
+                                         format: window.stampCounterFormat
+                                     });
+                                     window.stampCounter++;
+                                     return;
                                 }
 
                                 if (window.currentTool === "eraser") {
@@ -3156,11 +3197,8 @@ DankModal {
     function performUndo() {
         if (window.strokes.length > 0) {
             const list = [...window.strokes];
-            const last = list.pop();
+            list.pop();
             window.strokes = list;
-            if (last.tool === "stamp" && window.stampCounter > 1) {
-                window.stampCounter--;
-            }
             if (window.activeCanvas) window.activeCanvas.requestPaint();
         }
     }
