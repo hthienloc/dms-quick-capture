@@ -49,7 +49,11 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
             const yc = (pts[i].y + pts[i + 1].y) / 2;
             ctx.quadraticCurveTo(pts[i].x, pts[i].y, xc, yc);
         }
-        ctx.quadraticCurveTo(pts[len - 2].x, pts[len - 2].y, pts[len - 1].x, pts[len - 1].y);
+        if (stroke.isClosed) {
+            ctx.closePath();
+        } else {
+            ctx.quadraticCurveTo(pts[len - 2].x, pts[len - 2].y, pts[len - 1].x, pts[len - 1].y);
+        }
         ctx.stroke();
 
     } else if (stroke.tool === "line") {
