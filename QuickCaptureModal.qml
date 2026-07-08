@@ -1578,11 +1578,19 @@ DankModal {
                         } else {
                             var pt = buttonItem.mapToItem(contentRoot, 0, 0);
                             if (toolbarCard.isVertical) {
-                                moreToolsMenu.x = pt.x + buttonItem.width + Theme.spacingS;
-                                moreToolsMenu.y = pt.y;
+                                if (window.toolbarPosition === "right") {
+                                    moreToolsMenu.x = pt.x - moreToolsMenu.width - Theme.spacingS;
+                                } else {
+                                    moreToolsMenu.x = pt.x + buttonItem.width + Theme.spacingS;
+                                }
+                                moreToolsMenu.y = Math.max(Theme.spacingS, Math.min(pt.y, contentRoot.height - moreToolsMenu.height - Theme.spacingS));
                             } else {
-                                moreToolsMenu.x = pt.x;
-                                moreToolsMenu.y = pt.y + buttonItem.height + Theme.spacingS;
+                                moreToolsMenu.x = Math.max(Theme.spacingS, Math.min(pt.x, contentRoot.width - moreToolsMenu.width - Theme.spacingS));
+                                if (window.toolbarPosition === "bottom") {
+                                    moreToolsMenu.y = pt.y - moreToolsMenu.height - Theme.spacingS;
+                                } else {
+                                    moreToolsMenu.y = pt.y + buttonItem.height + Theme.spacingS;
+                                }
                             }
                             moreToolsMenu.open();
                         }
