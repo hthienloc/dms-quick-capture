@@ -1044,6 +1044,19 @@ DankModal {
         }
     }
 
+    function openColorPickerModal() {
+        if (typeof PopoutService !== "undefined" && PopoutService && PopoutService.colorPickerModal) {
+            PopoutService.colorPickerModal.selectedColor = window.currentColor;
+            PopoutService.colorPickerModal.pickerTitle = I18n.tr("Choose Color");
+            PopoutService.colorPickerModal.onColorSelectedCallback = function (selectedColor) {
+                window.updateColorSlot(window.activeColorSlotIndex, selectedColor);
+            };
+            PopoutService.colorPickerModal.show();
+            return true;
+        }
+        return false;
+    }
+
     function writeColorSlotToCustom(slotIdx, hex) {
         if (!window.parentWidget || !window.parentWidget.pluginService || slotIdx < 0) return;
         
@@ -1280,14 +1293,24 @@ DankModal {
 
         const toolShortcut = config.findByKey(config.toolShortcuts, token);
         if (toolShortcut) {
+            if (toolShortcut.tool === "colorpicker") {
+                if (!window.openColorPickerModal()) {
+                    if (window.currentTool === "colorpicker") {
+                        window.currentTool = window.lastActiveTool;
+                    } else {
+                        window.colorPickerMode = "draw";
+                        window.currentTool = "colorpicker";
+                    }
+                }
+                event.accepted = true;
+                return;
+            }
+
             if (window.currentTool === toolShortcut.tool) {
-                if (toolShortcut.tool === "backdrop" || toolShortcut.tool === "crop" || toolShortcut.tool === "colorpicker") {
+                if (toolShortcut.tool === "backdrop" || toolShortcut.tool === "crop") {
                     window.currentTool = window.lastActiveTool;
                 }
             } else {
-                if (toolShortcut.tool === "colorpicker") {
-                    window.colorPickerMode = "draw";
-                }
                 window.currentTool = toolShortcut.tool;
             }
             event.accepted = true;
@@ -1615,15 +1638,15 @@ DankModal {
                         window.activeColorSlotIndex = index;
                         window.currentColor = color;
                     }
-                    onColorPickerRightClicked: (buttonItem) => {
+                    onCustomColorPickerRequested: (buttonItem) => {
                         moreToolsMenu.close();
-                        if (typeof PopoutService !== "undefined" && PopoutService && PopoutService.colorPickerModal) {
-                            PopoutService.colorPickerModal.selectedColor = window.currentColor;
-                            PopoutService.colorPickerModal.pickerTitle = I18n.tr("Choose Color");
-                            PopoutService.colorPickerModal.onColorSelectedCallback = function (selectedColor) {
-                                window.updateColorSlot(window.activeColorSlotIndex, selectedColor);
-                            };
-                            PopoutService.colorPickerModal.show();
+                        if (!window.openColorPickerModal()) {
+                            if (window.currentTool === "colorpicker") {
+                                window.currentTool = window.lastActiveTool;
+                            } else {
+                                window.colorPickerMode = "draw";
+                                window.currentTool = "colorpicker";
+                            }
                         }
                     }
                     onStrokeWidthSelected: (width) => {
@@ -2960,10 +2983,11 @@ DankModal {
                     customPaletteColors: {
                         var customList = [];
                         var primaryRaw = config.pluginData["toolbar_color_primary"] || "primary";
-                        customList.push(primaryRaw === "primary" ? Theme.primary : Qt.color(primaryRaw));
+                        var primaryColor = primaryRaw === "primary" ? Theme.primary : primaryRaw;
+                        customList.push(typeof primaryColor === "string" ? Qt.color(primaryColor) : primaryColor);
                         for (var i = 0; i < 7; i++) {
                             var val = config.pluginData["toolbar_color_" + i] || config.adaptiveColors[i];
-                            customList.push(Qt.color(val));
+                            customList.push(typeof val === "string" ? Qt.color(val) : val);
                         }
                         return customList;
                     }
