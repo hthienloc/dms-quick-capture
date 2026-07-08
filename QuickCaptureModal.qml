@@ -1022,15 +1022,7 @@ DankModal {
 
     function shortcutToken(key) { return Helpers.shortcutToken(key, Qt); }
 
-    function formatHexColor(color) {
-        var r = Math.round(color.r * 255).toString(16);
-        if (r.length < 2) r = "0" + r;
-        var g = Math.round(color.g * 255).toString(16);
-        if (g.length < 2) g = "0" + g;
-        var b = Math.round(color.b * 255).toString(16);
-        if (b.length < 2) b = "0" + b;
-        return "#" + r + g + b;
-    }
+    function formatHexColor(color) { return Helpers.formatHexColor(color); }
 
     function updateColorSlot(slotIdx, colorValue) {
         const hex = window.formatHexColor(colorValue).toUpperCase();

@@ -3,6 +3,7 @@ import QtQuick.Controls
 import qs.Common
 import qs.Widgets
 import ".."
+import "Helpers.js" as Helpers
 
 Rectangle {
     id: root
@@ -73,22 +74,7 @@ Rectangle {
     signal annotationsToggled()
     signal backdropColorPickerRequested(color currentColor)
 
-    function toHex6(c) {
-        if (c === undefined || c === null) return "";
-        var col = (typeof c === "string") ? Qt.color(c) : c;
-        if (!col) return "";
-        var r = Math.round((col.r || 0) * 255).toString(16);
-        if (r.length < 2) r = "0" + r;
-        var g = Math.round((col.g || 0) * 255).toString(16);
-        if (g.length < 2) g = "0" + g;
-        var b = Math.round((col.b || 0) * 255).toString(16);
-        if (b.length < 2) b = "0" + b;
-        return ("#" + r + g + b).toLowerCase();
-    }
 
-    function colorEquals(c1, c2) {
-        return toHex6(c1) === toHex6(c2);
-    }
 
     width: isVertical ? 56 : (contentLayout.width + Theme.spacingM * 2)
     height: isVertical ? (contentLayout.height + Theme.spacingM * 2) : 56
@@ -190,8 +176,8 @@ Rectangle {
                     model: root.toolbarPalette
                     delegate: Rectangle {
                         width: tc.swatchSize; height: tc.swatchSize; radius: tc.swatchRadius; color: modelData
-                        border.color: (root.activeColorSlotIndex === index && root.colorEquals(root.currentColor, modelData)) ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
-                        border.width: (root.activeColorSlotIndex === index && root.colorEquals(root.currentColor, modelData)) ? 2 : 1
+                        border.color: (root.activeColorSlotIndex === index && Helpers.colorEquals(root.currentColor, modelData, Qt)) ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
+                        border.width: (root.activeColorSlotIndex === index && Helpers.colorEquals(root.currentColor, modelData, Qt)) ? 2 : 1
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
@@ -352,8 +338,8 @@ Rectangle {
                     model: root.toolbarPalette
                     delegate: Rectangle {
                         width: tc.swatchSizeVert; height: tc.swatchSizeVert; radius: tc.swatchRadiusVert; color: modelData
-                        border.color: (root.activeColorSlotIndex === index && root.colorEquals(root.currentColor, modelData)) ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
-                        border.width: (root.activeColorSlotIndex === index && root.colorEquals(root.currentColor, modelData)) ? 2 : 1
+                        border.color: (root.activeColorSlotIndex === index && Helpers.colorEquals(root.currentColor, modelData, Qt)) ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
+                        border.width: (root.activeColorSlotIndex === index && Helpers.colorEquals(root.currentColor, modelData, Qt)) ? 2 : 1
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor

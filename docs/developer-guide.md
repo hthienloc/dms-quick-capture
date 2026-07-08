@@ -101,3 +101,29 @@ Or run DMS in a verbose terminal session to capture standard output directly:
 ```bash
 dms-session-launch --verbose
 ```
+
+---
+
+## 5. Color Selection, Management & Verification
+
+When working with color palette swatches, backdrop colors, or custom RGB inputs, follow these guidelines to prevent type mismatch bugs and system warnings.
+
+### A. Saving & Formatting Custom Colors
+* Custom palette colors are stored in the user settings dictionary (`pluginData`) as 6-character uppercase hex strings (e.g., `"#FF5252"`).
+* **Rule**: Always convert QML color objects using `Helpers.formatHexColor(color)` before writing them to the settings storage:
+  ```javascript
+  const hex = Helpers.formatHexColor(colorValue).toUpperCase();
+  ```
+
+### B. Safe Color Comparison
+* **Problem**: QML's V4 JS engine represents native colors as `V4ReferenceObject`. Calling string formatting like `.toString()` or `Qt.colorEqual()` directly on them can cause crashes, capitalization mismatches (`#ff5252` vs `#FF5252`), or type warnings (`[object V4ReferenceObject] is not a valid color`).
+* **Rule**: **Never** compare colors using direct `===` on string representations or raw `Qt.colorEqual()`.
+* **Solution**: Always use the centralized `Helpers.colorEquals(c1, c2, Qt)` function located in `components/Helpers.js`. This function normalizes all types of inputs (strings, objects, alpha channels) into 6-character lowercase strings safely before performing the comparison:
+  ```qml
+  border.color: Helpers.colorEquals(root.currentColor, modelData, Qt) ? Theme.primary : Theme.outline
+  ```
+
+### C. Integrating Color Picker Modal
+* Rather than instantiating custom color picker menus, use DMS's native modal service: `PopoutService.colorPickerModal`.
+* **Rule**: Always call the centralized `window.openColorPickerModal()` helper in `QuickCaptureModal.qml`. This function handles the DBus modal invocation and automatically falls back to the canvas eyedropper tool if the modal service is unavailable in the environment.
+

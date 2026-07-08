@@ -576,7 +576,45 @@ function getBoundaryColorOrGradient(ctx, rx, ry, rw, rh, offscreenSampler, Qt) {
     const finalR = Math.round(rSum / count);
     const finalG = Math.round(gSum / count);
     const finalB = Math.round(bSum / count);
-    
     return Qt.rgba(finalR / 255, finalG / 255, finalB / 255, 1.0);
 }
 
+/**
+ * Formats a color object into a hex string (#RRGGBB).
+ * @param {object} color - The QML color object.
+ * @returns {string} The formatted hex string.
+ */
+function formatHexColor(color) {
+    if (!color) return "#000000";
+    const r = Math.round((color.r || 0) * 255).toString(16).padStart(2, '0');
+    const g = Math.round((color.g || 0) * 255).toString(16).padStart(2, '0');
+    const b = Math.round((color.b || 0) * 255).toString(16).padStart(2, '0');
+    return "#" + r + g + b;
+}
+
+/**
+ * Normalizes any color input (string or color object) into a 6-character hex string.
+ * @param {*} c - The color input.
+ * @param {object} Qt - The Qt object.
+ * @returns {string} Normalized lowercase hex string.
+ */
+function toHex6(c, Qt) {
+    if (c === undefined || c === null) return "";
+    const col = (typeof c === "string") ? Qt.color(c) : c;
+    if (!col) return "";
+    const r = Math.round((col.r || 0) * 255).toString(16).padStart(2, '0');
+    const g = Math.round((col.g || 0) * 255).toString(16).padStart(2, '0');
+    const b = Math.round((col.b || 0) * 255).toString(16).padStart(2, '0');
+    return ("#" + r + g + b).toLowerCase();
+}
+
+/**
+ * Compares two color inputs case-insensitively and handles format variations.
+ * @param {*} c1 - First color.
+ * @param {*} c2 - Second color.
+ * @param {object} Qt - The Qt object.
+ * @returns {boolean} True if equivalent.
+ */
+function colorEquals(c1, c2, Qt) {
+    return toHex6(c1, Qt) === toHex6(c2, Qt);
+}
