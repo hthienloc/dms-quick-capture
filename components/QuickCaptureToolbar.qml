@@ -60,7 +60,9 @@ Rectangle {
     }
 
     signal toolSelected(string tool)
-    signal colorSelected(var color)
+    signal colorSelected(var color, int index)
+    signal colorPickerRightClicked(var buttonItem)
+    property int activeColorSlotIndex: 0
     signal strokeWidthSelected(int width)
     signal undoRequested()
     signal floatRequested()
@@ -170,21 +172,46 @@ Rectangle {
                     model: root.toolbarPalette
                     delegate: Rectangle {
                         width: tc.swatchSize; height: tc.swatchSize; radius: tc.swatchRadius; color: modelData
-                        border.color: Qt.colorEqual(root.currentColor, modelData) ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
-                        border.width: Qt.colorEqual(root.currentColor, modelData) ? 2 : 1
-                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.colorSelected(modelData) }
+                        border.color: (root.activeColorSlotIndex === index && Qt.colorEqual(root.currentColor, modelData)) ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
+                        border.width: (root.activeColorSlotIndex === index && Qt.colorEqual(root.currentColor, modelData)) ? 2 : 1
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                root.activeColorSlotIndex = index;
+                                root.colorSelected(modelData, index);
+                            }
+                        }
                     }
                 }
             }
 
-            DankActionButton {
-                iconName: "colorize"
-                buttonSize: tc.btnSize
-                iconSize: tc.iconSize
-                tooltipText: qsTr("Color Picker (F)")
-                backgroundColor: root.currentTool === "colorpicker" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                iconColor: root.currentTool === "colorpicker" ? Theme.primary : Theme.surfaceText
-                onClicked: root.toolSelected("colorpicker-draw")
+            Item {
+                width: tc.btnSize
+                height: tc.btnSize
+                anchors.verticalCenter: parent.verticalCenter
+                DankActionButton {
+                    id: colorPickerButton
+                    anchors.fill: parent
+                    iconName: "colorize"
+                    buttonSize: tc.btnSize
+                    iconSize: tc.iconSize
+                    tooltipText: qsTr("Color Picker (F / Right-Click for RGB)")
+                    backgroundColor: root.currentTool === "colorpicker" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.currentTool === "colorpicker" ? Theme.primary : Theme.surfaceText
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: mouse => {
+                        if (mouse.button === Qt.RightButton) {
+                            root.colorPickerRightClicked(colorPickerButton);
+                        } else {
+                            root.toolSelected("colorpicker-draw");
+                        }
+                    }
+                }
             }
 
             Rectangle { width: tc.separatorThickness; height: tc.separatorLength; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
@@ -307,22 +334,46 @@ Rectangle {
                     model: root.toolbarPalette
                     delegate: Rectangle {
                         width: tc.swatchSizeVert; height: tc.swatchSizeVert; radius: tc.swatchRadiusVert; color: modelData
-                        border.color: Qt.colorEqual(root.currentColor, modelData) ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
-                        border.width: 1
-                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.colorSelected(modelData) }
+                        border.color: (root.activeColorSlotIndex === index && Qt.colorEqual(root.currentColor, modelData)) ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
+                        border.width: (root.activeColorSlotIndex === index && Qt.colorEqual(root.currentColor, modelData)) ? 2 : 1
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                root.activeColorSlotIndex = index;
+                                root.colorSelected(modelData, index);
+                            }
+                        }
                     }
                 }
             }
 
-            DankActionButton {
-                iconName: "colorize"
-                buttonSize: tc.btnSize
-                iconSize: tc.iconSize
-                tooltipText: qsTr("Color Picker (F)")
-                backgroundColor: root.currentTool === "colorpicker" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                iconColor: root.currentTool === "colorpicker" ? Theme.primary : Theme.surfaceText
+            Item {
+                width: tc.btnSize
+                height: tc.btnSize
                 anchors.horizontalCenter: parent.horizontalCenter
-                onClicked: root.toolSelected("colorpicker-draw")
+                DankActionButton {
+                    id: colorPickerVerticalButton
+                    anchors.fill: parent
+                    iconName: "colorize"
+                    buttonSize: tc.btnSize
+                    iconSize: tc.iconSize
+                    tooltipText: qsTr("Color Picker (F / Right-Click for RGB)")
+                    backgroundColor: root.currentTool === "colorpicker" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                    iconColor: root.currentTool === "colorpicker" ? Theme.primary : Theme.surfaceText
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: mouse => {
+                        if (mouse.button === Qt.RightButton) {
+                            root.colorPickerRightClicked(colorPickerVerticalButton);
+                        } else {
+                            root.toolSelected("colorpicker-draw");
+                        }
+                    }
+                }
             }
 
             Rectangle { width: tc.separatorLength; height: tc.separatorThickness; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
