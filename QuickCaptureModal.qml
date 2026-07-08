@@ -242,13 +242,15 @@ DankModal {
     property int calloutLinkLines: 1 // 1, 2
     onCalloutLinkLinesChanged: {
         if (selectedStroke && selectedStroke.tool === "callout") {
-            selectedStroke.calloutLinkLines = calloutLinkLines;
-            const idx = window.strokes.indexOf(selectedStroke);
-            if (idx !== -1) {
-                window.strokes[idx] = selectedStroke;
-                window.strokes = [...window.strokes];
+            if (selectedStroke.calloutLinkLines !== calloutLinkLines) {
+                selectedStroke.calloutLinkLines = calloutLinkLines;
+                const idx = window.strokes.indexOf(selectedStroke);
+                if (idx !== -1) {
+                    window.strokes[idx] = selectedStroke;
+                    window.strokes = [...window.strokes];
+                }
+                if (window.activeCanvas) window.activeCanvas.requestPaint();
             }
-            if (window.activeCanvas) window.activeCanvas.requestPaint();
         }
     }
     property bool isScreenshotDark: false

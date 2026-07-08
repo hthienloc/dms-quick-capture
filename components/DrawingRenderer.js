@@ -401,7 +401,7 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
                 const bW = stroke.borderWidth !== undefined ? stroke.borderWidth : 2;
 
                 // 1. Draw connecting lines (dynamic corners) using semi-transparent stroke color
-                const linkLines = stroke.calloutLinkLines !== undefined ? stroke.calloutLinkLines : 1;
+                const linkLines = stroke.calloutLinkLines !== undefined ? stroke.calloutLinkLines : 2;
                 ctx.strokeStyle = Qt.rgba(rgb.r, rgb.g, rgb.b, 0.6);
                 ctx.lineWidth = bW;
                 ctx.beginPath();
