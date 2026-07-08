@@ -401,20 +401,39 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
                 const bW = stroke.borderWidth !== undefined ? stroke.borderWidth : 2;
 
                 // 1. Draw connecting lines (dynamic corners) using semi-transparent stroke color
+                const linkLines = stroke.calloutLinkLines !== undefined ? stroke.calloutLinkLines : 2;
                 ctx.strokeStyle = Qt.rgba(rgb.r, rgb.g, rgb.b, 0.6);
                 ctx.lineWidth = bW;
                 ctx.beginPath();
                 
-                // Simple logic: connect closest horizontal corners
-                if (dx > sx + sw) { // Dest is to the right
-                    ctx.moveTo(srcP1.x, srcP0.y); ctx.lineTo(dstP0.x, dstP0.y);
-                    ctx.moveTo(srcP1.x, srcP1.y); ctx.lineTo(dstP0.x, dstP1.y);
-                } else if (dx + dw < sx) { // Dest is to the left
-                    ctx.moveTo(srcP0.x, srcP0.y); ctx.lineTo(dstP1.x, dstP0.y);
-                    ctx.moveTo(srcP0.x, srcP1.y); ctx.lineTo(dstP1.x, dstP1.y);
-                } else { // Dest is above/below
-                    ctx.moveTo(srcP0.x, srcP1.y); ctx.lineTo(dstP0.x, dstP0.y);
-                    ctx.moveTo(srcP1.x, srcP1.y); ctx.lineTo(dstP1.x, dstP0.y);
+                if (linkLines === 2) {
+                    // Simple logic: connect closest horizontal corners
+                    if (dx > sx + sw) { // Dest is to the right
+                        ctx.moveTo(srcP1.x, srcP0.y); ctx.lineTo(dstP0.x, dstP0.y);
+                        ctx.moveTo(srcP1.x, srcP1.y); ctx.lineTo(dstP0.x, dstP1.y);
+                    } else if (dx + dw < sx) { // Dest is to the left
+                        ctx.moveTo(srcP0.x, srcP0.y); ctx.lineTo(dstP1.x, dstP0.y);
+                        ctx.moveTo(srcP0.x, srcP1.y); ctx.lineTo(dstP1.x, dstP1.y);
+                    } else { // Dest is above/below
+                        ctx.moveTo(srcP0.x, srcP1.y); ctx.lineTo(dstP0.x, dstP0.y);
+                        ctx.moveTo(srcP1.x, srcP1.y); ctx.lineTo(dstP1.x, dstP0.y);
+                    }
+                } else { // 1 Line
+                    if (dx > sx + sw) { // Dest is to the right
+                        ctx.moveTo(sx + sw, sy + sh / 2);
+                        ctx.lineTo(dx, dy + dh / 2);
+                    } else if (dx + dw < sx) { // Dest is to the left
+                        ctx.moveTo(sx, sy + sh / 2);
+                        ctx.lineTo(dx + dw, dy + dh / 2);
+                    } else { // Dest is above/below
+                        if (dy > sy + sh) { // Dest is below
+                            ctx.moveTo(sx + sw / 2, sy + sh);
+                            ctx.lineTo(dx + dw / 2, dy);
+                        } else { // Dest is above
+                            ctx.moveTo(sx + sw / 2, sy);
+                            ctx.lineTo(dx + dw / 2, dy + dh);
+                        }
+                    }
                 }
                 ctx.stroke();
 
