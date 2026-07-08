@@ -1575,6 +1575,28 @@ DankModal {
                         window.hasUserCustomizedBackdrop = true;
                         if (window.activeCanvas) window.activeCanvas.requestPaint();
                     }
+                    onBackdropColorPickerRequested: (currentColor) => {
+                        moreToolsMenu.close();
+                        if (typeof PopoutService !== "undefined" && PopoutService && PopoutService.colorPickerModal) {
+                            PopoutService.colorPickerModal.selectedColor = currentColor;
+                            PopoutService.colorPickerModal.pickerTitle = I18n.tr("Choose Color");
+                            PopoutService.colorPickerModal.onColorSelectedCallback = function (selectedColor) {
+                                if (window.backdropMode === "solid") {
+                                    window.backdropSolidColor = selectedColor;
+                                } else {
+                                    const activeSlot = (window.toolbarItem ? window.toolbarItem.gradientActiveSlot : "start");
+                                    if (activeSlot === "start") {
+                                        window.backdropGradientStart = selectedColor;
+                                    } else {
+                                        window.backdropGradientEnd = selectedColor;
+                                    }
+                                }
+                                window.hasUserCustomizedBackdrop = true;
+                                if (window.activeCanvas) window.activeCanvas.requestPaint();
+                            };
+                            PopoutService.colorPickerModal.show();
+                        }
+                    }
                     onChangeBackdropGradientStart: (col) => {
                         window.backdropGradientStart = col;
                         window.hasUserCustomizedBackdrop = true;
