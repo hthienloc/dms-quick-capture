@@ -54,6 +54,11 @@ DankModal {
     property var parentWidget: null
 
     // State Variables
+    property var paletteWarningDialogRef: null
+    property var toolbarItem: null
+    property int activeColorSlotIndex: 0
+    property color pendingColorToSave: "transparent"
+    property int pendingSlotToSave: -1
     property string currentTool: "crop" // crop, select, pen, line, arrow, rect, ellipse, text, pixelate, redact, stamp, highlighter, eraser, spotlight, backdrop
     property string lastActiveTool: "pen"
     property string colorPickerMode: "draw" // draw, copy
@@ -1027,6 +1032,68 @@ DankModal {
         return "#" + r + g + b;
     }
 
+    function updateColorSlot(slotIdx, colorValue) {
+        const hex = window.formatHexColor(colorValue).toUpperCase();
+        if (config.selectedPreset !== "custom") {
+            window.pendingColorToSave = colorValue;
+            window.pendingSlotToSave = slotIdx;
+            if (window.paletteWarningDialogRef) window.paletteWarningDialogRef.open();
+        } else {
+            window.currentColor = colorValue;
+            window.writeColorSlotToCustom(slotIdx, hex);
+        }
+    }
+
+    function writeColorSlotToCustom(slotIdx, hex) {
+        if (!window.parentWidget || !window.parentWidget.pluginService || slotIdx < 0) return;
+        
+        let pData = Object.assign({}, window.parentWidget.pluginData);
+        pData["color_palette_preset"] = "custom";
+        
+        const key = slotIdx === 0 ? "toolbar_color_primary" : "toolbar_color_" + (slotIdx - 1);
+        pData[key] = hex;
+        
+        window.parentWidget.pluginData = pData;
+        
+        window.parentWidget.pluginService.savePluginData("quickCapture", "color_palette_preset", "custom");
+        window.parentWidget.pluginService.savePluginData("quickCapture", key, hex);
+    }
+
+    function switchPresetToCustom(copyCurrent) {
+        if (!window.parentWidget || !window.parentWidget.pluginService) return;
+        
+        let pData = Object.assign({}, window.parentWidget.pluginData);
+        pData["color_palette_preset"] = "custom";
+        window.parentWidget.pluginService.savePluginData("quickCapture", "color_palette_preset", "custom");
+        
+        if (copyCurrent) {
+            const currentPalette = window.toolbarItem ? window.toolbarItem.toolbarPalette : [];
+            if (currentPalette && currentPalette.length >= 8) {
+                pData["toolbar_color_primary"] = window.formatHexColor(currentPalette[0]).toUpperCase();
+                window.parentWidget.pluginService.savePluginData("quickCapture", "toolbar_color_primary", pData["toolbar_color_primary"]);
+                
+                for (let i = 0; i < 7; i++) {
+                    const key = "toolbar_color_" + i;
+                    pData[key] = window.formatHexColor(currentPalette[i + 1]).toUpperCase();
+                    window.parentWidget.pluginService.savePluginData("quickCapture", key, pData[key]);
+                }
+            }
+        }
+        
+        if (window.pendingSlotToSave >= 0) {
+            const hex = window.formatHexColor(window.pendingColorToSave).toUpperCase();
+            const key = window.pendingSlotToSave === 0 ? "toolbar_color_primary" : "toolbar_color_" + (window.pendingSlotToSave - 1);
+            pData[key] = hex;
+            window.parentWidget.pluginService.savePluginData("quickCapture", key, hex);
+            
+            window.parentWidget.pluginData = pData;
+            window.currentColor = window.pendingColorToSave;
+        }
+        
+        window.pendingColorToSave = "transparent";
+        window.pendingSlotToSave = -1;
+    }
+
     function sampleCanvasColor(mouseX, mouseY) {
         if (!window.activeCanvas) return window.currentColor;
         
@@ -1189,6 +1256,10 @@ DankModal {
         if (hasCtrl) {
             const colorShortcut = config.findByKey(config.colorShortcuts, token);
             if (colorShortcut) {
+                let idx = config.colorShortcuts.indexOf(colorShortcut);
+                if (idx !== -1) {
+                    window.activeColorSlotIndex = idx;
+                }
                 window.currentColor = window.shortcutColor(colorShortcut.color);
                 event.accepted = true;
             }
@@ -1435,6 +1506,7 @@ DankModal {
 
                 QuickCaptureToolbar {
                     id: toolbarCard
+                    Component.onCompleted: window.toolbarItem = toolbarCard
                     z: 100
                     visible: window.toolbarVisible
                     pluginData: (window.parentWidget && window.parentWidget.pluginData) ? window.parentWidget.pluginData : ({})
@@ -1455,6 +1527,7 @@ DankModal {
                     currentTool: window.currentTool
                     activeToolType: window.effectiveTool
                     currentColor: window.currentColor
+                    activeColorSlotIndex: window.activeColorSlotIndex
 
                     strokeWidth: window.activeIntensity
                     canUndo: window.strokes.length > 0
@@ -1537,9 +1610,21 @@ DankModal {
                             window.currentTool = tool;
                         }
                     }
-                    onColorSelected: (color) => {
+                    onColorSelected: (color, index) => {
                         moreToolsMenu.close();
+                        window.activeColorSlotIndex = index;
                         window.currentColor = color;
+                    }
+                    onColorPickerRightClicked: (buttonItem) => {
+                        moreToolsMenu.close();
+                        if (typeof PopoutService !== "undefined" && PopoutService && PopoutService.colorPickerModal) {
+                            PopoutService.colorPickerModal.selectedColor = window.currentColor;
+                            PopoutService.colorPickerModal.pickerTitle = I18n.tr("Choose Color");
+                            PopoutService.colorPickerModal.onColorSelectedCallback = function (selectedColor) {
+                                window.updateColorSlot(window.activeColorSlotIndex, selectedColor);
+                            };
+                            PopoutService.colorPickerModal.show();
+                        }
                     }
                     onStrokeWidthSelected: (width) => {
                         moreToolsMenu.close();
@@ -2265,8 +2350,8 @@ DankModal {
                                                  ToastService.showInfo(I18n.tr("Color copied to clipboard: %1").arg(hexStr));
                                              }
                                          } else {
-                                             window.currentColor = pickedColor;
-                                         }
+                                              window.updateColorSlot(window.activeColorSlotIndex, pickedColor);
+                                          }
                                          window.currentTool = window.lastActiveTool;
                                      }
                                      return;
@@ -2863,6 +2948,30 @@ DankModal {
                     onCopyColorRequested: {
                         window.colorPickerMode = "copy";
                         window.currentTool = "colorpicker";
+                    }
+                }
+
+
+
+                PaletteWarningDialog {
+                    id: paletteWarningDialog
+                    Component.onCompleted: window.paletteWarningDialogRef = paletteWarningDialog
+                    currentPaletteColors: toolbarCard.toolbarPalette
+                    customPaletteColors: {
+                        var customList = [];
+                        var primaryRaw = config.pluginData["toolbar_color_primary"] || "primary";
+                        customList.push(primaryRaw === "primary" ? Theme.primary : Qt.color(primaryRaw));
+                        for (var i = 0; i < 7; i++) {
+                            var val = config.pluginData["toolbar_color_" + i] || config.adaptiveColors[i];
+                            customList.push(Qt.color(val));
+                        }
+                        return customList;
+                    }
+                    onCopyAndSwitch: {
+                        window.switchPresetToCustom(true);
+                    }
+                    onSwitchOnly: {
+                        window.switchPresetToCustom(false);
                     }
                 }
 
