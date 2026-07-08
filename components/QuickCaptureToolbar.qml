@@ -230,8 +230,11 @@ Rectangle {
                 DankActionButton { iconName: "save"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Save to File (Ctrl+S)"; onClicked: root.saveRequested() }
                 DankActionButton { iconName: "content_copy"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Copy to Clipboard (Ctrl+C)"; onClicked: root.copyRequested() }
                 DankActionButton { iconName: "done_all"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Copy & Save (Enter)"; backgroundColor: Theme.withAlpha(Theme.primary, 0.1); iconColor: Theme.primary; onClicked: root.copyAndSaveRequested() }
-                DankActionButton { iconName: "close"; buttonSize: tc.btnSize; iconSize: tc.iconSize; iconColor: Theme.error; onClicked: root.closeRequested() }
             }
+
+            Rectangle { width: tc.separatorThickness; height: tc.separatorLength; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
+
+            DankActionButton { iconName: "close"; buttonSize: tc.btnSize; iconSize: tc.iconSize; iconColor: Theme.error; anchors.verticalCenter: parent.verticalCenter; onClicked: root.closeRequested() }
         }
     }
 
