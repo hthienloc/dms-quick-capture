@@ -1195,6 +1195,18 @@ DankModal {
             return;
         }
 
+        if (token === "O" && !hasCtrl) {
+            if (window.currentTool === "ocr") {
+                window.currentTool = window.lastActiveTool;
+                window.ocrRect = Qt.rect(0, 0, 0, 0);
+                if (window.activeCanvas) window.activeCanvas.requestPaint();
+            } else {
+                window.runOcr();
+            }
+            event.accepted = true;
+            return;
+        }
+
         const toolShortcut = config.findByKey(config.toolShortcuts, token);
         if (toolShortcut) {
             if (window.currentTool === toolShortcut.tool) {
