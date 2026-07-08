@@ -186,7 +186,7 @@ QtObject {
     function resolveColor(rawColor) {
         if (!rawColor) return Theme.primary;
         if (typeof rawColor !== "string") {
-            return Qt.color(rawColor);
+            return rawColor;
         }
         let resolved = rawColor;
         if (rawColor === "primary") {
@@ -201,7 +201,7 @@ QtObject {
                 resolved = accentColors[slotIdx - 1];
             }
         }
-        return Qt.color(resolved);
+        return typeof resolved === "string" ? Qt.color(resolved) : resolved;
     }
 
     function formatWatermarkText(pattern) { return Helpers.formatWatermarkText(pattern, Quickshell); }

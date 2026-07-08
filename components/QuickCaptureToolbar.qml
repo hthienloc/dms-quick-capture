@@ -61,7 +61,7 @@ Rectangle {
 
     signal toolSelected(string tool)
     signal colorSelected(var color, int index)
-    signal colorPickerRightClicked(var buttonItem)
+    signal customColorPickerRequested(var buttonItem)
     property int activeColorSlotIndex: 0
     signal strokeWidthSelected(int width)
     signal undoRequested()
@@ -196,7 +196,7 @@ Rectangle {
                     iconName: "colorize"
                     buttonSize: tc.btnSize
                     iconSize: tc.iconSize
-                    tooltipText: qsTr("Color Picker (F / Right-Click for RGB)")
+                    tooltipText: qsTr("Color Picker (F for RGB / Right-Click for Eyedropper)")
                     backgroundColor: root.currentTool === "colorpicker" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                     iconColor: root.currentTool === "colorpicker" ? Theme.primary : Theme.surfaceText
                 }
@@ -206,9 +206,9 @@ Rectangle {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: mouse => {
                         if (mouse.button === Qt.RightButton) {
-                            root.colorPickerRightClicked(colorPickerButton);
-                        } else {
                             root.toolSelected("colorpicker-draw");
+                        } else {
+                            root.customColorPickerRequested(colorPickerButton);
                         }
                     }
                 }
@@ -358,7 +358,7 @@ Rectangle {
                     iconName: "colorize"
                     buttonSize: tc.btnSize
                     iconSize: tc.iconSize
-                    tooltipText: qsTr("Color Picker (F / Right-Click for RGB)")
+                    tooltipText: qsTr("Color Picker (F for RGB / Right-Click for Eyedropper)")
                     backgroundColor: root.currentTool === "colorpicker" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                     iconColor: root.currentTool === "colorpicker" ? Theme.primary : Theme.surfaceText
                 }
@@ -368,9 +368,9 @@ Rectangle {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: mouse => {
                         if (mouse.button === Qt.RightButton) {
-                            root.colorPickerRightClicked(colorPickerVerticalButton);
-                        } else {
                             root.toolSelected("colorpicker-draw");
+                        } else {
+                            root.customColorPickerRequested(colorPickerVerticalButton);
                         }
                     }
                 }
