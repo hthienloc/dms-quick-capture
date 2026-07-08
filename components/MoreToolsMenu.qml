@@ -7,7 +7,7 @@ Rectangle {
 
     ToolbarConstants { id: tc }
 
-    width: 120
+    width: 140
     height: menuColumn.implicitHeight + Theme.spacingS * 2
     color: Theme.surfaceContainer
     border.color: Theme.withAlpha(Theme.outline, 0.15)
@@ -55,96 +55,99 @@ Rectangle {
         anchors.margins: Theme.spacingS
         spacing: tc.spacingCompact
 
-        // Rotate Option
-        Rectangle {
+        // ── Quick action row: Rotate | Mirror ─────────────────────────────
+        Row {
             width: parent.width
-            height: 32
-            radius: Theme.cornerRadius - 2
-            color: rotateMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+            height: 52
+            spacing: tc.spacingCompact
 
-            Row {
-                anchors.fill: parent
-                anchors.leftMargin: Theme.spacingS
-                anchors.rightMargin: Theme.spacingS
-                spacing: Theme.spacingS
-                anchors.verticalCenter: parent.verticalCenter
+            // Rotate button
+            Rectangle {
+                width: (parent.width - tc.spacingCompact) / 2
+                height: parent.height
+                radius: Theme.cornerRadius - 2
+                color: rotateMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                border.width: 0
 
-                DankIcon {
-                    name: "rotate_right"
-                    size: 16
-                    color: Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
+                Column {
+                    anchors.centerIn: parent
+                    spacing: 3
+
+                    DankIcon {
+                        name: "rotate_right"
+                        size: 18
+                        color: Theme.surfaceText
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    StyledText {
+                        text: qsTr("Rotate")
+                        font.pixelSize: Theme.fontSizeSmall - 1
+                        color: Theme.surfaceText
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
                 }
 
-                StyledText {
-                    text: qsTr("Rotate")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
+                MouseArea {
+                    id: rotateMouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        // Keep menu open — rotate is a repeatable action
+                        menuRoot.rotateRequested();
+                    }
                 }
             }
 
-            MouseArea {
-                id: rotateMouseArea
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    menuRoot.close();
-                    menuRoot.rotateRequested();
+            // Mirror button
+            Rectangle {
+                width: (parent.width - tc.spacingCompact) / 2
+                height: parent.height
+                radius: Theme.cornerRadius - 2
+                color: mirrorMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+                border.width: 0
+
+                Column {
+                    anchors.centerIn: parent
+                    spacing: 3
+
+                    DankIcon {
+                        name: "flip"
+                        size: 18
+                        color: Theme.surfaceText
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    StyledText {
+                        text: qsTr("Mirror")
+                        font.pixelSize: Theme.fontSizeSmall - 1
+                        color: Theme.surfaceText
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+
+                MouseArea {
+                    id: mirrorMouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        // Keep menu open — mirror is a repeatable action
+                        menuRoot.mirrorRequested();
+                    }
                 }
             }
         }
 
-        // Mirror Option
-        Rectangle {
-            width: parent.width
-            height: 32
-            radius: Theme.cornerRadius - 2
-            color: mirrorMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-
-            Row {
-                anchors.fill: parent
-                anchors.leftMargin: Theme.spacingS
-                anchors.rightMargin: Theme.spacingS
-                spacing: Theme.spacingS
-                anchors.verticalCenter: parent.verticalCenter
-
-                DankIcon {
-                    name: "flip"
-                    size: 16
-                    color: Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                StyledText {
-                    text: qsTr("Mirror")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
-
-            MouseArea {
-                id: mirrorMouseArea
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    menuRoot.close();
-                    menuRoot.mirrorRequested();
-                }
-            }
-        }
-
-        // Separator
+        // ── Separator ─────────────────────────────────────────────────────
         Rectangle {
             width: parent.width
             height: 1
             color: Theme.withAlpha(Theme.outline, 0.15)
         }
 
-        // OCR Option
+        // ── OCR ───────────────────────────────────────────────────────────
         Rectangle {
             width: parent.width
             height: 32
@@ -166,7 +169,7 @@ Rectangle {
                 }
 
                 StyledText {
-                    text: qsTr("OCR")
+                    text: qsTr("OCR (O)")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
@@ -185,7 +188,7 @@ Rectangle {
             }
         }
 
-        // QR Scanner Option
+        // ── Scan QR ───────────────────────────────────────────────────────
         Rectangle {
             width: parent.width
             height: 32
@@ -226,7 +229,7 @@ Rectangle {
             }
         }
 
-        // Eraser Option
+        // ── Eraser ────────────────────────────────────────────────────────
         Rectangle {
             width: parent.width
             height: 32
@@ -267,7 +270,7 @@ Rectangle {
             }
         }
 
-        // Copy Color Option
+        // ── Copy Color ────────────────────────────────────────────────────
         Rectangle {
             width: parent.width
             height: 32
