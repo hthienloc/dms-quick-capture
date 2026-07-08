@@ -50,6 +50,9 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
             ctx.quadraticCurveTo(pts[i].x, pts[i].y, xc, yc);
         }
         ctx.quadraticCurveTo(pts[len - 2].x, pts[len - 2].y, pts[len - 1].x, pts[len - 1].y);
+        if (stroke.isClosed) {
+            ctx.closePath();
+        }
         ctx.stroke();
 
     } else if (stroke.tool === "line") {

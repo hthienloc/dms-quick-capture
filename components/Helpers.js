@@ -470,11 +470,36 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
     return -1;
 }
 
+/**
+ * Smooths a polyline using a multi-pass weighted moving average.
+ * Each pass replaces every interior point with:
+ *   0.25 * prev + 0.5 * current + 0.25 * next
+ * Endpoints are kept fixed. Running multiple passes compounds the effect.
+ *
+ * @param {Array} points - Array of {x, y} points.
+ * @param {number} passes - Number of smoothing passes (recommended: 4-8).
+ * @returns {Array} New smoothed array of Qt.point objects.
+ */
+function smoothStrokePoints(points, passes, Qt) {
+    if (!points || points.length < 3) return points;
+    let pts = points;
+    for (let p = 0; p < passes; p++) {
+        const next = [pts[0]]; // keep start fixed
+        for (let i = 1; i < pts.length - 1; i++) {
+            next.push(Qt.point(
+                0.25 * pts[i - 1].x + 0.5 * pts[i].x + 0.25 * pts[i + 1].x,
+                0.25 * pts[i - 1].y + 0.5 * pts[i].y + 0.25 * pts[i + 1].y
+            ));
+        }
+        next.push(pts[pts.length - 1]); // keep end fixed
+        pts = next;
+    }
+    return pts;
+}
 
 function getBoundaryColorOrGradient(ctx, rx, ry, rw, rh, offscreenSampler, Qt) {
     if (!offscreenSampler) return "transparent";
     const octx = offscreenSampler.getContext("2d");
-    
     const border = 3;
     const sampleX = Math.max(0, Math.min(offscreenSampler.width - 1, rx - border));
     const sampleY = Math.max(0, Math.min(offscreenSampler.height - 1, ry - border));

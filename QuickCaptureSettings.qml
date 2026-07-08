@@ -1481,12 +1481,13 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Drawing")
             icon: "brush"
-            showReset: defaultToolMode.isDirty || defaultPresetIndex.isDirty || defaultTool.isDirty || defaultThickness.isDirty
+            showReset: defaultToolMode.isDirty || defaultPresetIndex.isDirty || defaultTool.isDirty || defaultThickness.isDirty || penAutoClose.isDirty
             onResetClicked: {
                 defaultToolMode.resetToDefault();
                 defaultPresetIndex.resetToDefault();
                 defaultTool.resetToDefault();
                 defaultThickness.resetToDefault();
+                penAutoClose.resetToDefault();
             }
         }
 
@@ -1589,7 +1590,18 @@ PluginSettings {
             visible: defaultToolMode.value === "custom"
         }
 
+        Separator {
+            visible: defaultToolMode.value === "custom"
+        }
 
+
+        ToggleSettingPlus {
+            id: penAutoClose
+            settingKey: "penAutoClose"
+            label: I18n.tr("Pen Auto-Close")
+            description: I18n.tr("Automatically close the loop when ending close to the start point.")
+            defaultValue: true
+        }
     }
 
     SettingsCard {

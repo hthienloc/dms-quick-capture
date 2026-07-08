@@ -951,6 +951,8 @@ DankModal {
     property bool hasSelection: false
     readonly property bool roundRect: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.roundRect !== undefined ? window.parentWidget.pluginData.roundRect : true
     readonly property bool roundHighlighter: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.roundHighlighter !== undefined ? window.parentWidget.pluginData.roundHighlighter : false
+    readonly property bool penAutoClose: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.penAutoClose !== undefined ? window.parentWidget.pluginData.penAutoClose : true
+
     property string activeHandle: "none" // "tl", "tr", "bl", "br", "new", "none"
     property point selectStart: Qt.point(0, 0)
     property rect ocrRect: Qt.rect(0, 0, 0, 0)
@@ -2444,6 +2446,23 @@ DankModal {
                                         return;
                                     }
                                 }
+                                if (stroke.tool === "pen" && stroke.points.length >= 3) {
+                                    stroke.points = Helpers.smoothStrokePoints(stroke.points, 6, Qt);
+
+                                    // Auto-close: if start and end are within 20 screen-px, snap closed
+                                    if (window.penAutoClose) {
+                                        const snapThreshold = 20 / window.editScale;
+                                        const fp = stroke.points[0];
+                                        const lp = stroke.points[stroke.points.length - 1];
+                                        const dx = lp.x - fp.x;
+                                        const dy = lp.y - fp.y;
+                                        if (Math.sqrt(dx * dx + dy * dy) < snapThreshold) {
+                                            stroke.points = [...stroke.points, Qt.point(fp.x, fp.y)];
+                                            stroke.isClosed = true;
+                                        }
+                                    }
+                                }
+
                                 window.pushStroke(window.currentStroke);
                                 window.currentStroke = null;
                             }
