@@ -239,6 +239,18 @@ DankModal {
     onStampCounterFormatChanged: {
         window.reindexStamps();
     }
+    property int calloutLinkLines: 1 // 1, 2
+    onCalloutLinkLinesChanged: {
+        if (selectedStroke && selectedStroke.tool === "callout") {
+            selectedStroke.calloutLinkLines = calloutLinkLines;
+            const idx = window.strokes.indexOf(selectedStroke);
+            if (idx !== -1) {
+                window.strokes[idx] = selectedStroke;
+                window.strokes = [...window.strokes];
+            }
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+        }
+    }
     property bool isScreenshotDark: false
     property bool hasSampledContrast: false
     property real previewX: 0
@@ -518,6 +530,7 @@ DankModal {
     property int preGrabCalloutZoom: 150
     property color preGrabColor: Theme.primary
     property string preGrabRedactMode: "solid"
+    property int preGrabCalloutLinkLines: 1
     property point pressCoords: Qt.point(0, 0)
     property var originalPoints: []
 
@@ -908,6 +921,7 @@ DankModal {
             window.preGrabStrokeWidth = window.strokeWidth;
             window.preGrabColor = window.currentColor;
             window.preGrabRedactMode = window.activeRedactMode;
+            window.preGrabCalloutLinkLines = window.calloutLinkLines;
             window.strokeWidth = pasted.width;
             window.currentColor = pasted.color;
             if (pasted.tool === "redact" && pasted.redactMode) window.activeRedactMode = pasted.redactMode;
@@ -2334,6 +2348,9 @@ DankModal {
                                         } else if (window.currentTool === "redact") {
                                             redactOptionsToolbar.open(mapped.x, mapped.y);
                                             return;
+                                        } else if (window.currentTool === "callout") {
+                                            calloutOptionsToolbar.open(mapped.x, mapped.y);
+                                            return;
                                         }
                                     }
                                     radialMenu.open(mapped.x, mapped.y);
@@ -2367,6 +2384,7 @@ DankModal {
                                             window.preGrabCalloutZoom = window.calloutZoom;
                                             window.preGrabColor = window.currentColor;
                                             window.preGrabRedactMode = window.activeRedactMode;
+                                            window.preGrabCalloutLinkLines = window.calloutLinkLines;
                                         }
                                         
                                         window.selectedStroke = stroke;
@@ -2380,6 +2398,9 @@ DankModal {
                                         }
                                         if (stroke.tool === "redact" && stroke.redactMode) {
                                             window.activeRedactMode = stroke.redactMode;
+                                        }
+                                        if (stroke.tool === "callout") {
+                                            window.calloutLinkLines = stroke.calloutLinkLines !== undefined ? stroke.calloutLinkLines : 1;
                                         }
 
                                         // Detection for callout destination dragging
@@ -2528,7 +2549,8 @@ DankModal {
                                      lineStyle: window.currentTool === "line" ? window.activeLineStyle : "solid",
                                      arrowLineStyle: window.currentTool === "arrow" ? window.activeArrowLineStyle : "solid",
                                      arrowHeadStyle: window.currentTool === "arrow" ? window.activeArrowHeadStyle : "single-filled",
-                                     redactMode: window.currentTool === "redact" ? window.activeRedactMode : "solid"
+                                     redactMode: window.currentTool === "redact" ? window.activeRedactMode : "solid",
+                                     calloutLinkLines: window.currentTool === "callout" ? window.calloutLinkLines : 1
                                  };
                                  drawingCanvas.requestPaint();
                             }
@@ -2543,6 +2565,7 @@ DankModal {
                                      window.calloutZoom = window.preGrabCalloutZoom;
                                      window.currentColor = window.preGrabColor;
                                      window.activeRedactMode = window.preGrabRedactMode;
+                                     window.calloutLinkLines = window.preGrabCalloutLinkLines;
                                      window.calloutDestDragging = false;
                                      window.originalPoints = [];
                                      drawingCanvas.requestPaint();
@@ -3014,6 +3037,13 @@ DankModal {
                     toolbarPosition: window.toolbarPosition
                     currentMode: window.activeRedactMode
                     onModeSelected: (mode) => window.activeRedactMode = mode
+                }
+
+                CalloutOptionsToolbar {
+                    id: calloutOptionsToolbar
+                    toolbarPosition: window.toolbarPosition
+                    currentLinkLines: window.calloutLinkLines
+                    onLinkLinesSelected: (count) => window.calloutLinkLines = count
                 }
 
                 MoreToolsMenu {

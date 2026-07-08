@@ -154,6 +154,7 @@ binds {
   - **Line tool**: Line styles (dashed, dotted)
   - **Rectangle tool**: Border styles (dashed, dotted)
   - **Redact tool**: Clean text eraser (dominant color/gradient background matcher)
+  - **Callout tool**: Ellipse callout shape support
 
 ## Credits
 
