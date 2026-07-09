@@ -55,9 +55,14 @@ Rectangle {
     signal autoColorBalanceRequested()
 
     readonly property var toolbarPalette: {
-        const p1 = root.pluginData["toolbar_color_primary"] || "primary";
-        const slot1 = p1 === "primary" ? Theme.primary : p1;
-        return [slot1].concat(config.accentColors);
+        const isCustom = config.selectedPreset === "custom";
+        const isAdaptive = config.selectedPreset === "adaptive";
+        if (isCustom || isAdaptive) {
+            const p1 = isAdaptive ? "primary" : (root.pluginData["toolbar_color_primary"] || "primary");
+            const slot1 = p1 === "primary" ? Theme.primary : p1;
+            return [slot1].concat(config.accentColors);
+        }
+        return [config.defaultAccentColors[0]].concat(config.accentColors);
     }
 
     signal toolSelected(string tool)

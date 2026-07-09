@@ -24,6 +24,7 @@ Item {
 
     readonly property color resolvedColor: {
         if (value === "primary") return Theme.primary;
+        if (typeof value === "string" && value.indexOf("slot_") === 0) return Theme.primary;
         return Qt.color(value);
     }
 
