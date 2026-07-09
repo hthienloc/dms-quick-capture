@@ -182,7 +182,6 @@ Rectangle {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                root.activeColorSlotIndex = index;
                                 root.colorSelected(modelData, index);
                             }
                         }
@@ -344,7 +343,6 @@ Rectangle {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                root.activeColorSlotIndex = index;
                                 root.colorSelected(modelData, index);
                             }
                         }
