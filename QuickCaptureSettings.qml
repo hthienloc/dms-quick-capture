@@ -654,70 +654,70 @@ PluginSettings {
                 label: I18n.tr("Slot 1")
                 defaultValue: "primary"
                 readOnly: palettePresetSetting.value !== "custom"
-                overrideColor: palettePresetSetting.value !== "custom" ? Theme.primary : null
+                overrideColor: palettePresetSetting.value !== "custom" ? (palettePresetSetting.value === "adaptive" ? Theme.primary : captureConfig.defaultAccentColors[0]) : null
             }
 
             CompactColorSetting {
                 id: c0
                 settingKey: "toolbar_color_0"
                 label: I18n.tr("Slot 2")
-                defaultValue: captureConfig.defaultAccentColors[0]
+                defaultValue: captureConfig.adaptiveColors[0]
                 readOnly: palettePresetSetting.value !== "custom"
-                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[0] : null
+                overrideColor: palettePresetSetting.value !== "custom" ? (palettePresetSetting.value === "adaptive" ? captureConfig.adaptiveColors[0] : captureConfig.defaultAccentColors[1]) : null
             }
 
             CompactColorSetting {
                 id: c1
                 settingKey: "toolbar_color_1"
                 label: I18n.tr("Slot 3")
-                defaultValue: captureConfig.defaultAccentColors[1]
+                defaultValue: captureConfig.adaptiveColors[1]
                 readOnly: palettePresetSetting.value !== "custom"
-                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[1] : null
+                overrideColor: palettePresetSetting.value !== "custom" ? (palettePresetSetting.value === "adaptive" ? captureConfig.adaptiveColors[1] : captureConfig.defaultAccentColors[2]) : null
             }
 
             CompactColorSetting {
                 id: c2
                 settingKey: "toolbar_color_2"
                 label: I18n.tr("Slot 4")
-                defaultValue: captureConfig.defaultAccentColors[2]
+                defaultValue: captureConfig.adaptiveColors[2]
                 readOnly: palettePresetSetting.value !== "custom"
-                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[2] : null
+                overrideColor: palettePresetSetting.value !== "custom" ? (palettePresetSetting.value === "adaptive" ? captureConfig.adaptiveColors[2] : captureConfig.defaultAccentColors[3]) : null
             }
 
             CompactColorSetting {
                 id: c3
                 settingKey: "toolbar_color_3"
                 label: I18n.tr("Slot 5")
-                defaultValue: captureConfig.defaultAccentColors[3]
+                defaultValue: captureConfig.adaptiveColors[3]
                 readOnly: palettePresetSetting.value !== "custom"
-                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[3] : null
+                overrideColor: palettePresetSetting.value !== "custom" ? (palettePresetSetting.value === "adaptive" ? captureConfig.adaptiveColors[3] : captureConfig.defaultAccentColors[4]) : null
             }
 
             CompactColorSetting {
                 id: c4
                 settingKey: "toolbar_color_4"
                 label: I18n.tr("Slot 6")
-                defaultValue: captureConfig.defaultAccentColors[4]
+                defaultValue: captureConfig.adaptiveColors[4]
                 readOnly: palettePresetSetting.value !== "custom"
-                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[4] : null
+                overrideColor: palettePresetSetting.value !== "custom" ? (palettePresetSetting.value === "adaptive" ? captureConfig.adaptiveColors[4] : captureConfig.defaultAccentColors[5]) : null
             }
 
             CompactColorSetting {
                 id: c5
                 settingKey: "toolbar_color_5"
                 label: I18n.tr("Slot 7")
-                defaultValue: captureConfig.defaultAccentColors[5]
+                defaultValue: captureConfig.adaptiveColors[5]
                 readOnly: palettePresetSetting.value !== "custom"
-                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[5] : null
+                overrideColor: palettePresetSetting.value !== "custom" ? (palettePresetSetting.value === "adaptive" ? captureConfig.adaptiveColors[5] : captureConfig.defaultAccentColors[6]) : null
             }
 
             CompactColorSetting {
                 id: c6
                 settingKey: "toolbar_color_6"
                 label: I18n.tr("Slot 8")
-                defaultValue: captureConfig.defaultAccentColors[6]
+                defaultValue: captureConfig.adaptiveColors[6]
                 readOnly: palettePresetSetting.value !== "custom"
-                overrideColor: palettePresetSetting.value !== "custom" ? captureConfig.defaultAccentColors[6] : null
+                overrideColor: palettePresetSetting.value !== "custom" ? (palettePresetSetting.value === "adaptive" ? captureConfig.adaptiveColors[6] : captureConfig.defaultAccentColors[7]) : null
             }
         }
     }
