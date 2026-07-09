@@ -2576,7 +2576,11 @@ DankModal {
 
                                 if (window.currentTool === "crop") {
                                     if (window.activeHandle === "new" || window.activeHandle === "tl" || window.activeHandle === "tr" || window.activeHandle === "bl" || window.activeHandle === "br") {
-                                        if (window.cropRect.width > 10 && window.cropRect.height > 10) {
+                                        if (window.cropRect.width <= 3 && window.cropRect.height <= 3) {
+                                            window.discardAndClose();
+                                            return;
+                                        }
+                                        if (window.cropRect.width >= 16 && window.cropRect.height >= 16) {
                                             window.hasSelection = true;
                                             // Automatically enter edit mode with the pen tool once selection is made/resized!
                                             window.currentTool = "pen";
