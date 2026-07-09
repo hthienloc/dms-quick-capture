@@ -1526,6 +1526,22 @@ DankModal {
                             window.cropRect = Qt.rect(data.cropRect.x, data.cropRect.y, data.cropRect.width, data.cropRect.height);
                             window.hasSelection = (data.cropRect.width > 0 && data.cropRect.height > 0);
                         }
+                        if (data && data.backdropMode !== undefined) {
+                            window.backdropMode = data.backdropMode;
+                            window.backdropSolidColor = data.backdropSolidColor;
+                            window.backdropGradientStart = data.backdropGradientStart;
+                            window.backdropGradientEnd = data.backdropGradientEnd;
+                            window.backdropGradientAngle = data.backdropGradientAngle;
+                            window.backdropPadding = data.backdropPadding;
+                            window.backdropCornerRadius = data.backdropCornerRadius;
+                            window.backdropShadowStrength = data.backdropShadowStrength;
+                            window.backdropAspectRatio = data.backdropAspectRatio;
+                            window.customAspectRatio = data.customAspectRatio;
+                            window.hasUserCustomizedBackdrop = data.hasUserCustomizedBackdrop;
+                            window.autoBackdropGradientStart = data.autoBackdropGradientStart;
+                            window.autoBackdropGradientEnd = data.autoBackdropGradientEnd;
+                            window.autoBackdropSolidColor = data.autoBackdropSolidColor;
+                        }
                         if (window.activeCanvas) window.activeCanvas.requestPaint();
                     } catch (e) {
                         console.error("Failed to parse strokes json:", e);
@@ -3216,7 +3232,7 @@ DankModal {
                             window.autoBackdropGradientEnd = colors.end;
                             window.autoBackdropSolidColor = colors.start;
 
-                            if (!window.hasUserCustomizedBackdrop) {
+                            if (!window.hasUserCustomizedBackdrop && !(window.parentWidget && window.parentWidget.restoringFromFloat)) {
                                 window.backdropGradientStart = colors.start;
                                 window.backdropGradientEnd = colors.end;
                                 window.backdropSolidColor = colors.start;

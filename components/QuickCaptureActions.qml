@@ -327,7 +327,21 @@ QtObject {
                         width: root.modal.cropRect.width,
                         height: root.modal.cropRect.height
                     },
-                    hasSelection: root.modal.hasSelection
+                    hasSelection: root.modal.hasSelection,
+                    backdropMode: root.modal.backdropMode,
+                    backdropSolidColor: root.modal.backdropSolidColor,
+                    backdropGradientStart: root.modal.backdropGradientStart,
+                    backdropGradientEnd: root.modal.backdropGradientEnd,
+                    backdropGradientAngle: root.modal.backdropGradientAngle,
+                    backdropPadding: root.modal.backdropPadding,
+                    backdropCornerRadius: root.modal.backdropCornerRadius,
+                    backdropShadowStrength: root.modal.backdropShadowStrength,
+                    backdropAspectRatio: root.modal.backdropAspectRatio,
+                    customAspectRatio: root.modal.customAspectRatio,
+                    hasUserCustomizedBackdrop: root.modal.hasUserCustomizedBackdrop,
+                    autoBackdropGradientStart: root.modal.autoBackdropGradientStart,
+                    autoBackdropGradientEnd: root.modal.autoBackdropGradientEnd,
+                    autoBackdropSolidColor: root.modal.autoBackdropSolidColor
                 };
 
                 let jsonStr = JSON.stringify(stateData);
