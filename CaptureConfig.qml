@@ -171,7 +171,7 @@ QtObject {
     ]
 
     readonly property var colorShortcuts: [
-        { key: "1", color: pluginData["toolbar_color_primary"] || "primary" },
+        { key: "1", color: selectedPreset === "custom" ? (pluginData["toolbar_color_primary"] || "primary") : defaultAccentColors[0] },
         { key: "2", color: accentColors[0] },
         { key: "3", color: accentColors[1] },
         { key: "4", color: accentColors[2] },
@@ -195,8 +195,12 @@ QtObject {
             const parts = rawColor.split("_");
             const slotIdx = parseInt(parts[1]) - 1;
             if (slotIdx === 0) {
-                const primaryColor = pluginData["toolbar_color_primary"] || "primary";
-                resolved = primaryColor === "primary" ? Theme.primary : primaryColor;
+                if (selectedPreset === "custom") {
+                    const primaryColor = pluginData["toolbar_color_primary"] || "primary";
+                    resolved = primaryColor === "primary" ? Theme.primary : primaryColor;
+                } else {
+                    resolved = defaultAccentColors[0];
+                }
             } else if (slotIdx >= 1 && slotIdx <= 7) {
                 resolved = accentColors[slotIdx - 1];
             }
