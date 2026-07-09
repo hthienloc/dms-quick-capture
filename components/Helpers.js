@@ -586,6 +586,18 @@ function getBoundaryColorOrGradient(ctx, rx, ry, rw, rh, offscreenSampler, Qt) {
  */
 function formatHexColor(color) {
     if (!color) return "#000000";
+    if (typeof color === "string") {
+        var h = color.replace("#", "");
+        if (h.length === 6) {
+            var rr = parseInt(h.substring(0, 2), 16);
+            var gg = parseInt(h.substring(2, 4), 16);
+            var bb = parseInt(h.substring(4, 6), 16);
+            return "#" + [rr, gg, bb].map(function(v) {
+                return v.toString(16).padStart(2, "0");
+            }).join("").toUpperCase();
+        }
+        return "#000000";
+    }
     const r = Math.round((color.r || 0) * 255).toString(16).padStart(2, '0');
     const g = Math.round((color.g || 0) * 255).toString(16).padStart(2, '0');
     const b = Math.round((color.b || 0) * 255).toString(16).padStart(2, '0');
