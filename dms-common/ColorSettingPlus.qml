@@ -24,7 +24,8 @@ Item {
 
     readonly property color resolvedColor: {
         if (value === "primary") return Theme.primary;
-        return Qt.color(value);
+        var c = Qt.color(value);
+        return c.valid ? c : Theme.primary;
     }
 
     function resetToDefault() {
