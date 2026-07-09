@@ -727,9 +727,9 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Styles")
             icon: "aspect_ratio"
-            showReset: modalOpacity.isDirty || showCanvasBorder.isDirty || editQuality.isDirty || modalDisplayTarget.isDirty
+            showReset: overlayOpacity.isDirty || showCanvasBorder.isDirty || editQuality.isDirty || modalDisplayTarget.isDirty
             onResetClicked: {
-                modalOpacity.resetToDefault();
+                overlayOpacity.resetToDefault();
                 showCanvasBorder.resetToDefault();
                 editQuality.resetToDefault();
                 modalDisplayTarget.resetToDefault();
@@ -763,9 +763,9 @@ PluginSettings {
         Separator {}
 
         SliderSettingPlus {
-            id: modalOpacity
-            settingKey: "modalOpacity"
-            label: I18n.tr("Backdrop Opacity")
+            id: overlayOpacity
+            settingKey: "overlayOpacity"
+            label: I18n.tr("Overlay Opacity")
             defaultValue: 60
             minimum: 0
             maximum: 100
@@ -798,7 +798,7 @@ PluginSettings {
                 { label: I18n.tr("2160px (4K)"), value: "2160" },
                 { label: I18n.tr("Original (Unscaled)"), value: "original" }
             ]
-            defaultValue: "1080"
+            defaultValue: "720"
         }
 
         InfoText {
