@@ -1,5 +1,4 @@
 import "./dms-common"
-import "components/Constants.js" as Constants
 import QtQuick
 import Quickshell
 import qs.Common
@@ -799,7 +798,7 @@ PluginSettings {
                 { label: I18n.tr("2160px (4K)"), value: "2160" },
                 { label: I18n.tr("Original (Unscaled)"), value: "original" }
             ]
-            defaultValue: String(Constants.defaultEditQuality)
+            defaultValue: "720"
         }
 
         InfoText {
