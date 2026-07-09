@@ -262,10 +262,10 @@ DankModal {
 
     // --- Proxy Editing Optimization ---
     readonly property real maxEditDimension: {
-        const q = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.editQuality) || "1080";
+        const q = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.editQuality) || String(Constants.defaultEditQuality);
         if (q === "original") return Infinity;
         const val = parseInt(q);
-        return (isNaN(val) || val <= 0) ? 1080 : val;
+        return (isNaN(val) || val <= 0) ? Constants.defaultEditQuality : val;
     }
     readonly property real editScale: {
         if (!window.bgImageItem) return 1.0;
@@ -544,7 +544,7 @@ DankModal {
     // Helper to decode hex color to RGB
     function hexToRgb(hex) { return Helpers.hexToRgb(hex, Qt); }
 
-    backgroundOpacity: (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.modalOpacity !== undefined ? window.parentWidget.pluginData.modalOpacity : 60) / 100
+    backgroundOpacity: (window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.overlayOpacity !== undefined ? window.parentWidget.pluginData.overlayOpacity : window.parentWidget.pluginData.modalOpacity !== undefined ? window.parentWidget.pluginData.modalOpacity : 60) : 60) / 100
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
 
     readonly property bool textMonospace: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textMonospace !== undefined ? window.parentWidget.pluginData.textMonospace : false
