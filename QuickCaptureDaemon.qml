@@ -95,8 +95,7 @@ PluginComponent {
                             root.isCapturing = false;
                             root.activeIpcMode = "";
                             root.resolvedDmsPath = "dms"; // reset to default path on success
-                            modal.shouldBeVisible = true;
-                            modal.openCentered();
+                            root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
                         } else {
                             // File not written — user cancelled with ESC. Reset silently.
                             root.isCapturing = false;

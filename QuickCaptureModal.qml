@@ -544,7 +544,13 @@ DankModal {
     // Helper to decode hex color to RGB
     function hexToRgb(hex) { return Helpers.hexToRgb(hex, Qt); }
 
-    backgroundOpacity: (window.parentWidget && window.parentWidget.pluginData ? (window.parentWidget.pluginData.overlayOpacity !== undefined ? window.parentWidget.pluginData.overlayOpacity : window.parentWidget.pluginData.modalOpacity !== undefined ? window.parentWidget.pluginData.modalOpacity : 60) : 60) / 100
+    backgroundOpacity: {
+        const data = window.parentWidget && window.parentWidget.pluginData;
+        if (!data) return 0.6;
+        if (data.overlayOpacity !== undefined) return data.overlayOpacity / 100;
+        if (data.modalOpacity !== undefined) return data.modalOpacity / 100;
+        return 0.6;
+    }
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
 
     readonly property bool textMonospace: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textMonospace !== undefined ? window.parentWidget.pluginData.textMonospace : false
@@ -2574,9 +2580,18 @@ DankModal {
                                      return;
                                 }
 
-                                if (window.currentTool === "crop") {
+                                 if (window.currentTool === "crop") {
                                     if (window.activeHandle === "new" || window.activeHandle === "tl" || window.activeHandle === "tr" || window.activeHandle === "bl" || window.activeHandle === "br") {
-                                        if (window.cropRect.width > 10 && window.cropRect.height > 10) {
+                                        if (Math.min(window.cropRect.width, window.cropRect.height) <= 3) {
+                                            if (window.strokes.length === 0) {
+                                                window.discardAndClose();
+                                            } else {
+                                                window.hasSelection = false;
+                                                window.cropRect = Qt.rect(0, 0, 0, 0);
+                                            }
+                                            return;
+                                        }
+                                        if (Math.min(window.cropRect.width, window.cropRect.height) >= 16) {
                                             window.hasSelection = true;
                                             // Automatically enter edit mode with the pen tool once selection is made/resized!
                                             window.currentTool = "pen";
