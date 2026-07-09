@@ -56,5 +56,6 @@
   "Text Note": "Text Note",
   "Thickness": "Thickness",
   "Tool": "Tool",
-  "Underline": "Underline"
+  "Underline": "Underline",
+  "Window capture mode is only supported on Hyprland or DWL.": "Window capture mode is only supported on Hyprland or DWL."
 }
