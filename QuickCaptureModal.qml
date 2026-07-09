@@ -1985,6 +1985,9 @@ DankModal {
                                     if (spotlights.length > 0) {
                                         ctx.save();
                                         
+                                        const sw = window.screenshotWidth;
+                                        const sh = window.screenshotHeight;
+                                        
                                         // Determine which intensity to use for the global dimming opacity
                                         let activeInt = window.spotlightIntensity;
                                         if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "spotlight") {
@@ -1996,14 +1999,23 @@ DankModal {
 
                                         const spotlightOpacity = activeInt / 100.0;
                                         
-                                        const dimmingX = 0;
-                                        const dimmingY = 0;
-                                        const dimmingW = window.screenshotWidth;
-                                        const dimmingH = window.screenshotHeight;
-
                                         ctx.beginPath();
-                                        // Outer rectangle covering the whole view
-                                        ctx.rect(dimmingX, dimmingY, dimmingW, dimmingH);
+                                        // Outer rectangle covering the whole view (rounded if backdrop active)
+                                        if (window.effectiveBackdropMode !== "none" && window.backdropCornerRadius > 0) {
+                                            const r = Math.min(window.backdropCornerRadius, sw / 2, sh / 2);
+                                            ctx.moveTo(r, 0);
+                                            ctx.lineTo(sw - r, 0);
+                                            ctx.arcTo(sw, 0, sw, r, r);
+                                            ctx.lineTo(sw, sh - r);
+                                            ctx.arcTo(sw, sh, sw - r, sh, r);
+                                            ctx.lineTo(r, sh);
+                                            ctx.arcTo(0, sh, 0, sh - r, r);
+                                            ctx.lineTo(0, r);
+                                            ctx.arcTo(0, 0, r, 0, r);
+                                            ctx.closePath();
+                                        } else {
+                                            ctx.rect(0, 0, sw, sh);
+                                        }
                                         
                                         for (let s of spotlights) {
                                             if (s.points.length >= 2) {
@@ -2895,6 +2907,9 @@ DankModal {
                                 if (spotlights.length > 0) {
                                     ctx.save();
                                     
+                                    const sw = window.screenshotWidth;
+                                    const sh = window.screenshotHeight;
+                                    
                                     let activeInt = window.spotlightIntensity;
                                     if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "spotlight") {
                                         activeInt = window.selectedStroke.width;
@@ -2906,7 +2921,22 @@ DankModal {
                                     const spotlightOpacity = activeInt / 100.0;
 
                                     ctx.beginPath();
-                                    ctx.rect(0, 0, window.screenshotWidth, window.screenshotHeight);
+                                    // Outer rectangle covering the whole view (rounded if backdrop active)
+                                    if (window.effectiveBackdropMode !== "none" && window.backdropCornerRadius > 0) {
+                                        const r = Math.min(window.backdropCornerRadius, sw / 2, sh / 2);
+                                        ctx.moveTo(r, 0);
+                                        ctx.lineTo(sw - r, 0);
+                                        ctx.arcTo(sw, 0, sw, r, r);
+                                        ctx.lineTo(sw, sh - r);
+                                        ctx.arcTo(sw, sh, sw - r, sh, r);
+                                        ctx.lineTo(r, sh);
+                                        ctx.arcTo(0, sh, 0, sh - r, r);
+                                        ctx.lineTo(0, r);
+                                        ctx.arcTo(0, 0, r, 0, r);
+                                        ctx.closePath();
+                                    } else {
+                                        ctx.rect(0, 0, sw, sh);
+                                    }
                                     
                                     for (let s of spotlights) {
                                         if (s.points.length >= 2) {
