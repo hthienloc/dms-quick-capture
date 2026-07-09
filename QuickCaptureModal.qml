@@ -1536,6 +1536,7 @@ DankModal {
                             window.backdropCornerRadius = data.backdropCornerRadius;
                             window.backdropShadowStrength = data.backdropShadowStrength;
                             window.backdropAspectRatio = data.backdropAspectRatio;
+                            window.customAspectRatio = data.customAspectRatio;
                             window.hasUserCustomizedBackdrop = data.hasUserCustomizedBackdrop;
                             window.autoBackdropGradientStart = data.autoBackdropGradientStart;
                             window.autoBackdropGradientEnd = data.autoBackdropGradientEnd;
@@ -3231,7 +3232,7 @@ DankModal {
                             window.autoBackdropGradientEnd = colors.end;
                             window.autoBackdropSolidColor = colors.start;
 
-                            if (!window.hasUserCustomizedBackdrop) {
+                            if (!window.hasUserCustomizedBackdrop && !(window.parentWidget && window.parentWidget.restoringFromFloat)) {
                                 window.backdropGradientStart = colors.start;
                                 window.backdropGradientEnd = colors.end;
                                 window.backdropSolidColor = colors.start;

@@ -337,6 +337,7 @@ QtObject {
                     backdropCornerRadius: root.modal.backdropCornerRadius,
                     backdropShadowStrength: root.modal.backdropShadowStrength,
                     backdropAspectRatio: root.modal.backdropAspectRatio,
+                    customAspectRatio: root.modal.customAspectRatio,
                     hasUserCustomizedBackdrop: root.modal.hasUserCustomizedBackdrop,
                     autoBackdropGradientStart: root.modal.autoBackdropGradientStart,
                     autoBackdropGradientEnd: root.modal.autoBackdropGradientEnd,
