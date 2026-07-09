@@ -1991,7 +1991,16 @@ DankModal {
                                             const sh = window.screenshotHeight;
                                             const r = Math.min(window.backdropCornerRadius, sw / 2, sh / 2);
                                             ctx.beginPath();
-                                            ctx.roundRect(0, 0, sw, sh, r);
+                                            ctx.moveTo(r, 0);
+                                            ctx.lineTo(sw - r, 0);
+                                            ctx.arcTo(sw, 0, sw, r, r);
+                                            ctx.lineTo(sw, sh - r);
+                                            ctx.arcTo(sw, sh, sw - r, sh, r);
+                                            ctx.lineTo(r, sh);
+                                            ctx.arcTo(0, sh, 0, sh - r, r);
+                                            ctx.lineTo(0, r);
+                                            ctx.arcTo(0, 0, r, 0, r);
+                                            ctx.closePath();
                                             ctx.clip();
                                         }
                                         
@@ -2911,7 +2920,16 @@ DankModal {
                                         const sh = window.screenshotHeight;
                                         const r = Math.min(window.backdropCornerRadius, sw / 2, sh / 2);
                                         ctx.beginPath();
-                                        ctx.roundRect(0, 0, sw, sh, r);
+                                        ctx.moveTo(r, 0);
+                                        ctx.lineTo(sw - r, 0);
+                                        ctx.arcTo(sw, 0, sw, r, r);
+                                        ctx.lineTo(sw, sh - r);
+                                        ctx.arcTo(sw, sh, sw - r, sh, r);
+                                        ctx.lineTo(r, sh);
+                                        ctx.arcTo(0, sh, 0, sh - r, r);
+                                        ctx.lineTo(0, r);
+                                        ctx.arcTo(0, 0, r, 0, r);
+                                        ctx.closePath();
                                         ctx.clip();
                                     }
                                     
