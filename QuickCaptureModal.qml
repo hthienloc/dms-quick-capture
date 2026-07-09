@@ -1526,6 +1526,21 @@ DankModal {
                             window.cropRect = Qt.rect(data.cropRect.x, data.cropRect.y, data.cropRect.width, data.cropRect.height);
                             window.hasSelection = (data.cropRect.width > 0 && data.cropRect.height > 0);
                         }
+                        if (data && data.backdropMode !== undefined) {
+                            window.backdropMode = data.backdropMode;
+                            window.backdropSolidColor = data.backdropSolidColor;
+                            window.backdropGradientStart = data.backdropGradientStart;
+                            window.backdropGradientEnd = data.backdropGradientEnd;
+                            window.backdropGradientAngle = data.backdropGradientAngle;
+                            window.backdropPadding = data.backdropPadding;
+                            window.backdropCornerRadius = data.backdropCornerRadius;
+                            window.backdropShadowStrength = data.backdropShadowStrength;
+                            window.backdropAspectRatio = data.backdropAspectRatio;
+                            window.hasUserCustomizedBackdrop = data.hasUserCustomizedBackdrop;
+                            window.autoBackdropGradientStart = data.autoBackdropGradientStart;
+                            window.autoBackdropGradientEnd = data.autoBackdropGradientEnd;
+                            window.autoBackdropSolidColor = data.autoBackdropSolidColor;
+                        }
                         if (window.activeCanvas) window.activeCanvas.requestPaint();
                     } catch (e) {
                         console.error("Failed to parse strokes json:", e);
