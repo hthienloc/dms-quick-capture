@@ -181,10 +181,7 @@ Rectangle {
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                root.activeColorSlotIndex = index;
-                                root.colorSelected(modelData, index);
-                            }
+                            onClicked: root.colorSelected(modelData, index)
                         }
                     }
                 }
@@ -343,10 +340,7 @@ Rectangle {
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                root.activeColorSlotIndex = index;
-                                root.colorSelected(modelData, index);
-                            }
+                            onClicked: root.colorSelected(modelData, index)
                         }
                     }
                 }
