@@ -1,6 +1,7 @@
 .pragma library
 
 // Configuration defaults
+const defaultEditQuality = 720;
 const defaultBackdropPadding = 40;
 const defaultBackdropCornerRadius = 12;
 const defaultBackdropShadowStrength = 50;
