@@ -1985,6 +1985,25 @@ DankModal {
                                     if (spotlights.length > 0) {
                                         ctx.save();
                                         
+                                        // Clip to backdrop corner radius if backdrop is active
+                                        if (window.effectiveBackdropMode !== "none" && window.backdropCornerRadius > 0) {
+                                            const r = window.backdropCornerRadius;
+                                            const sw = window.screenshotWidth;
+                                            const sh = window.screenshotHeight;
+                                            ctx.beginPath();
+                                            ctx.moveTo(r, 0);
+                                            ctx.lineTo(sw - r, 0);
+                                            ctx.arcTo(sw, 0, sw, r, r);
+                                            ctx.lineTo(sw, sh - r);
+                                            ctx.arcTo(sw, sh, sw - r, sh, r);
+                                            ctx.lineTo(r, sh);
+                                            ctx.arcTo(0, sh, 0, sh - r, r);
+                                            ctx.lineTo(0, r);
+                                            ctx.arcTo(0, 0, r, 0, r);
+                                            ctx.closePath();
+                                            ctx.clip();
+                                        }
+                                        
                                         // Determine which intensity to use for the global dimming opacity
                                         let activeInt = window.spotlightIntensity;
                                         if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "spotlight") {
@@ -2894,6 +2913,25 @@ DankModal {
 
                                 if (spotlights.length > 0) {
                                     ctx.save();
+                                    
+                                    // Clip to backdrop corner radius if backdrop is active
+                                    if (window.effectiveBackdropMode !== "none" && window.backdropCornerRadius > 0) {
+                                        const r = window.backdropCornerRadius;
+                                        const sw = window.screenshotWidth;
+                                        const sh = window.screenshotHeight;
+                                        ctx.beginPath();
+                                        ctx.moveTo(r, 0);
+                                        ctx.lineTo(sw - r, 0);
+                                        ctx.arcTo(sw, 0, sw, r, r);
+                                        ctx.lineTo(sw, sh - r);
+                                        ctx.arcTo(sw, sh, sw - r, sh, r);
+                                        ctx.lineTo(r, sh);
+                                        ctx.arcTo(0, sh, 0, sh - r, r);
+                                        ctx.lineTo(0, r);
+                                        ctx.arcTo(0, 0, r, 0, r);
+                                        ctx.closePath();
+                                        ctx.clip();
+                                    }
                                     
                                     let activeInt = window.spotlightIntensity;
                                     if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "spotlight") {
