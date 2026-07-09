@@ -214,7 +214,7 @@ PluginSettings {
                             let colorStr = swatchRoot.overrideColor !== null
                                 ? swatchRoot.overrideColor.toString()
                                 : swatchRoot.value.toString();
-                            Proc.runCommand("copy-color", ["wl-copy", "--", colorStr], function() {
+                            Proc.runCommand("copy-color", ["dms", "cl", "copy", colorStr], function() {
                                 if (typeof ToastService !== "undefined" && ToastService) {
                                     ToastService.showInfo(I18n.tr("Copied:") + " " + colorStr.toUpperCase());
                                 }
