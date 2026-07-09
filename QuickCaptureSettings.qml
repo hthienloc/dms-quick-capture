@@ -89,14 +89,9 @@ PluginSettings {
         readonly property bool isDirty: value.toString() !== defaultValue.toString()
 
         readonly property color resolvedColor: {
-            if (overrideColor !== null) {
-                var c = Qt.color(overrideColor);
-                if (c.valid) return c;
-                return Theme.primary;
-            }
+            if (overrideColor !== null) return Qt.color(overrideColor);
             if (value === "primary") return Theme.primary;
-            var c = Qt.color(value);
-            return c.valid ? c : Theme.primary;
+            return Qt.color(value);
         }
 
         function resetToDefault() {
