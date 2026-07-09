@@ -47,8 +47,24 @@ PluginComponent {
 
     function triggerCapture(mode) {
         root.restoringFromFloat = false;
-        root.activeIpcMode = mode || "";
-        root.startCaptureAfterDelay();
+        const targetMode = mode ? mode : root.captureMode;
+        
+        if (targetMode === "window") {
+            const checkCmd = "if [ -n \"$HYPRLAND_INSTANCE_SIGNATURE\" ] || pgrep -x dwl >/dev/null; then echo \"SUPPORTED\"; else echo \"UNSUPPORTED\"; fi";
+            Proc.runCommand("check-compositor", ["sh", "-c", checkCmd], (stdout, exitCode) => {
+                if (stdout.trim() !== "SUPPORTED") {
+                    if (typeof ToastService !== "undefined" && ToastService) {
+                        ToastService.showError(qsTr("Window capture mode is only supported on Hyprland or DWL."));
+                    }
+                    return;
+                }
+                root.activeIpcMode = mode || "";
+                root.startCaptureAfterDelay();
+            });
+        } else {
+            root.activeIpcMode = mode || "";
+            root.startCaptureAfterDelay();
+        }
     }
 
     function closeControlCenter() {
