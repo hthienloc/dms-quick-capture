@@ -1,0 +1,19 @@
+changelog:
+  categories:
+    - title: New Features
+      labels:
+        - enhancement
+        - feat
+    - title: Bug Fixes
+      labels:
+        - bug
+        - fix
+    - title: Performance Improvements
+      labels:
+        - perf
+    - title: Chores & Maintenance
+      labels:
+        - chore
+    - title: Other Changes
+      labels:
+        - "*"
