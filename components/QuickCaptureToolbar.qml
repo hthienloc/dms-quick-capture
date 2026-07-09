@@ -56,8 +56,9 @@ Rectangle {
 
     readonly property var toolbarPalette: {
         const isCustom = config.selectedPreset === "custom";
-        if (isCustom) {
-            const p1 = root.pluginData["toolbar_color_primary"] || "primary";
+        const isAdaptive = config.selectedPreset === "adaptive";
+        if (isCustom || isAdaptive) {
+            const p1 = isAdaptive ? "primary" : (root.pluginData["toolbar_color_primary"] || "primary");
             const slot1 = p1 === "primary" ? Theme.primary : p1;
             return [slot1].concat(config.accentColors);
         }

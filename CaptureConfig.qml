@@ -30,6 +30,7 @@ QtObject {
         "#22c55e",
         "#eab308",
         "#a855f7",
+        "#f97316",
         "#ffffff",
         "#000000"
     ]
@@ -40,6 +41,7 @@ QtObject {
         "#a3be8c",
         "#ebcb8b",
         "#b48ead",
+        "#81a1c1",
         "#e5e9f0",
         "#2e3440"
     ]
@@ -50,6 +52,7 @@ QtObject {
         "#98971a",
         "#d79921",
         "#b16286",
+        "#83a598",
         "#ebdbb2",
         "#282828"
     ]
@@ -60,6 +63,7 @@ QtObject {
         "#50fa7b",
         "#f1fa8c",
         "#ff79c6",
+        "#6272a4",
         "#f8f8f2",
         "#282a36"
     ]
@@ -70,6 +74,7 @@ QtObject {
         "#a6e3a1",
         "#f9e2af",
         "#cba6f7",
+        "#94e2d5",
         "#cdd6f4",
         "#1e1e2e"
     ]
@@ -80,6 +85,7 @@ QtObject {
         "#a6da95",
         "#eed49f",
         "#c6a0f6",
+        "#8bd5ca",
         "#cad3f5",
         "#24273a"
     ]
@@ -90,6 +96,7 @@ QtObject {
         "#a6d189",
         "#e5c890",
         "#ca9ee6",
+        "#81c8be",
         "#c6d0f5",
         "#303446"
     ]
@@ -100,6 +107,7 @@ QtObject {
         "#40a02b",
         "#df8e1d",
         "#8839ef",
+        "#179299",
         "#4c4f69",
         "#eff1f5"
     ]
@@ -141,11 +149,14 @@ QtObject {
     readonly property var accentColors: {
         const list = [];
         const isCustom = selectedPreset === "custom";
+        const isAdaptive = selectedPreset === "adaptive";
         for (let i = 0; i < 7; i++) {
             if (isCustom) {
                 list.push(pluginData["toolbar_color_" + i] || adaptiveColors[i]);
-            } else {
+            } else if (isAdaptive) {
                 list.push(defaultAccentColors[i]);
+            } else {
+                list.push(defaultAccentColors[i + 1]);
             }
         }
         return list;
@@ -171,7 +182,7 @@ QtObject {
     ]
 
     readonly property var colorShortcuts: [
-        { key: "1", color: selectedPreset === "custom" ? (pluginData["toolbar_color_primary"] || "primary") : defaultAccentColors[0] },
+        { key: "1", color: selectedPreset === "custom" ? (pluginData["toolbar_color_primary"] || "primary") : (selectedPreset === "adaptive" ? "primary" : defaultAccentColors[0]) },
         { key: "2", color: accentColors[0] },
         { key: "3", color: accentColors[1] },
         { key: "4", color: accentColors[2] },
@@ -198,6 +209,8 @@ QtObject {
                 if (selectedPreset === "custom") {
                     const primaryColor = pluginData["toolbar_color_primary"] || "primary";
                     resolved = primaryColor === "primary" ? Theme.primary : primaryColor;
+                } else if (selectedPreset === "adaptive") {
+                    resolved = Theme.primary;
                 } else {
                     resolved = defaultAccentColors[0];
                 }
