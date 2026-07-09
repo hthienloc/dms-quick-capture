@@ -1987,9 +1987,9 @@ DankModal {
                                         
                                         // Clip to backdrop corner radius if backdrop is active
                                         if (window.effectiveBackdropMode !== "none" && window.backdropCornerRadius > 0) {
-                                            const r = window.backdropCornerRadius;
                                             const sw = window.screenshotWidth;
                                             const sh = window.screenshotHeight;
+                                            const r = Math.min(window.backdropCornerRadius, sw / 2, sh / 2);
                                             ctx.beginPath();
                                             ctx.moveTo(r, 0);
                                             ctx.lineTo(sw - r, 0);
@@ -2916,9 +2916,9 @@ DankModal {
                                     
                                     // Clip to backdrop corner radius if backdrop is active
                                     if (window.effectiveBackdropMode !== "none" && window.backdropCornerRadius > 0) {
-                                        const r = window.backdropCornerRadius;
                                         const sw = window.screenshotWidth;
                                         const sh = window.screenshotHeight;
+                                        const r = Math.min(window.backdropCornerRadius, sw / 2, sh / 2);
                                         ctx.beginPath();
                                         ctx.moveTo(r, 0);
                                         ctx.lineTo(sw - r, 0);
