@@ -165,13 +165,3 @@ binds {
 ## License
 
 MIT
-
-## Star History
-
-<a href="https://star-history.com/#hthienloc/dms-quick-capture&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=hthienloc/dms-quick-capture&type=date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=hthienloc/dms-quick-capture&type=date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=hthienloc/dms-quick-capture&type=date" />
- </picture>
-</a>
