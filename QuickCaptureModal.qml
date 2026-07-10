@@ -142,7 +142,8 @@ DankModal {
             window.hoveredColor = window.sampleCanvasColor(window.cursorX * window.editScale, window.cursorY * window.editScale);
         }
         if (currentTool === "backdrop" && window.backdropMode === "none") {
-            window.backdropMode = backdropConfigValue("backdropDefaultMode", Constants.defaultBackdropMode, false);
+            const bm = backdropConfigValue("backdropDefaultMode", Constants.defaultBackdropMode, false);
+            window.backdropMode = bm !== "none" ? bm : "solid";
         }
         if (window.activeCanvas) {
             window.activeCanvas.requestPaint();
