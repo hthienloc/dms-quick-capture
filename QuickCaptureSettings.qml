@@ -811,9 +811,13 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Backdrop Defaults")
             icon: "wallpaper"
-            showReset: backdropDefaultMode.isDirty || backdropDefaultPadding.isDirty || backdropDefaultRadius.isDirty || backdropDefaultShadow.isDirty || backdropDefaultAngle.isDirty || backdropDefaultAspectRatio.isDirty
+            showReset: backdropAutoApply.isDirty || backdropDefaultMode.isDirty || backdropDefaultSolidColor.isDirty || backdropDefaultGradientStart.isDirty || backdropDefaultGradientEnd.isDirty || backdropDefaultPadding.isDirty || backdropDefaultRadius.isDirty || backdropDefaultShadow.isDirty || backdropDefaultAngle.isDirty || backdropDefaultAspectRatio.isDirty
             onResetClicked: {
+                backdropAutoApply.resetToDefault();
                 backdropDefaultMode.resetToDefault();
+                backdropDefaultSolidColor.resetToDefault();
+                backdropDefaultGradientStart.resetToDefault();
+                backdropDefaultGradientEnd.resetToDefault();
                 backdropDefaultPadding.resetToDefault();
                 backdropDefaultRadius.resetToDefault();
                 backdropDefaultShadow.resetToDefault();
@@ -821,6 +825,16 @@ PluginSettings {
                 backdropDefaultAspectRatio.resetToDefault();
             }
         }
+
+        ToggleSettingPlus {
+            id: backdropAutoApply
+            settingKey: "backdropAutoApply"
+            label: I18n.tr("Auto-apply backdrop defaults on tool switch")
+            description: I18n.tr("When enabled, switching to the backdrop tool will use the configured default mode, colors, and sizes below.")
+            defaultValue: false
+        }
+
+        Separator {}
 
         SelectionSettingPlus {
             id: backdropDefaultMode
@@ -834,6 +848,33 @@ PluginSettings {
                 { label: I18n.tr("Conic Gradient"), value: "conic" }
             ]
             defaultValue: "solid"
+        }
+
+        Separator {}
+
+        ColorSettingPlus {
+            id: backdropDefaultSolidColor
+            settingKey: "backdropDefaultSolidColor"
+            label: I18n.tr("Default Solid Color")
+            defaultValue: "primary"
+        }
+
+        Separator {}
+
+        ColorSettingPlus {
+            id: backdropDefaultGradientStart
+            settingKey: "backdropDefaultGradientStart"
+            label: I18n.tr("Default Gradient Start Color")
+            defaultValue: "primary"
+        }
+
+        Separator {}
+
+        ColorSettingPlus {
+            id: backdropDefaultGradientEnd
+            settingKey: "backdropDefaultGradientEnd"
+            label: I18n.tr("Default Gradient End Color")
+            defaultValue: Theme.secondary
         }
 
         Separator {}

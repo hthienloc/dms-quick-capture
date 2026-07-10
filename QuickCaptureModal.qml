@@ -1031,8 +1031,17 @@ DankModal {
 
     function backdropConfigValue(key, defaultValue, numeric) {
         const pd = config && config.pluginData;
-        if (!pd || pd[key] === undefined || pd[key] === null) return defaultValue;
+        if (!pd || pd["backdropAutoApply"] !== true) return defaultValue;
+        if (pd[key] === undefined || pd[key] === null) return defaultValue;
         return numeric ? parseInt(pd[key], 10) : pd[key];
+    }
+
+    function backdropConfigColor(key, defaultValue) {
+        const pd = config && config.pluginData;
+        if (!pd || pd["backdropAutoApply"] !== true) return defaultValue;
+        const val = pd[key];
+        if (!val || val === "primary") return Theme.primary;
+        return Qt.color(val);
     }
 
     function constrainSquarePoint(start, point) {
@@ -1514,6 +1523,9 @@ DankModal {
         window.backdropShadowStrength = backdropConfigValue("backdropDefaultShadow", Constants.defaultBackdropShadowStrength, true);
         window.backdropGradientAngle = backdropConfigValue("backdropDefaultAngle", Constants.defaultBackdropGradientAngle, true);
         window.backdropAspectRatio = backdropConfigValue("backdropDefaultAspectRatio", Constants.defaultBackdropAspectRatio, false);
+        window.backdropSolidColor = backdropConfigColor("backdropDefaultSolidColor", Theme.primary);
+        window.backdropGradientStart = backdropConfigColor("backdropDefaultGradientStart", Theme.primary);
+        window.backdropGradientEnd = backdropConfigColor("backdropDefaultGradientEnd", Theme.secondary);
         window.cropRect = Qt.rect(0, 0, 0, 0);
         window.hasSelection = false;
         window.activeHandle = "none";
