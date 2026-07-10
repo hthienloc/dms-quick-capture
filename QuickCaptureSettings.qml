@@ -597,16 +597,16 @@ PluginSettings {
                     options: [
                         { "label": I18n.tr("Adaptive (DMS Theme)"), "value": "adaptive" },
                         { "label": I18n.tr("Classic (Tailwind)"), "value": "classic" },
-                        { "label": "Nord", "value": "nord" },
-                        { "label": "Dracula", "value": "dracula" },
-                        { "label": "Gruvbox Material", "value": "gruvbox" },
-                        { "label": "Catppuccin", "value": "catppuccin" },
-                        { "label": "Everforest", "value": "everforest" },
-                        { "label": "Rosé Pine", "value": "rosePine" },
-                        { "label": "Kanagawa", "value": "kanagawaWl" },
-                        { "label": "Tokyo Night", "value": "tokyoNight" },
-                        { "label": "Synthwave Electric", "value": "synthwaveElectric" },
-                        { "label": "Dank Violet", "value": "dankViolet" },
+                        { "label": I18n.tr("Nord"), "value": "nord" },
+                        { "label": I18n.tr("Dracula"), "value": "dracula" },
+                        { "label": I18n.tr("Gruvbox Material"), "value": "gruvbox" },
+                        { "label": I18n.tr("Catppuccin"), "value": "catppuccin" },
+                        { "label": I18n.tr("Everforest"), "value": "everforest" },
+                        { "label": I18n.tr("Rosé Pine"), "value": "rosePine" },
+                        { "label": I18n.tr("Kanagawa"), "value": "kanagawaWl" },
+                        { "label": I18n.tr("Tokyo Night"), "value": "tokyoNight" },
+                        { "label": I18n.tr("Synthwave Electric"), "value": "synthwaveElectric" },
+                        { "label": I18n.tr("Dank Violet"), "value": "dankViolet" },
                         { "label": I18n.tr("Custom Colors"), "value": "custom" }
                     ]
                     Component.onCompleted: {

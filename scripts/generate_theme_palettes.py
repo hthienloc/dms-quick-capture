@@ -2,7 +2,7 @@
 """
 Generate CaptureConfig.qml palette entries from dms-plugin-registry theme JSONs.
 Usage:
-    python3 generate_theme_palettes.py
+    python3 scripts/generate_theme_palettes.py
 Output: QML code blocks ready to insert into CaptureConfig.qml
 """
 
@@ -11,18 +11,21 @@ import os
 import sys
 
 THEMES_DIR = os.path.join(os.path.dirname(__file__), "../../dms-plugin-registry/themes")
-COLOR_KEYS = ["primary", "info", "error", "warning", "secondary", "surfaceText", "surface", "background"]
+COLOR_KEYS = ["primary", "error", "warning", "info", "secondary", "primaryContainer", "surfaceText", "surface"]
 
-# Themes already handled separately or to skip
-SKIP_IDS = {"catppuccin"}  # handled via variants below
+# Catppuccin flavors: mocha & macchiato & frappe are dark, latte is light
+CATPPUCCIN_DARK_FLAVORS = {"mocha", "macchiato", "frappe"}
+
 
 def to_prop_name(theme_id: str, suffix: str = "") -> str:
     """Convert theme id to a QML property name like tokyoNightColors."""
     return theme_id + suffix + "Colors"
 
+
 def extract_palette(colors: dict) -> list[str]:
     """Extract 8 colors in order of COLOR_KEYS, fallback to #ffffff."""
     return [colors.get(k, "#ffffff") for k in COLOR_KEYS]
+
 
 def render_qml_property(prop_name: str, palette: list[str], comment_keys: bool = True) -> str:
     lines = [f"    readonly property var {prop_name}: ["]
@@ -33,12 +36,13 @@ def render_qml_property(prop_name: str, palette: list[str], comment_keys: bool =
     lines.append("    ]")
     return "\n".join(lines)
 
+
 def main():
     if not os.path.isdir(THEMES_DIR):
         print(f"ERROR: themes dir not found: {THEMES_DIR}", file=sys.stderr)
         sys.exit(1)
 
-    simple_themes = []   # (prop_name_dark, prop_name_light, theme_id, theme_name, palette_dark, palette_light)
+    simple_themes = []
     catppuccin_data = None
 
     for theme_dir in sorted(os.listdir(THEMES_DIR)):
@@ -52,7 +56,6 @@ def main():
         theme_id = data["id"]
         theme_name = data.get("name", theme_id)
 
-        # Handle catppuccin multi-variant separately
         if theme_id == "catppuccin":
             catppuccin_data = data
             continue
@@ -92,7 +95,7 @@ def main():
     print("// ═══════════════════════════════════════════════════════════════════")
     print("// AUTO-GENERATED from dms-plugin-registry — DO NOT EDIT MANUALLY")
     print("// Run: python3 scripts/generate_theme_palettes.py")
-    print("// Color order: primary, info, error, warning, secondary, surfaceText, surface, background")
+    print("// Color order: primary, error, warning, info, secondary, primaryContainer, surfaceText, surface")
     print("// ═══════════════════════════════════════════════════════════════════")
     print()
 
@@ -104,7 +107,7 @@ def main():
             print(render_qml_property(t["prop_light"], t["palette_light"]))
         print()
 
-    # Catppuccin multi-variant
+    # Catppuccin multi-flavor — each flavor outputs one array (no separate dark/light)
     if catppuccin_data:
         variants_info = catppuccin_data.get("variants", {})
         flavors = variants_info.get("flavors", [])
@@ -115,46 +118,30 @@ def main():
 
         for flavor in flavors:
             fid = flavor["id"]
-            fname = flavor.get("name", fid)
-            dark = flavor.get("dark", {})
-            light = flavor.get("light", {})
+            is_dark = fid in CATPPUCCIN_DARK_FLAVORS
+            variant_key = "dark" if is_dark else "light"
+            colors = flavor.get(variant_key, {})
 
-            if dark:
-                # primary/secondary come from accent — use default accent for this flavor
-                default_dark = defaults.get("dark", {})
-                default_accent = default_dark.get("accent", "mauve") if isinstance(default_dark, dict) else "mauve"
+            if not colors:
+                continue
 
-                # Find accent color from accents list
-                accent_color = "#cba6f7"  # fallback mauve mocha
-                if accents:
-                    for acc in accents:
-                        if acc.get("id") == default_accent:
-                            accent_color = acc.get("dark", {}).get(fid, accent_color)
-                            break
+            default_key = variant_key
+            default_accent = defaults.get(default_key, {}).get("accent", "mauve") if isinstance(defaults.get(default_key), dict) else "mauve"
+            fallback = "#cba6f7" if is_dark else "#8839ef"
 
-                full_dark = dict(dark)
-                full_dark.setdefault("primary", accent_color)
-                full_dark.setdefault("secondary", accent_color)
-                palette = extract_palette(full_dark)
-                prop = f"catppuccin{fid.capitalize()}DarkColors"
-                print(render_qml_property(prop, palette))
+            accent_color = fallback
+            if accents:
+                for acc in accents:
+                    if acc.get("id") == default_accent:
+                        accent_color = acc.get(variant_key, {}).get(fid, fallback)
+                        break
 
-            if light:
-                default_light = defaults.get("light", {})
-                default_accent = default_light.get("accent", "mauve") if isinstance(default_light, dict) else "mauve"
-                accent_color = "#8839ef"  # fallback mauve latte
-                if accents:
-                    for acc in accents:
-                        if acc.get("id") == default_accent:
-                            accent_color = acc.get("light", {}).get(fid, accent_color)
-                            break
-
-                full_light = dict(light)
-                full_light.setdefault("primary", accent_color)
-                full_light.setdefault("secondary", accent_color)
-                palette = extract_palette(full_light)
-                prop = f"catppuccin{fid.capitalize()}LightColors"
-                print(render_qml_property(prop, palette))
+            full_colors = dict(colors)
+            full_colors.setdefault("primary", accent_color)
+            full_colors.setdefault("secondary", accent_color)
+            palette = extract_palette(full_colors)
+            prop = f"catppuccin{fid.capitalize()}Colors"
+            print(render_qml_property(prop, palette))
 
         print()
 
@@ -163,7 +150,7 @@ def main():
     print("// ═══════════════ defaultAccentColors switch cases ═══════════════")
     for t in simple_themes:
         if t["has_dark"] and t["has_light"]:
-            print(f'            case "{t["id"]}": return themeVariant_{t["id"]} === "light" ? {t["prop_light"]} : {t["prop_dark"]};')
+            print(f'            case "{t["id"]}": return registryThemeVariant === "light" ? {t["prop_light"]} : {t["prop_dark"]};')
         elif t["has_dark"]:
             print(f'            case "{t["id"]}": return {t["prop_dark"]};')
         else:
@@ -172,15 +159,15 @@ def main():
     if catppuccin_data:
         flavors = catppuccin_data.get("variants", {}).get("flavors", [])
         print('            case "catppuccin": {')
-        print('                const isDark = catppuccinThemeVariant === "dark";')
         print('                switch (selectedCatppuccinFlavor) {')
         for f in flavors:
             fid = f["id"]
             cap = fid.capitalize()
-            print(f'                    case "{fid}": return isDark ? catppuccin{cap}DarkColors : catppuccin{cap}LightColors;')
-        print('                    default: return catppuccinMochaDarkColors;')
+            print(f'                    case "{fid}": return catppuccin{cap}Colors;')
+        print('                    default: return catppuccinMochaColors;')
         print('                }')
         print('            }')
+
 
 if __name__ == "__main__":
     main()
