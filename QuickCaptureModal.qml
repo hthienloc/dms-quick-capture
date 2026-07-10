@@ -142,7 +142,7 @@ DankModal {
             window.hoveredColor = window.sampleCanvasColor(window.cursorX * window.editScale, window.cursorY * window.editScale);
         }
         if (currentTool === "backdrop" && window.backdropMode === "none") {
-            window.backdropMode = config.pluginData && config.pluginData["backdropDefaultMode"] || "solid";
+            window.backdropMode = backdropConfigValue("backdropDefaultMode", Constants.defaultBackdropMode, false);
         }
         if (window.activeCanvas) {
             window.activeCanvas.requestPaint();
@@ -1028,6 +1028,12 @@ DankModal {
         return Qt.rect(cx, cy, cw, ch);
     }
 
+    function backdropConfigValue(key, defaultValue, numeric) {
+        const pd = config && config.pluginData;
+        if (!pd || pd[key] === undefined || pd[key] === null) return defaultValue;
+        return numeric ? parseInt(pd[key], 10) : pd[key];
+    }
+
     function constrainSquarePoint(start, point) {
         return Helpers.constrainSquarePoint(start, point, Qt);
     }
@@ -1502,11 +1508,11 @@ DankModal {
         window.hasSampledContrast = false;
         window.hasUserCustomizedBackdrop = false;
         window.backdropMode = "none";
-        window.backdropPadding = config.pluginData && config.pluginData["backdropDefaultPadding"] !== undefined ? parseInt(config.pluginData["backdropDefaultPadding"]) : Constants.defaultBackdropPadding;
-        window.backdropCornerRadius = config.pluginData && config.pluginData["backdropDefaultRadius"] !== undefined ? parseInt(config.pluginData["backdropDefaultRadius"]) : Constants.defaultBackdropCornerRadius;
-        window.backdropShadowStrength = config.pluginData && config.pluginData["backdropDefaultShadow"] !== undefined ? parseInt(config.pluginData["backdropDefaultShadow"]) : Constants.defaultBackdropShadowStrength;
-        window.backdropGradientAngle = config.pluginData && config.pluginData["backdropDefaultAngle"] !== undefined ? parseInt(config.pluginData["backdropDefaultAngle"]) : Constants.defaultBackdropGradientAngle;
-        window.backdropAspectRatio = config.pluginData && config.pluginData["backdropDefaultAspectRatio"] !== undefined ? config.pluginData["backdropDefaultAspectRatio"] : "auto";
+        window.backdropPadding = backdropConfigValue("backdropDefaultPadding", Constants.defaultBackdropPadding, true);
+        window.backdropCornerRadius = backdropConfigValue("backdropDefaultRadius", Constants.defaultBackdropCornerRadius, true);
+        window.backdropShadowStrength = backdropConfigValue("backdropDefaultShadow", Constants.defaultBackdropShadowStrength, true);
+        window.backdropGradientAngle = backdropConfigValue("backdropDefaultAngle", Constants.defaultBackdropGradientAngle, true);
+        window.backdropAspectRatio = backdropConfigValue("backdropDefaultAspectRatio", Constants.defaultBackdropAspectRatio, false);
         window.cropRect = Qt.rect(0, 0, 0, 0);
         window.hasSelection = false;
         window.activeHandle = "none";
