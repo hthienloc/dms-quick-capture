@@ -20,6 +20,7 @@ Rectangle {
     property int value: 0
     property int stepSize: 5
     property bool opened: false
+    onValueChanged: slider.value = value
 
     signal userValueChanged(int val)
 
