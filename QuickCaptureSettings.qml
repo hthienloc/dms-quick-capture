@@ -859,7 +859,6 @@ PluginSettings {
             defaultValue: 12
             minimum: 0
             maximum: 60
-            stepSize: 2
             unit: "px"
             leftLabel: "0"
             rightLabel: "60"
@@ -888,7 +887,6 @@ PluginSettings {
             defaultValue: 45
             minimum: 0
             maximum: 360
-            stepSize: 15
             unit: "°"
             leftLabel: "0"
             rightLabel: "360"
