@@ -142,7 +142,7 @@ DankModal {
             window.hoveredColor = window.sampleCanvasColor(window.cursorX * window.editScale, window.cursorY * window.editScale);
         }
         if (currentTool === "backdrop" && window.backdropMode === "none") {
-            window.backdropMode = "solid";
+            window.backdropMode = config.pluginData && config.pluginData["backdropDefaultMode"] || "solid";
         }
         if (window.activeCanvas) {
             window.activeCanvas.requestPaint();
@@ -1501,6 +1501,12 @@ DankModal {
         window.isScreenshotDark = false;
         window.hasSampledContrast = false;
         window.hasUserCustomizedBackdrop = false;
+        window.backdropMode = "none";
+        window.backdropPadding = config.pluginData && config.pluginData["backdropDefaultPadding"] !== undefined ? parseInt(config.pluginData["backdropDefaultPadding"]) : Constants.defaultBackdropPadding;
+        window.backdropCornerRadius = config.pluginData && config.pluginData["backdropDefaultRadius"] !== undefined ? parseInt(config.pluginData["backdropDefaultRadius"]) : Constants.defaultBackdropCornerRadius;
+        window.backdropShadowStrength = config.pluginData && config.pluginData["backdropDefaultShadow"] !== undefined ? parseInt(config.pluginData["backdropDefaultShadow"]) : Constants.defaultBackdropShadowStrength;
+        window.backdropGradientAngle = config.pluginData && config.pluginData["backdropDefaultAngle"] !== undefined ? parseInt(config.pluginData["backdropDefaultAngle"]) : Constants.defaultBackdropGradientAngle;
+        window.backdropAspectRatio = config.pluginData && config.pluginData["backdropDefaultAspectRatio"] !== undefined ? config.pluginData["backdropDefaultAspectRatio"] : "auto";
         window.cropRect = Qt.rect(0, 0, 0, 0);
         window.hasSelection = false;
         window.activeHandle = "none";

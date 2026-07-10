@@ -808,6 +808,112 @@ PluginSettings {
     }
 
     SettingsCard {
+        SectionTitle {
+            text: I18n.tr("Backdrop Defaults")
+            icon: "wallpaper"
+            showReset: backdropDefaultMode.isDirty || backdropDefaultPadding.isDirty || backdropDefaultRadius.isDirty || backdropDefaultShadow.isDirty || backdropDefaultAngle.isDirty || backdropDefaultAspectRatio.isDirty
+            onResetClicked: {
+                backdropDefaultMode.resetToDefault();
+                backdropDefaultPadding.resetToDefault();
+                backdropDefaultRadius.resetToDefault();
+                backdropDefaultShadow.resetToDefault();
+                backdropDefaultAngle.resetToDefault();
+                backdropDefaultAspectRatio.resetToDefault();
+            }
+        }
+
+        SelectionSettingPlus {
+            id: backdropDefaultMode
+            settingKey: "backdropDefaultMode"
+            label: I18n.tr("Default Backdrop Mode")
+            options: [
+                { label: I18n.tr("None"), value: "none" },
+                { label: I18n.tr("Solid Color"), value: "solid" },
+                { label: I18n.tr("Linear Gradient"), value: "gradient" },
+                { label: I18n.tr("Radial Gradient"), value: "radial" },
+                { label: I18n.tr("Conic Gradient"), value: "conic" }
+            ]
+            defaultValue: "solid"
+        }
+
+        Separator {}
+
+        SliderSettingPlus {
+            id: backdropDefaultPadding
+            settingKey: "backdropDefaultPadding"
+            label: I18n.tr("Default Padding")
+            defaultValue: 40
+            minimum: 0
+            maximum: 150
+            unit: "px"
+            leftLabel: "0"
+            rightLabel: "150"
+        }
+
+        Separator {}
+
+        SliderSettingPlus {
+            id: backdropDefaultRadius
+            settingKey: "backdropDefaultRadius"
+            label: I18n.tr("Default Corner Radius")
+            defaultValue: 12
+            minimum: 0
+            maximum: 60
+            stepSize: 2
+            unit: "px"
+            leftLabel: "0"
+            rightLabel: "60"
+        }
+
+        Separator {}
+
+        SliderSettingPlus {
+            id: backdropDefaultShadow
+            settingKey: "backdropDefaultShadow"
+            label: I18n.tr("Default Shadow Strength")
+            defaultValue: 50
+            minimum: 0
+            maximum: 100
+            unit: "%"
+            leftLabel: "0"
+            rightLabel: "100"
+        }
+
+        Separator {}
+
+        SliderSettingPlus {
+            id: backdropDefaultAngle
+            settingKey: "backdropDefaultAngle"
+            label: I18n.tr("Default Gradient Angle")
+            defaultValue: 45
+            minimum: 0
+            maximum: 360
+            stepSize: 15
+            unit: "°"
+            leftLabel: "0"
+            rightLabel: "360"
+        }
+
+        Separator {}
+
+        SelectionSettingPlus {
+            id: backdropDefaultAspectRatio
+            settingKey: "backdropDefaultAspectRatio"
+            label: I18n.tr("Default Aspect Ratio")
+            options: [
+                { label: I18n.tr("Auto"), value: "auto" },
+                { label: "1:1", value: "1:1" },
+                { label: "16:9", value: "16:9" },
+                { label: "9:16", value: "9:16" },
+                { label: "4:3", value: "4:3" },
+                { label: "3:2", value: "3:2" },
+                { label: "21:9", value: "21:9" }
+            ]
+            defaultValue: "auto"
+        }
+    }
+
+    SettingsCard {
         id: radialMenuCard
 
         property int presetActiveIndex: 0
