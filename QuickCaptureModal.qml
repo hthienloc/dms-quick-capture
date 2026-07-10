@@ -142,8 +142,7 @@ DankModal {
             window.hoveredColor = window.sampleCanvasColor(window.cursorX * window.editScale, window.cursorY * window.editScale);
         }
         if (currentTool === "backdrop" && window.backdropMode === "none") {
-            const bm = backdropConfigValue("backdropDefaultMode", Constants.defaultBackdropMode, false);
-            window.backdropMode = bm !== "none" ? bm : "solid";
+            window.backdropMode = Constants.defaultBackdropMode;
         }
         if (window.activeCanvas) {
             window.activeCanvas.requestPaint();
@@ -1031,14 +1030,13 @@ DankModal {
 
     function backdropConfigValue(key, defaultValue, numeric) {
         const pd = config && config.pluginData;
-        if (!pd || pd["backdropAutoApply"] !== true) return defaultValue;
-        if (pd[key] === undefined || pd[key] === null) return defaultValue;
+        if (!pd || pd[key] === undefined || pd[key] === null) return defaultValue;
         return numeric ? parseInt(pd[key], 10) : pd[key];
     }
 
     function backdropConfigColor(key, defaultValue) {
         const pd = config && config.pluginData;
-        if (!pd || pd["backdropAutoApply"] !== true) return defaultValue;
+        if (!pd) return defaultValue;
         const val = pd[key];
         if (!val || val === "primary") return Theme.primary;
         return Qt.color(val);
@@ -1518,14 +1516,15 @@ DankModal {
         window.hasSampledContrast = false;
         window.hasUserCustomizedBackdrop = false;
         window.backdropMode = "none";
+        if (config && config.pluginData && config.pluginData["backdropAutoApply"] === true) {
+            const bm = config.pluginData["backdropDefaultMode"];
+            if (bm) window.backdropMode = bm;
+        }
         window.backdropPadding = backdropConfigValue("backdropDefaultPadding", Constants.defaultBackdropPadding, true);
         window.backdropCornerRadius = backdropConfigValue("backdropDefaultRadius", Constants.defaultBackdropCornerRadius, true);
         window.backdropShadowStrength = backdropConfigValue("backdropDefaultShadow", Constants.defaultBackdropShadowStrength, true);
         window.backdropGradientAngle = backdropConfigValue("backdropDefaultAngle", Constants.defaultBackdropGradientAngle, true);
         window.backdropAspectRatio = backdropConfigValue("backdropDefaultAspectRatio", Constants.defaultBackdropAspectRatio, false);
-        window.backdropSolidColor = backdropConfigColor("backdropDefaultSolidColor", Theme.primary);
-        window.backdropGradientStart = backdropConfigColor("backdropDefaultGradientStart", Theme.primary);
-        window.backdropGradientEnd = backdropConfigColor("backdropDefaultGradientEnd", Theme.secondary);
         window.cropRect = Qt.rect(0, 0, 0, 0);
         window.hasSelection = false;
         window.activeHandle = "none";
