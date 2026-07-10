@@ -1017,6 +1017,17 @@ DankModal {
         return Helpers.isInsideCropRect(mx, my, window.hasSelection, window.cropRect);
     }
 
+    function clampCropRect(x, y, w, h) {
+        const bw = window.screenshotWidth;
+        const bh = window.screenshotHeight;
+        const minSize = 10;
+        const cx = Math.max(0, Math.min(x, Math.max(0, bw - minSize)));
+        const cy = Math.max(0, Math.min(y, Math.max(0, bh - minSize)));
+        const cw = Math.max(minSize, Math.min(w, bw - cx));
+        const ch = Math.max(minSize, Math.min(h, bh - cy));
+        return Qt.rect(cx, cy, cw, ch);
+    }
+
     function constrainSquarePoint(start, point) {
         return Helpers.constrainSquarePoint(start, point, Qt);
     }
@@ -2239,12 +2250,14 @@ DankModal {
                                 }
 
                                 if (window.currentTool === "crop") {
+                                    const ox = Math.max(0, Math.min(origX, window.screenshotWidth));
+                                    const oy = Math.max(0, Math.min(origY, window.screenshotHeight));
                                     if (window.activeHandle === "new") {
-                                        const x1 = Math.min(window.selectStart.x, origX);
-                                        const y1 = Math.min(window.selectStart.y, origY);
-                                        const w = Math.abs(origX - window.selectStart.x);
-                                        const h = Math.abs(origY - window.selectStart.y);
-                                        window.cropRect = Qt.rect(x1, y1, w, h);
+                                        const x1 = Math.min(window.selectStart.x, ox);
+                                        const y1 = Math.min(window.selectStart.y, oy);
+                                        const w = Math.abs(ox - window.selectStart.x);
+                                        const h = Math.abs(oy - window.selectStart.y);
+                                        window.cropRect = window.clampCropRect(x1, y1, w, h);
                                         drawingCanvas.requestPaint();
                                         return;
                                     }
@@ -2258,23 +2271,23 @@ DankModal {
                                         let newH = cr.height;
 
                                         if (window.activeHandle === "tl") {
-                                            newX = Math.min(origX, cr.x + cr.width - 10);
-                                            newY = Math.min(origY, cr.y + cr.height - 10);
+                                            newX = Math.min(ox, cr.x + cr.width - 10);
+                                            newY = Math.min(oy, cr.y + cr.height - 10);
                                             newW = cr.x + cr.width - newX;
                                             newH = cr.y + cr.height - newY;
                                         } else if (window.activeHandle === "tr") {
-                                            newY = Math.min(origY, cr.y + cr.height - 10);
-                                            newW = Math.max(10, origX - cr.x);
+                                            newY = Math.min(oy, cr.y + cr.height - 10);
+                                            newW = Math.max(10, ox - cr.x);
                                             newH = cr.y + cr.height - newY;
                                         } else if (window.activeHandle === "bl") {
-                                            newX = Math.min(origX, cr.x + cr.width - 10);
+                                            newX = Math.min(ox, cr.x + cr.width - 10);
                                             newW = cr.x + cr.width - newX;
-                                            newH = Math.max(10, origY - cr.y);
+                                            newH = Math.max(10, oy - cr.y);
                                         } else if (window.activeHandle === "br") {
-                                            newW = Math.max(10, origX - cr.x);
-                                            newH = Math.max(10, origY - cr.y);
+                                            newW = Math.max(10, ox - cr.x);
+                                            newH = Math.max(10, oy - cr.y);
                                         }
-                                        window.cropRect = Qt.rect(newX, newY, newW, newH);
+                                        window.cropRect = window.clampCropRect(newX, newY, newW, newH);
                                         drawingCanvas.requestPaint();
                                         return;
                                     }
@@ -2494,6 +2507,8 @@ DankModal {
                                 if (window.currentTool === "crop") {
                                     const ox = mouse.x / window.editScale;
                                     const oy = mouse.y / window.editScale;
+                                    const pw = window.screenshotWidth;
+                                    const ph = window.screenshotHeight;
                                     const handle = window.getHoveredHandle(ox, oy);
                                     if (handle !== "none") {
                                         window.activeHandle = handle;
@@ -2502,8 +2517,8 @@ DankModal {
 
                                     // Drag-to-select crop area
                                     window.activeHandle = "new";
-                                    window.selectStart = Qt.point(ox, oy);
-                                    window.cropRect = Qt.rect(ox, oy, 0, 0);
+                                    window.selectStart = Qt.point(Math.max(0, Math.min(ox, pw)), Math.max(0, Math.min(oy, ph)));
+                                    window.cropRect = Qt.rect(window.selectStart.x, window.selectStart.y, 0, 0);
                                     window.hasSelection = false;
                                     drawingCanvas.requestPaint();
                                     return;
@@ -2610,6 +2625,7 @@ DankModal {
 
                                  if (window.currentTool === "crop") {
                                     if (window.activeHandle === "new" || window.activeHandle === "tl" || window.activeHandle === "tr" || window.activeHandle === "bl" || window.activeHandle === "br") {
+                                        // Check for accidental click (too small) BEFORE clamping
                                         if (Math.min(window.cropRect.width, window.cropRect.height) <= 3) {
                                             if (window.strokes.length === 0) {
                                                 window.discardAndClose();
@@ -2619,6 +2635,7 @@ DankModal {
                                             }
                                             return;
                                         }
+                                        window.cropRect = window.clampCropRect(window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height);
                                         if (Math.min(window.cropRect.width, window.cropRect.height) >= 16) {
                                             window.hasSelection = true;
                                             // Automatically enter edit mode with the pen tool once selection is made/resized!
