@@ -1017,6 +1017,16 @@ DankModal {
         return Helpers.isInsideCropRect(mx, my, window.hasSelection, window.cropRect);
     }
 
+    function clampCropRect(x, y, w, h) {
+        const bw = window.screenshotWidth;
+        const bh = window.screenshotHeight;
+        const cx = Math.max(0, Math.min(x, bw - 10));
+        const cy = Math.max(0, Math.min(y, bh - 10));
+        const cw = Math.max(10, Math.min(w, bw - cx));
+        const ch = Math.max(10, Math.min(h, bh - cy));
+        return Qt.rect(cx, cy, cw, ch);
+    }
+
     function constrainSquarePoint(start, point) {
         return Helpers.constrainSquarePoint(start, point, Qt);
     }
@@ -2244,7 +2254,7 @@ DankModal {
                                         const y1 = Math.min(window.selectStart.y, origY);
                                         const w = Math.abs(origX - window.selectStart.x);
                                         const h = Math.abs(origY - window.selectStart.y);
-                                        window.cropRect = Qt.rect(x1, y1, w, h);
+                                        window.cropRect = window.clampCropRect(x1, y1, w, h);
                                         drawingCanvas.requestPaint();
                                         return;
                                     }
@@ -2274,7 +2284,7 @@ DankModal {
                                             newW = Math.max(10, origX - cr.x);
                                             newH = Math.max(10, origY - cr.y);
                                         }
-                                        window.cropRect = Qt.rect(newX, newY, newW, newH);
+                                        window.cropRect = window.clampCropRect(newX, newY, newW, newH);
                                         drawingCanvas.requestPaint();
                                         return;
                                     }
@@ -2610,6 +2620,7 @@ DankModal {
 
                                  if (window.currentTool === "crop") {
                                     if (window.activeHandle === "new" || window.activeHandle === "tl" || window.activeHandle === "tr" || window.activeHandle === "bl" || window.activeHandle === "br") {
+                                        window.cropRect = window.clampCropRect(window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height);
                                         if (Math.min(window.cropRect.width, window.cropRect.height) <= 3) {
                                             if (window.strokes.length === 0) {
                                                 window.discardAndClose();
