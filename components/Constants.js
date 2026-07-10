@@ -6,6 +6,8 @@ const defaultBackdropPadding = 40;
 const defaultBackdropCornerRadius = 12;
 const defaultBackdropShadowStrength = 50;
 const defaultBackdropGradientAngle = 45;
+const defaultBackdropAspectRatio = "auto";
+const defaultBackdropMode = "solid";
 
 // Selection and threshold constants
 const selectionThresholdBase = 12;
