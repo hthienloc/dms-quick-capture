@@ -113,11 +113,11 @@ QtObject {
     readonly property string selectedCatppuccinFlavor: pluginData["catppuccin_variant"] || "mocha"
 
     readonly property var adaptiveColors: [
-        Theme.info,
         Theme.error,
-        Theme.success,
         Theme.warning,
+        Theme.info,
         Theme.secondary,
+        Theme.surfaceContainerHighest,
         Theme.surfaceText,
         Theme.surface
     ]
