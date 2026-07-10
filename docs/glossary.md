@@ -1,122 +1,122 @@
-# Thuật ngữ / Glossary
+# Glossary
 
-Dưới đây là các thuật ngữ dùng trong plugin, code, và settings để tránh nhầm lẫn.
+Terms used across the plugin, codebase, and settings to avoid ambiguity.
 
 ## Annotation concepts
 
-| Thuật ngữ | Ý nghĩa | Ghi chú |
+| Term | Meaning | Notes |
 |---|---|---|
-| **Tool** | Công cụ vẽ / chỉnh sửa (pen, line, arrow, rect, etc.) | `toolButtons` trong CaptureConfig.qml |
-| **Stroke** | Một đường vẽ hoàn chỉnh do user tạo ra | Lưu trong strokes JSON |
-| **Annotation** | Tổng thể tất cả strokes + text + stamp trên canvas | Export ra ảnh cuối cùng |
-| **Canvas** | Vùng vẽ chính, chứa screenshot + annotation | `drawingCanvas` trong QuickCaptureModal.qml |
-| **Screenshot** | Ảnh chụp màn hình gốc (chưa annotate) | `bgImage`, nằm dưới strokes |
+| **Tool** | Drawing / editing instrument (pen, line, arrow, rect, etc.) | `toolButtons` in CaptureConfig.qml |
+| **Stroke** | A complete drawn path created by the user | Stored in strokes JSON |
+| **Annotation** | All strokes + text + stamps on the canvas | Final exported image |
+| **Canvas** | The main drawing surface, holds screenshot + annotations | `drawingCanvas` in QuickCaptureModal.qml |
+| **Screenshot** | The original captured image (before annotation) | `bgImage`, sits beneath strokes |
 
 ## Color / Palette
 
-| Thuật ngữ | Ý nghĩa | Ghi chú |
+| Term | Meaning | Notes |
 |---|---|---|
-| **Palette** | Bộ 8 màu có sẵn để chọn | Preset (Nord, Solarized, Adaptive) hoặc Custom |
-| **Preset** | Palette màu định sẵn (Nord, Solarized, Adaptive) | Không thể sửa trực tiếp |
-| **Custom palette** | Palette màu user tự định nghĩa | Có thể ghi đè từng slot |
-| **Color slot** | 1 trong 8 ô màu trên toolbar | Slot 0 = primary, Slot 1-7 = accent |
-| **Slot** | Viết tắt của color slot | Dùng trong code: `toolbar_color_0`, `slot_1`... |
-| **Accent color** | Màu phụ (slot 2-8) | Phân biệt với primary |
-| **Primary color** | Màu chính (slot 1) | Thường dùng làm màu mặc định cho tool |
+| **Palette** | Set of 8 preset colors | Preset (Nord, Solarized, Adaptive) or Custom |
+| **Preset** | Built-in color palette (Nord, Solarized, Adaptive) | Read-only, cannot edit directly |
+| **Custom palette** | User-defined color palette | Each slot can be overridden |
+| **Color slot** | One of 8 color positions on the toolbar | Slot 0 = primary, Slot 1-7 = accent |
+| **Slot** | Short for color slot | In code: `toolbar_color_0`, `slot_1`... |
+| **Accent color** | Secondary colors (slots 2-8) | As opposed to primary |
+| **Primary color** | Main color (slot 1) | Default tool color |
 
 ## Toolbar
 
-| Thuật ngữ | Ý nghĩa | Ghi chú |
+| Term | Meaning | Notes |
 |---|---|---|
-| **Toolbar** | Thanh công cụ chính, chứa tất cả tools + tùy chỉnh | QuickCaptureToolbar.qml |
-| **Horizontal toolbar** | Toolbar nằm ngang (dưới modal) | Layout chính, đủ chỗ cho tất cả tools |
-| **Vertical toolbar** | Toolbar dọc (trái modal) | Bị giới hạn chiều cao, cần 2 hàng |
-| **More tools** | Menu phụ chứa các actions: rotate, mirror, OCR, QR | MoreToolsMenu.qml |
-| **Action button** | Nút thực thi hành động (không phải tool vẽ) | Export, Copy, Float, Undo, Redo |
-| **Tool button** | Nút chọn tool vẽ | Pen, Line, Arrow, Rect, etc. |
+| **Toolbar** | Main toolbar with all tools + controls | QuickCaptureToolbar.qml |
+| **Horizontal toolbar** | Toolbar at the bottom of the modal | Primary layout, fits all tools |
+| **Vertical toolbar** | Toolbar on the left of the modal | Height constrained, needs 2 rows |
+| **More tools** | Secondary actions menu: rotate, mirror, OCR, QR | MoreToolsMenu.qml |
+| **Action button** | Non-drawing action button | Export, Copy, Float, Undo, Redo |
+| **Tool button** | Drawing tool selector | Pen, Line, Arrow, Rect, etc. |
 
 ## Backdrop
 
-| Thuật ngữ | Ý nghĩa | Ghi chú |
+| Term | Meaning | Notes |
 |---|---|---|
-| **Backdrop** | Nền phía sau screenshot | Có padding, shadow, corner radius |
-| **Backdrop mode** | Kiểu backdrop: none, solid, gradient, radial, conic | BackdropModeSelectors.qml |
-| **Backdrop padding** | Khoảng cách từ viền screenshot đến viền backdrop | Mặc định 40px |
-| **Backdrop shadow** | Bóng đổ mô phỏng (4 lớp đè) | Chưa có GPU blur |
-| **Backdrop alignment** | Vị trí screenshot trong khung backdrop | 9 vị trí (hiện tại chỉ center) |
+| **Backdrop** | Background behind the screenshot | Has padding, shadow, corner radius |
+| **Backdrop mode** | Backdrop style: none, solid, gradient, radial, conic | BackdropModeSelectors.qml |
+| **Backdrop padding** | Gap from screenshot edge to backdrop edge | Default 40px |
+| **Backdrop shadow** | Simulated drop shadow (4 layered rects) | No GPU blur yet |
+| **Backdrop alignment** | Screenshot position within the backdrop frame | 9 positions (currently center only) |
 
 ## Radial menu
 
-| Thuật ngữ | Ý nghĩa | Ghi chú |
+| Term | Meaning | Notes |
 |---|---|---|
-| **Radial menu** | Menu vòng tròn xuất hiện khi right-click | RadialMenu.qml |
-| **Radial preset** | 1 trong 8 slot của radial menu | Mỗi slot gồm: tool + color + thickness |
-| **Center button** | Nút giữa radial menu (chọn Select tool) | `centerClicked` signal |
-| **Hover trigger** | Auto-chọn preset khi hover qua sector | Không cần click |
-| **Sector** | Một phần của radial menu (1/8 vòng tròn) | |
+| **Radial menu** | Ring menu on right-click | RadialMenu.qml |
+| **Radial preset** | One of 8 radial menu slots | Each slot: tool + color + thickness |
+| **Center button** | Center of the radial menu (selects Select tool) | `centerClicked` signal |
+| **Hover trigger** | Auto-select preset on hover | No click needed |
+| **Sector** | One slice of the radial menu (1/8 circle) | |
 
 ## Capture / Export
 
-| Thuật ngữ | Ý nghĩa | Ghi chú |
+| Term | Meaning | Notes |
 |---|---|---|
-| **Capture** | Hành động chụp màn hình | `capture()` function |
-| **Region capture** | Chụp một vùng chọn trên màn hình | |
-| **Fullscreen capture** | Chụp toàn màn hình | |
-| **Export** | Xuất ảnh đã annotate ra file | PNG / WebP / JPEG |
-| **Float** | Đưa ảnh đang edit ra cửa sổ riêng (luôn ở trên) | Cần dms-floaty |
-| **Restore from float** | Mở lại ảnh từ float window để tiếp tục edit | |
-| **Copy to clipboard** | Copy annotation ra clipboard (không lưu file) | |
+| **Capture** | The act of taking a screenshot | `capture()` function |
+| **Region capture** | Capture a selected screen region | |
+| **Fullscreen capture** | Capture the entire screen | |
+| **Export** | Save annotated image to file | PNG / WebP / JPEG |
+| **Float** | Detach current edit into an always-on-top window | Requires dms-floaty |
+| **Restore from float** | Reopen a floating image for continued editing | |
+| **Copy to clipboard** | Copy annotation to clipboard (no file save) | |
 
-## Tools (vẽ)
+## Drawing tools
 
-| Thuật ngữ | Ý nghĩa | Ghi chú |
+| Term | Meaning | Notes |
 |---|---|---|
-| **Pen / Freehand** | Vẽ tự do bằng chuột | `strokeWidth` kiểm soát độ dày |
-| **Line** | Vẽ đường thẳng | Click điểm đầu → kéo → thả |
-| **Arrow** | Vẽ đường thẳng có mũi tên | Double-headed, dashed styles |
-| **Rectangle / Rect** | Vẽ hình chữ nhật | Border styles: dashed, dotted |
-| **Ellipse** | Vẽ hình ellipse / circle | |
-| **Text** | Thêm text annotation | Font size = `thickness` |
-| **Pixelate** | Làm mờ vùng chọn (mosaic) | `thickness` = pixel block size |
-| **Redact** | Che vùng chọn bằng màu đen | Shape: rectangle (hiện tại) |
-| **Stamp** | Đánh số thứ tự (1, 2, 3...) | Number stamp |
-| **Highlighter** | Tô màu trong suốt (highlight) | |
-| **Spotlight** | Làm tối vùng ngoài spotlight | Còn gọi là "focus spotlight" |
-| **Callout** | Zoom một vùng ảnh | Còn gọi là "area zoom" |
-| **Backdrop** | Bật/tắt chế độ nền | Không phải tool vẽ, là mode |
+| **Pen / Freehand** | Freehand drawing with mouse | `strokeWidth` controls thickness |
+| **Line** | Straight line | Click start → drag → release |
+| **Arrow** | Line with arrowhead(s) | Double-headed, dashed styles |
+| **Rectangle / Rect** | Rectangle shape | Border styles: dashed, dotted |
+| **Ellipse** | Ellipse / circle | |
+| **Text** | Text annotation | Font size = `thickness` |
+| **Pixelate** | Blur a region (mosaic) | `thickness` = pixel block size |
+| **Redact** | Cover a region with solid fill | Shape: rectangle (currently) |
+| **Stamp** | Number stamp (1, 2, 3...) | |
+| **Highlighter** | Semi-transparent highlight | |
+| **Spotlight** | Darken area outside spotlight | Aka "focus spotlight" |
+| **Callout** | Zoom into a screen region | Aka "area zoom" |
+| **Backdrop** | Toggle backdrop mode | Not a drawing tool, it's a mode |
 
-## Actions (không phải tool vẽ)
+## Actions (non-drawing)
 
-| Thuật ngữ | Ý nghĩa | Ghi chú |
+| Term | Meaning | Notes |
 |---|---|---|
-| **Select** | Chọn / di chuyển annotation có sẵn | Tool mặc định (phím V) |
-| **Eraser** | Xóa stroke / annotation | |
-| **Crop** | Cắt ảnh | |
-| **Color picker** | Chọn màu từ ảnh | Eyedropper (phím F) |
-| **Rotate** | Xoay ảnh (CW / CCW) | |
-| **Mirror** | Lật ảnh (ngang / dọc) | |
-| **OCR** | Nhận diện text từ ảnh (copy ra clipboard) | |
-| **Scan QR** | Quét QR code từ ảnh | |
-| **Copy Color** | Copy màu tại vị trí click | Eyedropper tool |
+| **Select** | Select / move existing annotations | Default tool (V key) |
+| **Eraser** | Delete strokes / annotations | |
+| **Crop** | Crop the image | |
+| **Color picker** | Pick a color from the image | Eyedropper (F key) |
+| **Rotate** | Rotate image (CW / CCW) | |
+| **Mirror** | Flip image (horizontal / vertical) | |
+| **OCR** | Extract text from image (copy to clipboard) | |
+| **Scan QR** | Scan QR code from image | |
+| **Copy Color** | Copy color at click position | Eyedropper action |
 
 ## Settings / PluginData
 
-| Thuật ngữ | Ý nghĩa | Ghi chú |
+| Term | Meaning | Notes |
 |---|---|---|
-| **pluginData** | Object lưu tất cả settings của plugin | Key-value, persist ra file |
-| **Setting** | Một giá trị cấu hình cụ thể | Mỗi key trong pluginData |
+| **pluginData** | Object holding all plugin settings | Key-value, persisted to file |
+| **Setting** | A single configuration value | One key in pluginData |
 | **Preset (tool)** | Radial preset = tool + color + thickness | |
-| **Preset (palette)** | Bộ màu có sẵn (Nord, Solarized...) | Context: palette preset |
-| **Starting tool** | Tool được chọn khi mở capture | Có thể là 1 tool cụ thể hoặc radial preset |
-| **Default preset** | Radial preset mặc định khi capture | `defaultPresetIndex` (0-7) |
+| **Preset (palette)** | Built-in color set (Nord, Solarized...) | Context: palette preset |
+| **Starting tool** | Tool selected when capture opens | Can be a specific tool or radial preset |
+| **Default preset** | Default radial preset on capture | `defaultPresetIndex` (0-7) |
 
 ## Misc
 
-| Thuật ngữ | Ý nghĩa | Ghi chú |
+| Term | Meaning | Notes |
 |---|---|---|
-| **Modal** | Cửa sổ capture chính (toàn màn hình) | QuickCaptureModal.qml |
-| **Daemon** | Service chạy nền, quản lý lifecycle | QuickCaptureDaemon.qml |
-| **Float window** | Cửa sổ nhỏ luôn ở trên, hiển thị annotation | Do dms-floaty quản lý |
-| **IPC** | Giao tiếp giữa các process | Dùng `dms ipc call` |
-| **Stroke JSON** | File lưu tất cả annotation dưới dạng JSON | `/tmp/dms_capture_strokes.json` |
-| **Sidecar** | File JSON đi kèm ảnh float, lưu trạng thái backdrop + strokes | |
+| **Modal** | The main capture window (fullscreen) | QuickCaptureModal.qml |
+| **Daemon** | Background service managing lifecycle | QuickCaptureDaemon.qml |
+| **Float window** | Small always-on-top window showing annotation | Managed by dms-floaty |
+| **IPC** | Inter-process communication | Uses `dms ipc call` |
+| **Stroke JSON** | File storing all annotations as JSON | `/tmp/dms_capture_strokes.json` |
+| **Sidecar** | JSON file accompanying a float image, stores backdrop + stroke state | |
