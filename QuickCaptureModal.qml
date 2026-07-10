@@ -1020,10 +1020,11 @@ DankModal {
     function clampCropRect(x, y, w, h) {
         const bw = window.screenshotWidth;
         const bh = window.screenshotHeight;
-        const cx = Math.max(0, Math.min(x, bw - 10));
-        const cy = Math.max(0, Math.min(y, bh - 10));
-        const cw = Math.max(10, Math.min(w, bw - cx));
-        const ch = Math.max(10, Math.min(h, bh - cy));
+        const minSize = 10;
+        const cx = Math.max(0, Math.min(x, Math.max(0, bw - minSize)));
+        const cy = Math.max(0, Math.min(y, Math.max(0, bh - minSize)));
+        const cw = Math.max(minSize, Math.min(w, bw - cx));
+        const ch = Math.max(minSize, Math.min(h, bh - cy));
         return Qt.rect(cx, cy, cw, ch);
     }
 
@@ -2620,7 +2621,7 @@ DankModal {
 
                                  if (window.currentTool === "crop") {
                                     if (window.activeHandle === "new" || window.activeHandle === "tl" || window.activeHandle === "tr" || window.activeHandle === "bl" || window.activeHandle === "br") {
-                                        window.cropRect = window.clampCropRect(window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height);
+                                        // Check for accidental click (too small) BEFORE clamping
                                         if (Math.min(window.cropRect.width, window.cropRect.height) <= 3) {
                                             if (window.strokes.length === 0) {
                                                 window.discardAndClose();
@@ -2630,6 +2631,7 @@ DankModal {
                                             }
                                             return;
                                         }
+                                        window.cropRect = window.clampCropRect(window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height);
                                         if (Math.min(window.cropRect.width, window.cropRect.height) >= 16) {
                                             window.hasSelection = true;
                                             // Automatically enter edit mode with the pen tool once selection is made/resized!
