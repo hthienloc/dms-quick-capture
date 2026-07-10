@@ -597,10 +597,16 @@ PluginSettings {
                     options: [
                         { "label": I18n.tr("Adaptive (DMS Theme)"), "value": "adaptive" },
                         { "label": I18n.tr("Classic (Tailwind)"), "value": "classic" },
-                        { "label": I18n.tr("Nord (Pastel Cold)"), "value": "nord" },
-                        { "label": I18n.tr("Gruvbox (Warm Retro)"), "value": "gruvbox" },
-                        { "label": I18n.tr("Dracula (High Contrast Dark)"), "value": "dracula" },
+                        { "label": I18n.tr("Nord"), "value": "nord" },
+                        { "label": I18n.tr("Dracula"), "value": "dracula" },
+                        { "label": I18n.tr("Gruvbox Material"), "value": "gruvbox" },
                         { "label": I18n.tr("Catppuccin"), "value": "catppuccin" },
+                        { "label": I18n.tr("Everforest"), "value": "everforest" },
+                        { "label": I18n.tr("Rosé Pine"), "value": "rosePine" },
+                        { "label": I18n.tr("Kanagawa"), "value": "kanagawaWl" },
+                        { "label": I18n.tr("Tokyo Night"), "value": "tokyoNight" },
+                        { "label": I18n.tr("Synthwave Electric"), "value": "synthwaveElectric" },
+                        { "label": I18n.tr("Dank Violet"), "value": "dankViolet" },
                         { "label": I18n.tr("Custom Colors"), "value": "custom" }
                     ]
                     Component.onCompleted: {
@@ -608,6 +614,33 @@ PluginSettings {
                             if (children[i].toString().indexOf("Rectangle") !== -1) {
                                 children[i].visible = false;
                             }
+                        }
+                    }
+                }
+
+                ButtonGroupSettingPlus {
+                    id: registryVariantSetting
+                    settingKey: "registry_theme_variant"
+                    label: ""
+                    defaultValue: "dark"
+                    options: [
+                        { "label": I18n.tr("Dark"), "value": "dark" },
+                        { "label": I18n.tr("Light"), "value": "light" }
+                    ]
+                    visible: {
+                        const p = palettePresetSetting.value;
+                        return p !== "adaptive" && p !== "classic" && p !== "custom" && p !== "catppuccin";
+                    }
+                    height: visible ? implicitHeight : 0
+                    Component.onCompleted: {
+                        for (var i = 0; i < children.length; i++) {
+                            if (children[i].toString().indexOf("Rectangle") !== -1) {
+                                children[i].visible = false;
+                            }
+                        }
+                        if (children[1] && children[1].children[0]) {
+                            children[1].children[0].height = 0;
+                            children[1].children[0].visible = false;
                         }
                     }
                 }
@@ -2488,6 +2521,7 @@ PluginSettings {
         pluginData: {
             "color_palette_preset": palettePresetSetting.value,
             "catppuccin_variant": catppuccinVariantSetting.value,
+            "registry_theme_variant": registryVariantSetting.value,
             "toolbar_color_primary": toolbar_primary.value,
             "toolbar_color_0": c0.value,
             "toolbar_color_1": c1.value,
