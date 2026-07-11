@@ -1157,21 +1157,22 @@ DankModal {
     function switchPresetToCustom(copyCurrent) {
         if (!window.parentWidget || !window.parentWidget.pluginService) return;
         
+        // 1. Read current palette FIRST before switching preset to custom
+        // to avoid QML reactive bindings immediately resetting the palette to custom empty/defaults.
+        const currentPalette = (copyCurrent && window.toolbarItem && window.toolbarItem.toolbarPalette) ? window.toolbarItem.toolbarPalette : [];
+        
         let pData = Object.assign({}, window.parentWidget.pluginData);
         pData["color_palette_preset"] = "custom";
         window.parentWidget.pluginService.savePluginData("quickCapture", "color_palette_preset", "custom");
         
-        if (copyCurrent) {
-            const currentPalette = window.toolbarItem ? window.toolbarItem.toolbarPalette : [];
-            if (currentPalette && currentPalette.length >= 8) {
-                pData["toolbar_color_primary"] = window.formatHexColor(currentPalette[0]).toUpperCase();
-                window.parentWidget.pluginService.savePluginData("quickCapture", "toolbar_color_primary", pData["toolbar_color_primary"]);
-                
-                for (let i = 0; i < 7; i++) {
-                    const key = "toolbar_color_" + i;
-                    pData[key] = window.formatHexColor(currentPalette[i + 1]).toUpperCase();
-                    window.parentWidget.pluginService.savePluginData("quickCapture", key, pData[key]);
-                }
+        if (copyCurrent && currentPalette && currentPalette.length >= 8) {
+            pData["toolbar_color_primary"] = window.formatHexColor(currentPalette[0]).toUpperCase();
+            window.parentWidget.pluginService.savePluginData("quickCapture", "toolbar_color_primary", pData["toolbar_color_primary"]);
+            
+            for (let i = 0; i < 7; i++) {
+                const key = "toolbar_color_" + i;
+                pData[key] = window.formatHexColor(currentPalette[i + 1]).toUpperCase();
+                window.parentWidget.pluginService.savePluginData("quickCapture", key, pData[key]);
             }
         }
         

@@ -586,10 +586,32 @@ function getBoundaryColorOrGradient(ctx, rx, ry, rw, rh, offscreenSampler, Qt) {
  */
 function formatHexColor(color) {
     if (!color) return "#000000";
-    const r = Math.round((color.r || 0) * 255).toString(16).padStart(2, '0');
-    const g = Math.round((color.g || 0) * 255).toString(16).padStart(2, '0');
-    const b = Math.round((color.b || 0) * 255).toString(16).padStart(2, '0');
-    return "#" + r + g + b;
+    
+    // Coerce to string to see if it represents a valid hex color
+    const s = String(color).trim();
+    const match = s.match(/^#?([a-fA-F0-9]{3,8})$/);
+    if (match) {
+        let h = match[1];
+        if (h.length === 8) {
+            h = h.substring(2);
+        } else if (h.length === 3) {
+            h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+        }
+        if (h.length === 6) {
+            return "#" + h.toUpperCase();
+        }
+        return "#000000";
+    }
+    
+    // Otherwise, check if it is a QML color object (has r, g, b)
+    if (color && typeof color === "object" && color.r !== undefined) {
+        const r = Math.round((color.r || 0) * 255).toString(16).padStart(2, '0');
+        const g = Math.round((color.g || 0) * 255).toString(16).padStart(2, '0');
+        const b = Math.round((color.b || 0) * 255).toString(16).padStart(2, '0');
+        return ("#" + r + g + b).toUpperCase();
+    }
+    
+    return "#000000";
 }
 
 /**
