@@ -2,7 +2,6 @@ name: Auto-Release Bot
 
 on:
   schedule:
-    - cron: '50 16 * * 1-5' # Daily patch bump (Mon-Fri) at 23:50 Vietnam Time (16:50 UTC)
     - cron: '50 16 * * 0'   # Weekly minor bump (Sunday) at 23:50 Vietnam Time (16:50 UTC)
   workflow_dispatch:
     inputs:
@@ -31,10 +30,8 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "BUMP_TYPE=${{ github.event.inputs.bump_type }}" >> $GITHUB_ENV
-          elif [ "${{ github.event.schedule }}" = "50 16 * * 0" ]; then
-            echo "BUMP_TYPE=minor" >> $GITHUB_ENV
           else
-            echo "BUMP_TYPE=patch" >> $GITHUB_ENV
+            echo "BUMP_TYPE=minor" >> $GITHUB_ENV
           fi
 
       - name: Check for Changes & Filter Docs
@@ -50,7 +47,6 @@ jobs:
               echo "No new commits since $LATEST_TAG. Skipping release."
               echo "should_release=false" >> $GITHUB_OUTPUT
             else
-              # List changed files excluding docs, config, license, gitignore
               CHANGED_FILES=$(git diff --name-only "$LATEST_TAG"..HEAD)
               NON_DOC_CHANGES=$(echo "$CHANGED_FILES" | grep -vE '^(\.github/|.*\.md$|LICENSE$|\.gitignore$)' || true)
               if [ -n "$NON_DOC_CHANGES" ]; then
@@ -69,18 +65,17 @@ jobs:
         run: |
           VERSION=$(jq -r '.version' plugin.json)
           IFS='.' read -r major minor patch <<< "$VERSION"
-          
+
           if [ "$BUMP_TYPE" = "minor" ]; then
             minor=$((minor + 1))
             patch=0
           else
             patch=$((patch + 1))
           fi
-          
+
           NEW_VERSION="$major.$minor.$patch"
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
-          
-          # Write back to plugin.json
+
           jq --arg ver "$NEW_VERSION" '.version = $ver' plugin.json > tmp.json && mv tmp.json plugin.json
           echo "Bumped version to $NEW_VERSION"
 
