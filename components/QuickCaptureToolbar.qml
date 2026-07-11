@@ -33,6 +33,7 @@ Rectangle {
     property string backdropAspectRatio: "auto"
     
     property real customAspectRatio: 1.50
+    property string backdropAlignment: "center"
 
     property string gradientActiveSlot: "start"
 
@@ -46,6 +47,7 @@ Rectangle {
     signal changeBackdropShadowStrength(int strength)
     signal changeBackdropAspectRatio(string ratio)
     signal changeCustomAspectRatio(real ratio)
+    signal changeBackdropAlignment(string alignment)
     signal rotateRequested()
     signal mirrorRequested()
     signal moreToolsClicked(var buttonItem)
@@ -583,6 +585,16 @@ Rectangle {
                     onExited: root.backdropControlExited("aspectRatio")
                     onWheeled: (delta) => root.backdropControlWheel("aspectRatio", delta)
                 }
+
+                // Alignment Control (Hover to reveal 3x3 position grid popover)
+                AlignmentControl {
+                    id: alignControl
+                    backdropAlignment: root.backdropAlignment
+                    compact: false
+                    anchors.verticalCenter: parent.verticalCenter
+                    onHovered: root.backdropControlHovered("alignment", alignControl)
+                    onExited: root.backdropControlExited("alignment")
+                }
             }
             
             Rectangle { 
@@ -817,6 +829,16 @@ Rectangle {
                     onHovered: root.backdropControlHovered("aspectRatio", aspectControlVert)
                     onExited: root.backdropControlExited("aspectRatio")
                     onWheeled: (delta) => root.backdropControlWheel("aspectRatio", delta)
+                }
+
+                // Alignment Control
+                AlignmentControl {
+                    id: alignControlVert
+                    backdropAlignment: root.backdropAlignment
+                    compact: true
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    onHovered: root.backdropControlHovered("alignment", alignControlVert)
+                    onExited: root.backdropControlExited("alignment")
                 }
             }
             

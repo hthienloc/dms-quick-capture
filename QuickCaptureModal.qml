@@ -160,6 +160,7 @@ DankModal {
     property int backdropShadowStrength: Constants.defaultBackdropShadowStrength
     property string backdropAspectRatio: "auto"
     property real customAspectRatio: 1.50
+    property string backdropAlignment: "center"
     readonly property real customRatioMin: 0.50
     readonly property real customRatioMax: 2.50
     readonly property real customRatioStep: 0.05
@@ -350,8 +351,20 @@ DankModal {
 
     readonly property real backdropScaleFactor: 1.0
 
-    readonly property real screenshotXOffset: window.effectiveBackdropMode === "none" ? 0 : (canvasWidth - screenshotWidth) / 2
-    readonly property real screenshotYOffset: window.effectiveBackdropMode === "none" ? 0 : (canvasHeight - screenshotHeight) / 2
+    readonly property real screenshotXOffset: {
+        if (window.effectiveBackdropMode === "none") return 0;
+        const align = window.backdropAlignment;
+        if (align.endsWith("-left"))  return 0;
+        if (align.endsWith("-right")) return canvasWidth - screenshotWidth;
+        return (canvasWidth - screenshotWidth) / 2;
+    }
+    readonly property real screenshotYOffset: {
+        if (window.effectiveBackdropMode === "none") return 0;
+        const align = window.backdropAlignment;
+        if (align.startsWith("top-"))    return 0;
+        if (align.startsWith("bottom-")) return canvasHeight - screenshotHeight;
+        return (canvasHeight - screenshotHeight) / 2;
+    }
 
     function drawBackdropBackground(ctx, w, h) {
         if (window.backdropMode === "solid") {
@@ -1634,6 +1647,7 @@ DankModal {
                             window.backdropShadowStrength = data.backdropShadowStrength;
                             window.backdropAspectRatio = data.backdropAspectRatio;
                             window.customAspectRatio = data.customAspectRatio;
+                            if (data.backdropAlignment) window.backdropAlignment = data.backdropAlignment;
                             window.hasUserCustomizedBackdrop = data.hasUserCustomizedBackdrop;
                             window.autoBackdropGradientStart = data.autoBackdropGradientStart;
                             window.autoBackdropGradientEnd = data.autoBackdropGradientEnd;
@@ -1735,6 +1749,7 @@ DankModal {
                     backdropShadowStrength: window.backdropShadowStrength
                     backdropAspectRatio: window.backdropAspectRatio
                     customAspectRatio: window.customAspectRatio
+                    backdropAlignment: window.backdropAlignment
 
                     onChangeBackdropMode: (mode) => {
                         window.backdropMode = mode;
@@ -1800,6 +1815,10 @@ DankModal {
                     onChangeCustomAspectRatio: (ratio) => {
                         window.customAspectRatio = ratio;
                         if (window.activeCanvas) window.activeCanvas.requestPaint();
+                    }
+                    onChangeBackdropAlignment: (alignment) => {
+                        window.backdropAlignment = alignment;
+                        window.requestPaintAll();
                     }
                     onAutoColorBalanceRequested: {
                         window.backdropGradientStart = window.autoBackdropGradientStart;
@@ -1903,6 +1922,7 @@ DankModal {
                         else if (type === "shadow") popover = backdropShadowPopover;
                         else if (type === "angle") popover = backdropAnglePopover;
                         else if (type === "aspectRatio") popover = backdropAspectRatioPopover;
+                        else if (type === "alignment") popover = backdropAlignmentPopover;
 
                         if (popover) {
                             if (toolbarCard.isVertical) {
@@ -1930,6 +1950,7 @@ DankModal {
                         else if (type === "shadow") popover = backdropShadowPopover;
                         else if (type === "angle") popover = backdropAnglePopover;
                         else if (type === "aspectRatio") popover = backdropAspectRatioPopover;
+                        else if (type === "alignment") popover = backdropAlignmentPopover;
 
                         if (popover) {
                             popover.startCloseTimer();
@@ -3446,6 +3467,15 @@ DankModal {
                     onChangeCustomAspectRatio: (ratio) => {
                         window.customAspectRatio = ratio;
                         if (window.activeCanvas) window.activeCanvas.requestPaint();
+                    }
+                }
+
+                BackdropAlignmentPopover {
+                    id: backdropAlignmentPopover
+                    backdropAlignment: window.backdropAlignment
+                    onChangeBackdropAlignment: (alignment) => {
+                        window.backdropAlignment = alignment;
+                        window.requestPaintAll();
                     }
                 }
 
