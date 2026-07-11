@@ -507,9 +507,7 @@ DankModal {
 
     property bool showAnnotations: true
     onShowAnnotationsChanged: {
-        if (window.activeCanvas) {
-            window.activeCanvas.requestPaint();
-        }
+        window.requestPaintAll();
     }
     property var copiedStroke: null
 
@@ -867,7 +865,6 @@ DankModal {
     property var exportCanvasItem: null
 
     onSelectedStrokeChanged: window.requestPaintAll()
-    onShowAnnotationsChanged: window.requestPaintAll()
     onEffectiveBackdropModeChanged: window.requestPaintAll()
     onBackdropSolidColorChanged: window.requestPaintAll()
     onBackdropGradientStartChanged: window.requestPaintAll()
