@@ -295,7 +295,40 @@ function extractDominantColors(imgData, Qt) {
         }
     }
     
-    return { start: colorStart, end: colorEnd };
+    // Calculate average image luminance
+    var imgLuminance = 0;
+    for (var i = 0; i < 16; i++) {
+        var pr = imgData.data[i * 4] / 255;
+        var pg = imgData.data[i * 4 + 1] / 255;
+        var pb = imgData.data[i * 4 + 2] / 255;
+        imgLuminance += (0.299 * pr + 0.587 * pg + 0.114 * pb);
+    }
+    imgLuminance /= 16;
+
+    // Helper to adjust color for contrast ratio >= 4.5
+    function adjustColorForContrast(c) {
+        var l = 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
+        var ratio = (Math.max(l, imgLuminance) + 0.05) / (Math.min(l, imgLuminance) + 0.05);
+        if (ratio >= 4.5) return c;
+        
+        if (imgLuminance > 0.5) {
+            // Image is light -> Make backdrop darker
+            var targetL = Math.max(0.02, (imgLuminance + 0.05) / 4.5 - 0.05);
+            var scale = targetL / Math.max(0.01, l);
+            return Qt.rgba(Math.min(1.0, c.r * scale), Math.min(1.0, c.g * scale), Math.min(1.0, c.b * scale), 1);
+        } else {
+            // Image is dark -> Make backdrop lighter
+            var targetL = Math.min(0.98, 4.5 * (imgLuminance + 0.05) - 0.05);
+            if (l >= 0.99) return Qt.rgba(1, 1, 1, 1);
+            var t = Math.max(0.0, (targetL - l) / (1.0 - l));
+            return Qt.rgba(c.r + (1.0 - c.r) * t, c.g + (1.0 - c.g) * t, c.b + (1.0 - c.b) * t, 1);
+        }
+    }
+
+    return { 
+        start: adjustColorForContrast(colorStart), 
+        end: adjustColorForContrast(colorEnd) 
+    };
 }
 
 /**
