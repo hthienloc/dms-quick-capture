@@ -559,17 +559,11 @@ function drawSelectionOverlay(ctx, options, Theme) {
         const cw = options.canvasWidth;
         const ch = options.canvasHeight;
 
-        if (!options.isOcrMode) {
-            // Dim outside selection (crop mode)
-            ctx.fillRect(0, 0, cr.x, ch);
-            ctx.fillRect(cr.x + cr.width, 0, cw - (cr.x + cr.width), ch);
-            ctx.fillRect(cr.x, 0, cr.width, cr.y);
-            ctx.fillRect(cr.x, cr.y + cr.height, cr.width, ch - (cr.y + cr.height));
-        } else {
-            // Highlight selection (OCR mode)
-            ctx.fillRect(0, 0, cw, ch);
-            ctx.clearRect(cr.x, cr.y, cr.width, cr.height);
-        }
+        // Dim outside selection
+        ctx.fillRect(0, 0, cr.x, ch);
+        ctx.fillRect(cr.x + cr.width, 0, cw - (cr.x + cr.width), ch);
+        ctx.fillRect(cr.x, 0, cr.width, cr.y);
+        ctx.fillRect(cr.x, cr.y + cr.height, cr.width, ch - (cr.y + cr.height));
 
         // Selection border
         ctx.strokeStyle = borderColor;
