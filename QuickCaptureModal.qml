@@ -1159,7 +1159,7 @@ DankModal {
         
         // 1. Read current palette FIRST before switching preset to custom
         // to avoid QML reactive bindings immediately resetting the palette to custom empty/defaults.
-        const currentPalette = (copyCurrent && window.toolbarItem) ? window.toolbarItem.toolbarPalette : [];
+        const currentPalette = (copyCurrent && window.toolbarItem && window.toolbarItem.toolbarPalette) ? window.toolbarItem.toolbarPalette : [];
         
         let pData = Object.assign({}, window.parentWidget.pluginData);
         pData["color_palette_preset"] = "custom";

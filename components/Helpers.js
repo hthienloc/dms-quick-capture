@@ -588,10 +588,10 @@ function formatHexColor(color) {
     if (!color) return "#000000";
     
     // Coerce to string to see if it represents a valid hex color
-    var s = String(color).trim();
-    var match = s.match(/^#?([a-fA-F0-9]{3,8})$/);
+    const s = String(color).trim();
+    const match = s.match(/^#?([a-fA-F0-9]{3,8})$/);
     if (match) {
-        var h = match[1];
+        let h = match[1];
         if (h.length === 8) {
             h = h.substring(2);
         } else if (h.length === 3) {
