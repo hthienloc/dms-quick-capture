@@ -273,11 +273,13 @@ PluginSettings {
 
             Repeater {
                 model: [
-                    { label: I18n.tr("Capture"),    icon: "camera"    },
-                    { label: I18n.tr("Appearance"), icon: "palette"   },
-                    { label: I18n.tr("Radial"),     icon: "radar"     },
-                    { label: I18n.tr("Tools"),      icon: "brush"     },
-                    { label: I18n.tr("About"),      icon: "menu_book" }
+                    { label: I18n.tr("Capture"), icon: "camera"    },
+                    { label: I18n.tr("Save"),    icon: "save"      },
+                    { label: I18n.tr("Theme"),   icon: "palette"   },
+                    { label: I18n.tr("Tools"),   icon: "brush"     },
+                    { label: I18n.tr("Canvas"),  icon: "crop"      },
+                    { label: I18n.tr("Radial"),  icon: "radar"     },
+                    { label: I18n.tr("Help"),    icon: "menu_book" }
                 ]
 
                 delegate: Rectangle {
@@ -327,7 +329,6 @@ PluginSettings {
         }
     }
 
-
     // ── Tab 0: Capture ─────────────────────────────────────────────────────────
     Item {
         visible: tabBar.currentIndex === 0
@@ -338,7 +339,6 @@ PluginSettings {
             id: captureTabCol
             width: parent.width
             spacing: Theme.spacingM
-
     SettingsCard {
         id: captureModeCard
         SectionTitle {
@@ -435,6 +435,19 @@ PluginSettings {
         }
     }
 
+        }
+    }
+
+    // ── Tab 1: Save ────────────────────────────────────────────────────────────
+    Item {
+        visible: tabBar.currentIndex === 1
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        implicitHeight: saveTabCol.implicitHeight
+        Column {
+            id: saveTabCol
+            width: parent.width
+            spacing: Theme.spacingM
     SettingsCard {
         id: saveOptionsCard
         SectionTitle {
@@ -564,21 +577,19 @@ PluginSettings {
         }
     }
 
-
         }
     }
 
-    // ── Tab 1: Appearance ──────────────────────────────────────────────────────
+    // ── Tab 2: Theme ───────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 1
+        visible: tabBar.currentIndex === 2
         width: parent.width
         height: visible ? implicitHeight : 0
-        implicitHeight: appearanceTabCol.implicitHeight
+        implicitHeight: themeTabCol.implicitHeight
         Column {
-            id: appearanceTabCol
+            id: themeTabCol
             width: parent.width
             spacing: Theme.spacingM
-
     SettingsCard {
         id: toolbarCard
         SectionTitle {
@@ -943,12 +954,883 @@ PluginSettings {
             opacity: 0.8
         }
     }
+
         }
     }
 
-    // ── Tab 2: Radial ──────────────────────────────────────────────────────────
+    // ── Tab 3: Tools ───────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 2
+        visible: tabBar.currentIndex === 3
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        implicitHeight: toolsTabCol.implicitHeight
+        Column {
+            id: toolsTabCol
+            width: parent.width
+            spacing: Theme.spacingM
+    SettingsCard {
+        id: drawingCard
+        SectionTitle {
+            text: I18n.tr("Drawing")
+            icon: "brush"
+            showReset: defaultToolMode.isDirty || defaultPresetIndex.isDirty || defaultTool.isDirty || defaultThickness.isDirty || penAutoClose.isDirty
+            onResetClicked: {
+                defaultToolMode.resetToDefault();
+                defaultPresetIndex.resetToDefault();
+                defaultTool.resetToDefault();
+                defaultThickness.resetToDefault();
+                penAutoClose.resetToDefault();
+            }
+        }
+
+        ButtonGroupSettingPlus {
+            id: defaultToolMode
+            settingKey: "defaultToolMode"
+            label: I18n.tr("Starting Tool Mode")
+            options: [
+                { label: I18n.tr("Radial Preset"), value: "preset" },
+                { label: I18n.tr("Custom Tool"), value: "custom" }
+            ]
+            defaultValue: "preset"
+        }
+
+        Separator {}
+
+        SelectionSettingPlus {
+            id: defaultPresetIndex
+            settingKey: "defaultPresetIndex"
+            label: I18n.tr("Starting Preset")
+            options: [
+                { "label": I18n.tr("Preset 1"), "value": "0" },
+                { "label": I18n.tr("Preset 2"), "value": "1" },
+                { "label": I18n.tr("Preset 3"), "value": "2" },
+                { "label": I18n.tr("Preset 4"), "value": "3" },
+                { "label": I18n.tr("Preset 5"), "value": "4" },
+                { "label": I18n.tr("Preset 6"), "value": "5" },
+                { "label": I18n.tr("Preset 7"), "value": "6" },
+                { "label": I18n.tr("Preset 8"), "value": "7" }
+            ]
+            defaultValue: "0"
+            visible: defaultToolMode.value === "preset"
+        }
+
+        Separator {
+            visible: defaultToolMode.value === "preset"
+        }
+
+
+
+        SelectionSettingPlus {
+            id: defaultTool
+            settingKey: "defaultTool"
+            label: I18n.tr("Starting Tool")
+            options: [{
+                "label": I18n.tr("Freehand Pen"),
+                "value": "pen"
+            }, {
+                "label": I18n.tr("Straight Line"),
+                "value": "line"
+            }, {
+                "label": I18n.tr("Arrow Vector"),
+                "value": "arrow"
+            }, {
+                "label": I18n.tr("Rectangle Outline"),
+                "value": "rect"
+            }, {
+                "label": I18n.tr("Ellipse / Circle"),
+                "value": "ellipse"
+            }, {
+                "label": I18n.tr("Text Note"),
+                "value": "text"
+            }, {
+                "label": I18n.tr("Pixelate"),
+                "value": "pixelate"
+            }, {
+                "label": I18n.tr("Redact"),
+                "value": "redact"
+            }, {
+                "label": I18n.tr("Number Stamp"),
+                "value": "stamp"
+            }, {
+                "label": I18n.tr("Highlighter"),
+                "value": "highlighter"
+            }, {
+                "label": I18n.tr("Eraser"),
+                "value": "eraser"
+            }, {
+                "label": I18n.tr("Crop / Resize"),
+                "value": "crop"
+            }]
+            defaultValue: "pen"
+            visible: defaultToolMode.value === "custom"
+        }
+
+        Separator {
+            visible: defaultToolMode.value === "custom"
+        }
+
+        SliderSettingPlus {
+            id: defaultThickness
+            label: I18n.tr("Default Stroke Thickness")
+            settingKey: "defaultThickness"
+            defaultValue: 6
+            minimum: 1
+            maximum: 20
+            leftLabel: "1"
+            rightLabel: "20"
+            previewType: "thickness"
+            visible: defaultToolMode.value === "custom"
+        }
+
+        Separator {
+            visible: defaultToolMode.value === "custom"
+        }
+
+
+        ToggleSettingPlus {
+            id: penAutoClose
+            settingKey: "penAutoClose"
+            label: I18n.tr("Pen Auto-Close")
+            description: I18n.tr("Automatically close the loop when ending close to the start point.")
+            defaultValue: true
+        }
+    }
+
+    SettingsCard {
+        id: textSettingsCard
+        SectionTitle {
+            text: I18n.tr("Text")
+            icon: "format_size"
+            showReset: textFontSize.isDirty || textFontFamily.isDirty || textBold.isDirty || textItalic.isDirty || textUnderline.isDirty || textBackground.isDirty || textInputMode.isDirty
+            onResetClicked: {
+                textFontSize.resetToDefault();
+                textFontFamily.resetToDefault();
+                textBold.resetToDefault();
+                textItalic.resetToDefault();
+                textUnderline.resetToDefault();
+                textBackground.resetToDefault();
+                textInputMode.resetToDefault();
+            }
+        }
+
+        SliderSettingPlus {
+            id: textFontSize
+            label: I18n.tr("Default Text Font Size")
+            settingKey: "textFontSize"
+            defaultValue: 36
+            minimum: 8
+            maximum: 72
+            leftLabel: "8"
+            rightLabel: "72"
+            previewType: "fontSize"
+        }
+
+        Separator {}
+
+        ButtonGroupSettingPlus {
+            id: textFontFamily
+            settingKey: "textFontFamily"
+            label: I18n.tr("Default Font Family")
+            options: [
+                { label: I18n.tr("Sans-Serif"), value: "sans-serif" },
+                { label: I18n.tr("Monospace"), value: "monospace" },
+                { label: I18n.tr("Serif"), value: "serif" }
+            ]
+            defaultValue: "sans-serif"
+        }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            id: textBold
+            settingKey: "textBold"
+            label: I18n.tr("Default Bold Text")
+            defaultValue: false
+        }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            id: textItalic
+            settingKey: "textItalic"
+            label: I18n.tr("Default Italic Text")
+            defaultValue: false
+        }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            id: textUnderline
+            settingKey: "textUnderline"
+            label: I18n.tr("Default Underline Text")
+            defaultValue: false
+        }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            id: textBackground
+            settingKey: "textBackground"
+            label: I18n.tr("Default Text Background")
+            defaultValue: false
+        }
+
+        Separator {}
+
+        ButtonGroupSettingPlus {
+            id: textInputMode
+            settingKey: "textInputMode"
+            label: I18n.tr("Input Mode")
+            options: [
+                { label: I18n.tr("Direct"), value: "inline" },
+                { label: I18n.tr("Popup Input"), value: "popup" }
+            ]
+            defaultValue: "inline"
+        }
+
+        InfoText {
+            text: I18n.tr("This mode does not support IME. If you use CJK or Vietnamese languages, please switch to Popup Input.")
+            visible: textInputMode.value === "inline"
+            opacity: 0.85
+        }
+    }
+
+    SettingsCard {
+        id: shapesCard
+        SectionTitle {
+            text: I18n.tr("Shapes")
+            icon: "category"
+            showReset: roundRect.isDirty || roundHighlighter.isDirty
+            onResetClicked: {
+                roundRect.resetToDefault();
+                roundHighlighter.resetToDefault();
+            }
+        }
+
+        ToggleSettingPlus {
+            id: roundRect
+            settingKey: "roundRect"
+            label: I18n.tr("Round Rectangle Corners")
+            defaultValue: true
+        }
+
+        Separator {}
+
+        SliderSettingPlus {
+            id: textCornerRadius
+            settingKey: "textCornerRadius"
+            label: I18n.tr("Text Background Roundness")
+            defaultValue: 12
+            minimum: 0
+            maximum: 20
+            unit: "px"
+            leftLabel: "0"
+            rightLabel: "20"
+        }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            id: roundHighlighter
+            settingKey: "roundHighlighter"
+            label: I18n.tr("Round Highlighter Tips")
+            defaultValue: false
+        }
+    }
+
+        }
+    }
+
+    // ── Tab 4: Canvas ──────────────────────────────────────────────────────────
+    Item {
+        visible: tabBar.currentIndex === 4
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        implicitHeight: canvasTabCol.implicitHeight
+        Column {
+            id: canvasTabCol
+            width: parent.width
+            spacing: Theme.spacingM
+    SettingsCard {
+        SectionTitle {
+            text: I18n.tr("Backdrop Defaults")
+            icon: "wallpaper"
+            showReset: backdropAutoApply.isDirty || backdropDefaultMode.isDirty || backdropDefaultPadding.isDirty || backdropDefaultRadius.isDirty || backdropDefaultShadow.isDirty || backdropDefaultAngle.isDirty || backdropDefaultAspectRatio.isDirty
+            onResetClicked: {
+                backdropAutoApply.resetToDefault();
+                backdropDefaultMode.resetToDefault();
+                backdropDefaultPadding.resetToDefault();
+                backdropDefaultRadius.resetToDefault();
+                backdropDefaultShadow.resetToDefault();
+                backdropDefaultAngle.resetToDefault();
+                backdropDefaultAspectRatio.resetToDefault();
+            }
+        }
+
+        ToggleSettingPlus {
+            id: backdropAutoApply
+            settingKey: "backdropAutoApply"
+            label: I18n.tr("Auto-apply backdrop defaults")
+            description: I18n.tr("Enable backdrop automatically when opening the editor")
+            defaultValue: false
+        }
+
+        Separator {}
+
+        SelectionSettingPlus {
+            id: backdropDefaultMode
+            settingKey: "backdropDefaultMode"
+            label: I18n.tr("Default Backdrop Mode")
+            options: [
+                { label: I18n.tr("Solid Color"), value: "solid" },
+                { label: I18n.tr("Linear Gradient"), value: "gradient" },
+                { label: I18n.tr("Radial Gradient"), value: "radial" },
+                { label: I18n.tr("Conic Gradient"), value: "conic" }
+            ]
+            defaultValue: "solid"
+        }
+
+        Separator {}
+
+        SliderSettingPlus {
+            id: backdropDefaultPadding
+            settingKey: "backdropDefaultPadding"
+            label: I18n.tr("Default Padding")
+            defaultValue: 40
+            minimum: 0
+            maximum: 150
+            unit: "px"
+            leftLabel: "0"
+            rightLabel: "150"
+        }
+
+        Separator {}
+
+        SliderSettingPlus {
+            id: backdropDefaultRadius
+            settingKey: "backdropDefaultRadius"
+            label: I18n.tr("Default Corner Radius")
+            defaultValue: 12
+            minimum: 0
+            maximum: 60
+            unit: "px"
+            leftLabel: "0"
+            rightLabel: "60"
+        }
+
+        Separator {}
+
+        SliderSettingPlus {
+            id: backdropDefaultShadow
+            settingKey: "backdropDefaultShadow"
+            label: I18n.tr("Default Shadow Strength")
+            defaultValue: 50
+            minimum: 0
+            maximum: 100
+            unit: "%"
+            leftLabel: "0"
+            rightLabel: "100"
+        }
+
+        Separator {}
+
+        SliderSettingPlus {
+            id: backdropDefaultAngle
+            settingKey: "backdropDefaultAngle"
+            label: I18n.tr("Default Gradient Angle")
+            defaultValue: 45
+            minimum: 0
+            maximum: 360
+            unit: "°"
+            leftLabel: "0"
+            rightLabel: "360"
+        }
+
+        Separator {}
+
+        SelectionSettingPlus {
+            id: backdropDefaultAspectRatio
+            settingKey: "backdropDefaultAspectRatio"
+            label: I18n.tr("Default Aspect Ratio")
+            options: [
+                { label: I18n.tr("Auto"), value: "auto" },
+                { label: "1:1", value: "1:1" },
+                { label: "16:9", value: "16:9" },
+                { label: "9:16", value: "9:16" },
+                { label: "4:3", value: "4:3" },
+                { label: "3:2", value: "3:2" },
+                { label: "21:9", value: "21:9" }
+            ]
+            defaultValue: "auto"
+        }
+    }
+
+    SettingsCard {
+        id: watermarkCard
+        SectionTitle {
+            text: I18n.tr("Watermark")
+            icon: "branding_watermark"
+            showReset: enableWatermark.isDirty || watermarkType.isDirty || watermarkText.isDirty || watermarkImage.isDirty || watermarkPosition.isDirty || watermarkOpacity.isDirty || watermarkSize.isDirty || watermarkTextSize.isDirty
+            onResetClicked: {
+                enableWatermark.resetToDefault();
+                watermarkType.resetToDefault();
+                watermarkText.resetToDefault();
+                watermarkImage.resetToDefault();
+                watermarkPosition.resetToDefault();
+                watermarkOpacity.resetToDefault();
+                watermarkSize.resetToDefault();
+                watermarkTextSize.resetToDefault();
+            }
+        }
+
+        ToggleSettingPlus {
+            id: enableWatermark
+            settingKey: "enableWatermark"
+            label: I18n.tr("Enable Watermark")
+            defaultValue: false
+        }
+
+        Separator {
+            visible: enableWatermark.value
+            height: visible ? 1 : 0
+        }
+
+        ButtonGroupSettingPlus {
+            id: watermarkType
+            settingKey: "watermarkType"
+            label: I18n.tr("Watermark Type")
+            options: [
+                { label: I18n.tr("Text"), value: "text" },
+                { label: I18n.tr("Image"), value: "image" },
+                { label: I18n.tr("Image + Text"), value: "hybrid" }
+            ]
+            defaultValue: "text"
+            visible: enableWatermark.value
+            height: visible ? implicitHeight : 0
+        }
+
+        Separator {
+            visible: enableWatermark.value
+            height: visible ? 1 : 0
+        }
+
+        SelectionSettingPlus {
+            id: watermarkPosition
+            settingKey: "watermarkPosition"
+            label: I18n.tr("Position")
+            options: [
+                { label: I18n.tr("Top Left"), value: "top_left" },
+                { label: I18n.tr("Top Right"), value: "top_right" },
+                { label: I18n.tr("Bottom Left"), value: "bottom_left" },
+                { label: I18n.tr("Bottom Right"), value: "bottom_right" },
+                { label: I18n.tr("Center"), value: "center" },
+                { label: I18n.tr("Top"), value: "top" },
+                { label: I18n.tr("Bottom"), value: "bottom" },
+                { label: I18n.tr("Left"), value: "left" },
+                { label: I18n.tr("Right"), value: "right" }
+            ]
+            defaultValue: "bottom_right"
+            visible: enableWatermark.value
+            height: visible ? implicitHeight : 0
+        }
+
+        Separator {
+            visible: enableWatermark.value
+            height: visible ? 1 : 0
+        }
+
+        SliderSettingPlus {
+            id: watermarkOpacity
+            settingKey: "watermarkOpacity"
+            label: I18n.tr("Opacity")
+            defaultValue: 20
+            minimum: 5
+            maximum: 100
+            unit: "%"
+            leftLabel: "5"
+            rightLabel: "100"
+            visible: enableWatermark.value
+            height: visible ? implicitHeight : 0
+        }
+
+        Separator {
+            visible: enableWatermark.value
+            height: visible ? 1 : 0
+        }
+
+        StringSettingPlus {
+            id: watermarkText
+            settingKey: "watermarkText"
+            label: I18n.tr("Watermark Text")
+            placeholder: "© {user}"
+            defaultValue: "© {user}"
+            visible: enableWatermark.value && (watermarkType.value === "text" || watermarkType.value === "hybrid")
+            height: visible ? implicitHeight : 0
+        }
+
+        InfoText {
+            text: I18n.tr("Supports formatting: {user} (Username), \\n (New Line), %Y (Year), %y (Last 2 digits of the year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)")
+            opacity: 0.85
+            visible: enableWatermark.value && (watermarkType.value === "text" || watermarkType.value === "hybrid")
+            height: visible ? implicitHeight : 0
+        }
+
+        Separator {
+            visible: enableWatermark.value && (watermarkType.value === "text" || watermarkType.value === "hybrid")
+            height: visible ? 1 : 0
+        }
+
+        SliderSettingPlus {
+            id: watermarkTextSize
+            settingKey: "watermarkTextSize"
+            label: I18n.tr("Text Size")
+            defaultValue: 5
+            minimum: 1
+            maximum: 50
+            unit: "%"
+            leftLabel: "1"
+            rightLabel: "50"
+            visible: enableWatermark.value && (watermarkType.value === "text" || watermarkType.value === "hybrid")
+            height: visible ? implicitHeight : 0
+        }
+
+        Separator {
+            visible: enableWatermark.value && (watermarkType.value === "hybrid")
+            height: visible ? 1 : 0
+        }
+
+        StringSettingPlus {
+            id: watermarkImage
+            settingKey: "watermarkImage"
+            label: I18n.tr("Watermark Image")
+            placeholder: "~/Pictures/watermark.png"
+            defaultValue: ""
+            isFile: true
+            fileExtensions: ["Image files (*.png *.jpg *.jpeg *.svg *.webp)", "All files (*)"]
+            visible: enableWatermark.value && (watermarkType.value === "image" || watermarkType.value === "hybrid")
+            height: visible ? implicitHeight : 0
+        }
+
+        Separator {
+            visible: enableWatermark.value && (watermarkType.value === "image" || watermarkType.value === "hybrid")
+            height: visible ? 1 : 0
+        }
+
+        SliderSettingPlus {
+            id: watermarkSize
+            settingKey: "watermarkSize"
+            label: I18n.tr("Image Size")
+            defaultValue: 5
+            minimum: 5
+            maximum: 50
+            unit: "%"
+            leftLabel: "5"
+            rightLabel: "50"
+            visible: enableWatermark.value && (watermarkType.value === "image" || watermarkType.value === "hybrid")
+            height: visible ? implicitHeight : 0
+        }
+
+        Separator {
+            visible: enableWatermark.value
+            height: visible ? 1 : 0
+        }
+
+        // Live Preview of the watermark overlay
+        Column {
+            width: parent.width
+            spacing: Theme.spacingS
+            visible: enableWatermark.value
+            height: visible ? implicitHeight : 0
+
+            StyledText {
+                text: I18n.tr("Live Preview")
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceVariantText
+                font.bold: true
+            }
+
+            StyledRect {
+                id: watermarkPreviewArea
+                width: parent.width
+                height: 160
+                radius: Theme.cornerRadius / 2
+                color: Theme.surfaceContainer
+                clip: true
+
+                // A dark checkered/gradient backdrop representing a mock captured screenshot
+                Rectangle {
+                    anchors.fill: parent
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: "#2E3440" }
+                        GradientStop { position: 1.0; color: "#1A1C23" }
+                    }
+                }
+
+                // Grid pattern to help visualize transparent opacity
+                Grid {
+                    anchors.fill: parent
+                    columns: 8
+                    rows: 4
+                    spacing: 0
+                    opacity: 0.1
+                    Repeater {
+                        model: 32
+                        Rectangle {
+                            width: watermarkPreviewArea.width / 8
+                            height: 40
+                            color: index % 2 === 0 ? "transparent" : "#ffffff"
+                        }
+                    }
+                }
+
+                // Offscreen image loader to resolve the watermark image path
+                Image {
+                    id: previewWatermarkImageLoader
+                    
+                    property int pathIndex: 0
+                    property var fallbackPaths: []
+                    
+                    source: {
+                        const rawPath = watermarkImage.value || "";
+                        if (rawPath) {
+                            let p = rawPath.trim();
+                            if (p.indexOf("~/") === 0) {
+                                const home = Quickshell.env("HOME") || "";
+                                p = home + p.substring(1);
+                            }
+                            if (p.indexOf("/") === 0) {
+                                p = "file://" + p;
+                            }
+                            return p;
+                        }
+                        
+                        if (fallbackPaths.length > 0 && pathIndex < fallbackPaths.length) {
+                            return fallbackPaths[pathIndex];
+                        }
+                        return "";
+                    }
+                    
+                    onStatusChanged: {
+                        if (status === Image.Error && (!watermarkImage.value)) {
+                            if (pathIndex < fallbackPaths.length - 1) {
+                                pathIndex++;
+                            }
+                        }
+                    }
+                    
+                    Component.onCompleted: {
+                        const username = Quickshell.env("USER") || Quickshell.env("USERNAME") || "";
+                        const home = Quickshell.env("HOME") || "";
+                        const list = [];
+                        if (home) {
+                            list.push("file://" + home + "/.face");
+                            list.push("file://" + home + "/.face.icon");
+                        }
+                        if (username) {
+                            list.push("file:///var/lib/AccountsService/icons/" + username);
+                        }
+                        list.push("image://icon/user-info");
+                        list.push("image://icon/avatar-default");
+                        fallbackPaths = list;
+                    }
+                    
+                    visible: false
+                    cache: true
+                }
+
+                // Watermark container layout with QML States for anchor alignment
+                Item {
+                    id: previewWatermarkContainer
+                    anchors.margins: 16
+
+                    width: previewHybridLayout.implicitWidth
+                    height: previewHybridLayout.implicitHeight
+
+                    opacity: watermarkOpacity.value / 100.0
+
+                    states: [
+                        State {
+                            name: "top_left"
+                            when: watermarkPosition.value === "top_left"
+                            AnchorChanges {
+                                target: previewWatermarkContainer
+                                anchors.left: watermarkPreviewArea.left
+                                anchors.top: watermarkPreviewArea.top
+                                anchors.right: undefined
+                                anchors.bottom: undefined
+                                anchors.horizontalCenter: undefined
+                                anchors.verticalCenter: undefined
+                            }
+                        },
+                        State {
+                            name: "top_right"
+                            when: watermarkPosition.value === "top_right"
+                            AnchorChanges {
+                                target: previewWatermarkContainer
+                                anchors.right: watermarkPreviewArea.right
+                                anchors.top: watermarkPreviewArea.top
+                                anchors.left: undefined
+                                anchors.bottom: undefined
+                                anchors.horizontalCenter: undefined
+                                anchors.verticalCenter: undefined
+                            }
+                        },
+                        State {
+                            name: "bottom_left"
+                            when: watermarkPosition.value === "bottom_left"
+                            AnchorChanges {
+                                target: previewWatermarkContainer
+                                anchors.left: watermarkPreviewArea.left
+                                anchors.bottom: watermarkPreviewArea.bottom
+                                anchors.right: undefined
+                                anchors.top: undefined
+                                anchors.horizontalCenter: undefined
+                                anchors.verticalCenter: undefined
+                            }
+                        },
+                        State {
+                            name: "bottom_right"
+                            when: watermarkPosition.value === "bottom_right" || !watermarkPosition.value
+                            AnchorChanges {
+                                target: previewWatermarkContainer
+                                anchors.right: watermarkPreviewArea.right
+                                anchors.bottom: watermarkPreviewArea.bottom
+                                anchors.left: undefined
+                                anchors.top: undefined
+                                anchors.horizontalCenter: undefined
+                                anchors.verticalCenter: undefined
+                            }
+                        },
+                        State {
+                            name: "center"
+                            when: watermarkPosition.value === "center"
+                            AnchorChanges {
+                                target: previewWatermarkContainer
+                                anchors.horizontalCenter: watermarkPreviewArea.horizontalCenter
+                                anchors.verticalCenter: watermarkPreviewArea.verticalCenter
+                                anchors.left: undefined
+                                anchors.right: undefined
+                                anchors.top: undefined
+                                anchors.bottom: undefined
+                            }
+                        },
+                        State {
+                            name: "top"
+                            when: watermarkPosition.value === "top"
+                            AnchorChanges {
+                                target: previewWatermarkContainer
+                                anchors.horizontalCenter: watermarkPreviewArea.horizontalCenter
+                                anchors.top: watermarkPreviewArea.top
+                                anchors.left: undefined
+                                anchors.right: undefined
+                                anchors.bottom: undefined
+                                anchors.verticalCenter: undefined
+                            }
+                        },
+                        State {
+                            name: "bottom"
+                            when: watermarkPosition.value === "bottom"
+                            AnchorChanges {
+                                target: previewWatermarkContainer
+                                anchors.horizontalCenter: watermarkPreviewArea.horizontalCenter
+                                anchors.bottom: watermarkPreviewArea.bottom
+                                anchors.left: undefined
+                                anchors.right: undefined
+                                anchors.top: undefined
+                                anchors.verticalCenter: undefined
+                            }
+                        },
+                        State {
+                            name: "left"
+                            when: watermarkPosition.value === "left"
+                            AnchorChanges {
+                                target: previewWatermarkContainer
+                                anchors.left: watermarkPreviewArea.left
+                                anchors.verticalCenter: watermarkPreviewArea.verticalCenter
+                                anchors.right: undefined
+                                anchors.top: undefined
+                                anchors.bottom: undefined
+                                anchors.horizontalCenter: undefined
+                            }
+                        },
+                        State {
+                            name: "right"
+                            when: watermarkPosition.value === "right"
+                            AnchorChanges {
+                                target: previewWatermarkContainer
+                                anchors.right: watermarkPreviewArea.right
+                                anchors.verticalCenter: watermarkPreviewArea.verticalCenter
+                                anchors.left: undefined
+                                anchors.top: undefined
+                                anchors.bottom: undefined
+                                anchors.horizontalCenter: undefined
+                            }
+                        }
+                    ]
+
+                    Row {
+                        id: previewHybridLayout
+                        spacing: Math.round(previewTextItem.font.pixelSize * 0.4)
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        Image {
+                            id: previewImageItem
+                            visible: (watermarkType.value === "image" || watermarkType.value === "hybrid") && previewWatermarkImageLoader.status === Image.Ready
+                            source: previewWatermarkImageLoader.source
+                            
+                            height: {
+                                if (previewWatermarkImageLoader.status !== Image.Ready) return 0;
+                                const w = previewWatermarkImageLoader.sourceSize.width;
+                                const h = previewWatermarkImageLoader.sourceSize.height;
+                                const maxW = watermarkPreviewArea.width * (watermarkSize.value / 100.0);
+                                const maxH = watermarkPreviewArea.height * (watermarkSize.value / 100.0);
+                                const scale = Math.min(maxW / w, maxH / h, 1.0);
+                                return h * scale;
+                            }
+                            
+                            width: {
+                                if (previewWatermarkImageLoader.status !== Image.Ready) return 0;
+                                const w = previewWatermarkImageLoader.sourceSize.width;
+                                const h = previewWatermarkImageLoader.sourceSize.height;
+                                return (w / h) * height;
+                            }
+                            
+                            fillMode: Image.PreserveAspectFit
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            visible: (watermarkType.value === "image" || watermarkType.value === "hybrid") && previewWatermarkImageLoader.status !== Image.Ready
+                            text: watermarkImage.value ? I18n.tr("Image Error") : I18n.tr("No Image Specified")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: "#ff6b6b"
+                            font.italic: true
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            id: previewTextItem
+                            visible: watermarkType.value === "text" || watermarkType.value === "hybrid"
+                            text: captureConfig.formatWatermarkText(watermarkText.value || "© {user}")
+                            font.pixelSize: Math.max(10, Math.round(watermarkPreviewArea.height * (watermarkTextSize.value / 100.0)))
+                            font.bold: true
+                            color: "#ffffff"
+                            style: Text.Outline
+                            styleColor: "#000000"
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+        }
+    }
+
+    // ── Tab 5: Radial ──────────────────────────────────────────────────────────
+    Item {
+        visible: tabBar.currentIndex === 5
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: radialTabCol.implicitHeight
@@ -956,7 +1838,6 @@ PluginSettings {
             id: radialTabCol
             width: parent.width
             spacing: Theme.spacingM
-
     SettingsCard {
         id: radialMenuCard
 
@@ -1626,881 +2507,19 @@ PluginSettings {
         }
     }
 
-
         }
     }
 
-    // ── Tab 3: Tools ───────────────────────────────────────────────────────────
+    // ── Tab 6: Help ────────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 3
+        visible: tabBar.currentIndex === 6
         width: parent.width
         height: visible ? implicitHeight : 0
-        implicitHeight: toolsTabCol.implicitHeight
+        implicitHeight: helpTabCol.implicitHeight
         Column {
-            id: toolsTabCol
+            id: helpTabCol
             width: parent.width
             spacing: Theme.spacingM
-
-    SettingsCard {
-        SectionTitle {
-            text: I18n.tr("Backdrop Defaults")
-            icon: "wallpaper"
-            showReset: backdropAutoApply.isDirty || backdropDefaultMode.isDirty || backdropDefaultPadding.isDirty || backdropDefaultRadius.isDirty || backdropDefaultShadow.isDirty || backdropDefaultAngle.isDirty || backdropDefaultAspectRatio.isDirty
-            onResetClicked: {
-                backdropAutoApply.resetToDefault();
-                backdropDefaultMode.resetToDefault();
-                backdropDefaultPadding.resetToDefault();
-                backdropDefaultRadius.resetToDefault();
-                backdropDefaultShadow.resetToDefault();
-                backdropDefaultAngle.resetToDefault();
-                backdropDefaultAspectRatio.resetToDefault();
-            }
-        }
-
-        ToggleSettingPlus {
-            id: backdropAutoApply
-            settingKey: "backdropAutoApply"
-            label: I18n.tr("Auto-apply backdrop defaults")
-            description: I18n.tr("Enable backdrop automatically when opening the editor")
-            defaultValue: false
-        }
-
-        Separator {}
-
-        SelectionSettingPlus {
-            id: backdropDefaultMode
-            settingKey: "backdropDefaultMode"
-            label: I18n.tr("Default Backdrop Mode")
-            options: [
-                { label: I18n.tr("Solid Color"), value: "solid" },
-                { label: I18n.tr("Linear Gradient"), value: "gradient" },
-                { label: I18n.tr("Radial Gradient"), value: "radial" },
-                { label: I18n.tr("Conic Gradient"), value: "conic" }
-            ]
-            defaultValue: "solid"
-        }
-
-        Separator {}
-
-        SliderSettingPlus {
-            id: backdropDefaultPadding
-            settingKey: "backdropDefaultPadding"
-            label: I18n.tr("Default Padding")
-            defaultValue: 40
-            minimum: 0
-            maximum: 150
-            unit: "px"
-            leftLabel: "0"
-            rightLabel: "150"
-        }
-
-        Separator {}
-
-        SliderSettingPlus {
-            id: backdropDefaultRadius
-            settingKey: "backdropDefaultRadius"
-            label: I18n.tr("Default Corner Radius")
-            defaultValue: 12
-            minimum: 0
-            maximum: 60
-            unit: "px"
-            leftLabel: "0"
-            rightLabel: "60"
-        }
-
-        Separator {}
-
-        SliderSettingPlus {
-            id: backdropDefaultShadow
-            settingKey: "backdropDefaultShadow"
-            label: I18n.tr("Default Shadow Strength")
-            defaultValue: 50
-            minimum: 0
-            maximum: 100
-            unit: "%"
-            leftLabel: "0"
-            rightLabel: "100"
-        }
-
-        Separator {}
-
-        SliderSettingPlus {
-            id: backdropDefaultAngle
-            settingKey: "backdropDefaultAngle"
-            label: I18n.tr("Default Gradient Angle")
-            defaultValue: 45
-            minimum: 0
-            maximum: 360
-            unit: "°"
-            leftLabel: "0"
-            rightLabel: "360"
-        }
-
-        Separator {}
-
-        SelectionSettingPlus {
-            id: backdropDefaultAspectRatio
-            settingKey: "backdropDefaultAspectRatio"
-            label: I18n.tr("Default Aspect Ratio")
-            options: [
-                { label: I18n.tr("Auto"), value: "auto" },
-                { label: "1:1", value: "1:1" },
-                { label: "16:9", value: "16:9" },
-                { label: "9:16", value: "9:16" },
-                { label: "4:3", value: "4:3" },
-                { label: "3:2", value: "3:2" },
-                { label: "21:9", value: "21:9" }
-            ]
-            defaultValue: "auto"
-        }
-    }
-
-
-    SettingsCard {
-        id: drawingCard
-        SectionTitle {
-            text: I18n.tr("Drawing")
-            icon: "brush"
-            showReset: defaultToolMode.isDirty || defaultPresetIndex.isDirty || defaultTool.isDirty || defaultThickness.isDirty || penAutoClose.isDirty
-            onResetClicked: {
-                defaultToolMode.resetToDefault();
-                defaultPresetIndex.resetToDefault();
-                defaultTool.resetToDefault();
-                defaultThickness.resetToDefault();
-                penAutoClose.resetToDefault();
-            }
-        }
-
-        ButtonGroupSettingPlus {
-            id: defaultToolMode
-            settingKey: "defaultToolMode"
-            label: I18n.tr("Starting Tool Mode")
-            options: [
-                { label: I18n.tr("Radial Preset"), value: "preset" },
-                { label: I18n.tr("Custom Tool"), value: "custom" }
-            ]
-            defaultValue: "preset"
-        }
-
-        Separator {}
-
-        SelectionSettingPlus {
-            id: defaultPresetIndex
-            settingKey: "defaultPresetIndex"
-            label: I18n.tr("Starting Preset")
-            options: [
-                { "label": I18n.tr("Preset 1"), "value": "0" },
-                { "label": I18n.tr("Preset 2"), "value": "1" },
-                { "label": I18n.tr("Preset 3"), "value": "2" },
-                { "label": I18n.tr("Preset 4"), "value": "3" },
-                { "label": I18n.tr("Preset 5"), "value": "4" },
-                { "label": I18n.tr("Preset 6"), "value": "5" },
-                { "label": I18n.tr("Preset 7"), "value": "6" },
-                { "label": I18n.tr("Preset 8"), "value": "7" }
-            ]
-            defaultValue: "0"
-            visible: defaultToolMode.value === "preset"
-        }
-
-        Separator {
-            visible: defaultToolMode.value === "preset"
-        }
-
-
-
-        SelectionSettingPlus {
-            id: defaultTool
-            settingKey: "defaultTool"
-            label: I18n.tr("Starting Tool")
-            options: [{
-                "label": I18n.tr("Freehand Pen"),
-                "value": "pen"
-            }, {
-                "label": I18n.tr("Straight Line"),
-                "value": "line"
-            }, {
-                "label": I18n.tr("Arrow Vector"),
-                "value": "arrow"
-            }, {
-                "label": I18n.tr("Rectangle Outline"),
-                "value": "rect"
-            }, {
-                "label": I18n.tr("Ellipse / Circle"),
-                "value": "ellipse"
-            }, {
-                "label": I18n.tr("Text Note"),
-                "value": "text"
-            }, {
-                "label": I18n.tr("Pixelate"),
-                "value": "pixelate"
-            }, {
-                "label": I18n.tr("Redact"),
-                "value": "redact"
-            }, {
-                "label": I18n.tr("Number Stamp"),
-                "value": "stamp"
-            }, {
-                "label": I18n.tr("Highlighter"),
-                "value": "highlighter"
-            }, {
-                "label": I18n.tr("Eraser"),
-                "value": "eraser"
-            }, {
-                "label": I18n.tr("Crop / Resize"),
-                "value": "crop"
-            }]
-            defaultValue: "pen"
-            visible: defaultToolMode.value === "custom"
-        }
-
-        Separator {
-            visible: defaultToolMode.value === "custom"
-        }
-
-        SliderSettingPlus {
-            id: defaultThickness
-            label: I18n.tr("Default Stroke Thickness")
-            settingKey: "defaultThickness"
-            defaultValue: 6
-            minimum: 1
-            maximum: 20
-            leftLabel: "1"
-            rightLabel: "20"
-            previewType: "thickness"
-            visible: defaultToolMode.value === "custom"
-        }
-
-        Separator {
-            visible: defaultToolMode.value === "custom"
-        }
-
-
-        ToggleSettingPlus {
-            id: penAutoClose
-            settingKey: "penAutoClose"
-            label: I18n.tr("Pen Auto-Close")
-            description: I18n.tr("Automatically close the loop when ending close to the start point.")
-            defaultValue: true
-        }
-    }
-
-    SettingsCard {
-        id: textSettingsCard
-        SectionTitle {
-            text: I18n.tr("Text")
-            icon: "format_size"
-            showReset: textFontSize.isDirty || textFontFamily.isDirty || textBold.isDirty || textItalic.isDirty || textUnderline.isDirty || textBackground.isDirty || textInputMode.isDirty
-            onResetClicked: {
-                textFontSize.resetToDefault();
-                textFontFamily.resetToDefault();
-                textBold.resetToDefault();
-                textItalic.resetToDefault();
-                textUnderline.resetToDefault();
-                textBackground.resetToDefault();
-                textInputMode.resetToDefault();
-            }
-        }
-
-        SliderSettingPlus {
-            id: textFontSize
-            label: I18n.tr("Default Text Font Size")
-            settingKey: "textFontSize"
-            defaultValue: 36
-            minimum: 8
-            maximum: 72
-            leftLabel: "8"
-            rightLabel: "72"
-            previewType: "fontSize"
-        }
-
-        Separator {}
-
-        ButtonGroupSettingPlus {
-            id: textFontFamily
-            settingKey: "textFontFamily"
-            label: I18n.tr("Default Font Family")
-            options: [
-                { label: I18n.tr("Sans-Serif"), value: "sans-serif" },
-                { label: I18n.tr("Monospace"), value: "monospace" },
-                { label: I18n.tr("Serif"), value: "serif" }
-            ]
-            defaultValue: "sans-serif"
-        }
-
-        Separator {}
-
-        ToggleSettingPlus {
-            id: textBold
-            settingKey: "textBold"
-            label: I18n.tr("Default Bold Text")
-            defaultValue: false
-        }
-
-        Separator {}
-
-        ToggleSettingPlus {
-            id: textItalic
-            settingKey: "textItalic"
-            label: I18n.tr("Default Italic Text")
-            defaultValue: false
-        }
-
-        Separator {}
-
-        ToggleSettingPlus {
-            id: textUnderline
-            settingKey: "textUnderline"
-            label: I18n.tr("Default Underline Text")
-            defaultValue: false
-        }
-
-        Separator {}
-
-        ToggleSettingPlus {
-            id: textBackground
-            settingKey: "textBackground"
-            label: I18n.tr("Default Text Background")
-            defaultValue: false
-        }
-
-        Separator {}
-
-        ButtonGroupSettingPlus {
-            id: textInputMode
-            settingKey: "textInputMode"
-            label: I18n.tr("Input Mode")
-            options: [
-                { label: I18n.tr("Direct"), value: "inline" },
-                { label: I18n.tr("Popup Input"), value: "popup" }
-            ]
-            defaultValue: "inline"
-        }
-
-        InfoText {
-            text: I18n.tr("This mode does not support IME. If you use CJK or Vietnamese languages, please switch to Popup Input.")
-            visible: textInputMode.value === "inline"
-            opacity: 0.85
-        }
-    }
-
-    SettingsCard {
-        id: shapesCard
-        SectionTitle {
-            text: I18n.tr("Shapes")
-            icon: "category"
-            showReset: roundRect.isDirty || roundHighlighter.isDirty
-            onResetClicked: {
-                roundRect.resetToDefault();
-                roundHighlighter.resetToDefault();
-            }
-        }
-
-        ToggleSettingPlus {
-            id: roundRect
-            settingKey: "roundRect"
-            label: I18n.tr("Round Rectangle Corners")
-            defaultValue: true
-        }
-
-        Separator {}
-
-        SliderSettingPlus {
-            id: textCornerRadius
-            settingKey: "textCornerRadius"
-            label: I18n.tr("Text Background Roundness")
-            defaultValue: 12
-            minimum: 0
-            maximum: 20
-            unit: "px"
-            leftLabel: "0"
-            rightLabel: "20"
-        }
-
-        Separator {}
-
-        ToggleSettingPlus {
-            id: roundHighlighter
-            settingKey: "roundHighlighter"
-            label: I18n.tr("Round Highlighter Tips")
-            defaultValue: false
-        }
-    }
-
-    SettingsCard {
-        id: watermarkCard
-        SectionTitle {
-            text: I18n.tr("Watermark")
-            icon: "branding_watermark"
-            showReset: enableWatermark.isDirty || watermarkType.isDirty || watermarkText.isDirty || watermarkImage.isDirty || watermarkPosition.isDirty || watermarkOpacity.isDirty || watermarkSize.isDirty || watermarkTextSize.isDirty
-            onResetClicked: {
-                enableWatermark.resetToDefault();
-                watermarkType.resetToDefault();
-                watermarkText.resetToDefault();
-                watermarkImage.resetToDefault();
-                watermarkPosition.resetToDefault();
-                watermarkOpacity.resetToDefault();
-                watermarkSize.resetToDefault();
-                watermarkTextSize.resetToDefault();
-            }
-        }
-
-        ToggleSettingPlus {
-            id: enableWatermark
-            settingKey: "enableWatermark"
-            label: I18n.tr("Enable Watermark")
-            defaultValue: false
-        }
-
-        Separator {
-            visible: enableWatermark.value
-            height: visible ? 1 : 0
-        }
-
-        ButtonGroupSettingPlus {
-            id: watermarkType
-            settingKey: "watermarkType"
-            label: I18n.tr("Watermark Type")
-            options: [
-                { label: I18n.tr("Text"), value: "text" },
-                { label: I18n.tr("Image"), value: "image" },
-                { label: I18n.tr("Image + Text"), value: "hybrid" }
-            ]
-            defaultValue: "text"
-            visible: enableWatermark.value
-            height: visible ? implicitHeight : 0
-        }
-
-        Separator {
-            visible: enableWatermark.value
-            height: visible ? 1 : 0
-        }
-
-        SelectionSettingPlus {
-            id: watermarkPosition
-            settingKey: "watermarkPosition"
-            label: I18n.tr("Position")
-            options: [
-                { label: I18n.tr("Top Left"), value: "top_left" },
-                { label: I18n.tr("Top Right"), value: "top_right" },
-                { label: I18n.tr("Bottom Left"), value: "bottom_left" },
-                { label: I18n.tr("Bottom Right"), value: "bottom_right" },
-                { label: I18n.tr("Center"), value: "center" },
-                { label: I18n.tr("Top"), value: "top" },
-                { label: I18n.tr("Bottom"), value: "bottom" },
-                { label: I18n.tr("Left"), value: "left" },
-                { label: I18n.tr("Right"), value: "right" }
-            ]
-            defaultValue: "bottom_right"
-            visible: enableWatermark.value
-            height: visible ? implicitHeight : 0
-        }
-
-        Separator {
-            visible: enableWatermark.value
-            height: visible ? 1 : 0
-        }
-
-        SliderSettingPlus {
-            id: watermarkOpacity
-            settingKey: "watermarkOpacity"
-            label: I18n.tr("Opacity")
-            defaultValue: 20
-            minimum: 5
-            maximum: 100
-            unit: "%"
-            leftLabel: "5"
-            rightLabel: "100"
-            visible: enableWatermark.value
-            height: visible ? implicitHeight : 0
-        }
-
-        Separator {
-            visible: enableWatermark.value
-            height: visible ? 1 : 0
-        }
-
-        StringSettingPlus {
-            id: watermarkText
-            settingKey: "watermarkText"
-            label: I18n.tr("Watermark Text")
-            placeholder: "© {user}"
-            defaultValue: "© {user}"
-            visible: enableWatermark.value && (watermarkType.value === "text" || watermarkType.value === "hybrid")
-            height: visible ? implicitHeight : 0
-        }
-
-        InfoText {
-            text: I18n.tr("Supports formatting: {user} (Username), \\n (New Line), %Y (Year), %y (Last 2 digits of the year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)")
-            opacity: 0.85
-            visible: enableWatermark.value && (watermarkType.value === "text" || watermarkType.value === "hybrid")
-            height: visible ? implicitHeight : 0
-        }
-
-        Separator {
-            visible: enableWatermark.value && (watermarkType.value === "text" || watermarkType.value === "hybrid")
-            height: visible ? 1 : 0
-        }
-
-        SliderSettingPlus {
-            id: watermarkTextSize
-            settingKey: "watermarkTextSize"
-            label: I18n.tr("Text Size")
-            defaultValue: 5
-            minimum: 1
-            maximum: 50
-            unit: "%"
-            leftLabel: "1"
-            rightLabel: "50"
-            visible: enableWatermark.value && (watermarkType.value === "text" || watermarkType.value === "hybrid")
-            height: visible ? implicitHeight : 0
-        }
-
-        Separator {
-            visible: enableWatermark.value && (watermarkType.value === "hybrid")
-            height: visible ? 1 : 0
-        }
-
-        StringSettingPlus {
-            id: watermarkImage
-            settingKey: "watermarkImage"
-            label: I18n.tr("Watermark Image")
-            placeholder: "~/Pictures/watermark.png"
-            defaultValue: ""
-            isFile: true
-            fileExtensions: ["Image files (*.png *.jpg *.jpeg *.svg *.webp)", "All files (*)"]
-            visible: enableWatermark.value && (watermarkType.value === "image" || watermarkType.value === "hybrid")
-            height: visible ? implicitHeight : 0
-        }
-
-        Separator {
-            visible: enableWatermark.value && (watermarkType.value === "image" || watermarkType.value === "hybrid")
-            height: visible ? 1 : 0
-        }
-
-        SliderSettingPlus {
-            id: watermarkSize
-            settingKey: "watermarkSize"
-            label: I18n.tr("Image Size")
-            defaultValue: 5
-            minimum: 5
-            maximum: 50
-            unit: "%"
-            leftLabel: "5"
-            rightLabel: "50"
-            visible: enableWatermark.value && (watermarkType.value === "image" || watermarkType.value === "hybrid")
-            height: visible ? implicitHeight : 0
-        }
-
-        Separator {
-            visible: enableWatermark.value
-            height: visible ? 1 : 0
-        }
-
-        // Live Preview of the watermark overlay
-        Column {
-            width: parent.width
-            spacing: Theme.spacingS
-            visible: enableWatermark.value
-            height: visible ? implicitHeight : 0
-
-            StyledText {
-                text: I18n.tr("Live Preview")
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceVariantText
-                font.bold: true
-            }
-
-            StyledRect {
-                id: watermarkPreviewArea
-                width: parent.width
-                height: 160
-                radius: Theme.cornerRadius / 2
-                color: Theme.surfaceContainer
-                clip: true
-
-                // A dark checkered/gradient backdrop representing a mock captured screenshot
-                Rectangle {
-                    anchors.fill: parent
-                    gradient: Gradient {
-                        GradientStop { position: 0.0; color: "#2E3440" }
-                        GradientStop { position: 1.0; color: "#1A1C23" }
-                    }
-                }
-
-                // Grid pattern to help visualize transparent opacity
-                Grid {
-                    anchors.fill: parent
-                    columns: 8
-                    rows: 4
-                    spacing: 0
-                    opacity: 0.1
-                    Repeater {
-                        model: 32
-                        Rectangle {
-                            width: watermarkPreviewArea.width / 8
-                            height: 40
-                            color: index % 2 === 0 ? "transparent" : "#ffffff"
-                        }
-                    }
-                }
-
-                // Offscreen image loader to resolve the watermark image path
-                Image {
-                    id: previewWatermarkImageLoader
-                    
-                    property int pathIndex: 0
-                    property var fallbackPaths: []
-                    
-                    source: {
-                        const rawPath = watermarkImage.value || "";
-                        if (rawPath) {
-                            let p = rawPath.trim();
-                            if (p.indexOf("~/") === 0) {
-                                const home = Quickshell.env("HOME") || "";
-                                p = home + p.substring(1);
-                            }
-                            if (p.indexOf("/") === 0) {
-                                p = "file://" + p;
-                            }
-                            return p;
-                        }
-                        
-                        if (fallbackPaths.length > 0 && pathIndex < fallbackPaths.length) {
-                            return fallbackPaths[pathIndex];
-                        }
-                        return "";
-                    }
-                    
-                    onStatusChanged: {
-                        if (status === Image.Error && (!watermarkImage.value)) {
-                            if (pathIndex < fallbackPaths.length - 1) {
-                                pathIndex++;
-                            }
-                        }
-                    }
-                    
-                    Component.onCompleted: {
-                        const username = Quickshell.env("USER") || Quickshell.env("USERNAME") || "";
-                        const home = Quickshell.env("HOME") || "";
-                        const list = [];
-                        if (home) {
-                            list.push("file://" + home + "/.face");
-                            list.push("file://" + home + "/.face.icon");
-                        }
-                        if (username) {
-                            list.push("file:///var/lib/AccountsService/icons/" + username);
-                        }
-                        list.push("image://icon/user-info");
-                        list.push("image://icon/avatar-default");
-                        fallbackPaths = list;
-                    }
-                    
-                    visible: false
-                    cache: true
-                }
-
-                // Watermark container layout with QML States for anchor alignment
-                Item {
-                    id: previewWatermarkContainer
-                    anchors.margins: 16
-
-                    width: previewHybridLayout.implicitWidth
-                    height: previewHybridLayout.implicitHeight
-
-                    opacity: watermarkOpacity.value / 100.0
-
-                    states: [
-                        State {
-                            name: "top_left"
-                            when: watermarkPosition.value === "top_left"
-                            AnchorChanges {
-                                target: previewWatermarkContainer
-                                anchors.left: watermarkPreviewArea.left
-                                anchors.top: watermarkPreviewArea.top
-                                anchors.right: undefined
-                                anchors.bottom: undefined
-                                anchors.horizontalCenter: undefined
-                                anchors.verticalCenter: undefined
-                            }
-                        },
-                        State {
-                            name: "top_right"
-                            when: watermarkPosition.value === "top_right"
-                            AnchorChanges {
-                                target: previewWatermarkContainer
-                                anchors.right: watermarkPreviewArea.right
-                                anchors.top: watermarkPreviewArea.top
-                                anchors.left: undefined
-                                anchors.bottom: undefined
-                                anchors.horizontalCenter: undefined
-                                anchors.verticalCenter: undefined
-                            }
-                        },
-                        State {
-                            name: "bottom_left"
-                            when: watermarkPosition.value === "bottom_left"
-                            AnchorChanges {
-                                target: previewWatermarkContainer
-                                anchors.left: watermarkPreviewArea.left
-                                anchors.bottom: watermarkPreviewArea.bottom
-                                anchors.right: undefined
-                                anchors.top: undefined
-                                anchors.horizontalCenter: undefined
-                                anchors.verticalCenter: undefined
-                            }
-                        },
-                        State {
-                            name: "bottom_right"
-                            when: watermarkPosition.value === "bottom_right" || !watermarkPosition.value
-                            AnchorChanges {
-                                target: previewWatermarkContainer
-                                anchors.right: watermarkPreviewArea.right
-                                anchors.bottom: watermarkPreviewArea.bottom
-                                anchors.left: undefined
-                                anchors.top: undefined
-                                anchors.horizontalCenter: undefined
-                                anchors.verticalCenter: undefined
-                            }
-                        },
-                        State {
-                            name: "center"
-                            when: watermarkPosition.value === "center"
-                            AnchorChanges {
-                                target: previewWatermarkContainer
-                                anchors.horizontalCenter: watermarkPreviewArea.horizontalCenter
-                                anchors.verticalCenter: watermarkPreviewArea.verticalCenter
-                                anchors.left: undefined
-                                anchors.right: undefined
-                                anchors.top: undefined
-                                anchors.bottom: undefined
-                            }
-                        },
-                        State {
-                            name: "top"
-                            when: watermarkPosition.value === "top"
-                            AnchorChanges {
-                                target: previewWatermarkContainer
-                                anchors.horizontalCenter: watermarkPreviewArea.horizontalCenter
-                                anchors.top: watermarkPreviewArea.top
-                                anchors.left: undefined
-                                anchors.right: undefined
-                                anchors.bottom: undefined
-                                anchors.verticalCenter: undefined
-                            }
-                        },
-                        State {
-                            name: "bottom"
-                            when: watermarkPosition.value === "bottom"
-                            AnchorChanges {
-                                target: previewWatermarkContainer
-                                anchors.horizontalCenter: watermarkPreviewArea.horizontalCenter
-                                anchors.bottom: watermarkPreviewArea.bottom
-                                anchors.left: undefined
-                                anchors.right: undefined
-                                anchors.top: undefined
-                                anchors.verticalCenter: undefined
-                            }
-                        },
-                        State {
-                            name: "left"
-                            when: watermarkPosition.value === "left"
-                            AnchorChanges {
-                                target: previewWatermarkContainer
-                                anchors.left: watermarkPreviewArea.left
-                                anchors.verticalCenter: watermarkPreviewArea.verticalCenter
-                                anchors.right: undefined
-                                anchors.top: undefined
-                                anchors.bottom: undefined
-                                anchors.horizontalCenter: undefined
-                            }
-                        },
-                        State {
-                            name: "right"
-                            when: watermarkPosition.value === "right"
-                            AnchorChanges {
-                                target: previewWatermarkContainer
-                                anchors.right: watermarkPreviewArea.right
-                                anchors.verticalCenter: watermarkPreviewArea.verticalCenter
-                                anchors.left: undefined
-                                anchors.top: undefined
-                                anchors.bottom: undefined
-                                anchors.horizontalCenter: undefined
-                            }
-                        }
-                    ]
-
-                    Row {
-                        id: previewHybridLayout
-                        spacing: Math.round(previewTextItem.font.pixelSize * 0.4)
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        Image {
-                            id: previewImageItem
-                            visible: (watermarkType.value === "image" || watermarkType.value === "hybrid") && previewWatermarkImageLoader.status === Image.Ready
-                            source: previewWatermarkImageLoader.source
-                            
-                            height: {
-                                if (previewWatermarkImageLoader.status !== Image.Ready) return 0;
-                                const w = previewWatermarkImageLoader.sourceSize.width;
-                                const h = previewWatermarkImageLoader.sourceSize.height;
-                                const maxW = watermarkPreviewArea.width * (watermarkSize.value / 100.0);
-                                const maxH = watermarkPreviewArea.height * (watermarkSize.value / 100.0);
-                                const scale = Math.min(maxW / w, maxH / h, 1.0);
-                                return h * scale;
-                            }
-                            
-                            width: {
-                                if (previewWatermarkImageLoader.status !== Image.Ready) return 0;
-                                const w = previewWatermarkImageLoader.sourceSize.width;
-                                const h = previewWatermarkImageLoader.sourceSize.height;
-                                return (w / h) * height;
-                            }
-                            
-                            fillMode: Image.PreserveAspectFit
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            visible: (watermarkType.value === "image" || watermarkType.value === "hybrid") && previewWatermarkImageLoader.status !== Image.Ready
-                            text: watermarkImage.value ? I18n.tr("Image Error") : I18n.tr("No Image Specified")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: "#ff6b6b"
-                            font.italic: true
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            id: previewTextItem
-                            visible: watermarkType.value === "text" || watermarkType.value === "hybrid"
-                            text: captureConfig.formatWatermarkText(watermarkText.value || "© {user}")
-                            font.pixelSize: Math.max(10, Math.round(watermarkPreviewArea.height * (watermarkTextSize.value / 100.0)))
-                            font.bold: true
-                            color: "#ffffff"
-                            style: Text.Outline
-                            styleColor: "#000000"
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-
-        }
-    }
-
-    // ── Tab 4: About ───────────────────────────────────────────────────────────
-    Item {
-        visible: tabBar.currentIndex === 4
-        width: parent.width
-        height: visible ? implicitHeight : 0
-        implicitHeight: aboutTabCol.implicitHeight
-        Column {
-            id: aboutTabCol
-            width: parent.width
-            spacing: Theme.spacingM
-
     SettingsCard {
         SectionTitle { 
             id: usageTitle
@@ -2670,7 +2689,6 @@ PluginSettings {
 
         }
     }
-
 
     CaptureConfig {
         id: captureConfig
