@@ -139,14 +139,13 @@ DankModal {
             window._lastSampledX = -1;
             window._lastSampledY = -1;
             window._lastSampledColor = "transparent";
+            window.requestPaintAll();
             window.hoveredColor = window.sampleCanvasColor(window.cursorX * window.editScale, window.cursorY * window.editScale);
         }
         if (currentTool === "backdrop" && window.backdropMode === "none") {
             window.backdropMode = Constants.defaultBackdropMode;
         }
-        if (window.activeCanvas) {
-            window.activeCanvas.requestPaint();
-        }
+        window.requestPaintAll();
     }
 
     // Backdrop State Variables
@@ -1257,11 +1256,12 @@ DankModal {
     }
 
     function sampleCanvasColor(mouseX, mouseY) {
-        if (!window.activeCanvas) return window.currentColor;
+        var canvas = window.bakedCanvas || window.activeCanvas;
+        if (!canvas) return window.currentColor;
         
         // Clamp and round coordinates to prevent out-of-bounds errors and ensure integer coordinates in device pixels
-        var x = Math.max(0, Math.min(Math.floor(mouseX * window.dpr), Math.floor(window.activeCanvas.width * window.dpr) - 1));
-        var y = Math.max(0, Math.min(Math.floor(mouseY * window.dpr), Math.floor(window.activeCanvas.height * window.dpr) - 1));
+        var x = Math.max(0, Math.min(Math.floor(mouseX * window.dpr), Math.floor(canvas.width * window.dpr) - 1));
+        var y = Math.max(0, Math.min(Math.floor(mouseY * window.dpr), Math.floor(canvas.height * window.dpr) - 1));
         
         // Performance optimization: skip sampling if the pixel coordinates haven't changed
         if (window._lastSampledX === x && window._lastSampledY === y) {
@@ -1269,7 +1269,7 @@ DankModal {
         }
         
         try {
-            var ctx = window.activeCanvas.getContext("2d");
+            var ctx = canvas.getContext("2d");
             if (!ctx) return window.currentColor;
             
             var imgData = ctx.getImageData(x, y, 1, 1);
