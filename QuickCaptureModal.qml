@@ -866,6 +866,7 @@ DankModal {
     property var exportCanvasItem: null
 
     onSelectedStrokeChanged: window.requestPaintAll()
+    onShowAnnotationsChanged: window.requestPaintAll()
     onEffectiveBackdropModeChanged: window.requestPaintAll()
     onBackdropSolidColorChanged: window.requestPaintAll()
     onBackdropGradientStartChanged: window.requestPaintAll()
@@ -2068,24 +2069,27 @@ DankModal {
                             }
 
                             if (window.showAnnotations) {
+                                const strokes = window.strokes;
+                                const selectedStroke = window.selectedStroke;
+
                                 // 2.05 Draw Pixelate strokes BEFORE dimming layer
-                                for (let i = 0; i < window.strokes.length; i++) {
-                                    if (window.strokes[i].tool === "pixelate" && window.strokes[i] !== window.selectedStroke) {
-                                        drawStroke(ctx, window.strokes[i]);
+                                for (let i = 0; i < strokes.length; i++) {
+                                    if (strokes[i].tool === "pixelate" && strokes[i] !== selectedStroke) {
+                                        drawStroke(ctx, strokes[i]);
                                     }
                                 }
 
                                 // 2.1 Draw Spotlight Layer (Dimming + Holes)
-                                const spotlightStrokes = window.strokes.filter(s => s.tool === "spotlight" && s !== window.selectedStroke);
-                                if (spotlightStrokes.length > 0) {
+                                const isDrawingSpotlight = window.currentStroke && window.currentStroke.tool === "spotlight";
+                                const isEditingSpotlight = selectedStroke && selectedStroke.tool === "spotlight";
+                                const spotlightStrokes = strokes.filter(s => s.tool === "spotlight" && s !== selectedStroke);
+                                if (spotlightStrokes.length > 0 && !isDrawingSpotlight && !isEditingSpotlight) {
                                     ctx.save();
                                     const sw = window.screenshotWidth;
                                     const sh = window.screenshotHeight;
 
-                                    let activeInt = window.spotlightIntensity;
-                                    const lastSpotlight = spotlightStrokes.slice().reverse().find(s => s.tool === "spotlight");
-                                    if (lastSpotlight) activeInt = lastSpotlight.width;
-
+                                    const lastSpotlight = spotlightStrokes[spotlightStrokes.length - 1];
+                                    const activeInt = lastSpotlight ? lastSpotlight.width : window.spotlightIntensity;
                                     const spotlightOpacity = activeInt / 100.0;
 
                                     ctx.beginPath();
@@ -2140,9 +2144,9 @@ DankModal {
                                     ctx.restore();
                                 }
 
-                                for (var i = 0; i < window.strokes.length; i++) {
-                                    if (window.strokes[i].tool !== "spotlight" && window.strokes[i].tool !== "pixelate" && window.strokes[i] !== window.selectedStroke) {
-                                        drawStroke(ctx, window.strokes[i]);
+                                for (let i = 0; i < strokes.length; i++) {
+                                    if (strokes[i].tool !== "spotlight" && strokes[i].tool !== "pixelate" && strokes[i] !== selectedStroke) {
+                                        drawStroke(ctx, strokes[i]);
                                     }
                                 }
                             }
@@ -2240,22 +2244,25 @@ DankModal {
                             }
 
                             if (window.showAnnotations) {
+                                const strokes = window.strokes;
+                                const selectedStroke = window.selectedStroke;
+
                                 // Draw active/selected pixelate stroke
                                 if (window.currentStroke && window.currentStroke.tool === "pixelate") {
                                     const tempStroke = Object.assign({}, window.currentStroke, { isCurrent: true });
                                     drawStroke(ctx, tempStroke);
                                 }
-                                if (window.selectedStroke && window.selectedStroke.tool === "pixelate") {
-                                    drawStroke(ctx, window.selectedStroke);
+                                if (selectedStroke && selectedStroke.tool === "pixelate") {
+                                    drawStroke(ctx, selectedStroke);
                                 }
 
                                 // Draw active/selected spotlight dimming + holes
                                 const isDrawingSpotlight = window.currentStroke && window.currentStroke.tool === "spotlight";
-                                const isEditingSpotlight = window.selectedStroke && window.selectedStroke.tool === "spotlight";
+                                const isEditingSpotlight = selectedStroke && selectedStroke.tool === "spotlight";
                                 if (isDrawingSpotlight || isEditingSpotlight) {
-                                    const activeSpotlights = [];
+                                    const activeSpotlights = strokes.filter(s => s.tool === "spotlight" && s !== selectedStroke);
                                     if (isDrawingSpotlight) activeSpotlights.push(window.currentStroke);
-                                    if (isEditingSpotlight) activeSpotlights.push(window.selectedStroke);
+                                    if (isEditingSpotlight) activeSpotlights.push(selectedStroke);
 
                                     ctx.save();
                                     const sw = window.screenshotWidth;
@@ -2263,7 +2270,7 @@ DankModal {
 
                                     let activeInt = window.spotlightIntensity;
                                     if (isEditingSpotlight) {
-                                        activeInt = window.selectedStroke.width;
+                                        activeInt = selectedStroke.width;
                                     }
 
                                     const spotlightOpacity = activeInt / 100.0;
@@ -2327,8 +2334,8 @@ DankModal {
                                 }
 
                                 // Draw selected stroke
-                                if (window.selectedStroke && window.selectedStroke.tool !== "spotlight" && window.selectedStroke.tool !== "pixelate") {
-                                    drawStroke(ctx, window.selectedStroke);
+                                if (selectedStroke && selectedStroke.tool !== "spotlight" && selectedStroke.tool !== "pixelate") {
+                                    drawStroke(ctx, selectedStroke);
                                 }
 
                                 // Draw temporary live typing text
