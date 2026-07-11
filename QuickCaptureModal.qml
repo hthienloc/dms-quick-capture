@@ -2110,21 +2110,24 @@ DankModal {
                                     const activeInt = lastSpotlight ? lastSpotlight.width : window.spotlightIntensity;
                                     const spotlightOpacity = activeInt / 100.0;
 
+                                    const cropX = hasCropSelection ? window.cropRect.x : 0;
+                                    const cropY = hasCropSelection ? window.cropRect.y : 0;
+
                                     ctx.beginPath();
                                     if (window.effectiveBackdropMode !== "none" && window.backdropCornerRadius > 0) {
                                         const r = Math.min(window.backdropCornerRadius, sw / 2, sh / 2);
-                                        ctx.moveTo(r, 0);
-                                        ctx.lineTo(sw - r, 0);
-                                        ctx.arcTo(sw, 0, sw, r, r);
-                                        ctx.lineTo(sw, sh - r);
-                                        ctx.arcTo(sw, sh, sw - r, sh, r);
-                                        ctx.lineTo(r, sh);
-                                        ctx.arcTo(0, sh, 0, sh - r, r);
-                                        ctx.lineTo(0, r);
-                                        ctx.arcTo(0, 0, r, 0, r);
+                                        ctx.moveTo(cropX + r, cropY);
+                                        ctx.lineTo(cropX + sw - r, cropY);
+                                        ctx.arcTo(cropX + sw, cropY, cropX + sw, cropY + r, r);
+                                        ctx.lineTo(cropX + sw, cropY + sh - r);
+                                        ctx.arcTo(cropX + sw, cropY + sh, cropX + sw - r, cropY + sh, r);
+                                        ctx.lineTo(cropX + r, cropY + sh);
+                                        ctx.arcTo(cropX, cropY + sh, cropX, cropY + sh - r, r);
+                                        ctx.lineTo(cropX, cropY + r);
+                                        ctx.arcTo(cropX, cropY, cropX + r, cropY, r);
                                         ctx.closePath();
                                     } else {
-                                        ctx.rect(0, 0, sw, sh);
+                                        ctx.rect(cropX, cropY, sw, sh);
                                     }
 
                                     for (let s of spotlightStrokes) {
@@ -2158,7 +2161,7 @@ DankModal {
 
                                     ctx.clip("evenodd");
                                     ctx.fillStyle = "rgba(0, 0, 0, " + spotlightOpacity + ")";
-                                    ctx.fillRect(0, 0, window.screenshotWidth, window.screenshotHeight);
+                                    ctx.fillRect(cropX, cropY, sw, sh);
                                     ctx.restore();
                                 }
 
@@ -2293,21 +2296,24 @@ DankModal {
 
                                     const spotlightOpacity = activeInt / 100.0;
 
+                                    const cropX = hasCropSelection ? window.cropRect.x : 0;
+                                    const cropY = hasCropSelection ? window.cropRect.y : 0;
+
                                     ctx.beginPath();
                                     if (window.effectiveBackdropMode !== "none" && window.backdropCornerRadius > 0) {
                                         const r = Math.min(window.backdropCornerRadius, sw / 2, sh / 2);
-                                        ctx.moveTo(r, 0);
-                                        ctx.lineTo(sw - r, 0);
-                                        ctx.arcTo(sw, 0, sw, r, r);
-                                        ctx.lineTo(sw, sh - r);
-                                        ctx.arcTo(sw, sh, sw - r, sh, r);
-                                        ctx.lineTo(r, sh);
-                                        ctx.arcTo(0, sh, 0, sh - r, r);
-                                        ctx.lineTo(0, r);
-                                        ctx.arcTo(0, 0, r, 0, r);
+                                        ctx.moveTo(cropX + r, cropY);
+                                        ctx.lineTo(cropX + sw - r, cropY);
+                                        ctx.arcTo(cropX + sw, cropY, cropX + sw, cropY + r, r);
+                                        ctx.lineTo(cropX + sw, cropY + sh - r);
+                                        ctx.arcTo(cropX + sw, cropY + sh, cropX + sw - r, cropY + sh, r);
+                                        ctx.lineTo(cropX + r, cropY + sh);
+                                        ctx.arcTo(cropX, cropY + sh, cropX, cropY + sh - r, r);
+                                        ctx.lineTo(cropX, cropY + r);
+                                        ctx.arcTo(cropX, cropY, cropX + r, cropY, r);
                                         ctx.closePath();
                                     } else {
-                                        ctx.rect(0, 0, sw, sh);
+                                        ctx.rect(cropX, cropY, sw, sh);
                                     }
 
                                     for (let s of activeSpotlights) {
@@ -2341,7 +2347,7 @@ DankModal {
 
                                     ctx.clip("evenodd");
                                     ctx.fillStyle = "rgba(0, 0, 0, " + spotlightOpacity + ")";
-                                    ctx.fillRect(0, 0, window.screenshotWidth, window.screenshotHeight);
+                                    ctx.fillRect(cropX, cropY, sw, sh);
                                     ctx.restore();
                                 }
 
@@ -3198,22 +3204,25 @@ DankModal {
 
                                     const spotlightOpacity = activeInt / 100.0;
 
+                                    const cropX = hasCropSelection ? window.cropRect.x : 0;
+                                    const cropY = hasCropSelection ? window.cropRect.y : 0;
+
                                     ctx.beginPath();
                                     // Outer rectangle covering the whole view (rounded if backdrop active)
                                     if (window.effectiveBackdropMode !== "none" && window.backdropCornerRadius > 0) {
                                         const r = Math.min(window.backdropCornerRadius, sw / 2, sh / 2);
-                                        ctx.moveTo(r, 0);
-                                        ctx.lineTo(sw - r, 0);
-                                        ctx.arcTo(sw, 0, sw, r, r);
-                                        ctx.lineTo(sw, sh - r);
-                                        ctx.arcTo(sw, sh, sw - r, sh, r);
-                                        ctx.lineTo(r, sh);
-                                        ctx.arcTo(0, sh, 0, sh - r, r);
-                                        ctx.lineTo(0, r);
-                                        ctx.arcTo(0, 0, r, 0, r);
+                                        ctx.moveTo(cropX + r, cropY);
+                                        ctx.lineTo(cropX + sw - r, cropY);
+                                        ctx.arcTo(cropX + sw, cropY, cropX + sw, cropY + r, r);
+                                        ctx.lineTo(cropX + sw, cropY + sh - r);
+                                        ctx.arcTo(cropX + sw, cropY + sh, cropX + sw - r, cropY + sh, r);
+                                        ctx.lineTo(cropX + r, cropY + sh);
+                                        ctx.arcTo(cropX, cropY + sh, cropX, cropY + sh - r, r);
+                                        ctx.lineTo(cropX, cropY + r);
+                                        ctx.arcTo(cropX, cropY, cropX + r, cropY, r);
                                         ctx.closePath();
                                     } else {
-                                        ctx.rect(0, 0, sw, sh);
+                                        ctx.rect(cropX, cropY, sw, sh);
                                     }
                                     
                                     for (let s of spotlights) {
@@ -3247,7 +3256,7 @@ DankModal {
                                     
                                     ctx.clip("evenodd");
                                     ctx.fillStyle = "rgba(0, 0, 0, " + spotlightOpacity + ")";
-                                    ctx.fillRect(0, 0, window.screenshotWidth, window.screenshotHeight);
+                                    ctx.fillRect(cropX, cropY, sw, sh);
                                     ctx.restore();
                                 }
                             }
