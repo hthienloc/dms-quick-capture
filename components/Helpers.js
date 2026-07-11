@@ -586,22 +586,32 @@ function getBoundaryColorOrGradient(ctx, rx, ry, rw, rh, offscreenSampler, Qt) {
  */
 function formatHexColor(color) {
     if (!color) return "#000000";
-    if (typeof color === "string") {
-        var h = color.replace("#", "");
+    
+    // Coerce to string to see if it represents a valid hex color
+    var s = String(color).trim();
+    var match = s.match(/^#?([a-fA-F0-9]{3,8})$/);
+    if (match) {
+        var h = match[1];
+        if (h.length === 8) {
+            h = h.substring(2);
+        } else if (h.length === 3) {
+            h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+        }
         if (h.length === 6) {
-            var rr = parseInt(h.substring(0, 2), 16);
-            var gg = parseInt(h.substring(2, 4), 16);
-            var bb = parseInt(h.substring(4, 6), 16);
-            return "#" + [rr, gg, bb].map(function(v) {
-                return v.toString(16).padStart(2, "0");
-            }).join("").toUpperCase();
+            return "#" + h.toUpperCase();
         }
         return "#000000";
     }
-    const r = Math.round((color.r || 0) * 255).toString(16).padStart(2, '0');
-    const g = Math.round((color.g || 0) * 255).toString(16).padStart(2, '0');
-    const b = Math.round((color.b || 0) * 255).toString(16).padStart(2, '0');
-    return "#" + r + g + b;
+    
+    // Otherwise, check if it is a QML color object (has r, g, b)
+    if (color && typeof color === "object" && color.r !== undefined) {
+        const r = Math.round((color.r || 0) * 255).toString(16).padStart(2, '0');
+        const g = Math.round((color.g || 0) * 255).toString(16).padStart(2, '0');
+        const b = Math.round((color.b || 0) * 255).toString(16).padStart(2, '0');
+        return ("#" + r + g + b).toUpperCase();
+    }
+    
+    return "#000000";
 }
 
 /**
