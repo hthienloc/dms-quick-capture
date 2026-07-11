@@ -466,13 +466,21 @@ PluginSettings {
 
             Repeater {
                 model: [
-                    { label: I18n.tr("Capture"), icon: "camera"    },
-                    { label: I18n.tr("Save"),    icon: "save"      },
-                    { label: I18n.tr("Theme"),   icon: "palette"   },
-                    { label: I18n.tr("Tools"),   icon: "brush"     },
-                    { label: I18n.tr("Canvas"),  icon: "crop"      },
-                    { label: I18n.tr("Radial"),  icon: "radar"     },
-                    { label: I18n.tr("Help"),    icon: "menu_book" }
+                    { label: I18n.tr("Capture"),       icon: "camera"             },
+                    { label: I18n.tr("Saving"),        icon: "save"               },
+                    { label: I18n.tr("Notifications"), icon: "notifications"      },
+                    { label: I18n.tr("Toolbar"),       icon: "dock"               },
+                    { label: I18n.tr("Palette"),       icon: "palette"            },
+                    { label: I18n.tr("Styles"),        icon: "aspect_ratio"       },
+                    { label: I18n.tr("Drawing"),       icon: "brush"              },
+                    { label: I18n.tr("Text"),          icon: "format_size"        },
+                    { label: I18n.tr("Shapes"),        icon: "category"           },
+                    { label: I18n.tr("Backdrop"),      icon: "wallpaper"          },
+                    { label: I18n.tr("Watermark"),     icon: "branding_watermark" },
+                    { label: I18n.tr("Presets"),       icon: "settings"           },
+                    { label: I18n.tr("Radial"),        icon: "mouse"              },
+                    { label: I18n.tr("Shortcuts"),     icon: "keyboard"           },
+                    { label: I18n.tr("Help"),          icon: "menu_book"          }
                 ]
 
                 delegate: Rectangle {
@@ -751,44 +759,55 @@ PluginSettings {
             height: visible ? implicitHeight : 0
         }
     }
-
-    SettingsCard {
-        id: notificationsCard
-        SectionTitle {
-            text: I18n.tr("Notifications")
-            icon: "notifications"
-            showReset: postNotification.isDirty
-            onResetClicked: {
-                postNotification.resetToDefault();
-            }
-        }
-
-        ButtonGroupSettingPlus {
-            id: postNotification
-            settingKey: "postNotification"
-            label: I18n.tr("Post-Capture Notification")
-            description: I18n.tr("Select which types of notifications to show after copying or saving.")
-            defaultValue: "notification"
-            options: [
-                { label: I18n.tr("Notification"), value: "notification" },
-                { label: I18n.tr("Toast"), value: "toast" },
-                { label: I18n.tr("Both"), value: "both" },
-                { label: I18n.tr("None"), value: "none" }
-            ]
         }
     }
 
-        }
-    }
-
-    // ── Tab 2: Theme ───────────────────────────────────────────────────────────
+    // ── Tab 2: Notifications ─────────────────────────────────────────────────────
     Item {
         visible: tabBar.currentIndex === 2
         width: parent.width
         height: visible ? implicitHeight : 0
-        implicitHeight: themeTabCol.implicitHeight
+        implicitHeight: notificationsTabCol.implicitHeight
         Column {
-            id: themeTabCol
+            id: notificationsTabCol
+            width: parent.width
+            spacing: Theme.spacingM
+            SettingsCard {
+                id: notificationsCard
+                SectionTitle {
+                    text: I18n.tr("Notifications")
+                    icon: "notifications"
+                    showReset: postNotification.isDirty
+                    onResetClicked: {
+                        postNotification.resetToDefault();
+                    }
+                }
+
+                ButtonGroupSettingPlus {
+                    id: postNotification
+                    settingKey: "postNotification"
+                    label: I18n.tr("Post-Capture Notification")
+                    description: I18n.tr("Select which types of notifications to show after copying or saving.")
+                    defaultValue: "notification"
+                    options: [
+                        { label: I18n.tr("Notification"), value: "notification" },
+                        { label: I18n.tr("Toast"), value: "toast" },
+                        { label: I18n.tr("Both"), value: "both" },
+                        { label: I18n.tr("None"), value: "none" }
+                    ]
+                }
+            }
+        }
+    }
+
+    // ── Tab 3: Toolbar ───────────────────────────────────────────────────────────
+    Item {
+        visible: tabBar.currentIndex === 3
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        implicitHeight: toolbarTabCol.implicitHeight
+        Column {
+            id: toolbarTabCol
             width: parent.width
             spacing: Theme.spacingM
     SettingsCard {
@@ -859,9 +878,21 @@ PluginSettings {
             height: visible ? 36 : 0
         }
     }
+        }
+    }
 
-    SettingsCard {
-        id: toolbarPaletteSection
+    // ── Tab 4: Palette ───────────────────────────────────────────────────────────
+    Item {
+        visible: tabBar.currentIndex === 4
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        implicitHeight: paletteTabCol.implicitHeight
+        Column {
+            id: paletteTabCol
+            width: parent.width
+            spacing: Theme.spacingM
+            SettingsCard {
+                id: toolbarPaletteSection
         SectionTitle {
             text: I18n.tr("Toolbar Palette")
             icon: "palette"
@@ -1070,9 +1101,21 @@ PluginSettings {
             }
         }
     }
+        }
+    }
 
-    SettingsCard {
-        id: backdropStylesCard
+    // ── Tab 5: Styles ────────────────────────────────────────────────────────────
+    Item {
+        visible: tabBar.currentIndex === 5
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        implicitHeight: stylesTabCol.implicitHeight
+        Column {
+            id: stylesTabCol
+            width: parent.width
+            spacing: Theme.spacingM
+            SettingsCard {
+                id: backdropStylesCard
         SectionTitle {
             text: I18n.tr("Styles")
             icon: "aspect_ratio"
@@ -1159,14 +1202,14 @@ PluginSettings {
         }
     }
 
-    // ── Tab 3: Tools ───────────────────────────────────────────────────────────
+    // ── Tab 6: Drawing ───────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 3
+        visible: tabBar.currentIndex === 6
         width: parent.width
         height: visible ? implicitHeight : 0
-        implicitHeight: toolsTabCol.implicitHeight
+        implicitHeight: drawingTabCol.implicitHeight
         Column {
-            id: toolsTabCol
+            id: drawingTabCol
             width: parent.width
             spacing: Theme.spacingM
     SettingsCard {
@@ -1296,9 +1339,21 @@ PluginSettings {
             defaultValue: true
         }
     }
+        }
+    }
 
-    SettingsCard {
-        id: textSettingsCard
+    // ── Tab 7: Text ──────────────────────────────────────────────────────────────
+    Item {
+        visible: tabBar.currentIndex === 7
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        implicitHeight: textTabCol.implicitHeight
+        Column {
+            id: textTabCol
+            width: parent.width
+            spacing: Theme.spacingM
+            SettingsCard {
+                id: textSettingsCard
         SectionTitle {
             text: I18n.tr("Text")
             icon: "format_size"
@@ -1395,9 +1450,21 @@ PluginSettings {
             opacity: 0.85
         }
     }
+        }
+    }
 
-    SettingsCard {
-        id: shapesCard
+    // ── Tab 8: Shapes ────────────────────────────────────────────────────────────
+    Item {
+        visible: tabBar.currentIndex === 8
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        implicitHeight: shapesTabCol.implicitHeight
+        Column {
+            id: shapesTabCol
+            width: parent.width
+            spacing: Theme.spacingM
+            SettingsCard {
+                id: shapesCard
         SectionTitle {
             text: I18n.tr("Shapes")
             icon: "category"
@@ -1442,14 +1509,14 @@ PluginSettings {
         }
     }
 
-    // ── Tab 4: Canvas ──────────────────────────────────────────────────────────
+    // ── Tab 9: Backdrop ──────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 4
+        visible: tabBar.currentIndex === 9
         width: parent.width
         height: visible ? implicitHeight : 0
-        implicitHeight: canvasTabCol.implicitHeight
+        implicitHeight: backdropTabCol.implicitHeight
         Column {
-            id: canvasTabCol
+            id: backdropTabCol
             width: parent.width
             spacing: Theme.spacingM
     SettingsCard {
@@ -1604,9 +1671,21 @@ PluginSettings {
             defaultValue: "auto"
         }
     }
+        }
+    }
 
-    SettingsCard {
-        id: watermarkCard
+    // ── Tab 10: Watermark ────────────────────────────────────────────────────────
+    Item {
+        visible: tabBar.currentIndex === 10
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        implicitHeight: watermarkTabCol.implicitHeight
+        Column {
+            id: watermarkTabCol
+            width: parent.width
+            spacing: Theme.spacingM
+            SettingsCard {
+                id: watermarkCard
         SectionTitle {
             text: I18n.tr("Watermark")
             icon: "branding_watermark"
@@ -2068,14 +2147,14 @@ PluginSettings {
         }
     }
 
-    // ── Tab 5: Radial ──────────────────────────────────────────────────────────
+    // ── Tab 11: Presets ──────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 5
+        visible: tabBar.currentIndex === 11
         width: parent.width
         height: visible ? implicitHeight : 0
-        implicitHeight: radialTabCol.implicitHeight
+        implicitHeight: presetsTabCol.implicitHeight
         Column {
-            id: radialTabCol
+            id: presetsTabCol
             width: parent.width
             spacing: Theme.spacingM
     SettingsCard {
@@ -2694,9 +2773,21 @@ PluginSettings {
             }
         }
     }
- 
-    SettingsCard {
-        id: radialBehaviorsCard
+        }
+    }
+
+    // ── Tab 12: Radial ───────────────────────────────────────────────────────────
+    Item {
+        visible: tabBar.currentIndex === 12
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        implicitHeight: radialBehaviorsTabCol.implicitHeight
+        Column {
+            id: radialBehaviorsTabCol
+            width: parent.width
+            spacing: Theme.spacingM
+            SettingsCard {
+                id: radialBehaviorsCard
         SectionTitle {
             text: I18n.tr("Radial Menu Settings")
             icon: "mouse"
@@ -2761,14 +2852,14 @@ PluginSettings {
         }
     }
 
-    // ── Tab 6: Help ────────────────────────────────────────────────────────────
+    // ── Tab 13: Shortcuts ────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 6
+        visible: tabBar.currentIndex === 13
         width: parent.width
         height: visible ? implicitHeight : 0
-        implicitHeight: helpTabCol.implicitHeight
+        implicitHeight: shortcutsTabCol.implicitHeight
         Column {
-            id: helpTabCol
+            id: shortcutsTabCol
             width: parent.width
             spacing: Theme.spacingM
     SettingsCard {
@@ -2854,8 +2945,20 @@ PluginSettings {
             }
         }
     }
+        }
+    }
 
-    SettingsCard {
+    // ── Tab 14: Help ─────────────────────────────────────────────────────────────
+    Item {
+        visible: tabBar.currentIndex === 14
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        implicitHeight: helpTabCol.implicitHeight
+        Column {
+            id: helpTabCol
+            width: parent.width
+            spacing: Theme.spacingM
+            SettingsCard {
         SectionTitle {
             id: ipcTitle
             text: I18n.tr("IPC Commands")
