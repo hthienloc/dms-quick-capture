@@ -1,0 +1,99 @@
+name: Auto-Release Bot
+
+on:
+  schedule:
+    - cron: '50 16 * * 0'   # Weekly minor bump (Sunday) at 23:50 Vietnam Time (16:50 UTC)
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: 'Bump type (patch or minor)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine Bump Type
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "BUMP_TYPE=${{ github.event.inputs.bump_type }}" >> $GITHUB_ENV
+          else
+            echo "BUMP_TYPE=minor" >> $GITHUB_ENV
+          fi
+
+      - name: Check for Changes & Filter Docs
+        id: check_changes
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LATEST_TAG" ]; then
+            echo "No tags found. Forcing release."
+            echo "should_release=true" >> $GITHUB_OUTPUT
+          else
+            COMMITS_COUNT=$(git log "$LATEST_TAG"..HEAD --oneline | wc -l)
+            if [ "$COMMITS_COUNT" -eq 0 ]; then
+              echo "No new commits since $LATEST_TAG. Skipping release."
+              echo "should_release=false" >> $GITHUB_OUTPUT
+            else
+              CHANGED_FILES=$(git diff --name-only "$LATEST_TAG"..HEAD)
+              NON_DOC_CHANGES=$(echo "$CHANGED_FILES" | grep -vE '^(\.github/|.*\.md$|LICENSE$|\.gitignore$)' || true)
+              if [ -n "$NON_DOC_CHANGES" ]; then
+                echo "Found non-documentation changes: $NON_DOC_CHANGES"
+                echo "should_release=true" >> $GITHUB_OUTPUT
+              else
+                echo "Only documentation changes found. Skipping release."
+                echo "should_release=false" >> $GITHUB_OUTPUT
+              fi
+            fi
+          fi
+
+      - name: Bump Version
+        if: steps.check_changes.outputs.should_release == 'true'
+        id: bump
+        run: |
+          VERSION=$(jq -r '.version' plugin.json)
+          IFS='.' read -r major minor patch <<< "$VERSION"
+
+          if [ "$BUMP_TYPE" = "minor" ]; then
+            minor=$((minor + 1))
+            patch=0
+          else
+            patch=$((patch + 1))
+          fi
+
+          NEW_VERSION="$major.$minor.$patch"
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+          jq --arg ver "$NEW_VERSION" '.version = $ver' plugin.json > tmp.json && mv tmp.json plugin.json
+          echo "Bumped version to $NEW_VERSION"
+
+      - name: Commit & Push Changes
+        if: steps.check_changes.outputs.should_release == 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add plugin.json
+          git commit -m "chore: bump version to $NEW_VERSION"
+          git tag "v$NEW_VERSION"
+          git push origin main
+          git push origin "v$NEW_VERSION"
+
+      - name: Create GitHub Release
+        if: steps.check_changes.outputs.should_release == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v${{ env.NEW_VERSION }}"
+          name: "v${{ env.NEW_VERSION }}"
+          generate_release_notes: true
