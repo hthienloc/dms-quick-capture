@@ -2397,7 +2397,7 @@ DankModal {
                                                      finalPt = Qt.point(p0.x + L * Math.cos(snappedAngle), p0.y + L * Math.sin(snappedAngle));
                                                  }
                                              }
-                                         } else if ((mouse.modifiers & Qt.ShiftModifier) && (window.currentTool === "ellipse" || window.currentTool === "rect" || window.currentTool === "redact" || window.currentTool === "pixelate" || window.currentTool === "spotlight")) {
+                                         } else if ((mouse.modifiers & Qt.ShiftModifier) && (window.currentTool === "ellipse" || window.currentTool === "rect" || window.currentTool === "redact" || window.currentTool === "pixelate" || window.currentTool === "spotlight" || window.currentTool === "callout")) {
                                              if (window.currentStroke.points[0]) {
                                                  finalPt = window.constrainSquarePoint(window.currentStroke.points[0], absPt);
                                              }
