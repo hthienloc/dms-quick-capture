@@ -17,10 +17,32 @@ QtObject {
         { id: "redact", icon: "ad_off", shortcut: "R", tooltip: qsTr("Redact (R)") },
         { id: "stamp", icon: "looks_one", shortcut: "A", tooltip: qsTr("Number Stamp (A)") },
         { id: "highlighter", icon: "border_color", shortcut: "S", tooltip: qsTr("Highlighter (S)") },
-        { id: "spotlight", icon: "highlight", shortcut: "D", tooltip: qsTr("Focus Spotlight (D)") },
-        { id: "callout", icon: "zoom_in", shortcut: "Z", tooltip: qsTr("Area Zoom (Z) | Hold G for Loupe") },
+        { id: "spotlight", icon: "highlight", shortcut: "D", tooltip: qsTr("Spotlight (D)") },
+        { id: "callout", icon: "zoom_in", shortcut: "Z", tooltip: qsTr("Callout (Z) | Hold G for Loupe") },
         { id: "backdrop", icon: "wallpaper", shortcut: "B", tooltip: qsTr("Image Backdrop (B)") }
     ]
+
+    function getToolIcon(toolId) {
+        const tool = toolButtons.find(t => t.id === toolId);
+        if (tool) return tool.icon;
+        
+        if (toolId === "eraser") return "auto_fix_normal";
+        if (toolId === "crop") return "crop";
+        if (toolId === "select") return "near_me";
+        
+        return "help";
+    }
+
+    function getToolLabel(toolId) {
+        const tool = toolButtons.find(t => t.id === toolId);
+        if (tool) return tool.tooltip.split(" (")[0];
+        
+        if (toolId === "eraser") return qsTr("Eraser");
+        if (toolId === "crop") return qsTr("Crop / Resize");
+        if (toolId === "select") return qsTr("Select");
+        
+        return "";
+    }
 
     readonly property string selectedPreset: pluginData["color_palette_preset"] || "adaptive"
 

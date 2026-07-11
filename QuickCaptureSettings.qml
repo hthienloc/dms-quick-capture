@@ -1984,8 +1984,7 @@ PluginSettings {
 
                         DankIcon {
                             name: {
-                                const tool = captureConfig.toolButtons.find(t => t.id === modelData.tool);
-                                return tool ? tool.icon : "help";
+                                return captureConfig.getToolIcon(modelData.tool);
                             }
                             size: 18
                             color: {
@@ -2018,8 +2017,7 @@ PluginSettings {
                         name: {
                             const p = radialMenuCard.currentPresets[radialMenuCard.presetActiveIndex];
                             if (p && p.tool !== "none") {
-                                const tool = captureConfig.toolButtons.find(t => t.id === p.tool);
-                                return tool ? tool.icon : "check";
+                                return captureConfig.getToolIcon(p.tool);
                             }
                             return "block";
                         }
@@ -2148,6 +2146,12 @@ PluginSettings {
                     }, {
                         "label": I18n.tr("Crop / Resize"),
                         "value": "crop"
+                    }, {
+                        "label": I18n.tr("Spotlight"),
+                        "value": "spotlight"
+                    }, {
+                        "label": I18n.tr("Callout"),
+                        "value": "callout"
                     }]
                     defaultValue: {
                         if (index === 0) return "pen";
@@ -2397,6 +2401,13 @@ PluginSettings {
                         presetThicknessSetting.unit = "%";
                         presetThicknessSetting.previewType = "none";
                         defVal = 50;
+                    } else if (t === "callout") {
+                        presetThicknessSetting.label = I18n.tr("Zoom Level");
+                        presetThicknessSetting.minimum = 100;
+                        presetThicknessSetting.maximum = 500;
+                        presetThicknessSetting.unit = "%";
+                        presetThicknessSetting.previewType = "none";
+                        defVal = 150;
                     } else if (t === "stamp") {
                         presetThicknessSetting.label = I18n.tr("Stamp Size");
                         presetThicknessSetting.minimum = 1;

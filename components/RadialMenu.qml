@@ -170,8 +170,7 @@ Item {
 
                 DankIcon {
                     name: {
-                        const tool = config.toolButtons.find(t => t.id === modelData.tool);
-                        return tool ? tool.icon : "help";
+                        return config.getToolIcon(modelData.tool);
                     }
                     size: 22
                     color: root.selectedIndex === index ? Theme.onPrimary : modelData.color
@@ -206,8 +205,7 @@ Item {
                 name: {
                     if (root.selectedIndex === -2) return "near_me";
                     if (root.selectedIndex >= 0 && root.selectedIndex < root.presets.length) {
-                        const tool = config.toolButtons.find(t => t.id === root.presets[root.selectedIndex].tool);
-                        return tool ? tool.icon : "check";
+                        return config.getToolIcon(root.presets[root.selectedIndex].tool);
                     }
                     return "near_me"; // default idle center icon
                 }
@@ -226,8 +224,7 @@ Item {
                 text: {
                     if (root.selectedIndex === -2) return I18n.tr("Select");
                     if (root.selectedIndex >= 0 && root.selectedIndex < root.presets.length) {
-                        const tool = config.toolButtons.find(t => t.id === root.presets[root.selectedIndex].tool);
-                        return tool ? tool.tooltip.split(" (")[0] : "";
+                        return config.getToolLabel(root.presets[root.selectedIndex].tool);
                     }
                     return I18n.tr("Select");
                 }
