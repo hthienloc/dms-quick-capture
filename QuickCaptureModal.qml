@@ -941,21 +941,57 @@ DankModal {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
 
+    function getPresetTool(index) {
+        let pData = {};
+        if (window.parentWidget && window.parentWidget.pluginData) {
+            pData = window.parentWidget.pluginData;
+        } else if (typeof config !== "undefined" && config.pluginData) {
+            pData = config.pluginData;
+        }
+        const val = pData["preset_" + index + "_tool"];
+        if (val !== undefined) return val;
+        
+        const defaultTools = ["pen", "arrow", "rect", "highlighter", "ellipse", "stamp", "redact", "pixelate"];
+        return defaultTools[index] || "none";
+    }
+
+    function getPresetColor(index) {
+        let pData = {};
+        if (window.parentWidget && window.parentWidget.pluginData) {
+            pData = window.parentWidget.pluginData;
+        } else if (typeof config !== "undefined" && config.pluginData) {
+            pData = config.pluginData;
+        }
+        const val = pData["preset_" + index + "_color"];
+        if (val !== undefined) return val;
+        
+        const defaultColors = ["primary", "primary", "primary", "primary", "primary", "primary", "#000000", "#ffffff"];
+        return defaultColors[index] || "primary";
+    }
+
+    function getPresetThickness(index) {
+        let pData = {};
+        if (window.parentWidget && window.parentWidget.pluginData) {
+            pData = window.parentWidget.pluginData;
+        } else if (typeof config !== "undefined" && config.pluginData) {
+            pData = config.pluginData;
+        }
+        const val = pData["preset_" + index + "_thickness"];
+        if (val !== undefined) return parseInt(val, 10) || 6;
+        return 6;
+    }
+
     function updateRadialPresets() {
         const list = [];
-        if (!window.parentWidget || !window.parentWidget.pluginData) {
-            window.radialPresets = list;
-            return;
-        }
         for (let i = 0; i < 8; i++) {
-            const t = window.parentWidget.pluginData["preset_" + i + "_tool"];
+            const t = window.getPresetTool(i);
             if (t && t !== "none") {
-                const rawColor = window.parentWidget.pluginData["preset_" + i + "_color"] || Theme.primary;
+                const rawColor = window.getPresetColor(i);
                 const resolvedColor = config.resolveColor(rawColor);
                 list.push({
                     tool: t,
                     color: resolvedColor,
-                    thickness: window.parentWidget.pluginData["preset_" + i + "_thickness"] || 6
+                    thickness: window.getPresetThickness(i)
                 });
             }
         }
@@ -1488,12 +1524,12 @@ DankModal {
         if (defaultToolMode === "preset") {
             const presetIdxRaw = config.pluginData.defaultPresetIndex || "0";
             const presetIdx = parseInt(presetIdxRaw, 10);
-            const t = config.pluginData["preset_" + presetIdx + "_tool"];
+            const t = window.getPresetTool(presetIdx);
             if (t && t !== "none") {
                 startTool = t;
-                const rawColor = config.pluginData["preset_" + presetIdx + "_color"] || Theme.primary;
+                const rawColor = window.getPresetColor(presetIdx);
                 startColor = config.resolveColor(rawColor);
-                startThickness = config.pluginData["preset_" + presetIdx + "_thickness"] || 6;
+                startThickness = window.getPresetThickness(presetIdx);
             } else {
                 startTool = config.pluginData.defaultTool || "pen";
                 startThickness = config.pluginData.defaultThickness || 6;
