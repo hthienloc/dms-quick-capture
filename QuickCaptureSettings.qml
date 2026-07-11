@@ -293,11 +293,14 @@ PluginSettings {
                     radius: 16
                     color: active
                         ? Theme.withAlpha(Theme.primary, 0.18)
-                        : (chipHover.hovered ? Theme.withAlpha(Theme.primary, 0.08) : Theme.withAlpha(Theme.outline, 0.12))
-                    border.color: active ? Theme.primary : "transparent"
+                        : (chipMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.08) : Theme.withAlpha(Theme.outline, 0.12))
+                    border.color: active 
+                        ? Theme.primary 
+                        : (chipMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.3) : "transparent")
                     border.width: 1
 
                     Behavior on color { ColorAnimation { duration: Theme.shortDuration } }
+                    Behavior on border.color { ColorAnimation { duration: Theme.shortDuration } }
 
                     Row {
                         id: chipRow
@@ -322,8 +325,13 @@ PluginSettings {
                         }
                     }
 
-                    HoverHandler { id: chipHover }
-                    TapHandler { onTapped: tabBar.currentIndex = chipDelegate.index }
+                    MouseArea {
+                        id: chipMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: tabBar.currentIndex = chipDelegate.index
+                    }
                 }
             }
         }
