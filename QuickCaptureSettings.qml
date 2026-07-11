@@ -250,6 +250,98 @@ PluginSettings {
         DankTooltipV2 { id: sharedTooltip }
     }
 
+
+    // ── Tab Navigation ─────────────────────────────────────────────────────────
+    Item {
+        id: tabBar
+        width: parent.width
+        height: 44
+
+        property int currentIndex: 0
+
+        Flow {
+            anchors {
+                left: parent.left
+                right: parent.right
+                verticalCenter: parent.verticalCenter
+                leftMargin: Theme.spacingM
+                rightMargin: Theme.spacingM
+            }
+            spacing: Theme.spacingS
+
+            Repeater {
+                model: [
+                    { label: I18n.tr("Capture"),    icon: "camera"    },
+                    { label: I18n.tr("Appearance"), icon: "palette"   },
+                    { label: I18n.tr("Radial"),     icon: "radar"     },
+                    { label: I18n.tr("Tools"),      icon: "brush"     },
+                    { label: I18n.tr("About"),      icon: "menu_book" }
+                ]
+
+                delegate: Rectangle {
+                    id: chipDelegate
+                    required property var modelData
+                    required property int index
+                    property bool active: tabBar.currentIndex === index
+
+                    height: 32
+                    width: chipRow.implicitWidth + 24
+                    radius: 16
+                    color: active
+                        ? Theme.withAlpha(Theme.primary, 0.18)
+                        : (chipHover.hovered ? Theme.withAlpha(Theme.primary, 0.08) : Theme.withAlpha(Theme.outline, 0.12))
+                    border.color: active ? Theme.primary : "transparent"
+                    border.width: 1
+
+                    Behavior on color { ColorAnimation { duration: Theme.shortDuration } }
+
+                    Row {
+                        id: chipRow
+                        anchors.centerIn: parent
+                        spacing: 6
+
+                        DankIcon {
+                            name: chipDelegate.modelData.icon
+                            size: 15
+                            color: chipDelegate.active ? Theme.primary : Theme.surfaceVariantText
+                            anchors.verticalCenter: parent.verticalCenter
+                            Behavior on color { ColorAnimation { duration: Theme.shortDuration } }
+                        }
+
+                        StyledText {
+                            text: chipDelegate.modelData.label
+                            font.pixelSize: Theme.fontSizeMedium
+                            font.weight: chipDelegate.active ? Font.Medium : Font.Normal
+                            color: chipDelegate.active ? Theme.primary : Theme.surfaceVariantText
+                            anchors.verticalCenter: parent.verticalCenter
+                            Behavior on color { ColorAnimation { duration: Theme.shortDuration } }
+                        }
+                    }
+
+                    HoverHandler { id: chipHover }
+                    TapHandler { onTapped: tabBar.currentIndex = chipDelegate.index }
+                }
+            }
+        }
+    }
+
+    Rectangle {
+        width: parent.width
+        height: 1
+        color: Theme.withAlpha(Theme.outline, 0.25)
+    }
+
+    // ── Tab 0: Capture ─────────────────────────────────────────────────────────
+    Item {
+        visible: tabBar.currentIndex === 0
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        implicitHeight: captureTabCol.implicitHeight
+        Column {
+            id: captureTabCol
+            width: parent.width
+            spacing: Theme.spacingM
+
     SettingsCard {
         id: captureModeCard
         SectionTitle {
@@ -474,6 +566,21 @@ PluginSettings {
             ]
         }
     }
+
+
+        }
+    }
+
+    // ── Tab 1: Appearance ──────────────────────────────────────────────────────
+    Item {
+        visible: tabBar.currentIndex === 1
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        implicitHeight: appearanceTabCol.implicitHeight
+        Column {
+            id: appearanceTabCol
+            width: parent.width
+            spacing: Theme.spacingM
 
     SettingsCard {
         id: toolbarCard
@@ -953,6 +1060,21 @@ PluginSettings {
             defaultValue: "auto"
         }
     }
+
+
+        }
+    }
+
+    // ── Tab 2: Radial ──────────────────────────────────────────────────────────
+    Item {
+        visible: tabBar.currentIndex === 2
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        implicitHeight: radialTabCol.implicitHeight
+        Column {
+            id: radialTabCol
+            width: parent.width
+            spacing: Theme.spacingM
 
     SettingsCard {
         id: radialMenuCard
@@ -1622,6 +1744,21 @@ PluginSettings {
             }
         }
     }
+
+
+        }
+    }
+
+    // ── Tab 3: Tools ───────────────────────────────────────────────────────────
+    Item {
+        visible: tabBar.currentIndex === 3
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        implicitHeight: toolsTabCol.implicitHeight
+        Column {
+            id: toolsTabCol
+            width: parent.width
+            spacing: Theme.spacingM
 
     SettingsCard {
         id: drawingCard
@@ -2353,6 +2490,21 @@ PluginSettings {
         }
     }
 
+
+        }
+    }
+
+    // ── Tab 4: About ───────────────────────────────────────────────────────────
+    Item {
+        visible: tabBar.currentIndex === 4
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        implicitHeight: aboutTabCol.implicitHeight
+        Column {
+            id: aboutTabCol
+            width: parent.width
+            spacing: Theme.spacingM
+
     SettingsCard {
         SectionTitle { 
             id: usageTitle
@@ -2513,8 +2665,16 @@ PluginSettings {
                 label: I18n.tr("Niri Binding Example")
                 text: "binds {\n    Print { spawn \"dms\" \"ipc\" \"call\" \"quickCapture\" \"screenshot\" \"default\"; }\n}"
             }
+
+            PluginAbout {
+                repoUrl: "https://github.com/hthienloc/dms-quick-capture"
+            }
         }
     }
+
+        }
+    }
+
 
     CaptureConfig {
         id: captureConfig
@@ -2531,10 +2691,6 @@ PluginSettings {
             "toolbar_color_5": c5.value,
             "toolbar_color_6": c6.value
         }
-    }
-
-    PluginAbout {
-        repoUrl: "https://github.com/hthienloc/dms-quick-capture"
     }
 
 }
