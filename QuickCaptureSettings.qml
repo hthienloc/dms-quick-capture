@@ -255,15 +255,17 @@ PluginSettings {
     Item {
         id: tabBar
         width: parent.width
-        height: 44
+        height: tabFlow.implicitHeight + Theme.spacingM * 2
 
         property int currentIndex: 0
 
         Flow {
+            id: tabFlow
             anchors {
                 left: parent.left
                 right: parent.right
-                verticalCenter: parent.verticalCenter
+                top: parent.top
+                topMargin: Theme.spacingM
                 leftMargin: Theme.spacingM
                 rightMargin: Theme.spacingM
             }
@@ -2659,11 +2661,11 @@ PluginSettings {
                 label: I18n.tr("Niri Binding Example")
                 text: "binds {\n    Print { spawn \"dms\" \"ipc\" \"call\" \"quickCapture\" \"screenshot\" \"default\"; }\n}"
             }
-
-            PluginAbout {
-                repoUrl: "https://github.com/hthienloc/dms-quick-capture"
-            }
         }
+    }
+
+    PluginAbout {
+        repoUrl: "https://github.com/hthienloc/dms-quick-capture"
     }
 
         }
