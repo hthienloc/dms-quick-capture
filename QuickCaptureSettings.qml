@@ -296,7 +296,7 @@ PluginSettings {
                         : (chipMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.08) : Theme.withAlpha(Theme.outline, 0.12))
                     border.color: active 
                         ? Theme.primary 
-                        : (chipMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.3) : "transparent")
+                        : (chipMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.6) : "transparent")
                     border.width: 1
 
                     Behavior on color { ColorAnimation { duration: Theme.shortDuration } }
