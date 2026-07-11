@@ -507,7 +507,9 @@ DankModal {
 
     property bool showAnnotations: true
     onShowAnnotationsChanged: {
-        window.requestPaintAll();
+        if (window.activeCanvas) {
+            window.activeCanvas.requestPaint();
+        }
     }
     property var copiedStroke: null
 
@@ -534,7 +536,6 @@ DankModal {
     property int preGrabCalloutLinkLines: 1
     property point pressCoords: Qt.point(0, 0)
     property var originalPoints: []
-    property bool paintPending: false
 
     // Text Input Management
     property bool isTyping: false
@@ -865,6 +866,7 @@ DankModal {
     property var exportCanvasItem: null
 
     onSelectedStrokeChanged: window.requestPaintAll()
+    onShowAnnotationsChanged: window.requestPaintAll()
     onEffectiveBackdropModeChanged: window.requestPaintAll()
     onBackdropSolidColorChanged: window.requestPaintAll()
     onBackdropGradientStartChanged: window.requestPaintAll()
@@ -879,14 +881,6 @@ DankModal {
     function requestPaintAll() {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
         if (window.bakedCanvas) window.bakedCanvas.requestPaint();
-    }
-
-    function requestPaintCoalesced() {
-        if (!window.paintPending) {
-            if (window.activeCanvas) window.activeCanvas.requestPaint();
-            window.paintPending = true;
-            paintCooldownTimer.start();
-        }
     }
 
     // Radial Menu Presets & History
@@ -2475,7 +2469,7 @@ DankModal {
                                          if (window.selectedStroke.tool === "redact") {
                                              window.selectedStroke.cachedCleanColor = undefined;
                                          }
-                                         window.requestPaintCoalesced();
+                                         drawingCanvas.requestPaint();
                                     } else {
                                         hoveredStrokeIdx = window.findStrokeAt(absPt.x, absPt.y);
                                     }
@@ -2491,7 +2485,7 @@ DankModal {
                                         const w = Math.abs(ox - window.selectStart.x);
                                         const h = Math.abs(oy - window.selectStart.y);
                                         window.cropRect = window.clampCropRect(x1, y1, w, h);
-                                        window.requestPaintCoalesced();
+                                        drawingCanvas.requestPaint();
                                         return;
                                     }
 
@@ -2521,7 +2515,7 @@ DankModal {
                                             newH = Math.max(10, oy - cr.y);
                                         }
                                         window.cropRect = window.clampCropRect(newX, newY, newW, newH);
-                                        window.requestPaintCoalesced();
+                                        drawingCanvas.requestPaint();
                                         return;
                                     }
                                 } else if (window.currentTool === "ocr" || window.currentTool === "qr") {
@@ -2533,7 +2527,7 @@ DankModal {
                                         const w = Math.abs(ox - window.selectStart.x);
                                         const h = Math.abs(oy - window.selectStart.y);
                                         window.ocrRect = Qt.rect(x1, y1, w, h);
-                                        window.requestPaintCoalesced();
+                                        drawingCanvas.requestPaint();
                                     }
                                     return;
                                 } else {
@@ -2581,7 +2575,7 @@ DankModal {
                                              window.currentStroke.points.push(finalPt);
                                          }
                                      }
-                                    window.requestPaintCoalesced();
+                                    drawingCanvas.requestPaint();
                                 }
                             }
 
@@ -3088,17 +3082,6 @@ DankModal {
                         repeat: false
                         onTriggered: {
                             window.showSizePreview = false;
-                        }
-                    }
-
-                    Timer {
-                        id: paintCooldownTimer
-                        interval: 16
-                        running: false
-                        repeat: false
-                        onTriggered: {
-                            if (window.activeCanvas) window.activeCanvas.requestPaint();
-                            window.paintPending = false;
                         }
                     }
 
