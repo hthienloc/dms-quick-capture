@@ -251,6 +251,199 @@ PluginSettings {
     }
 
 
+    component BackdropColorSetting : Column {
+        id: bcsRoot
+        required property string settingKey
+        required property string label
+        property var defaultValue: "primary"
+        property var value: defaultValue
+        
+        property bool isInitialized: false
+        readonly property bool isDirty: value.toString() !== defaultValue.toString()
+        
+        function resetToDefault() {
+            value = defaultValue;
+        }
+
+        function loadValue() {
+            const settings = findSettings();
+            if (settings && settings.pluginService) {
+                const loadedValue = settings.loadValue(settingKey, defaultValue);
+                value = loadedValue;
+                isInitialized = true;
+            }
+        }
+
+        Component.onCompleted: Qt.callLater(loadValue);
+
+        onValueChanged: {
+            if (!isInitialized) return;
+            const settings = findSettings();
+            if (settings) settings.saveValue(settingKey, value);
+        }
+
+        function findSettings() {
+            let item = parent;
+            while (item) {
+                if (item.saveValue !== undefined && item.loadValue !== undefined) return item;
+                item = item.parent;
+            }
+            return null;
+        }
+
+        width: parent.width
+        spacing: Theme.spacingS
+
+        StyledText {
+            text: bcsRoot.label
+            font.pixelSize: Theme.fontSizeLarge
+            font.weight: Font.Medium
+            color: Theme.surfaceText
+        }
+
+        Row {
+            width: parent.width
+            spacing: Theme.spacingS
+
+            // 1. 8 Palette Slots
+            Row {
+                spacing: Theme.spacingXS
+                anchors.verticalCenter: parent.verticalCenter
+
+                Repeater {
+                    model: 8
+                    delegate: Rectangle {
+                        width: 28
+                        height: 28
+                        radius: 14
+                        color: {
+                            if (index === 0) return toolbar_primary.resolvedColor;
+                            if (index === 1) return c0.resolvedColor;
+                            if (index === 2) return c1.resolvedColor;
+                            if (index === 3) return c2.resolvedColor;
+                            if (index === 4) return c3.resolvedColor;
+                            if (index === 5) return c4.resolvedColor;
+                            if (index === 6) return c5.resolvedColor;
+                            if (index === 7) return c6.resolvedColor;
+                            return "transparent";
+                        }
+
+                        property bool isSelected: bcsRoot.value === "slot_" + (index + 1)
+                        border.width: isSelected ? 2 : 1
+                        border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.outline, 0.4)
+                        scale: hoverArea.containsMouse ? 1.1 : 1.0
+                        Behavior on scale { NumberAnimation { duration: 100 } }
+
+                        DankIcon {
+                            anchors.centerIn: parent
+                            name: "check"
+                            size: 14
+                            color: (parent.color.r * 0.299 + parent.color.g * 0.587 + parent.color.b * 0.114) > 0.6 ? "#000000" : "#ffffff"
+                            visible: parent.isSelected
+                        }
+
+                        MouseArea {
+                            id: hoverArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                bcsRoot.value = "slot_" + (index + 1);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Small separator bar
+            Rectangle {
+                width: 1
+                height: 20
+                color: Theme.withAlpha(Theme.outline, 0.2)
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            // 2. Custom Option and Bar Row
+            Row {
+                spacing: Theme.spacingS
+                anchors.verticalCenter: parent.verticalCenter
+
+                // Custom button swatch
+                Rectangle {
+                    id: customSwatch
+                    width: 28
+                    height: 28
+                    radius: 14
+                    property bool isSelected: !bcsRoot.value.startsWith("slot_")
+                    color: isSelected ? captureConfig.resolveColor(bcsRoot.value) : Theme.surfaceContainerHighest
+                    border.width: isSelected ? 2 : 1
+                    border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.outline, 0.4)
+                    scale: customHover.containsMouse ? 1.1 : 1.0
+                    Behavior on scale { NumberAnimation { duration: 100 } }
+
+                    DankIcon {
+                        anchors.centerIn: parent
+                        name: "palette"
+                        size: 14
+                        color: {
+                            if (!parent.isSelected) return Theme.surfaceText;
+                            return (parent.color.r * 0.299 + parent.color.g * 0.587 + parent.color.b * 0.114) > 0.6 ? "#000000" : "#ffffff";
+                        }
+                    }
+
+                    MouseArea {
+                        id: customHover
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            if (!parent.isSelected) {
+                                bcsRoot.value = "primary";
+                            }
+                        }
+                    }
+                }
+
+                // Dynamic Custom Color Bar directly to the right
+                Rectangle {
+                    id: customColorBar
+                    width: 110
+                    height: 28
+                    radius: 14
+                    visible: !bcsRoot.value.startsWith("slot_")
+                    color: captureConfig.resolveColor(bcsRoot.value)
+                    border.color: Theme.withAlpha(Theme.surfaceText, 0.15)
+                    border.width: 1
+
+                    StyledText {
+                        anchors.centerIn: parent
+                        text: bcsRoot.value === "primary" ? I18n.tr("PRIMARY") : bcsRoot.value.toString().toUpperCase()
+                        font.pixelSize: Theme.fontSizeSmall - 1
+                        font.weight: Font.Bold
+                        isMonospace: true
+                        color: (parent.color.r * 0.299 + parent.color.g * 0.587 + parent.color.b * 0.114) > 0.6 ? "#000000" : "#ffffff"
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            if (typeof PopoutService !== "undefined" && PopoutService && PopoutService.colorPickerModal) {
+                                PopoutService.colorPickerModal.selectedColor = captureConfig.resolveColor(bcsRoot.value);
+                                PopoutService.colorPickerModal.pickerTitle = bcsRoot.label;
+                                PopoutService.colorPickerModal.onColorSelectedCallback = function (selectedColor) {
+                                    bcsRoot.value = selectedColor.toString();
+                                };
+                                PopoutService.colorPickerModal.show();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
     // ── Tab Navigation ─────────────────────────────────────────────────────────
     Item {
         id: tabBar
@@ -1263,10 +1456,13 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Backdrop Defaults")
             icon: "wallpaper"
-            showReset: backdropAutoApply.isDirty || backdropDefaultMode.isDirty || backdropDefaultPadding.isDirty || backdropDefaultRadius.isDirty || backdropDefaultShadow.isDirty || backdropDefaultAngle.isDirty || backdropDefaultAspectRatio.isDirty
+            showReset: backdropAutoApply.isDirty || backdropDefaultMode.isDirty || backdropDefaultPadding.isDirty || backdropDefaultRadius.isDirty || backdropDefaultShadow.isDirty || backdropDefaultAngle.isDirty || backdropDefaultAspectRatio.isDirty || backdropDefaultSolidColor.isDirty || backdropDefaultGradientStart.isDirty || backdropDefaultGradientEnd.isDirty
             onResetClicked: {
                 backdropAutoApply.resetToDefault();
                 backdropDefaultMode.resetToDefault();
+                backdropDefaultSolidColor.resetToDefault();
+                backdropDefaultGradientStart.resetToDefault();
+                backdropDefaultGradientEnd.resetToDefault();
                 backdropDefaultPadding.resetToDefault();
                 backdropDefaultRadius.resetToDefault();
                 backdropDefaultShadow.resetToDefault();
@@ -1296,6 +1492,42 @@ PluginSettings {
                 { label: I18n.tr("Conic Gradient"), value: "conic" }
             ]
             defaultValue: "solid"
+        }
+
+        Separator {
+            visible: backdropDefaultMode.value === "solid"
+        }
+
+        BackdropColorSetting {
+            id: backdropDefaultSolidColor
+            settingKey: "backdropDefaultSolidColor"
+            label: I18n.tr("Default Solid Color")
+            defaultValue: "slot_1"
+            visible: backdropDefaultMode.value === "solid"
+        }
+
+        Separator {
+            visible: backdropDefaultMode.value !== "solid"
+        }
+
+        BackdropColorSetting {
+            id: backdropDefaultGradientStart
+            settingKey: "backdropDefaultGradientStart"
+            label: I18n.tr("Default Gradient Start")
+            defaultValue: "slot_1"
+            visible: backdropDefaultMode.value !== "solid"
+        }
+
+        Separator {
+            visible: backdropDefaultMode.value !== "solid"
+        }
+
+        BackdropColorSetting {
+            id: backdropDefaultGradientEnd
+            settingKey: "backdropDefaultGradientEnd"
+            label: I18n.tr("Default Gradient End")
+            defaultValue: "slot_2"
+            visible: backdropDefaultMode.value !== "solid"
         }
 
         Separator {}

@@ -1074,8 +1074,8 @@ DankModal {
         const pd = config && config.pluginData;
         if (!pd) return defaultValue;
         const val = pd[key];
-        if (!val || val === "primary") return Theme.primary;
-        return Qt.color(val);
+        if (!val) return defaultValue;
+        return config.resolveColor(val);
     }
 
     function constrainSquarePoint(start, point) {
@@ -1551,7 +1551,15 @@ DankModal {
         window.bgImageSource = "file:///tmp/dms_capture_bg.png";
         window.isScreenshotDark = false;
         window.hasSampledContrast = false;
-        window.hasUserCustomizedBackdrop = false;
+        window.backdropSolidColor = backdropConfigColor("backdropDefaultSolidColor", config.resolveColor("slot_1"));
+        window.backdropGradientStart = backdropConfigColor("backdropDefaultGradientStart", config.resolveColor("slot_1"));
+        window.backdropGradientEnd = backdropConfigColor("backdropDefaultGradientEnd", config.resolveColor("slot_2"));
+
+        const pd = config && config.pluginData;
+        const hasCustomSolid = pd && pd["backdropDefaultSolidColor"] !== undefined;
+        const hasCustomGradStart = pd && pd["backdropDefaultGradientStart"] !== undefined;
+        const hasCustomGradEnd = pd && pd["backdropDefaultGradientEnd"] !== undefined;
+        window.hasUserCustomizedBackdrop = !!(hasCustomSolid || hasCustomGradStart || hasCustomGradEnd);
         window.backdropMode = "none";
         if (config && config.pluginData && config.pluginData["backdropAutoApply"] === true) {
             const bm = config.pluginData["backdropDefaultMode"];
