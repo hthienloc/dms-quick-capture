@@ -3589,12 +3589,6 @@ DankModal {
                             window.autoBackdropGradientStart = colors.start;
                             window.autoBackdropGradientEnd = colors.end;
                             window.autoBackdropSolidColor = colors.start;
-
-                            if (!window.hasUserCustomizedBackdrop && !(window.parentWidget && window.parentWidget.restoringFromFloat)) {
-                                window.backdropGradientStart = colors.start;
-                                window.backdropGradientEnd = colors.end;
-                                window.backdropSolidColor = colors.start;
-                            }
                         }
                     }
                 }
