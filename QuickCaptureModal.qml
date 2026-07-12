@@ -2060,8 +2060,8 @@ DankModal {
                         renderTarget: Canvas.Image
                         z: 1
 
-                        width: window.canvasWidth * window.editScale
-                        height: window.canvasHeight * window.editScale
+                        width: (window.hasSelection && window.currentTool !== "crop") ? window.cropRect.width * window.editScale : window.canvasWidth * window.editScale
+                        height: (window.hasSelection && window.currentTool !== "crop") ? window.cropRect.height * window.editScale : window.canvasHeight * window.editScale
 
                         layer.enabled: false
 
@@ -2243,8 +2243,8 @@ DankModal {
 
                         z: 2
 
-                        width: window.canvasWidth * window.editScale
-                        height: window.canvasHeight * window.editScale
+                        width: (window.hasSelection && window.currentTool !== "crop") ? window.cropRect.width * window.editScale : window.canvasWidth * window.editScale
+                        height: (window.hasSelection && window.currentTool !== "crop") ? window.cropRect.height * window.editScale : window.canvasHeight * window.editScale
 
                         layer.enabled: false
 
