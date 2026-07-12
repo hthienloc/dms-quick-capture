@@ -2101,6 +2101,18 @@ DankModal {
                                 }
                             }
 
+                            // 1. Draw Selection Overlay on bakedCanvas (only if not in active crop/ocr/qr tool)
+                            if (window.hasSelection && window.currentTool !== "crop" && window.currentTool !== "ocr" && window.currentTool !== "qr") {
+                                DrawingRenderer.drawSelectionOverlay(ctx, {
+                                    isCropMode: false,
+                                    isOcrMode: false,
+                                    cropRect: window.cropRect,
+                                    ocrRect: window.ocrRect,
+                                    canvasWidth: window.canvasWidth,
+                                    canvasHeight: window.canvasHeight
+                                }, Theme);
+                            }
+
                             // 2. Draw annotations (translated in edit mode, or clipped in crop mode)
                             ctx.save();
                             const hasCropSelection = window.currentTool !== "crop" && window.hasSelection;
@@ -2269,14 +2281,16 @@ DankModal {
                             ctx.scale(window.editScale, window.editScale);
 
                             // 1. Draw Dimming Selection Overlay (only if in crop/ocr/qr mode)
-                            DrawingRenderer.drawSelectionOverlay(ctx, {
-                                isCropMode: window.currentTool === "crop",
-                                isOcrMode: window.currentTool === "ocr" || window.currentTool === "qr",
-                                cropRect: window.cropRect,
-                                ocrRect: window.ocrRect,
-                                canvasWidth: window.canvasWidth,
-                                canvasHeight: window.canvasHeight
-                            }, Theme);
+                            if (window.currentTool === "crop" || window.currentTool === "ocr" || window.currentTool === "qr") {
+                                DrawingRenderer.drawSelectionOverlay(ctx, {
+                                    isCropMode: window.currentTool === "crop",
+                                    isOcrMode: window.currentTool === "ocr" || window.currentTool === "qr",
+                                    cropRect: window.cropRect,
+                                    ocrRect: window.ocrRect,
+                                    canvasWidth: window.canvasWidth,
+                                    canvasHeight: window.canvasHeight
+                                }, Theme);
+                            }
 
                             // 2. Draw active/selected annotations (translated in edit mode, or clipped in crop mode)
                             ctx.save();

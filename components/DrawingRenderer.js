@@ -607,7 +607,7 @@ function drawSelectionOverlay(ctx, options, Theme) {
             ctx.setLineDash([]);
         }
 
-        if (!options.isOcrMode) {
+        if (!options.isOcrMode && options.isCropMode) {
             // 8 resize handles (crop mode only)
             const hs = 10;
             const hh = hs / 2;
