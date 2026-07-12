@@ -913,6 +913,19 @@ DankModal {
         if (window.bakedCanvas) window.bakedCanvas.requestPaint();
     }
 
+    function drawStroke(ctx, stroke) {
+        DrawingRenderer.drawStroke(ctx, stroke, Helpers, Qt, Theme, {
+            roundRect: window.roundRect,
+            roundHighlighter: window.roundHighlighter,
+            bgImageItem: window.bgImageItem,
+            offscreenSampler: offscreenSampler,
+            canvasWidth: window.canvasWidth,
+            canvasHeight: window.canvasHeight,
+            canvasMinX: (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.x : 0,
+            canvasMinY: (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.y : 0,
+        });
+    }
+
     // Radial Menu Presets & History
     property var radialPresets: []
     property var presetHistory: []
@@ -2228,19 +2241,6 @@ DankModal {
 
                             ctx.restore();
                         }
-
-                        function drawStroke(ctx, stroke) {
-                            DrawingRenderer.drawStroke(ctx, stroke, Helpers, Qt, Theme, {
-                                roundRect: window.roundRect,
-                                roundHighlighter: window.roundHighlighter,
-                                bgImageItem: window.bgImageItem,
-                                offscreenSampler: offscreenSampler,
-                                canvasWidth: window.canvasWidth,
-                                canvasHeight: window.canvasHeight,
-                                canvasMinX: (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.x : 0,
-                                canvasMinY: (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.y : 0,
-                            });
-                        }
                     }
 
                     Canvas {
@@ -2459,19 +2459,6 @@ DankModal {
 
                             ctx.restore();
                             ctx.restore();
-                        }
-
-                        function drawStroke(ctx, stroke) {
-                            DrawingRenderer.drawStroke(ctx, stroke, Helpers, Qt, Theme, {
-                                roundRect: window.roundRect,
-                                roundHighlighter: window.roundHighlighter,
-                                bgImageItem: window.bgImageItem,
-                                offscreenSampler: offscreenSampler,
-                                canvasWidth: window.canvasWidth,
-                                canvasHeight: window.canvasHeight,
-                                canvasMinX: (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.x : 0,
-                                canvasMinY: (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.y : 0,
-                            });
                         }
 
                         // Mouse Drawing & Action Capture
@@ -3264,11 +3251,11 @@ DankModal {
                             // 1.4 Draw Pixelate BEFORE spotlight layer in export
                             for (let i = 0; i < window.strokes.length; i++) {
                                 if (window.strokes[i].tool === "pixelate") {
-                                    window.activeCanvas.drawStroke(ctx, window.strokes[i]);
+                                    window.drawStroke(ctx, window.strokes[i]);
                                 }
                             }
                             if (window.currentStroke && window.currentStroke.tool === "pixelate") {
-                                window.activeCanvas.drawStroke(ctx, window.currentStroke);
+                                window.drawStroke(ctx, window.currentStroke);
                             }
 
                             const isDrawingSpotlight = window.currentStroke && window.currentStroke.tool === "spotlight";
@@ -3352,17 +3339,15 @@ DankModal {
                             }
 
                             // 2. Overlay the annotations at full resolution
-                            if (window.activeCanvas) {
-                                // Draw all completed strokes (except pixelate and spotlight)
-                                for (var i = 0; i < window.strokes.length; i++) {
-                                    if (window.strokes[i].tool !== "pixelate" && window.strokes[i].tool !== "spotlight") {
-                                        window.activeCanvas.drawStroke(ctx, window.strokes[i]);
-                                    }
+                            // Draw all completed strokes (except pixelate and spotlight)
+                            for (var i = 0; i < window.strokes.length; i++) {
+                                if (window.strokes[i].tool !== "pixelate" && window.strokes[i].tool !== "spotlight") {
+                                    window.drawStroke(ctx, window.strokes[i]);
                                 }
-                                // Draw current dragging stroke if any
-                                if (window.currentStroke && window.currentStroke.tool !== "pixelate" && window.currentStroke.tool !== "spotlight") {
-                                    window.activeCanvas.drawStroke(ctx, window.currentStroke);
-                                }
+                            }
+                            // Draw current dragging stroke if any
+                            if (window.currentStroke && window.currentStroke.tool !== "pixelate" && window.currentStroke.tool !== "spotlight") {
+                                window.drawStroke(ctx, window.currentStroke);
                             }
                             ctx.restore();
                         }
