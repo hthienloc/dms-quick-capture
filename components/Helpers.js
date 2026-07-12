@@ -150,15 +150,6 @@ function isInsideCropRect(mx, my, hasSelection, cropRect) {
            my >= cropRect.y && my <= (cropRect.y + cropRect.height);
 }
 
-/**
- * Resolves a shortcut color string (e.g., "primary") to its actual color value.
- * @param {string} color
- * @param {object} Theme
- * @returns {color}
- */
-function resolveShortcutColor(color, Theme) {
-    return color === "primary" ? Theme.primary : color;
-}
 
 /**
  * Finds an item in a list by its 'key' property.
