@@ -895,6 +895,7 @@ DankModal {
     property var bgImageItem: null
     property var boardContainerItem: null
     property var exportCanvasItem: null
+    property var offscreenSamplerItem: null
 
     onSelectedStrokeChanged: window.requestPaintAll()
     onEffectiveBackdropModeChanged: window.requestPaintAll()
@@ -918,7 +919,7 @@ DankModal {
             roundRect: window.roundRect,
             roundHighlighter: window.roundHighlighter,
             bgImageItem: window.bgImageItem,
-            offscreenSampler: offscreenSampler,
+            offscreenSampler: window.offscreenSamplerItem,
             canvasWidth: window.canvasWidth,
             canvasHeight: window.canvasHeight,
             canvasMinX: (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.x : 0,
@@ -3599,6 +3600,9 @@ DankModal {
                         var ctx = getContext("2d");
                         ctx.clearRect(0, 0, width, height);
                         ctx.drawImage(bgImage, 0, 0, width, height);
+                    }
+                    Component.onCompleted: {
+                        window.offscreenSamplerItem = offscreenSampler;
                     }
                 }
             }
