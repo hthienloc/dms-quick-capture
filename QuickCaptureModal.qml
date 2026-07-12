@@ -2628,26 +2628,35 @@ DankModal {
                                               window.currentStroke.points.push(finalPt);
                                           }
                                       } else if (window.currentTool === "stamp") {
-                                          const p0 = window.currentStroke.points[0];
-                                          if (p0) {
-                                              const dx = absPt.x - p0.x;
-                                              const dy = absPt.y - p0.y;
-                                              const dist = Math.sqrt(dx * dx + dy * dy);
-                                              if (dist > 10 / window.editScale) {
-                                                  window.currentStroke.hasLeaderLine = true;
-                                                  if (window.currentStroke.points.length > 1) {
-                                                      window.currentStroke.points[1] = absPt;
-                                                  } else {
-                                                      window.currentStroke.points.push(absPt);
-                                                  }
-                                              } else {
-                                                  window.currentStroke.hasLeaderLine = false;
-                                                  if (window.currentStroke.points.length > 1) {
-                                                      window.currentStroke.points = [p0];
-                                                  }
-                                              }
-                                          }
-                                      }
+                                           const p0 = window.currentStroke.points[0];
+                                           if (p0) {
+                                               let finalPt = absPt;
+                                               const dx = absPt.x - p0.x;
+                                               const dy = absPt.y - p0.y;
+                                               const dist = Math.sqrt(dx * dx + dy * dy);
+                                               if (dist > 10 / window.editScale) {
+                                                   window.currentStroke.hasLeaderLine = true;
+                                                   
+                                                   if (mouse.modifiers & Qt.ShiftModifier) {
+                                                       const angle = Math.atan2(dy, dx);
+                                                       const SNAP_STEP = Math.PI / 12; // 15 degrees
+                                                       const snappedAngle = Math.round(angle / SNAP_STEP) * SNAP_STEP;
+                                                       finalPt = Qt.point(p0.x + dist * Math.cos(snappedAngle), p0.y + dist * Math.sin(snappedAngle));
+                                                   }
+
+                                                   if (window.currentStroke.points.length > 1) {
+                                                       window.currentStroke.points[1] = finalPt;
+                                                   } else {
+                                                       window.currentStroke.points.push(finalPt);
+                                                   }
+                                               } else {
+                                                   window.currentStroke.hasLeaderLine = false;
+                                                   if (window.currentStroke.points.length > 1) {
+                                                       window.currentStroke.points = [p0];
+                                                   }
+                                               }
+                                           }
+                                       }
                                     drawingCanvas.requestPaint();
                                 }
                             }
