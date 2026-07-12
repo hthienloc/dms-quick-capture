@@ -2593,17 +2593,21 @@ DankModal {
                                     // Standard stroke drawing positions update
                                     if (!window.currentStroke) return;
 
-                                    const absPt = getAbsolutePoint(mouse.x, mouse.y);                                     
+                                    const absPt = getAbsolutePoint(mouse.x, mouse.y);
                                     if (window.currentTool === "pen") {
-                                         if (mouse.modifiers & Qt.ShiftModifier) {
-                                             if (window.currentStroke.points.length > 1) {
-                                                 window.currentStroke.points = [window.currentStroke.points[0], absPt];
-                                             } else {
-                                                 window.currentStroke.points.push(absPt);
-                                             }
-                                         } else {
-                                             window.currentStroke.points.push(absPt);
-                                         }
+                                        if (mouse.modifiers & Qt.ShiftModifier) {
+                                            if (window.currentStroke.points.length > 1) {
+                                                window.currentStroke.points = [window.currentStroke.points[0], absPt];
+                                            } else {
+                                                window.currentStroke.points.push(absPt);
+                                            }
+                                        } else {
+                                            const pts = window.currentStroke.points;
+                                            const lastPt = (pts && pts.length > 0) ? pts[pts.length - 1] : null;
+                                            if (!lastPt || Math.abs(absPt.x - lastPt.x) > 2 || Math.abs(absPt.y - lastPt.y) > 2) {
+                                                pts.push(absPt);
+                                            }
+                                        }
                                      } else if (window.currentTool === "rect" || window.currentTool === "ellipse" || window.currentTool === "arrow" || window.currentTool === "line"
                                               || window.currentTool === "redact" || window.currentTool === "pixelate" || window.currentTool === "highlighter" || window.currentTool === "spotlight" || window.currentTool === "callout") {
                                          
