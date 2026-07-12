@@ -93,10 +93,10 @@ Rectangle {
                     const cropY = window.hasSelection ? window.cropRect.y : 0;
                     ctx.translate(-cropX, -cropY);
                     for (var i = 0; i < window.strokes.length; i++) {
-                        drawingCanvas.drawStroke(ctx, window.strokes[i]);
+                        window.drawStroke(ctx, window.strokes[i]);
                     }
                     if (window.currentStroke) {
-                        drawingCanvas.drawStroke(ctx, window.currentStroke);
+                        window.drawStroke(ctx, window.currentStroke);
                     }
                     ctx.restore();
                 }
@@ -110,10 +110,10 @@ Rectangle {
                 }
                 if (window.showAnnotations) {
                     for (var i = 0; i < window.strokes.length; i++) {
-                        drawingCanvas.drawStroke(ctx, window.strokes[i]);
+                        window.drawStroke(ctx, window.strokes[i]);
                     }
                     if (window.currentStroke) {
-                        drawingCanvas.drawStroke(ctx, window.currentStroke);
+                        window.drawStroke(ctx, window.currentStroke);
                     }
                 }
             }
