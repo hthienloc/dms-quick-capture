@@ -16,6 +16,7 @@ Row {
     signal setGradientActiveSlot(string slot)
     signal autoColorBalanceRequested()
     signal colorPickerRequested(color currentColor)
+    signal eyedropperRequested(string slot)
 
     spacing: Theme.spacingXS
     anchors.verticalCenter: parent.verticalCenter
@@ -26,6 +27,19 @@ Row {
         color: controlRoot.backdropSolidColor
         border.color: Theme.withAlpha(Theme.outline, 0.3)
         border.width: 1
+
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            cursorShape: Qt.PointingHandCursor
+            onClicked: (mouse) => {
+                if (mouse.button === Qt.RightButton) {
+                    controlRoot.eyedropperRequested("solid")
+                } else {
+                    controlRoot.colorPickerRequested(controlRoot.backdropSolidColor)
+                }
+            }
+        }
     }
 
     readonly property bool isGradient: backdropMode === "gradient" || backdropMode === "radial" || backdropMode === "conic"
@@ -42,8 +56,14 @@ Row {
             border.width: controlRoot.gradientActiveSlot === "start" ? (controlRoot.itemSize >= 24 ? 2 : 1.5) : 1
             MouseArea {
                 anchors.fill: parent
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
                 cursorShape: Qt.PointingHandCursor
-                onClicked: controlRoot.setGradientActiveSlot("start")
+                onClicked: (mouse) => {
+                    controlRoot.setGradientActiveSlot("start")
+                    if (mouse.button === Qt.RightButton) {
+                        controlRoot.eyedropperRequested("start")
+                    }
+                }
             }
         }
         Rectangle {
@@ -53,22 +73,45 @@ Row {
             border.width: controlRoot.gradientActiveSlot === "end" ? (controlRoot.itemSize >= 24 ? 2 : 1.5) : 1
             MouseArea {
                 anchors.fill: parent
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
                 cursorShape: Qt.PointingHandCursor
-                onClicked: controlRoot.setGradientActiveSlot("end")
+                onClicked: (mouse) => {
+                    controlRoot.setGradientActiveSlot("end")
+                    if (mouse.button === Qt.RightButton) {
+                        controlRoot.eyedropperRequested("end")
+                    }
+                }
             }
         }
     }
 
-    DankActionButton {
-        buttonSize: controlRoot.itemSize
-        iconName: "colorize"
-        iconSize: controlRoot.iconSize
-        backgroundColor: "transparent"
-        iconColor: Theme.primary
-        onClicked: {
-            let col = controlRoot.backdropMode === "solid" ? controlRoot.backdropSolidColor :
-                      (controlRoot.gradientActiveSlot === "start" ? controlRoot.backdropGradientStart : controlRoot.backdropGradientEnd);
-            controlRoot.colorPickerRequested(col);
+    Item {
+        width: controlRoot.itemSize
+        height: controlRoot.itemSize
+        anchors.verticalCenter: parent.verticalCenter
+
+        DankActionButton {
+            anchors.fill: parent
+            iconName: "colorize"
+            iconSize: controlRoot.iconSize
+            backgroundColor: "transparent"
+            iconColor: Theme.primary
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            cursorShape: Qt.PointingHandCursor
+            onClicked: (mouse) => {
+                let col = controlRoot.backdropMode === "solid" ? controlRoot.backdropSolidColor :
+                          (controlRoot.gradientActiveSlot === "start" ? controlRoot.backdropGradientStart : controlRoot.backdropGradientEnd);
+                let targetSlot = controlRoot.backdropMode === "solid" ? "solid" : controlRoot.gradientActiveSlot;
+                if (mouse.button === Qt.RightButton) {
+                    controlRoot.eyedropperRequested(targetSlot)
+                } else {
+                    controlRoot.colorPickerRequested(col)
+                }
+            }
         }
     }
 

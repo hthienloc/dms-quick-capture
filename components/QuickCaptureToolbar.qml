@@ -36,6 +36,7 @@ Rectangle {
     property string backdropAlignment: "center"
 
     property string gradientActiveSlot: "start"
+    property string backdropColorPickingSlot: "none"
 
     signal changeBackdropMode(string mode)
     signal changeBackdropSolidColor(color col)
@@ -80,6 +81,11 @@ Rectangle {
     signal closeRequested()
     signal annotationsToggled()
     signal backdropColorPickerRequested(color currentColor)
+    signal backdropEyedropperRequested(string slot)
+
+    readonly property color activeBackdropColor: root.backdropMode === "solid" ?
+        root.backdropSolidColor :
+        (root.gradientActiveSlot === "start" ? root.backdropGradientStart : root.backdropGradientEnd)
 
 
 
@@ -93,6 +99,34 @@ Rectangle {
     border.color: showBorder ? Theme.primary : Theme.withAlpha(Theme.outline, 0.15)
     border.width: showBorder ? 1.5 : 1
 
+    component ColorPaletteGrid : Grid {
+        id: paletteGrid
+        property var paletteModel: root.toolbarPalette
+        property color activeColor: "transparent"
+        property int activeSlotIndex: -1
+        property int swatchSize: tc.swatchSize
+        property int swatchRadius: tc.swatchRadius
+        property int cols: 4
+        property int gridSpacingValue: tc.gridSpacing
+        signal colorSelected(color col, int index)
+        columns: cols
+        spacing: gridSpacingValue
+        Repeater {
+            model: paletteGrid.paletteModel
+            delegate: Rectangle {
+                width: paletteGrid.swatchSize; height: paletteGrid.swatchSize; radius: paletteGrid.swatchRadius; color: modelData
+                readonly property bool isActive: (paletteGrid.activeSlotIndex === -1 || paletteGrid.activeSlotIndex === index) && Helpers.colorEquals(paletteGrid.activeColor, modelData, Qt)
+                border.color: isActive ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
+                border.width: isActive ? 2 : 1
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: paletteGrid.colorSelected(modelData, index)
+                }
+            }
+        }
+    }
+
     Item {
         id: contentLayout
         width: toolbarLoader.item ? toolbarLoader.item.width : 0
@@ -103,7 +137,7 @@ Rectangle {
             id: toolbarLoader
             anchors.centerIn: parent
             sourceComponent: {
-                if (root.currentTool === "backdrop") {
+                if (root.currentTool === "backdrop" || (root.currentTool === "colorpicker" && root.backdropColorPickingSlot !== "none")) {
                     return root.isVertical ? backdropVerticalLayout : backdropHorizontalLayout;
                 }
                 return root.isVertical ? verticalLayout : horizontalLayout;
@@ -177,21 +211,14 @@ Rectangle {
             Rectangle { width: tc.separatorThickness; height: tc.separatorLength; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
             // Colors
-            Grid {
-                rows: 2; columns: 4; spacing: tc.gridSpacing; anchors.verticalCenter: parent.verticalCenter
-                Repeater {
-                    model: root.toolbarPalette
-                    delegate: Rectangle {
-                        width: tc.swatchSize; height: tc.swatchSize; radius: tc.swatchRadius; color: modelData
-                        border.color: (root.activeColorSlotIndex === index && Helpers.colorEquals(root.currentColor, modelData, Qt)) ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
-                        border.width: (root.activeColorSlotIndex === index && Helpers.colorEquals(root.currentColor, modelData, Qt)) ? 2 : 1
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: root.colorSelected(modelData, index)
-                        }
-                    }
-                }
+            ColorPaletteGrid {
+                activeColor: root.currentColor
+                activeSlotIndex: root.activeColorSlotIndex
+                swatchSize: tc.swatchSize
+                swatchRadius: tc.swatchRadius
+                cols: 4
+                anchors.verticalCenter: parent.verticalCenter
+                onColorSelected: (col, idx) => root.colorSelected(col, idx)
             }
 
             Item {
@@ -336,21 +363,15 @@ Rectangle {
 
             Rectangle { width: tc.separatorLength; height: tc.separatorThickness; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
 
-            Grid {
-                columns: 2; spacing: tc.gridSpacing + 2; anchors.horizontalCenter: parent.horizontalCenter
-                Repeater {
-                    model: root.toolbarPalette
-                    delegate: Rectangle {
-                        width: tc.swatchSizeVert; height: tc.swatchSizeVert; radius: tc.swatchRadiusVert; color: modelData
-                        border.color: (root.activeColorSlotIndex === index && Helpers.colorEquals(root.currentColor, modelData, Qt)) ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
-                        border.width: (root.activeColorSlotIndex === index && Helpers.colorEquals(root.currentColor, modelData, Qt)) ? 2 : 1
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: root.colorSelected(modelData, index)
-                        }
-                    }
-                }
+            ColorPaletteGrid {
+                activeColor: root.currentColor
+                activeSlotIndex: root.activeColorSlotIndex
+                swatchSize: tc.swatchSizeVert
+                swatchRadius: tc.swatchRadiusVert
+                cols: 2
+                gridSpacingValue: tc.gridSpacing + 2
+                anchors.horizontalCenter: parent.horizontalCenter
+                onColorSelected: (col, idx) => root.colorSelected(col, idx)
             }
 
             Item {
@@ -607,8 +628,7 @@ Rectangle {
                 visible: root.backdropMode !== "none"
                 spacing: Theme.spacingS
                 anchors.verticalCenter: parent.verticalCenter
-                
-                BackdropColorSelectors {
+                                 BackdropColorSelectors {
                     backdropMode: root.backdropMode
                     backdropSolidColor: root.backdropSolidColor
                     backdropGradientStart: root.backdropGradientStart
@@ -619,30 +639,24 @@ Rectangle {
                     onSetGradientActiveSlot: (slot) => root.gradientActiveSlot = slot
                     onAutoColorBalanceRequested: root.autoColorBalanceRequested()
                     onColorPickerRequested: (currentColor) => root.backdropColorPickerRequested(currentColor)
+                    onEyedropperRequested: (slot) => root.backdropEyedropperRequested(slot)
                 }
                 
-                Grid {
-                    rows: 2; columns: 4; spacing: tc.gridSpacing; anchors.verticalCenter: parent.verticalCenter
-                    Repeater {
-                        model: root.toolbarPalette
-                        delegate: Rectangle {
-                            width: tc.swatchSizeSmall; height: tc.swatchSizeSmall; radius: tc.swatchRadiusSmall; color: modelData
-                            border.color: Theme.withAlpha(Theme.outline, 0.3)
-                            border.width: 1
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    if (root.backdropMode === "solid") {
-                                        root.changeBackdropSolidColor(modelData);
-                                    } else if (root.backdropMode === "gradient" || root.backdropMode === "radial" || root.backdropMode === "conic") {
-                                        if (root.gradientActiveSlot === "start") {
-                                            root.changeBackdropGradientStart(modelData);
-                                        } else {
-                                            root.changeBackdropGradientEnd(modelData);
-                                        }
-                                    }
-                                }
+                ColorPaletteGrid {
+                    activeColor: root.activeBackdropColor
+                    activeSlotIndex: -1
+                    swatchSize: tc.swatchSize
+                    swatchRadius: tc.swatchRadius
+                    cols: 4
+                    anchors.verticalCenter: parent.verticalCenter
+                    onColorSelected: (col, idx) => {
+                        if (root.backdropMode === "solid") {
+                            root.changeBackdropSolidColor(col);
+                        } else if (root.backdropMode === "gradient" || root.backdropMode === "radial" || root.backdropMode === "conic") {
+                            if (root.gradientActiveSlot === "start") {
+                                root.changeBackdropGradientStart(col);
+                            } else {
+                                root.changeBackdropGradientEnd(col);
                             }
                         }
                     }
@@ -852,8 +866,7 @@ Rectangle {
                 visible: root.backdropMode !== "none"
                 spacing: Theme.spacingS
                 anchors.horizontalCenter: parent.horizontalCenter
-                
-                BackdropColorSelectors {
+                                 BackdropColorSelectors {
                     backdropMode: root.backdropMode
                     backdropSolidColor: root.backdropSolidColor
                     backdropGradientStart: root.backdropGradientStart
@@ -864,30 +877,24 @@ Rectangle {
                     onSetGradientActiveSlot: (slot) => root.gradientActiveSlot = slot
                     onAutoColorBalanceRequested: root.autoColorBalanceRequested()
                     onColorPickerRequested: (currentColor) => root.backdropColorPickerRequested(currentColor)
+                    onEyedropperRequested: (slot) => root.backdropEyedropperRequested(slot)
                 }
                 
-                Grid {
-                    columns: 2; spacing: tc.gridSpacing; anchors.horizontalCenter: parent.horizontalCenter
-                    Repeater {
-                        model: root.toolbarPalette
-                        delegate: Rectangle {
-                            width: tc.swatchSizeVertSmall; height: tc.swatchSizeVertSmall; radius: tc.swatchRadiusVertSmall; color: modelData
-                            border.color: Theme.withAlpha(Theme.outline, 0.3)
-                            border.width: 1
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    if (root.backdropMode === "solid") {
-                                        root.changeBackdropSolidColor(modelData);
-                                    } else if (root.backdropMode === "gradient" || root.backdropMode === "radial" || root.backdropMode === "conic") {
-                                        if (root.gradientActiveSlot === "start") {
-                                            root.changeBackdropGradientStart(modelData);
-                                        } else {
-                                            root.changeBackdropGradientEnd(modelData);
-                                        }
-                                    }
-                                }
+                ColorPaletteGrid {
+                    activeColor: root.activeBackdropColor
+                    activeSlotIndex: -1
+                    swatchSize: tc.swatchSizeVert
+                    swatchRadius: tc.swatchRadiusVert
+                    cols: 2
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    onColorSelected: (col, idx) => {
+                        if (root.backdropMode === "solid") {
+                            root.changeBackdropSolidColor(col);
+                        } else if (root.backdropMode === "gradient" || root.backdropMode === "radial" || root.backdropMode === "conic") {
+                            if (root.gradientActiveSlot === "start") {
+                                root.changeBackdropGradientStart(col);
+                            } else {
+                                root.changeBackdropGradientEnd(col);
                             }
                         }
                     }

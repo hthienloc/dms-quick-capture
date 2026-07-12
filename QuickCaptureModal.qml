@@ -129,6 +129,9 @@ DankModal {
     property color _lastSampledColor: "transparent"
     readonly property real dpr: Screen.devicePixelRatio || 1.0
     onCurrentToolChanged: {
+        if (currentTool !== "colorpicker") {
+            window.backdropColorPickingSlot = "none";
+        }
         if (currentTool !== "text" && window.isTyping) {
             window.commitTypingText();
         }
@@ -161,6 +164,7 @@ DankModal {
     property string backdropAspectRatio: "auto"
     property real customAspectRatio: 1.50
     property string backdropAlignment: "center"
+    property string backdropColorPickingSlot: "none" // none, solid, start, end
     readonly property real customRatioMin: 0.50
     readonly property real customRatioMax: 2.50
     readonly property real customRatioStep: 0.05
@@ -1752,6 +1756,7 @@ DankModal {
                     backdropAspectRatio: window.backdropAspectRatio
                     customAspectRatio: window.customAspectRatio
                     backdropAlignment: window.backdropAlignment
+                    backdropColorPickingSlot: window.backdropColorPickingSlot
 
                     onChangeBackdropMode: (mode) => {
                         window.backdropMode = mode;
@@ -1783,6 +1788,10 @@ DankModal {
                             };
                             PopoutService.colorPickerModal.show();
                         }
+                    }
+                    onBackdropEyedropperRequested: (slot) => {
+                        window.backdropColorPickingSlot = slot;
+                        window.currentTool = "colorpicker";
                     }
                     onChangeBackdropGradientStart: (col) => {
                         window.backdropGradientStart = col;
@@ -2741,21 +2750,34 @@ DankModal {
                                 }
 
                                  if (window.currentTool === "colorpicker") {
-                                     if (mouse.button === Qt.LeftButton) {
-                                         const pickedColor = window.sampleCanvasColor(mouse.x, mouse.y);
-                                         const hexStr = window.formatHexColor(pickedColor).toUpperCase();
-                                         if (window.colorPickerMode === "copy") {
-                                             Quickshell.execDetached(["dms", "cl", "copy", hexStr]);
-                                             if (typeof ToastService !== "undefined" && ToastService) {
-                                                 ToastService.showInfo(I18n.tr("Color copied to clipboard: %1").arg(hexStr));
-                                             }
-                                         } else {
-                                              window.updateColorSlot(window.activeColorSlotIndex, pickedColor);
+                                      if (mouse.button === Qt.LeftButton) {
+                                          const pickedColor = window.sampleCanvasColor(mouse.x, mouse.y);
+                                          if (window.backdropColorPickingSlot !== "none") {
+                                              if (window.backdropColorPickingSlot === "solid") {
+                                                  window.backdropSolidColor = pickedColor;
+                                              } else if (window.backdropColorPickingSlot === "start") {
+                                                  window.backdropGradientStart = pickedColor;
+                                              } else if (window.backdropColorPickingSlot === "end") {
+                                                  window.backdropGradientEnd = pickedColor;
+                                              }
+                                              window.hasUserCustomizedBackdrop = true;
+                                              window.backdropColorPickingSlot = "none";
+                                              window.currentTool = "backdrop";
+                                          } else {
+                                              const hexStr = window.formatHexColor(pickedColor).toUpperCase();
+                                              if (window.colorPickerMode === "copy") {
+                                                  Quickshell.execDetached(["dms", "cl", "copy", hexStr]);
+                                                  if (typeof ToastService !== "undefined" && ToastService) {
+                                                      ToastService.showInfo(I18n.tr("Color copied to clipboard: %1").arg(hexStr));
+                                                  }
+                                              } else {
+                                                   window.updateColorSlot(window.activeColorSlotIndex, pickedColor);
+                                               }
+                                               window.currentTool = window.lastActiveTool;
                                           }
-                                         window.currentTool = window.lastActiveTool;
-                                     }
-                                     return;
-                                 }
+                                      }
+                                      return;
+                                  }
 
                                 if (window.currentTool === "crop") {
                                     const ox = mouse.x / window.editScale;
