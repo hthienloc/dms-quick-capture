@@ -1521,7 +1521,7 @@ DankModal {
             event.accepted = true;
             return;
         }
-        if (event.key === Qt.Key_G) {
+        if (event.key === Qt.Key_G && !window.isTyping) {
             if (event.isAutoRepeat) {
                 event.accepted = true;
                 return;
@@ -1547,7 +1547,7 @@ DankModal {
             event.accepted = true;
             return;
         }
-        if (event.key === Qt.Key_G) {
+        if (event.key === Qt.Key_G && !window.isTyping) {
             if (event.isAutoRepeat) {
                 event.accepted = true;
                 return;
