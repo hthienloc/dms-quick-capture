@@ -2602,16 +2602,20 @@ DankModal {
                                                   window.currentStroke.points.push(absPt);
                                               }
                                           } else {
-                                              const pts = window.currentStroke.points;
-                                              const lastPt = pts[pts.length - 1];
-                                              const dx = absPt.x - lastPt.x;
-                                              const dy = absPt.y - lastPt.y;
-                                              const minDistance = 1.5 / window.editScale;
-                                              if (dx * dx + dy * dy >= minDistance * minDistance) {
-                                                  pts.push(absPt);
-                                              } else {
-                                                  shouldRepaint = false;
-                                              }
+                                               const pts = window.currentStroke.points;
+                                               const lastPt = (pts && pts.length > 0) ? pts[pts.length - 1] : null;
+                                               if (lastPt) {
+                                                   const dx = absPt.x - lastPt.x;
+                                                   const dy = absPt.y - lastPt.y;
+                                                   const minDistance = 1.5 / window.editScale;
+                                                   if (dx * dx + dy * dy >= minDistance * minDistance) {
+                                                       pts.push(absPt);
+                                                   } else {
+                                                       shouldRepaint = false;
+                                                   }
+                                               } else if (pts) {
+                                                   pts.push(absPt);
+                                               }
                                           }
                                       } else if (window.currentTool === "rect" || window.currentTool === "ellipse" || window.currentTool === "arrow" || window.currentTool === "line"
                                                || window.currentTool === "redact" || window.currentTool === "pixelate" || window.currentTool === "highlighter" || window.currentTool === "spotlight" || window.currentTool === "callout") {
