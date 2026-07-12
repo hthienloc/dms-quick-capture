@@ -167,7 +167,6 @@ DankModal {
     property string backdropColorPickingSlot: "none" // none, solid, start, end
     readonly property real customRatioMin: 0.50
     readonly property real customRatioMax: 2.50
-    readonly property real customRatioStep: 0.05
     readonly property var aspectPresets: [
         { value: "auto", label: I18n.tr("AUTO") },
         { value: "1:1", label: "1:1" },
@@ -546,8 +545,6 @@ DankModal {
     property bool isZoomPressed: false
     property real cursorX: 0
     property real cursorY: 0
-    readonly property real boardCursorX: boardContainerItem ? (boardContainerItem.width / 2 + (cursorX - canvasWidth / 2) * fitScale) : 0
-    readonly property real boardCursorY: boardContainerItem ? (boardContainerItem.height / 2 + (cursorY - canvasHeight / 2) * fitScale) : 0
 
     property bool showAnnotations: true
     onShowAnnotationsChanged: {
