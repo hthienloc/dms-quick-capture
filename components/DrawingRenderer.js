@@ -324,15 +324,43 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         }
 
     } else if (stroke.tool === "stamp") {
-        const pt = stroke.points[0];
         const radius = stroke.width * Constants.stampRadiusMultiplier;
         const textColor = Helpers.getContrastingColor(stroke.color, Qt);
+        const hasLeader = stroke.hasLeaderLine && stroke.points.length >= 2;
+        const stampPt = hasLeader ? stroke.points[1] : stroke.points[0];
 
+        if (hasLeader) {
+            const startPt = stroke.points[0];
+
+            // Connection line
+            ctx.save();
+            ctx.strokeStyle = stroke.color;
+            ctx.lineWidth = Math.max(2, stroke.width);
+            ctx.beginPath();
+            ctx.moveTo(startPt.x, startPt.y);
+            ctx.lineTo(stampPt.x, stampPt.y);
+            ctx.stroke();
+            ctx.restore();
+
+            // Pointer dot at start point
+            ctx.save();
+            ctx.fillStyle = stroke.color;
+            ctx.beginPath();
+            ctx.arc(startPt.x, startPt.y, Math.max(4, stroke.width * 1.5), 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // Draw stamp circle background at stamp position
+        ctx.save();
         ctx.fillStyle = stroke.color;
         ctx.beginPath();
-        ctx.arc(pt.x, pt.y, radius, 0, 2 * Math.PI);
+        ctx.arc(stampPt.x, stampPt.y, radius, 0, 2 * Math.PI);
         ctx.fill();
+        ctx.restore();
 
+        // Draw text
+        ctx.save();
         const fontSize = Math.round(radius * Constants.stampTextFontSizeMultiplier);
         const text = Helpers.formatCounter(stroke.counter, stroke.format || "numeric");
         ctx.fillStyle = textColor;
@@ -340,7 +368,8 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         ctx.textBaseline = "middle";
         ctx.textAlign = "left";
         const textW = ctx.measureText(text).width;
-        ctx.fillText(text, pt.x - textW / 2, pt.y + Math.round(fontSize * Constants.stampTextOffsetMultiplier));
+        ctx.fillText(text, stampPt.x - textW / 2, stampPt.y + Math.round(fontSize * Constants.stampTextOffsetMultiplier));
+        ctx.restore();
 
     } else if (stroke.tool === "callout") {
         if (stroke.points.length === 4 || stroke.points.length >= 2) {

@@ -2605,11 +2605,31 @@ DankModal {
                                          }
 
                                          if (window.currentStroke.points.length > 1) {
-                                             window.currentStroke.points[window.currentStroke.points.length - 1] = finalPt;
-                                         } else {
-                                             window.currentStroke.points.push(finalPt);
-                                         }
-                                     }
+                                              window.currentStroke.points[window.currentStroke.points.length - 1] = finalPt;
+                                          } else {
+                                              window.currentStroke.points.push(finalPt);
+                                          }
+                                      } else if (window.currentTool === "stamp") {
+                                          const p0 = window.currentStroke.points[0];
+                                          if (p0) {
+                                              const dx = absPt.x - p0.x;
+                                              const dy = absPt.y - p0.y;
+                                              const dist = Math.sqrt(dx * dx + dy * dy);
+                                              if (dist > 10 / window.editScale) {
+                                                  window.currentStroke.hasLeaderLine = true;
+                                                  if (window.currentStroke.points.length > 1) {
+                                                      window.currentStroke.points[1] = absPt;
+                                                  } else {
+                                                      window.currentStroke.points.push(absPt);
+                                                  }
+                                              } else {
+                                                  window.currentStroke.hasLeaderLine = false;
+                                                  if (window.currentStroke.points.length > 1) {
+                                                      window.currentStroke.points = [p0];
+                                                  }
+                                              }
+                                          }
+                                      }
                                     drawingCanvas.requestPaint();
                                 }
                             }
@@ -2822,16 +2842,18 @@ DankModal {
                                 }
 
                                 if (window.currentTool === "stamp") {
-                                     window.pushStroke({
+                                     window.currentStroke = {
                                          id: Date.now() + Math.random(),
                                          tool: "stamp",
                                          color: window.currentColor.toString(),
                                          width: window.strokeWidth,
                                          points: [getAbsolutePoint(mouse.x, mouse.y)],
                                          counter: window.stampCounter,
-                                         format: window.stampCounterFormat
-                                     });
-                                     window.stampCounter++;
+                                         format: window.stampCounterFormat,
+                                         hasLeaderLine: false
+                                     };
+                                     window.pressCoords = getAbsolutePoint(mouse.x, mouse.y);
+                                     if (window.activeCanvas) window.activeCanvas.requestPaint();
                                      return;
                                 }
 
@@ -3005,9 +3027,11 @@ DankModal {
                                         }
                                     }
                                 }
-
-                                window.pushStroke(window.currentStroke);
-                                window.currentStroke = null;
+                                 if (stroke.tool === "stamp") {
+                                     window.stampCounter++;
+                                 }
+                                 window.pushStroke(window.currentStroke);
+                                 window.currentStroke = null;
                             }
 
                              onWheel: (wheel) => {
