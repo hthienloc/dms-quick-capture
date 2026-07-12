@@ -57,6 +57,9 @@ Rectangle {
             }
             return "transparent";
         }
+        if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "stamp") {
+            return "transparent";
+        }
         return Theme.primary;
     }
     border.width: 1.5 / drawingCanvas.scale
