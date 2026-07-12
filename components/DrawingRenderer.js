@@ -588,18 +588,24 @@ function drawSelectionOverlay(ctx, options, Theme) {
         const cw = options.canvasWidth;
         const ch = options.canvasHeight;
 
-        // Dim outside selection
-        ctx.fillRect(0, 0, cr.x, ch);
-        ctx.fillRect(cr.x + cr.width, 0, cw - (cr.x + cr.width), ch);
-        ctx.fillRect(cr.x, 0, cr.width, cr.y);
-        ctx.fillRect(cr.x, cr.y + cr.height, cr.width, ch - (cr.y + cr.height));
+        const isFullSize = cr.x === 0 && cr.y === 0 && 
+                           Math.abs(cr.width - cw) < 0.5 && 
+                           Math.abs(cr.height - ch) < 0.5;
 
-        // Selection border
-        ctx.strokeStyle = borderColor;
-        ctx.lineWidth = options.isOcrMode ? 2 : 1.5;
-        ctx.setLineDash(options.isOcrMode ? [6, 4] : []);
-        ctx.strokeRect(cr.x, cr.y, cr.width, cr.height);
-        ctx.setLineDash([]);
+        if (!isFullSize) {
+            // Dim outside selection
+            ctx.fillRect(0, 0, cr.x, ch);
+            ctx.fillRect(cr.x + cr.width, 0, cw - (cr.x + cr.width), ch);
+            ctx.fillRect(cr.x, 0, cr.width, cr.y);
+            ctx.fillRect(cr.x, cr.y + cr.height, cr.width, ch - (cr.y + cr.height));
+
+            // Selection border
+            ctx.strokeStyle = borderColor;
+            ctx.lineWidth = options.isOcrMode ? 2 : 1.5;
+            ctx.setLineDash(options.isOcrMode ? [6, 4] : []);
+            ctx.strokeRect(cr.x, cr.y, cr.width, cr.height);
+            ctx.setLineDash([]);
+        }
 
         if (!options.isOcrMode) {
             // 8 resize handles (crop mode only)
