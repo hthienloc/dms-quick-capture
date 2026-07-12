@@ -602,7 +602,7 @@ function drawSelectionOverlay(ctx, options, Theme) {
         ctx.setLineDash([]);
 
         if (!options.isOcrMode) {
-            // 4 Corner resize handles (crop mode only)
+            // 8 resize handles (crop mode only)
             const hs = 10;
             const hh = hs / 2;
             ctx.fillStyle = Theme.primary;
@@ -613,7 +613,10 @@ function drawSelectionOverlay(ctx, options, Theme) {
             const y1 = cr.y;
             const x2 = cr.x + cr.width;
             const y2 = cr.y + cr.height;
+            const cx = (x1 + x2) / 2;
+            const cy = (y1 + y2) / 2;
 
+            // 4 Corners
             ctx.fillRect(x1 - hh, y1 - hh, hs, hs);
             ctx.strokeRect(x1 - hh, y1 - hh, hs, hs);
             ctx.fillRect(x2 - hh, y1 - hh, hs, hs);
@@ -622,6 +625,16 @@ function drawSelectionOverlay(ctx, options, Theme) {
             ctx.strokeRect(x1 - hh, y2 - hh, hs, hs);
             ctx.fillRect(x2 - hh, y2 - hh, hs, hs);
             ctx.strokeRect(x2 - hh, y2 - hh, hs, hs);
+
+            // 4 Edge centers
+            ctx.fillRect(cx - hh, y1 - hh, hs, hs);
+            ctx.strokeRect(cx - hh, y1 - hh, hs, hs);
+            ctx.fillRect(cx - hh, y2 - hh, hs, hs);
+            ctx.strokeRect(cx - hh, y2 - hh, hs, hs);
+            ctx.fillRect(x1 - hh, cy - hh, hs, hs);
+            ctx.strokeRect(x1 - hh, cy - hh, hs, hs);
+            ctx.fillRect(x2 - hh, cy - hh, hs, hs);
+            ctx.strokeRect(x2 - hh, cy - hh, hs, hs);
         }
     } else {
         // Dim full canvas slightly before selection

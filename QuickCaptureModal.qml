@@ -1077,10 +1077,19 @@ DankModal {
         const y1 = cropRect.y;
         const x2 = cropRect.x + cropRect.width;
         const y2 = cropRect.y + cropRect.height;
+
+        // Check corners first
         if (Math.abs(mx - x1) <= threshold && Math.abs(my - y1) <= threshold) return "tl";
         if (Math.abs(mx - x2) <= threshold && Math.abs(my - y1) <= threshold) return "tr";
         if (Math.abs(mx - x1) <= threshold && Math.abs(my - y2) <= threshold) return "bl";
         if (Math.abs(mx - x2) <= threshold && Math.abs(my - y2) <= threshold) return "br";
+
+        // Check full edges
+        if (Math.abs(my - y1) <= threshold && mx >= x1 && mx <= x2) return "tc";
+        if (Math.abs(my - y2) <= threshold && mx >= x1 && mx <= x2) return "bc";
+        if (Math.abs(mx - x1) <= threshold && my >= y1 && my <= y2) return "lc";
+        if (Math.abs(mx - x2) <= threshold && my >= y1 && my <= y2) return "rc";
+
         return "none";
     }
 
@@ -2531,7 +2540,6 @@ DankModal {
                                         let newY = cr.y;
                                         let newW = cr.width;
                                         let newH = cr.height;
-
                                         if (window.activeHandle === "tl") {
                                             newX = Math.min(ox, cr.x + cr.width - 10);
                                             newY = Math.min(oy, cr.y + cr.height - 10);
@@ -2548,6 +2556,16 @@ DankModal {
                                         } else if (window.activeHandle === "br") {
                                             newW = Math.max(10, ox - cr.x);
                                             newH = Math.max(10, oy - cr.y);
+                                        } else if (window.activeHandle === "tc") {
+                                            newY = Math.min(oy, cr.y + cr.height - 10);
+                                            newH = cr.y + cr.height - newY;
+                                        } else if (window.activeHandle === "bc") {
+                                            newH = Math.max(10, oy - cr.y);
+                                        } else if (window.activeHandle === "lc") {
+                                            newX = Math.min(ox, cr.x + cr.width - 10);
+                                            newW = cr.x + cr.width - newX;
+                                        } else if (window.activeHandle === "rc") {
+                                            newW = Math.max(10, ox - cr.x);
                                         }
                                         window.cropRect = window.clampCropRect(newX, newY, newW, newH);
                                         drawingCanvas.requestPaint();
@@ -2635,8 +2653,11 @@ DankModal {
                             }
 
                             cursorShape: {
-                                if (hoveredHandle === "tl" || hoveredHandle === "br") return Qt.SizeFDiagCursor;
-                                if (hoveredHandle === "tr" || hoveredHandle === "bl") return Qt.SizeBDiagCursor;
+                                const h = (window.activeHandle !== "none" && window.activeHandle !== "new") ? window.activeHandle : hoveredHandle;
+                                if (h === "tl" || h === "br") return Qt.SizeFDiagCursor;
+                                if (h === "tr" || h === "bl") return Qt.SizeBDiagCursor;
+                                if (h === "tc" || h === "bc") return Qt.SplitVCursor;
+                                if (h === "lc" || h === "rc") return Qt.SplitHCursor;
                                 if (window.currentTool === "colorpicker") {
                                     return Qt.CrossCursor;
                                 }
