@@ -192,6 +192,7 @@ DankModal {
     property bool calloutDestDragging: false
 
     readonly property string effectiveTool: (currentTool === "select" && selectedStroke) ? selectedStroke.tool : currentTool
+    readonly property bool hasActiveCropSelection: window.currentTool !== "crop" && window.hasSelection
     property int activeIntensity: {
         if (effectiveTool === "text") return textFontSize;
         if (effectiveTool === "pixelate") return pixelateIntensity;
@@ -291,13 +292,13 @@ DankModal {
     readonly property string effectiveBackdropMode: window.currentTool === "crop" ? "none" : window.backdropMode
 
     readonly property real screenshotWidth: {
-        if (window.currentTool !== "crop" && window.hasSelection) {
+        if (window.hasActiveCropSelection) {
             return window.cropRect.width;
         }
         return window.bgImageItem ? window.bgImageItem.sourceSize.width : 1;
     }
     readonly property real screenshotHeight: {
-        if (window.currentTool !== "crop" && window.hasSelection) {
+        if (window.hasActiveCropSelection) {
             return window.cropRect.height;
         }
         return window.bgImageItem ? window.bgImageItem.sourceSize.height : 1;
@@ -922,8 +923,8 @@ DankModal {
             offscreenSampler: window.offscreenSamplerItem,
             canvasWidth: window.canvasWidth,
             canvasHeight: window.canvasHeight,
-            canvasMinX: (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.x : 0,
-            canvasMinY: (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.y : 0,
+            canvasMinX: window.hasActiveCropSelection ? window.cropRect.x : 0,
+            canvasMinY: window.hasActiveCropSelection ? window.cropRect.y : 0,
         });
     }
 
@@ -960,7 +961,7 @@ DankModal {
 
         const mx = window.cursorX;
         const my = window.cursorY;
-        const absPt = window.currentTool !== "crop" && window.hasSelection ? Qt.point(mx + window.cropRect.x, my + window.cropRect.y) : Qt.point(mx, my);
+        const absPt = window.hasActiveCropSelection ? Qt.point(mx + window.cropRect.x, my + window.cropRect.y) : Qt.point(mx, my);
 
         // Calculate the bounding box center of the copied stroke
         let minX = Infinity, maxX = -Infinity;
@@ -1073,7 +1074,7 @@ DankModal {
         const scaleX = maxW / targetW;
         const scaleY = maxH / targetH;
         const scale = Math.min(scaleX, scaleY);
-        if (window.currentTool !== "crop" && window.hasSelection) {
+        if (window.hasActiveCropSelection) {
             return Math.min(scale, 1.0);
         }
         return scale;
@@ -2066,12 +2067,12 @@ DankModal {
                             mipmap: true
                             
                             // Handle crop positioning
-                            x: (window.currentTool !== "crop" && window.hasSelection) ? -window.cropRect.x * window.editScale : 0
-                            y: (window.currentTool !== "crop" && window.hasSelection) ? -window.cropRect.y * window.editScale : 0
+                            x: window.hasActiveCropSelection ? -window.cropRect.x * window.editScale : 0
+                            y: window.hasActiveCropSelection ? -window.cropRect.y * window.editScale : 0
                             
                             // Scale to original size if cropped, otherwise fit to canvas
-                            width: (window.currentTool !== "crop" && window.hasSelection) ? window.bgImageItem.sourceSize.width * window.editScale : parent.width
-                            height: (window.currentTool !== "crop" && window.hasSelection) ? window.bgImageItem.sourceSize.height * window.editScale : parent.height
+                            width: window.hasActiveCropSelection ? window.bgImageItem.sourceSize.width * window.editScale : parent.width
+                            height: window.hasActiveCropSelection ? window.bgImageItem.sourceSize.height * window.editScale : parent.height
                         }
                     }
 
@@ -2120,10 +2121,9 @@ DankModal {
 
                             // 2. Draw annotations (translated in edit mode, or clipped in crop mode)
                             ctx.save();
-                            const hasCropSelection = window.currentTool !== "crop" && window.hasSelection;
-                            if (isBackdropActive || hasCropSelection) {
-                                const cropX = hasCropSelection ? window.cropRect.x : 0;
-                                const cropY = hasCropSelection ? window.cropRect.y : 0;
+                            if (isBackdropActive || window.hasActiveCropSelection) {
+                                const cropX = window.hasActiveCropSelection ? window.cropRect.x : 0;
+                                const cropY = window.hasActiveCropSelection ? window.cropRect.y : 0;
                                 ctx.translate(window.screenshotXOffset, window.screenshotYOffset);
                                 if (isBackdropActive) {
                                     ctx.scale(window.backdropScaleFactor, window.backdropScaleFactor);
@@ -2285,10 +2285,9 @@ DankModal {
                             // 2. Draw active/selected annotations (translated in edit mode, or clipped in crop mode)
                             ctx.save();
                             const isBackdropActive = window.effectiveBackdropMode !== "none";
-                            const hasCropSelection = window.currentTool !== "crop" && window.hasSelection;
-                            if (isBackdropActive || hasCropSelection) {
-                                const cropX = hasCropSelection ? window.cropRect.x : 0;
-                                const cropY = hasCropSelection ? window.cropRect.y : 0;
+                            if (isBackdropActive || window.hasActiveCropSelection) {
+                                const cropX = window.hasActiveCropSelection ? window.cropRect.x : 0;
+                                const cropY = window.hasActiveCropSelection ? window.cropRect.y : 0;
                                 ctx.translate(window.screenshotXOffset, window.screenshotYOffset);
                                 if (isBackdropActive) {
                                     ctx.scale(window.backdropScaleFactor, window.backdropScaleFactor);
@@ -2476,7 +2475,7 @@ DankModal {
                                     rx = (rx - window.screenshotXOffset) / window.backdropScaleFactor;
                                     ry = (ry - window.screenshotYOffset) / window.backdropScaleFactor;
                                 }
-                                if (window.currentTool !== "crop" && window.hasSelection) {
+                                if (window.hasActiveCropSelection) {
                                     return Qt.point(rx + window.cropRect.x, ry + window.cropRect.y);
                                 }
                                 return Qt.point(rx, ry);
@@ -3004,8 +3003,8 @@ DankModal {
                                         const dh = rh * zoom;
 
                                         // Visible canvas bounds in absolute coordinates
-                                        const visX = (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.x : 0;
-                                        const visY = (window.currentTool !== "crop" && window.hasSelection) ? window.cropRect.y : 0;
+                                        const visX = window.hasActiveCropSelection ? window.cropRect.x : 0;
+                                        const visY = window.hasActiveCropSelection ? window.cropRect.y : 0;
                                         const visW = window.canvasWidth;
                                         const visH = window.canvasHeight;
 
