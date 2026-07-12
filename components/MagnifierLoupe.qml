@@ -89,8 +89,8 @@ Rectangle {
                     ctx.save();
                     ctx.translate(window.screenshotXOffset, window.screenshotYOffset);
                     ctx.scale(window.backdropScaleFactor, window.backdropScaleFactor);
-                    const cropX = window.hasSelection ? window.cropRect.x : 0;
-                    const cropY = window.hasSelection ? window.cropRect.y : 0;
+                    const cropX = window.hasActiveCropSelection ? window.cropRect.x : 0;
+                    const cropY = window.hasActiveCropSelection ? window.cropRect.y : 0;
                     ctx.translate(-cropX, -cropY);
                     for (var i = 0; i < window.strokes.length; i++) {
                         window.drawStroke(ctx, window.strokes[i]);
@@ -102,7 +102,7 @@ Rectangle {
                 }
             } else {
                 if (staticBgImage.status === Image.Ready || staticBgImage.width > 0) {
-                    if (window.hasSelection) {
+                    if (window.hasActiveCropSelection) {
                         ctx.drawImage(staticBgImage, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, 0, 0, window.canvasWidth, window.canvasHeight);
                     } else {
                         ctx.drawImage(staticBgImage, 0, 0, window.canvasWidth, window.canvasHeight);

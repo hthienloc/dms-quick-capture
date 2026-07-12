@@ -442,14 +442,26 @@ DankModal {
         }
     }
 
+    function getScreenshotLayout() {
+        const factor = window.backdropScaleFactor;
+        return {
+            x: window.screenshotXOffset,
+            y: window.screenshotYOffset,
+            w: window.screenshotWidth * factor,
+            h: window.screenshotHeight * factor,
+            r: window.backdropCornerRadius * factor
+        };
+    }
+
     function drawScreenshotShadow(ctx) {
         if (window.backdropShadowStrength <= 0) return;
         ctx.save();
-        const r = window.backdropCornerRadius * window.backdropScaleFactor;
-        const x = window.screenshotXOffset;
-        const y = window.screenshotYOffset;
-        const w = window.screenshotWidth * window.backdropScaleFactor;
-        const h = window.screenshotHeight * window.backdropScaleFactor;
+        const layout = window.getScreenshotLayout();
+        const r = layout.r;
+        const x = layout.x;
+        const y = layout.y;
+        const w = layout.w;
+        const h = layout.h;
         
         const opacity = (window.backdropShadowStrength / 100.0) * 0.55;
         const STEPS = 12;
@@ -499,11 +511,12 @@ DankModal {
             ctx.imageSmoothingQuality = "high";
         }
         
-        const r = window.backdropCornerRadius * window.backdropScaleFactor;
-        const x = window.screenshotXOffset;
-        const y = window.screenshotYOffset;
-        const w = window.screenshotWidth * window.backdropScaleFactor;
-        const h = window.screenshotHeight * window.backdropScaleFactor;
+        const layout = window.getScreenshotLayout();
+        const r = layout.r;
+        const x = layout.x;
+        const y = layout.y;
+        const w = layout.w;
+        const h = layout.h;
         
         ctx.beginPath();
         if (r > 0) {
