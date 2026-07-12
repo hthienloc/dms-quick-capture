@@ -444,13 +444,19 @@ DankModal {
         const w = window.screenshotWidth * window.backdropScaleFactor;
         const h = window.screenshotHeight * window.backdropScaleFactor;
         
-        const opacity = (window.backdropShadowStrength / 100.0) * 0.45;
+        const opacity = (window.backdropShadowStrength / 100.0) * 0.55;
+        const STEPS = 12;
+        const maxOffset = 24.0;
+        const maxBlur = 45.0;
         
-        // Draw 4 concentric shadow layers for a soft, fast shadow effect without Gaussian blur CPU cost
-        for (let i = 1; i <= 4; i++) {
-            ctx.fillStyle = "rgba(0, 0, 0, " + (opacity / i) + ")";
-            const offset = i * 3.5;
-            const blur = i * 5;
+        // Draw 12 concentric shadow layers with quadratic spacing and falloff for smooth rendering
+        for (let i = 1; i <= STEPS; i++) {
+            const t = i / STEPS;
+            const blur = Math.pow(t, 1.5) * maxBlur;
+            const offset = Math.pow(t, 1.5) * maxOffset;
+            const alpha = opacity * Math.pow(1.0 - t, 1.5) * 0.75;
+            
+            ctx.fillStyle = Qt.rgba(0, 0, 0, alpha);
             
             const sx = x - blur/2;
             const sy = y - blur/2 + offset;
