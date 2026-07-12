@@ -305,29 +305,79 @@ function extractDominantColors(imgData, Qt) {
     }
     imgLuminance /= 16;
 
-    // Helper to adjust color for contrast ratio >= 4.5
-    function adjustColorForContrast(c) {
+    // Helper to adjust color to a specific target luminance
+    function adjustToLuminance(c, targetL) {
         var l = 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
-        var ratio = (Math.max(l, imgLuminance) + 0.05) / (Math.min(l, imgLuminance) + 0.05);
-        if (ratio >= 4.5) return c;
+        if (Math.abs(l - targetL) < 0.01) return c;
         
-        if (imgLuminance > 0.5) {
-            // Image is light -> Make backdrop darker
-            var targetL = Math.max(0.02, (imgLuminance + 0.05) / 4.5 - 0.05);
+        if (targetL < l) {
+            // Make darker
             var scale = targetL / Math.max(0.01, l);
             return Qt.rgba(Math.min(1.0, c.r * scale), Math.min(1.0, c.g * scale), Math.min(1.0, c.b * scale), 1);
         } else {
-            // Image is dark -> Make backdrop lighter
-            var targetL = Math.min(0.98, 4.5 * (imgLuminance + 0.05) - 0.05);
-            if (l >= 0.99) return Qt.rgba(1, 1, 1, 1);
-            var t = Math.max(0.0, (targetL - l) / (1.0 - l));
+            // Make lighter
+            if (l >= 0.99) return Qt.rgba(targetL, targetL, targetL, 1);
+            var t = (targetL - l) / (1.0 - l);
             return Qt.rgba(c.r + (1.0 - c.r) * t, c.g + (1.0 - c.g) * t, c.b + (1.0 - c.b) * t, 1);
         }
     }
 
+    var lStart = 0.299 * colorStart.r + 0.587 * colorStart.g + 0.114 * colorStart.b;
+    var ratioStart = (Math.max(lStart, imgLuminance) + 0.05) / (Math.min(lStart, imgLuminance) + 0.05);
+    
+    var finalStart = colorStart;
+    var finalEnd = colorEnd;
+    
+    if (ratioStart < 4.5) {
+        var targetLStart;
+        var targetLEnd;
+        if (imgLuminance > 0.5) {
+            // Image is light -> Make backdrop darker
+            targetLStart = Math.max(0.05, (imgLuminance + 0.05) / 4.5 - 0.05);
+            targetLEnd = Math.max(0.02, targetLStart * 0.65); // Make end color even darker
+        } else {
+            // Image is dark -> Make backdrop lighter
+            targetLStart = Math.min(0.95, 4.5 * (imgLuminance + 0.05) - 0.05);
+            targetLEnd = Math.min(0.98, targetLStart + (1.0 - targetLStart) * 0.35); // Make end color even lighter
+        }
+        finalStart = adjustToLuminance(colorStart, targetLStart);
+        finalEnd = adjustToLuminance(colorEnd, targetLEnd);
+    } else {
+        // Start color already has good contrast. Ensure End color also has contrast,
+        // and keep a healthy luminance gap between them to ensure gradient visibility.
+        var lEnd = 0.299 * colorEnd.r + 0.587 * colorEnd.g + 0.114 * colorEnd.b;
+        var ratioEnd = (Math.max(lEnd, imgLuminance) + 0.05) / (Math.min(lEnd, imgLuminance) + 0.05);
+        
+        if (ratioEnd < 4.5) {
+            var targetLEnd;
+            if (imgLuminance > 0.5) {
+                targetLEnd = Math.max(0.02, (imgLuminance + 0.05) / 4.5 - 0.05);
+                if (Math.abs(lStart - targetLEnd) < 0.1) {
+                    targetLEnd = Math.max(0.02, targetLEnd * 0.65);
+                }
+            } else {
+                targetLEnd = Math.min(0.98, 4.5 * (imgLuminance + 0.05) - 0.05);
+                if (Math.abs(lStart - targetLEnd) < 0.1) {
+                    targetLEnd = Math.min(0.98, targetLEnd + (1.0 - targetLEnd) * 0.35);
+                }
+            }
+            finalStart = colorStart;
+            finalEnd = adjustToLuminance(colorEnd, targetLEnd);
+        } else {
+            // Both already have good contrast. Ensure they are not too close in luminance
+            if (Math.abs(lStart - lEnd) < 0.08) {
+                if (imgLuminance > 0.5) {
+                    finalEnd = adjustToLuminance(colorEnd, Math.max(0.02, lEnd * 0.75));
+                } else {
+                    finalEnd = adjustToLuminance(colorEnd, Math.min(0.98, lEnd + (1.0 - lEnd) * 0.25));
+                }
+            }
+        }
+    }
+
     return { 
-        start: adjustColorForContrast(colorStart), 
-        end: adjustColorForContrast(colorEnd) 
+        start: finalStart, 
+        end: finalEnd 
     };
 }
 
