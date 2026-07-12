@@ -36,6 +36,7 @@ Rectangle {
     property string backdropAlignment: "center"
 
     property string gradientActiveSlot: "start"
+    property string backdropColorPickingSlot: "none"
 
     signal changeBackdropMode(string mode)
     signal changeBackdropSolidColor(color col)
@@ -136,7 +137,7 @@ Rectangle {
             id: toolbarLoader
             anchors.centerIn: parent
             sourceComponent: {
-                if (root.currentTool === "backdrop") {
+                if (root.currentTool === "backdrop" || (root.currentTool === "colorpicker" && root.backdropColorPickingSlot !== "none")) {
                     return root.isVertical ? backdropVerticalLayout : backdropHorizontalLayout;
                 }
                 return root.isVertical ? verticalLayout : horizontalLayout;

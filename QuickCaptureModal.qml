@@ -1756,6 +1756,7 @@ DankModal {
                     backdropAspectRatio: window.backdropAspectRatio
                     customAspectRatio: window.customAspectRatio
                     backdropAlignment: window.backdropAlignment
+                    backdropColorPickingSlot: window.backdropColorPickingSlot
 
                     onChangeBackdropMode: (mode) => {
                         window.backdropMode = mode;
