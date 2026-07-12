@@ -515,9 +515,11 @@ DankModal {
         ctx.closePath();
         ctx.clip();
         
+        const origW = window.bgImageItem ? window.bgImageItem.sourceSize.width : 0;
+        const origH = window.bgImageItem ? window.bgImageItem.sourceSize.height : 0;
         const isFullSize = window.cropRect.x === 0 && window.cropRect.y === 0 && 
-                           Math.abs(window.cropRect.width - window.screenshotWidth) < 0.5 && 
-                           Math.abs(window.cropRect.height - window.screenshotHeight) < 0.5;
+                           Math.abs(window.cropRect.width - origW) < 0.5 && 
+                           Math.abs(window.cropRect.height - origH) < 0.5;
 
         if (window.hasSelection && !isFullSize) {
             ctx.drawImage(imgSource, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, x, y, w, h);
