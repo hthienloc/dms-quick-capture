@@ -2762,6 +2762,7 @@ DankModal {
                                               }
                                               window.hasUserCustomizedBackdrop = true;
                                               window.backdropColorPickingSlot = "none";
+                                              window.currentTool = "backdrop";
                                           } else {
                                               const hexStr = window.formatHexColor(pickedColor).toUpperCase();
                                               if (window.colorPickerMode === "copy") {
@@ -2772,8 +2773,8 @@ DankModal {
                                               } else {
                                                    window.updateColorSlot(window.activeColorSlotIndex, pickedColor);
                                                }
+                                               window.currentTool = window.lastActiveTool;
                                           }
-                                          window.currentTool = window.lastActiveTool;
                                       }
                                       return;
                                   }
