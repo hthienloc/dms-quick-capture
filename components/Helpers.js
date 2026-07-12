@@ -445,16 +445,60 @@ function estimateTextWidth(text, fontSize, isBold, isMonospace) {
  * @param {function} estimateTextWidthFn - Text width estimation function.
  * @returns {number} Stroke index or -1.
  */
-function getStrokeBBox(stroke) {
+function getStrokeBBox(stroke, estimateTextWidthFn) {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     const pts = stroke.points;
     const len = pts.length;
-    for (let i = 0; i < len; i++) {
-        const p = pts[i];
-        if (p.x < minX) minX = p.x;
-        if (p.y < minY) minY = p.y;
-        if (p.x > maxX) maxX = p.x;
-        if (p.y > maxY) maxY = p.y;
+    if (len === 0) return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
+
+    if (stroke.tool === "text") {
+        const p0 = pts[0];
+        const fontSize = stroke.width;
+        const txt = stroke.text || "";
+        let textW = Constants.minTextWidth;
+        if (estimateTextWidthFn) {
+            textW = Math.max(Constants.minTextWidth, estimateTextWidthFn(txt, fontSize, stroke.isBold === true, stroke.isMonospace === true));
+        }
+        let textH = fontSize;
+        let textX = p0.x;
+        let textY = p0.y;
+
+        if (stroke.hasBackground) {
+            const padX = fontSize * Constants.textPaddingMultiplierX;
+            const padY = fontSize * Constants.textPaddingMultiplierY;
+            textX -= padX;
+            textY -= padY;
+            textW += padX * 2;
+            textH += padY * 2;
+        }
+        minX = textX;
+        maxX = textX + textW;
+        minY = textY;
+        maxY = textY + textH;
+    } else if (stroke.tool === "stamp") {
+        const radius = stroke.width * Constants.stampRadiusMultiplier + Constants.stampSelectThresholdOffset;
+        if (stroke.hasLeaderLine && len >= 2) {
+            const p0 = pts[0];
+            const p1 = pts[1];
+            minX = Math.min(p0.x, p1.x) - radius;
+            maxX = Math.max(p0.x, p1.x) + radius;
+            minY = Math.min(p0.y, p1.y) - radius;
+            maxY = Math.max(p0.y, p1.y) + radius;
+        } else {
+            const p0 = pts[0];
+            minX = p0.x - radius;
+            maxX = p0.x + radius;
+            minY = p0.y - radius;
+            maxY = p0.y + radius;
+        }
+    } else {
+        for (let i = 0; i < len; i++) {
+            const p = pts[i];
+            if (p.x < minX) minX = p.x;
+            if (p.y < minY) minY = p.y;
+            if (p.x > maxX) maxX = p.x;
+            if (p.y > maxY) maxY = p.y;
+        }
     }
     return { minX: minX, minY: minY, maxX: maxX, maxY: maxY };
 }
@@ -467,7 +511,7 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
         const threshold = Constants.selectionThresholdBase + stroke.width;
 
         // Fast bounding box reject check
-        const bbox = getStrokeBBox(stroke);
+        const bbox = getStrokeBBox(stroke, estimateTextWidthFn);
         const pad = threshold + 2;
         if (mx < bbox.minX - pad || mx > bbox.maxX + pad ||
             my < bbox.minY - pad || my > bbox.maxY + pad) {
