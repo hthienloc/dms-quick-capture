@@ -161,6 +161,7 @@ DankModal {
     property string backdropAspectRatio: "auto"
     property real customAspectRatio: 1.50
     property string backdropAlignment: "center"
+    property string backdropColorPickingSlot: "none" // none, solid, start, end
     readonly property real customRatioMin: 0.50
     readonly property real customRatioMax: 2.50
     readonly property real customRatioStep: 0.05
@@ -1784,6 +1785,10 @@ DankModal {
                             PopoutService.colorPickerModal.show();
                         }
                     }
+                    onBackdropEyedropperRequested: (slot) => {
+                        window.backdropColorPickingSlot = slot;
+                        window.currentTool = "colorpicker";
+                    }
                     onChangeBackdropGradientStart: (col) => {
                         window.backdropGradientStart = col;
                         window.hasUserCustomizedBackdrop = true;
@@ -2741,21 +2746,32 @@ DankModal {
                                 }
 
                                  if (window.currentTool === "colorpicker") {
-                                     if (mouse.button === Qt.LeftButton) {
-                                         const pickedColor = window.sampleCanvasColor(mouse.x, mouse.y);
-                                         const hexStr = window.formatHexColor(pickedColor).toUpperCase();
-                                         if (window.colorPickerMode === "copy") {
-                                             Quickshell.execDetached(["dms", "cl", "copy", hexStr]);
-                                             if (typeof ToastService !== "undefined" && ToastService) {
-                                                 ToastService.showInfo(I18n.tr("Color copied to clipboard: %1").arg(hexStr));
-                                             }
-                                         } else {
-                                              window.updateColorSlot(window.activeColorSlotIndex, pickedColor);
+                                      if (mouse.button === Qt.LeftButton) {
+                                          const pickedColor = window.sampleCanvasColor(mouse.x, mouse.y);
+                                          if (window.backdropColorPickingSlot !== "none") {
+                                              if (window.backdropColorPickingSlot === "solid") {
+                                                  window.backdropSolidColor = pickedColor;
+                                              } else if (window.backdropColorPickingSlot === "start") {
+                                                  window.backdropGradientStart = pickedColor;
+                                              } else if (window.backdropColorPickingSlot === "end") {
+                                                  window.backdropGradientEnd = pickedColor;
+                                              }
+                                              window.backdropColorPickingSlot = "none";
+                                          } else {
+                                              const hexStr = window.formatHexColor(pickedColor).toUpperCase();
+                                              if (window.colorPickerMode === "copy") {
+                                                  Quickshell.execDetached(["dms", "cl", "copy", hexStr]);
+                                                  if (typeof ToastService !== "undefined" && ToastService) {
+                                                      ToastService.showInfo(I18n.tr("Color copied to clipboard: %1").arg(hexStr));
+                                                  }
+                                              } else {
+                                                   window.updateColorSlot(window.activeColorSlotIndex, pickedColor);
+                                               }
                                           }
-                                         window.currentTool = window.lastActiveTool;
-                                     }
-                                     return;
-                                 }
+                                          window.currentTool = window.lastActiveTool;
+                                      }
+                                      return;
+                                  }
 
                                 if (window.currentTool === "crop") {
                                     const ox = mouse.x / window.editScale;
