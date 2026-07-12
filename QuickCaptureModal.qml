@@ -2592,78 +2592,89 @@ DankModal {
                                 } else {
                                     // Standard stroke drawing positions update
                                     if (!window.currentStroke) return;
-
-                                    const absPt = getAbsolutePoint(mouse.x, mouse.y);                                     
-                                    if (window.currentTool === "pen") {
-                                         if (mouse.modifiers & Qt.ShiftModifier) {
-                                             if (window.currentStroke.points.length > 1) {
-                                                 window.currentStroke.points = [window.currentStroke.points[0], absPt];
-                                             } else {
-                                                 window.currentStroke.points.push(absPt);
-                                             }
-                                         } else {
-                                             window.currentStroke.points.push(absPt);
-                                         }
-                                     } else if (window.currentTool === "rect" || window.currentTool === "ellipse" || window.currentTool === "arrow" || window.currentTool === "line"
-                                              || window.currentTool === "redact" || window.currentTool === "pixelate" || window.currentTool === "highlighter" || window.currentTool === "spotlight" || window.currentTool === "callout") {
-                                         
-                                         let finalPt = absPt;
-                                         if ((mouse.modifiers & Qt.ShiftModifier) && (window.currentTool === "line" || window.currentTool === "arrow" || window.currentTool === "highlighter")) {
-                                             // Snapping angle calculation (24 directions / 15 degrees)
-                                             const p0 = window.currentStroke.points[0];
-                                             if (p0) {
-                                                 const dx = absPt.x - p0.x;
-                                                 const dy = absPt.y - p0.y;
-                                                 const L = Math.sqrt(dx * dx + dy * dy);
-                                                 if (L > 0) {
-                                                     const angle = Math.atan2(dy, dx);
-                                                     const SNAP_STEP = Math.PI / 12; // 15 degrees
-                                                     const snappedAngle = Math.round(angle / SNAP_STEP) * SNAP_STEP;
-                                                     finalPt = Qt.point(p0.x + L * Math.cos(snappedAngle), p0.y + L * Math.sin(snappedAngle));
-                                                 }
-                                             }
-                                         } else if ((mouse.modifiers & Qt.ShiftModifier) && (window.currentTool === "ellipse" || window.currentTool === "rect" || window.currentTool === "redact" || window.currentTool === "pixelate" || window.currentTool === "spotlight" || window.currentTool === "callout")) {
-                                             if (window.currentStroke.points[0]) {
-                                                 finalPt = window.constrainSquarePoint(window.currentStroke.points[0], absPt);
-                                             }
-                                         }
-
-                                         if (window.currentStroke.points.length > 1) {
-                                              window.currentStroke.points[window.currentStroke.points.length - 1] = finalPt;
+                                     const absPt = getAbsolutePoint(mouse.x, mouse.y);                                     
+                                     let shouldRepaint = true;
+                                     if (window.currentTool === "pen") {
+                                          if (mouse.modifiers & Qt.ShiftModifier) {
+                                              if (window.currentStroke.points.length > 1) {
+                                                  window.currentStroke.points = [window.currentStroke.points[0], absPt];
+                                              } else {
+                                                  window.currentStroke.points.push(absPt);
+                                              }
                                           } else {
-                                              window.currentStroke.points.push(finalPt);
+                                              const pts = window.currentStroke.points;
+                                              const lastPt = pts[pts.length - 1];
+                                              const dx = absPt.x - lastPt.x;
+                                              const dy = absPt.y - lastPt.y;
+                                              const minDistance = 1.5 / window.editScale;
+                                              if (dx * dx + dy * dy >= minDistance * minDistance) {
+                                                  pts.push(absPt);
+                                              } else {
+                                                  shouldRepaint = false;
+                                              }
                                           }
-                                      } else if (window.currentTool === "stamp") {
-                                           const p0 = window.currentStroke.points[0];
-                                           if (p0) {
-                                               let finalPt = absPt;
-                                               const dx = absPt.x - p0.x;
-                                               const dy = absPt.y - p0.y;
-                                               const dist = Math.sqrt(dx * dx + dy * dy);
-                                               if (dist > 10 / window.editScale) {
-                                                   window.currentStroke.hasLeaderLine = true;
-                                                   
-                                                   if (mouse.modifiers & Qt.ShiftModifier) {
-                                                       const angle = Math.atan2(dy, dx);
-                                                       const SNAP_STEP = Math.PI / 12; // 15 degrees
-                                                       const snappedAngle = Math.round(angle / SNAP_STEP) * SNAP_STEP;
-                                                       finalPt = Qt.point(p0.x + dist * Math.cos(snappedAngle), p0.y + dist * Math.sin(snappedAngle));
-                                                   }
+                                      } else if (window.currentTool === "rect" || window.currentTool === "ellipse" || window.currentTool === "arrow" || window.currentTool === "line"
+                                               || window.currentTool === "redact" || window.currentTool === "pixelate" || window.currentTool === "highlighter" || window.currentTool === "spotlight" || window.currentTool === "callout") {
+                                          
+                                          let finalPt = absPt;
+                                          if ((mouse.modifiers & Qt.ShiftModifier) && (window.currentTool === "line" || window.currentTool === "arrow" || window.currentTool === "highlighter")) {
+                                              // Snapping angle calculation (24 directions / 15 degrees)
+                                              const p0 = window.currentStroke.points[0];
+                                              if (p0) {
+                                                  const dx = absPt.x - p0.x;
+                                                  const dy = absPt.y - p0.y;
+                                                  const L = Math.sqrt(dx * dx + dy * dy);
+                                                  if (L > 0) {
+                                                      const angle = Math.atan2(dy, dx);
+                                                      const SNAP_STEP = Math.PI / 12; // 15 degrees
+                                                      const snappedAngle = Math.round(angle / SNAP_STEP) * SNAP_STEP;
+                                                      finalPt = Qt.point(p0.x + L * Math.cos(snappedAngle), p0.y + L * Math.sin(snappedAngle));
+                                                  }
+                                              }
+                                          } else if ((mouse.modifiers & Qt.ShiftModifier) && (window.currentTool === "ellipse" || window.currentTool === "rect" || window.currentTool === "redact" || window.currentTool === "pixelate" || window.currentTool === "spotlight" || window.currentTool === "callout")) {
+                                              if (window.currentStroke.points[0]) {
+                                                  finalPt = window.constrainSquarePoint(window.currentStroke.points[0], absPt);
+                                              }
+                                          }
 
-                                                   if (window.currentStroke.points.length > 1) {
-                                                       window.currentStroke.points[1] = finalPt;
-                                                   } else {
-                                                       window.currentStroke.points.push(finalPt);
-                                                   }
-                                               } else {
-                                                   window.currentStroke.hasLeaderLine = false;
-                                                   if (window.currentStroke.points.length > 1) {
-                                                       window.currentStroke.points = [p0];
-                                                   }
-                                               }
+                                          if (window.currentStroke.points.length > 1) {
+                                               window.currentStroke.points[window.currentStroke.points.length - 1] = finalPt;
+                                           } else {
+                                               window.currentStroke.points.push(finalPt);
                                            }
-                                       }
-                                    drawingCanvas.requestPaint();
+                                       } else if (window.currentTool === "stamp") {
+                                            const p0 = window.currentStroke.points[0];
+                                            if (p0) {
+                                                let finalPt = absPt;
+                                                const dx = absPt.x - p0.x;
+                                                const dy = absPt.y - p0.y;
+                                                const dist = Math.sqrt(dx * dx + dy * dy);
+                                                if (dist > 10 / window.editScale) {
+                                                    window.currentStroke.hasLeaderLine = true;
+                                                    
+                                                    if (mouse.modifiers & Qt.ShiftModifier) {
+                                                        const angle = Math.atan2(dy, dx);
+                                                        const SNAP_STEP = Math.PI / 12; // 15 degrees
+                                                        const snappedAngle = Math.round(angle / SNAP_STEP) * SNAP_STEP;
+                                                        finalPt = Qt.point(p0.x + dist * Math.cos(snappedAngle), p0.y + dist * Math.sin(snappedAngle));
+                                                    }
+
+                                                    if (window.currentStroke.points.length > 1) {
+                                                        window.currentStroke.points[1] = finalPt;
+                                                    } else {
+                                                        window.currentStroke.points.push(finalPt);
+                                                    }
+                                                } else {
+                                                    window.currentStroke.hasLeaderLine = false;
+                                                    if (window.currentStroke.points.length > 1) {
+                                                        window.currentStroke.points = [p0];
+                                                    }
+                                                }
+                                            }
+                                        }
+                                     if (shouldRepaint) {
+                                         drawingCanvas.requestPaint();
+                                     }
                                 }
                             }
 
