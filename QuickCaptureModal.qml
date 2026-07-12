@@ -239,6 +239,7 @@ DankModal {
     property string stampCounterFormat: "numeric" // numeric, alpha, roman
     onStampCounterFormatChanged: {
         window.reindexStamps();
+        window.requestPaintAll();
     }
     property int calloutLinkLines: 1 // 1, 2
     onCalloutLinkLinesChanged: {
