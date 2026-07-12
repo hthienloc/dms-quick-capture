@@ -553,6 +553,9 @@ DankModal {
         return false;
     }
     property var currentStroke: null
+    onCurrentStrokeChanged: {
+        if (window.bakedCanvas) window.bakedCanvas.requestPaint();
+    }
     property var selectedStroke: null
     property int preGrabStrokeWidth: 8
     property int preGrabTextFontSize: 36
