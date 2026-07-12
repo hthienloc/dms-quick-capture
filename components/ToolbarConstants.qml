@@ -20,12 +20,8 @@ QtObject {
 
     readonly property int swatchSize: 20
     readonly property int swatchRadius: 10
-    readonly property int swatchSizeSmall: 16
-    readonly property int swatchRadiusSmall: 8
     readonly property int swatchSizeVert: 18
     readonly property int swatchRadiusVert: 9
-    readonly property int swatchSizeVertSmall: 14
-    readonly property int swatchRadiusVertSmall: 7
 
     readonly property int presetBtnWidth: 44
     readonly property int presetBtnHeight: 24
