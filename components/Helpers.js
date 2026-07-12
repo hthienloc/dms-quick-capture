@@ -445,12 +445,34 @@ function estimateTextWidth(text, fontSize, isBold, isMonospace) {
  * @param {function} estimateTextWidthFn - Text width estimation function.
  * @returns {number} Stroke index or -1.
  */
+function getStrokeBBox(stroke) {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    const pts = stroke.points;
+    const len = pts.length;
+    for (let i = 0; i < len; i++) {
+        const p = pts[i];
+        if (p.x < minX) minX = p.x;
+        if (p.y < minY) minY = p.y;
+        if (p.x > maxX) maxX = p.x;
+        if (p.y > maxY) maxY = p.y;
+    }
+    return { minX: minX, minY: minY, maxX: maxX, maxY: maxY };
+}
+
 function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
     for (let i = strokes.length - 1; i >= 0; i--) {
         const stroke = strokes[i];
         if (stroke.points.length === 0) continue;
 
         const threshold = Constants.selectionThresholdBase + stroke.width;
+
+        // Fast bounding box reject check
+        const bbox = getStrokeBBox(stroke);
+        const pad = threshold + 2;
+        if (mx < bbox.minX - pad || mx > bbox.maxX + pad ||
+            my < bbox.minY - pad || my > bbox.maxY + pad) {
+            continue;
+        }
 
         if (stroke.tool === "pen" || stroke.tool === "highlighter") {
             for (let j = 0; j < stroke.points.length - 1; j++) {

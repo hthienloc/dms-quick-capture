@@ -2906,16 +2906,9 @@ DankModal {
                                         const stroke = window.strokes[i];
                                         if (stroke.points.length === 0) continue;
                                         
-                                        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-                                        for (let p of stroke.points) {
-                                            if (p.x < minX) minX = p.x;
-                                            if (p.y < minY) minY = p.y;
-                                            if (p.x > maxX) maxX = p.x;
-                                            if (p.y > maxY) maxY = p.y;
-                                        }
-                                        
+                                        const bbox = Helpers.getStrokeBBox(stroke);
                                         const pad = 12 + stroke.width * 2;
-                                        if (sx >= minX - pad && sx <= maxX + pad && sy >= minY - pad && sy <= maxY + pad) {
+                                        if (sx >= bbox.minX - pad && sx <= bbox.maxX + pad && sy >= bbox.minY - pad && sy <= bbox.maxY + pad) {
                                             found = i;
                                             break;
                                         }
