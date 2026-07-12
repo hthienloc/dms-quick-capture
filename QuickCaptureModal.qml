@@ -129,6 +129,9 @@ DankModal {
     property color _lastSampledColor: "transparent"
     readonly property real dpr: Screen.devicePixelRatio || 1.0
     onCurrentToolChanged: {
+        if (currentTool !== "colorpicker") {
+            window.backdropColorPickingSlot = "none";
+        }
         if (currentTool !== "text" && window.isTyping) {
             window.commitTypingText();
         }
@@ -2756,6 +2759,7 @@ DankModal {
                                               } else if (window.backdropColorPickingSlot === "end") {
                                                   window.backdropGradientEnd = pickedColor;
                                               }
+                                              window.hasUserCustomizedBackdrop = true;
                                               window.backdropColorPickingSlot = "none";
                                           } else {
                                               const hexStr = window.formatHexColor(pickedColor).toUpperCase();
