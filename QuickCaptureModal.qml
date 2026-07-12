@@ -3203,7 +3203,6 @@ DankModal {
                         id: magnifier
                         window: rootWindow
                         drawingCanvas: drawingCanvas
-                        bakedCanvas: bakedCanvas
                         boardContainer: boardContainer
                         bgImage: bgImage
                         staticBgImage: staticBgImage
