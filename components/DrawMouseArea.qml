@@ -235,9 +235,6 @@ MouseArea {
         if (window.currentTool === "select") {
             return window.selectedStroke ? Qt.ClosedHandCursor : (hoveredStrokeIdx !== -1 ? Qt.OpenHandCursor : Qt.ArrowCursor);
         }
-        if (window.hasSelection && window.isInsideCropRect(mouseX / window.editScale, mouseY / window.editScale)) {
-            return Qt.CrossCursor;
-        }
         return Qt.CrossCursor;
     }
 
@@ -458,7 +455,7 @@ MouseArea {
                 const stroke = window.strokes[i];
                 if (stroke.points.length === 0) continue;
                 
-                const bbox = Helpers.getStrokeBBox(stroke, window.estimateTextWidth);
+                const bbox = Helpers.getStrokeBBox(stroke, Helpers.estimateTextWidth);
                 const pad = 12 + stroke.width * 2;
                 if (sx >= bbox.minX - pad && sx <= bbox.maxX + pad && sy >= bbox.minY - pad && sy <= bbox.maxY + pad) {
                     found = i;
