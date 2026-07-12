@@ -20,6 +20,7 @@ Rectangle {
 
     required property var window
     required property var drawingCanvas
+    required property var bakedCanvas
     required property var boardContainer
     required property var bgImage
     required property var staticBgImage
@@ -92,12 +93,8 @@ Rectangle {
                     const cropX = window.hasSelection ? window.cropRect.x : 0;
                     const cropY = window.hasSelection ? window.cropRect.y : 0;
                     ctx.translate(-cropX, -cropY);
-                    for (var i = 0; i < window.strokes.length; i++) {
-                        drawingCanvas.drawStroke(ctx, window.strokes[i]);
-                    }
-                    if (window.currentStroke) {
-                        drawingCanvas.drawStroke(ctx, window.currentStroke);
-                    }
+                    ctx.drawImage(bakedCanvas, 0, 0, bakedCanvas.width, bakedCanvas.height, 0, 0, window.canvasWidth, window.canvasHeight);
+                    ctx.drawImage(drawingCanvas, 0, 0, drawingCanvas.width, drawingCanvas.height, 0, 0, window.canvasWidth, window.canvasHeight);
                     ctx.restore();
                 }
             } else {
@@ -109,12 +106,8 @@ Rectangle {
                     }
                 }
                 if (window.showAnnotations) {
-                    for (var i = 0; i < window.strokes.length; i++) {
-                        drawingCanvas.drawStroke(ctx, window.strokes[i]);
-                    }
-                    if (window.currentStroke) {
-                        drawingCanvas.drawStroke(ctx, window.currentStroke);
-                    }
+                    ctx.drawImage(bakedCanvas, 0, 0, bakedCanvas.width, bakedCanvas.height, 0, 0, window.canvasWidth, window.canvasHeight);
+                    ctx.drawImage(drawingCanvas, 0, 0, drawingCanvas.width, drawingCanvas.height, 0, 0, window.canvasWidth, window.canvasHeight);
                 }
             }
 
