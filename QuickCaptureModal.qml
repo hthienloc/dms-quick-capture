@@ -278,8 +278,14 @@ DankModal {
         const w = window.bgImageItem.sourceSize.width;
         const h = window.bgImageItem.sourceSize.height;
         const max = Math.max(w, h);
-        if (isNaN(max) || max <= 0 || max <= maxEditDimension) return 1.0;
-        return maxEditDimension / max;
+        let baseScale = 1.0;
+        if (!(isNaN(max) || max <= 0 || max <= maxEditDimension)) {
+            baseScale = maxEditDimension / max;
+        }
+        // Cap the editScale to fitScale so that the canvas resolution
+        // never exceeds the actual display size on the screen.
+        const maxRequiredScale = window.fitScale;
+        return Math.min(baseScale, maxRequiredScale);
     }
 
     readonly property string effectiveBackdropMode: window.currentTool === "crop" ? "none" : window.backdropMode
