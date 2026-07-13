@@ -53,6 +53,11 @@ DankModal {
     // Parent communication reference
     property var parentWidget: null
 
+    // Async Image Loading State Variables
+    property bool isImageValidated: false
+    property bool isQmlImageLoaded: false
+    readonly property bool isImageLoading: !isImageValidated || !isQmlImageLoaded
+
     // State Variables
     property var paletteWarningDialogRef: null
     property var toolbarItem: null
@@ -1743,6 +1748,7 @@ DankModal {
                 cache: false
                 smooth: true
                 mipmap: true
+                asynchronous: true
 
                 Component.onCompleted: {
                     window.bgImageItem = bgImage;
@@ -1750,6 +1756,7 @@ DankModal {
 
                 onStatusChanged: {
                     if (status === Image.Ready) {
+                        window.isQmlImageLoaded = true;
                         window.hasSampledContrast = false;
                         if (window.activeCanvas) {
                             window.activeCanvas.unloadImage(source);
@@ -2550,6 +2557,45 @@ DankModal {
                         bgImage: bgImage
                         staticBgImage: staticBgImage
                         drawMouseArea: drawMouseArea
+                    }
+
+                    // Loading overlay
+                    Rectangle {
+                        anchors.fill: parent
+                        color: Theme.withAlpha(Theme.surfaceContainer, 0.4)
+                        z: 99999
+                        visible: window.isImageLoading
+                        opacity: window.isImageLoading ? 1.0 : 0.0
+                        
+                        Behavior on opacity {
+                            NumberAnimation { duration: 200 }
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                            hoverEnabled: true
+                        }
+
+                        Column {
+                            anchors.centerIn: parent
+                            spacing: Theme.spacingM
+                            
+                            DankSpinner {
+                                size: 48
+                                color: Theme.primary
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                running: window.isImageLoading
+                            }
+                            
+                            Text {
+                                text: qsTr("Loading screenshot...")
+                                color: Theme.surfaceText
+                                font.pixelSize: 13
+                                font.bold: true
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
                     }
                 }
 
