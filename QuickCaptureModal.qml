@@ -1103,10 +1103,12 @@ DankModal {
     property var exportCallback: null
 
     property var restoreState: null
+    property string restoreSource: ""
 
     FloatService {
         id: floatService
         onRestoreRequested: function(imageSource, annotationState) {
+            window.restoreSource = imageSource;
             window.restoreState = annotationState;
             window.shouldBeVisible = true;
             window.openCentered();
@@ -1645,7 +1647,11 @@ DankModal {
         window.strokes = [];
         window.stampCounter = 1;
         window.bgImageSource = "";
-        window.bgImageSource = "file:///tmp/dms_capture_bg.png";
+        if (window.restoreSource) {
+            window.bgImageSource = window.restoreSource;
+        } else {
+            window.bgImageSource = "file:///tmp/dms_capture_bg.png";
+        }
         window.isScreenshotDark = false;
         window.hasSampledContrast = false;
         window.backdropSolidColor = backdropConfigColor("backdropDefaultSolidColor", config.resolveColor("slot_1"));
@@ -1720,6 +1726,7 @@ DankModal {
             }
             if (window.activeCanvas) window.activeCanvas.requestPaint();
             window.restoreState = null;
+            window.restoreSource = "";
         }
 
         Qt.callLater(() => {

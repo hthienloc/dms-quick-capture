@@ -367,10 +367,6 @@ PanelWindow {
                 if (status === AnimatedImage.Ready) {
                     updateSize();
                     window.imageLoaded = true;
-                    for (var i = 0; i < window.tempPaths.length; i++) {
-                        Proc.runCommand("float-cleanup-temp", ["rm", "-f", window.tempPaths[i]]);
-                    }
-                    window.tempPaths = [];
                 } else if (status === AnimatedImage.Error) {
                     ToastService.showError("Failed to load image: " + window.imageSource);
                     window.closing();

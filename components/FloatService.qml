@@ -39,7 +39,10 @@ Item {
                 win.closing.connect(function() {
                     root.openWindows = root.openWindows.filter(function(w) { return w !== win; });
                     for (var i = 0; i < (tempPaths || []).length; i++) {
-                        Proc.runCommand("float-cleanup-temp", ["rm", "-f", tempPaths[i]]);
+                        var tp = tempPaths[i];
+                        if (tp && tp.indexOf("/tmp/dms_capture_") >= 0) {
+                            Proc.runCommand("float-delayed-cleanup-" + i, ["sh", "-c", "sleep 5 && rm -f -- '" + tp + "'"]);
+                        }
                     }
                 });
             } else {
