@@ -47,24 +47,8 @@ PluginComponent {
 
     function triggerCapture(mode) {
         root.restoringFromFloat = false;
-        const targetMode = mode ? mode : root.captureMode;
-        
-        if (targetMode === "window") {
-            const checkCmd = "if [ -n \"$HYPRLAND_INSTANCE_SIGNATURE\" ] || pgrep -x dwl >/dev/null; then echo \"SUPPORTED\"; else echo \"UNSUPPORTED\"; fi";
-            Proc.runCommand("check-compositor", ["sh", "-c", checkCmd], (stdout, exitCode) => {
-                if (!stdout || stdout.trim() !== "SUPPORTED") {
-                    if (typeof ToastService !== "undefined" && ToastService) {
-                        ToastService.showError(I18n.tr("Window capture mode is only supported on Hyprland or DWL."));
-                    }
-                    return;
-                }
-                root.activeIpcMode = mode || "";
-                root.startCaptureAfterDelay();
-            });
-        } else {
-            root.activeIpcMode = mode || "";
-            root.startCaptureAfterDelay();
-        }
+        root.activeIpcMode = mode || "";
+        root.startCaptureAfterDelay();
     }
 
     function closeControlCenter() {
@@ -86,36 +70,25 @@ PluginComponent {
         // This lets us detect ESC cancellation when `dms screenshot region`
         // incorrectly returns exit code 0 without writing a new file.
         Proc.runCommand("pre-capture-cleanup", ["rm", "-f", "/tmp/dms_capture_bg.png"], () => {
-            Proc.runCommand("screenshot-trigger", root.screenshotArgs(), (stdout, exitCode) => {
+            const cmdStr = root.screenshotArgs().map(arg => '"' + arg.replace(/"/g, '\\"') + '"').join(" ") + " 2>&1";
+            Proc.runCommand("screenshot-trigger", ["sh", "-c", cmdStr], (stdout, exitCode) => {
                 if (exitCode === 0) {
                     // Verify the file was actually written before opening the editor.
                     // If the user pressed ESC, dms may return 0 but write no file.
                     Proc.runCommand("verify-capture", ["test", "-f", "/tmp/dms_capture_bg.png"], (_, fileExists) => {
+                        root.isCapturing = false;
+                        root.activeIpcMode = "";
                         if (fileExists === 0) {
-                            root.isCapturing = false;
-                            root.activeIpcMode = "";
-                            root.resolvedDmsPath = "dms"; // reset to default path on success
                             root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
-                        } else {
-                            // File not written — user cancelled with ESC. Reset silently.
-                            root.isCapturing = false;
-                            root.activeIpcMode = "";
-                            root.resolvedDmsPath = "dms";
                         }
                     });
                 } else {
-                    if (root.resolvedDmsPath === "dms") {
-                        root.resolvedDmsPath = "/usr/local/bin/dms";
-                        root.startActualCapture();
-                    } else if (root.resolvedDmsPath === "/usr/local/bin/dms") {
-                        root.resolvedDmsPath = "/usr/bin/dms";
-                        root.startActualCapture();
-                    } else {
-                        root.isCapturing = false;
-                        root.activeIpcMode = "";
-                        root.resolvedDmsPath = "dms"; // reset to default path for next attempts
-                        if (typeof ToastService !== "undefined" && ToastService)
-                            ToastService.showError("Screenshot failed (mode: " + root.screenshotMode() + ").");
+                    const failMode = root.screenshotMode();
+                    root.isCapturing = false;
+                    root.activeIpcMode = "";
+                    if (typeof ToastService !== "undefined" && ToastService) {
+                        const errorMsg = (stdout && stdout.trim()) ? stdout.trim() : "Screenshot failed (mode: " + failMode + ").";
+                        ToastService.showError(errorMsg);
                     }
                 }
             }, 0, 60000);
@@ -346,6 +319,21 @@ PluginComponent {
             newInstances[pluginId] = root;
             pluginService.pluginInstances = newInstances;
         }
+
+        // Resolve dms path once at startup
+        Proc.runCommand("check-dms-local", ["test", "-x", "/usr/local/bin/dms"], (_, exitCode) => {
+            if (exitCode === 0) {
+                root.resolvedDmsPath = "/usr/local/bin/dms";
+            } else {
+                Proc.runCommand("check-dms-usr", ["test", "-x", "/usr/bin/dms"], (_, exitCodeUsr) => {
+                    if (exitCodeUsr === 0) {
+                        root.resolvedDmsPath = "/usr/bin/dms";
+                    } else {
+                        root.resolvedDmsPath = "dms";
+                    }
+                });
+            }
+        });
     }
 
     Component.onDestruction: {
