@@ -289,8 +289,8 @@ Rectangle {
                 spacing: Theme.spacingXS; anchors.verticalCenter: parent.verticalCenter
                 DankActionButton { iconName: "undo"; buttonSize: tc.btnSize; iconSize: tc.iconSize; enabled: root.canUndo; opacity: enabled ? 1.0 : 0.4; onClicked: root.undoRequested() }
                 DankActionButton { iconName: "push_pin"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Float Window (Ctrl+F)"; onClicked: root.floatRequested() }
-                DankActionButton { iconName: "save"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Save to File (Ctrl+S)"; onClicked: root.saveRequested() }
-                DankActionButton { iconName: "content_copy"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Copy to Clipboard (Ctrl+C)"; onClicked: root.copyRequested() }
+                DankActionButton { iconName: "save"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Save (Ctrl+S)"; onClicked: root.saveRequested() }
+                DankActionButton { iconName: "content_copy"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Copy (Ctrl+C)"; onClicked: root.copyRequested() }
                 DankActionButton { iconName: "done_all"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Copy & Save (Enter)"; backgroundColor: Theme.withAlpha(Theme.primary, 0.1); iconColor: Theme.primary; onClicked: root.copyAndSaveRequested() }
             }
 

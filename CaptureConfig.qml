@@ -9,17 +9,17 @@ QtObject {
     readonly property var toolButtons: [
         { id: "pen", icon: "edit", shortcut: "1", tooltip: qsTr("Freehand Pen (1)") },
         { id: "line", icon: "horizontal_rule", shortcut: "2", tooltip: qsTr("Straight Line (2)") },
-        { id: "arrow", icon: "trending_flat", shortcut: "3", tooltip: qsTr("Arrow Vector (3)") },
+        { id: "arrow", icon: "trending_flat", shortcut: "3", tooltip: qsTr("Arrow (3)") },
         { id: "rect", icon: "crop_square", shortcut: "4", tooltip: qsTr("Rectangle Outline (4)") },
         { id: "ellipse", icon: "radio_button_unchecked", shortcut: "Q", tooltip: qsTr("Ellipse / Circle (Q)") },
-        { id: "text", icon: "text_fields", shortcut: "W", tooltip: qsTr("Text Note (W)") },
+        { id: "text", icon: "text_fields", shortcut: "W", tooltip: qsTr("Text (W)") },
         { id: "pixelate", icon: "blur_on", shortcut: "E", tooltip: qsTr("Pixelate (E)") },
         { id: "redact", icon: "ad_off", shortcut: "R", tooltip: qsTr("Redact (R)") },
-        { id: "stamp", icon: "looks_one", shortcut: "A", tooltip: qsTr("Number Stamp (A)") },
+        { id: "stamp", icon: "looks_one", shortcut: "A", tooltip: qsTr("Stamp (A)") },
         { id: "highlighter", icon: "border_color", shortcut: "S", tooltip: qsTr("Highlighter (S)") },
         { id: "spotlight", icon: "highlight", shortcut: "D", tooltip: qsTr("Spotlight (D)") },
         { id: "callout", icon: "zoom_in", shortcut: "Z", tooltip: qsTr("Callout (Z) | Hold G for Loupe") },
-        { id: "backdrop", icon: "wallpaper", shortcut: "B", tooltip: qsTr("Image Backdrop (B)") }
+        { id: "backdrop", icon: "wallpaper", shortcut: "B", tooltip: qsTr("Backdrop (B)") }
     ]
 
     function getToolIcon(toolId) {

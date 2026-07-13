@@ -706,7 +706,7 @@ PluginSettings {
         }
 
         InfoText {
-            text: I18n.tr("Supports formatting: %Y (Year), %y (Last 2 digits of the year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)")
+            text: I18n.tr("Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)")
             opacity: 0.85
         }
 
@@ -727,7 +727,7 @@ PluginSettings {
         }
 
         InfoText {
-            text: I18n.tr("Note: The output format only affects files saved to disk. Images copied to the clipboard are always saved in PNG format.")
+            text: I18n.tr("Output format applies only to disk saves. Clipboard copies are always PNG.")
             opacity: 0.85
         }
 
@@ -792,7 +792,7 @@ PluginSettings {
                     id: postNotification
                     settingKey: "postNotification"
                     label: I18n.tr("Post-Capture Notification")
-                    description: I18n.tr("Select which types of notifications to show after copying or saving.")
+                    description: I18n.tr("Choose notifications shown after copy or save.")
                     defaultValue: "notification"
                     options: [
                         { label: I18n.tr("Notification"), value: "notification" },
@@ -911,7 +911,7 @@ PluginSettings {
         }
 
         InfoText {
-            text: I18n.tr("Select a color palette preset or customize the color slots individually.")
+            text: I18n.tr("Pick a palette preset or customize individual color slots.")
         }
 
         Item { width: 1; height: Theme.spacingS }
@@ -1199,7 +1199,7 @@ PluginSettings {
         }
 
         InfoText {
-            text: I18n.tr("If you experience lag during editing, consider lowering the resolution limit.")
+            text: I18n.tr("Lower the resolution limit if you experience lag while editing.")
             opacity: 0.8
         }
     }
@@ -1340,7 +1340,7 @@ PluginSettings {
             id: penAutoClose
             settingKey: "penAutoClose"
             label: I18n.tr("Pen Auto-Close")
-            description: I18n.tr("Automatically close the loop when ending close to the start point.")
+            description: I18n.tr("Auto-close the loop when ending near the start point.")
             defaultValue: true
         }
     }
@@ -1450,7 +1450,7 @@ PluginSettings {
         }
 
         InfoText {
-            text: I18n.tr("This mode does not support IME. If you use CJK or Vietnamese languages, please switch to Popup Input.")
+            text: I18n.tr("Inline mode does not support IME. Switch to Popup Input for CJK or Vietnamese.")
             visible: textInputMode.value === "inline"
             opacity: 0.85
         }
@@ -1793,7 +1793,7 @@ PluginSettings {
         }
 
         InfoText {
-            text: I18n.tr("Supports formatting: {user} (Username), \\n (New Line), %Y (Year), %y (Last 2 digits of the year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)")
+            text: I18n.tr("Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)")
             opacity: 0.85
             visible: enableWatermark.value && (watermarkType.value === "text" || watermarkType.value === "hybrid")
             height: visible ? implicitHeight : 0
@@ -2188,7 +2188,7 @@ PluginSettings {
         }
 
         InfoText {
-            text: I18n.tr("Configure up to 8 quick-access tool presets. Right-click anywhere during capture to open the radial menu.")
+            text: I18n.tr("Configure up to 8 quick-access tool presets. Right-click during capture to open the radial menu.")
         }
 
         Item { width: 1; height: Theme.spacingXS }
@@ -2810,7 +2810,7 @@ PluginSettings {
             id: radialHoverTrigger
             settingKey: "radialHoverTrigger"
             label: I18n.tr("Trigger on Hover")
-            description: I18n.tr("Select a tool preset automatically by hovering over it, without needing to release the mouse click.")
+            description: I18n.tr("Auto-select a tool preset on hover, without releasing the mouse.")
             defaultValue: false
         }
 
