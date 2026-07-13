@@ -2169,8 +2169,8 @@ DankModal {
                                     const activeInt = lastSpotlight ? lastSpotlight.width : window.spotlightIntensity;
                                     const spotlightOpacity = activeInt / 100.0;
 
-                                    const cropX = hasCropSelection ? window.cropRect.x : 0;
-                                    const cropY = hasCropSelection ? window.cropRect.y : 0;
+                                    const cropX = window.hasActiveCropSelection ? window.cropRect.x : 0;
+                                    const cropY = window.hasActiveCropSelection ? window.cropRect.y : 0;
 
                                     ctx.beginPath();
                                     if (window.effectiveBackdropMode !== "none" && window.backdropCornerRadius > 0) {
@@ -2341,8 +2341,8 @@ DankModal {
 
                                     const spotlightOpacity = activeInt / 100.0;
 
-                                    const cropX = hasCropSelection ? window.cropRect.x : 0;
-                                    const cropY = hasCropSelection ? window.cropRect.y : 0;
+                                    const cropX = window.hasActiveCropSelection ? window.cropRect.x : 0;
+                                    const cropY = window.hasActiveCropSelection ? window.cropRect.y : 0;
 
                                     ctx.beginPath();
                                     if (window.effectiveBackdropMode !== "none" && window.backdropCornerRadius > 0) {
@@ -2595,10 +2595,9 @@ DankModal {
                         // 1.5 Overlay the Spotlight Layer and Annotations
                         if (window.showAnnotations) {
                             ctx.save();
-                            const hasCropSelection = window.hasSelection;
-                            if (isBackdropActive || hasCropSelection) {
-                                const cropX = hasCropSelection ? window.cropRect.x : 0;
-                                const cropY = hasCropSelection ? window.cropRect.y : 0;
+                            if (isBackdropActive || window.hasActiveCropSelection) {
+                                const cropX = window.hasActiveCropSelection ? window.cropRect.x : 0;
+                                const cropY = window.hasActiveCropSelection ? window.cropRect.y : 0;
                                 ctx.translate(window.screenshotXOffset, window.screenshotYOffset);
                                 ctx.scale(window.backdropScaleFactor, window.backdropScaleFactor);
                                 ctx.translate(-cropX, -cropY);
@@ -2637,8 +2636,8 @@ DankModal {
 
                                     const spotlightOpacity = activeInt / 100.0;
 
-                                    const cropX = hasCropSelection ? window.cropRect.x : 0;
-                                    const cropY = hasCropSelection ? window.cropRect.y : 0;
+                                    const cropX = window.hasActiveCropSelection ? window.cropRect.x : 0;
+                                    const cropY = window.hasActiveCropSelection ? window.cropRect.y : 0;
 
                                     ctx.beginPath();
                                     // Outer rectangle covering the whole view (rounded if backdrop active)
