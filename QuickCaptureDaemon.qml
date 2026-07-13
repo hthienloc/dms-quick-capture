@@ -47,6 +47,14 @@ PluginComponent {
 
     function triggerCapture(mode) {
         root.restoringFromFloat = false;
+        
+        // Strictly validate mode against allowlist to prevent command injection
+        const allowedModes = ["region", "window", "full", "output", ""];
+        if (mode && !allowedModes.includes(mode)) {
+            console.warn("Invalid screenshot mode rejected: " + mode);
+            return;
+        }
+
         root.activeIpcMode = mode || "";
         root.startCaptureAfterDelay();
     }
@@ -70,7 +78,7 @@ PluginComponent {
         // This lets us detect ESC cancellation when `dms screenshot region`
         // incorrectly returns exit code 0 without writing a new file.
         Proc.runCommand("pre-capture-cleanup", ["rm", "-f", "/tmp/dms_capture_bg.png"], () => {
-            const cmdStr = root.screenshotArgs().map(arg => '"' + arg.replace(/"/g, '\\"') + '"').join(" ") + " 2>&1";
+            const cmdStr = root.screenshotArgs().map(arg => "'" + arg.replace(/'/g, "'\\''") + "'").join(" ") + " 2>&1";
             Proc.runCommand("screenshot-trigger", ["sh", "-c", cmdStr], (stdout, exitCode) => {
                 if (exitCode === 0) {
                     // Verify the file was actually written before opening the editor.
@@ -87,7 +95,7 @@ PluginComponent {
                     root.isCapturing = false;
                     root.activeIpcMode = "";
                     if (typeof ToastService !== "undefined" && ToastService) {
-                        const errorMsg = (stdout && stdout.trim()) ? stdout.trim() : "Screenshot failed (mode: " + failMode + ").";
+                        const errorMsg = (stdout && stdout.trim()) ? stdout.trim() : I18n.tr("Screenshot failed (mode: %1).").arg(failMode);
                         ToastService.showError(errorMsg);
                     }
                 }
