@@ -154,11 +154,7 @@ MouseArea {
                         window.currentStroke.points.push(absPt);
                     }
                 } else {
-                    const pts = window.currentStroke.points;
-                    const lastPt = (pts && pts.length > 0) ? pts[pts.length - 1] : null;
-                    if (!lastPt || Math.abs(absPt.x - lastPt.x) > 2 || Math.abs(absPt.y - lastPt.y) > 2) {
-                        pts.push(absPt);
-                    }
+                    window.currentStroke.points.push(absPt);
                 }
              } else if (window.currentTool === "rect" || window.currentTool === "ellipse" || window.currentTool === "arrow" || window.currentTool === "line"
                       || window.currentTool === "redact" || window.currentTool === "pixelate" || window.currentTool === "highlighter" || window.currentTool === "spotlight" || window.currentTool === "callout") {
