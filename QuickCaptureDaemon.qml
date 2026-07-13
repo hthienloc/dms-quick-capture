@@ -116,7 +116,7 @@ PluginComponent {
     function fromClipboard() {
         root.restoringFromFloat = false;
         root.closeControlCenter();
-        const checkCmd = "if wl-paste -t image/png > /tmp/dms_capture_bg.png 2>/dev/null; then echo \"IMAGE\"; else TEXT=$(dms cl paste 2>/dev/null); if [ -n \"$TEXT\" ]; then echo \"TEXT:$TEXT\"; else echo \"EMPTY\"; fi; fi";
+        const checkCmd = "if dms cl paste > /tmp/dms_capture_bg.png 2>/dev/null && file -b /tmp/dms_capture_bg.png | grep -qi \"image\"; then echo \"IMAGE\"; else TEXT=$(dms cl paste 2>/dev/null); if [ -n \"$TEXT\" ]; then echo \"TEXT:$TEXT\"; else echo \"EMPTY\"; fi; fi";
         Proc.runCommand("smart-paste", ["sh", "-c", checkCmd], (stdout, exitCode) => {
             const output = stdout.trim();
             if (output === "IMAGE") {

@@ -17,7 +17,6 @@ Screenshot and vector annotation plugin for DankMaterialShell (DMS).
 - **img2pdf** (required for PDF export)
 - **tesseract** (required for OCR text scanner)
 - **zbar** (provides `zbarimg`, required for QR scanner)
-- **wl-clipboard** (provides `wl-paste`, optional — only needed for pasting images from clipboard into editor)
 
 ## Install
 
