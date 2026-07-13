@@ -726,6 +726,11 @@ PluginSettings {
             defaultValue: "png"
         }
 
+        InfoText {
+            text: I18n.tr("Note: The output format only affects files saved to disk. Images copied to the clipboard are always saved in PNG format.")
+            opacity: 0.85
+        }
+
         Separator {
             visible: outputFormat.value === "jpg" || outputFormat.value === "webp"
             height: visible ? 1 : 0

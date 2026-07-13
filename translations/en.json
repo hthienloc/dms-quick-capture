@@ -36,6 +36,7 @@
   "Italic": "Italic",
   "Loading contributors...": "Loading contributors...",
   "None / Disabled": "None / Disabled",
+  "Note: The output format only affects files saved to disk. Images copied to the clipboard are always saved in PNG format.": "Note: The output format only affects files saved to disk. Images copied to the clipboard are always saved in PNG format.",
   "Number Stamp": "Number Stamp",
   "Numeric": "Numeric",
   "Pixelate": "Pixelate",
