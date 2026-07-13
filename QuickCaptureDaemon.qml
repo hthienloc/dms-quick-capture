@@ -16,7 +16,6 @@ PluginComponent {
     property bool isCapturing: false
     readonly property string captureMode: (pluginData.captureMode || "region")
     property string activeIpcMode: ""
-    property bool restoringFromFloat: false
     property bool isDownloading: false
     // Exposed so the widget surface can read annotation state without accessing internal modal id
     readonly property bool isAnnotating: modal.shouldBeVisible
@@ -45,8 +44,6 @@ PluginComponent {
     }
 
     function triggerCapture(mode) {
-        root.restoringFromFloat = false;
-        
         // Strictly validate mode against allowlist to prevent command injection
         const allowedModes = ["region", "window", "full", "output", ""];
         if (mode && !allowedModes.includes(mode)) {
@@ -108,13 +105,11 @@ PluginComponent {
     }
 
     function selectImageAndAnnotate() {
-        root.restoringFromFloat = false;
         root.closeControlCenter();
         fileBrowserModal.open();
     }
 
     function fromClipboard() {
-        root.restoringFromFloat = false;
         root.closeControlCenter();
         const checkCmd = "if dms cl paste > /tmp/dms_capture_bg.png 2>/dev/null && file -b /tmp/dms_capture_bg.png | grep -qi \"image\"; then echo \"IMAGE\"; else TEXT=$(dms cl paste 2>/dev/null); if [ -n \"$TEXT\" ]; then echo \"TEXT:$TEXT\"; else echo \"EMPTY\"; fi; fi";
         Proc.runCommand("smart-paste", ["sh", "-c", checkCmd], (stdout, exitCode) => {
@@ -195,7 +190,6 @@ PluginComponent {
     }
 
     function handleDrop(drop) {
-        root.restoringFromFloat = false;
         let urlStr = "";
         if (drop.hasUrls && drop.urls.length > 0) {
             urlStr = drop.urls[0].toString();
@@ -246,29 +240,8 @@ PluginComponent {
                 path = path.substring(7);
             }
             if (path === "/tmp/dms_capture_bg.png") {
-                root.restoringFromFloat = false;
                 root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
-            } else if (path.startsWith("/tmp/dms_capture_float/")) {
-                const floatBase = path.replace(/\.png$/, "");
-                const bgPath = floatBase + "_bg.png";
-                const strokesPath = floatBase + "_strokes.json";
-                Proc.runCommand("check-float-bg", ["test", "-f", bgPath], (_, bgExists) => {
-                    if (bgExists === 0) {
-                        Proc.runCommand("cp-float-bg", ["cp", "-f", bgPath, "/tmp/dms_capture_bg.png"], () => {
-                            Proc.runCommand("cp-float-strokes", ["cp", "-f", strokesPath, "/tmp/dms_capture_strokes.json"], () => {
-                                root.restoringFromFloat = true;
-                                root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
-                            });
-                        });
-                    } else {
-                        Proc.runCommand("cp-float-img", ["cp", "-f", path, "/tmp/dms_capture_bg.png"], () => {
-                            root.restoringFromFloat = false;
-                            root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
-                        });
-                    }
-                });
             } else {
-                root.restoringFromFloat = false;
                 root.loadImageFromUri(path);
             }
             return "SUCCESS";

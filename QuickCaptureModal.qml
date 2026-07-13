@@ -1102,11 +1102,20 @@ DankModal {
     property rect ocrRect: Qt.rect(0, 0, 0, 0)
     property var exportCallback: null
 
+    FloatService {
+        id: floatService
+        onRestoreRequested: function(imageSource) {
+            window.shouldBeVisible = true;
+            window.openCentered();
+        }
+    }
+
     QuickCaptureActions {
         id: captureActions
         parentWidget: window.parentWidget
         modal: window
         exportAndExecute: window.exportAndExecute
+        floatService: floatService
         onCloseRequested: window.discardAndClose()
     }
 
@@ -1659,69 +1668,55 @@ DankModal {
         window.hasSelection = false;
         window.activeHandle = "none";
 
-        if (window.parentWidget && window.parentWidget.restoringFromFloat) {
-            Proc.runCommand("read-strokes", ["cat", "/tmp/dms_capture_strokes.json"], (stdout, exitCode) => {
-                if (exitCode === 0 && stdout) {
-                    try {
-                        let data = JSON.parse(stdout);
-                        if (data && data.strokes) {
-                            let restoredStrokes = [];
-                            for (let i = 0; i < data.strokes.length; i++) {
-                                let s = data.strokes[i];
-                                let stroke = {
-                                    tool: s.tool,
-                                    color: s.color,
-                                    width: s.width,
-                                    points: []
-                                };
-                                if (s.points) {
-                                    for (let j = 0; j < s.points.length; j++) {
-                                        stroke.points.push(Qt.point(s.points[j].x, s.points[j].y));
-                                    }
-                                }
-                                StrokeProps.copyStrokeProperties(s, stroke);
-                                restoredStrokes.push(stroke);
-                            }
-                            window.strokes = restoredStrokes;
+        // Restore state from FloatService (in-memory) if available
+        if (floatService.pendingState) {
+            var data = floatService.pendingState;
+            if (data && data.strokes) {
+                var restoredStrokes = [];
+                for (var rsi = 0; rsi < data.strokes.length; rsi++) {
+                    var rs = data.strokes[rsi];
+                    var stroke = {
+                        tool: rs.tool,
+                        color: rs.color,
+                        width: rs.width,
+                        points: []
+                    };
+                    if (rs.points) {
+                        for (var rpj = 0; rpj < rs.points.length; rpj++) {
+                            stroke.points.push(Qt.point(rs.points[rpj].x, rs.points[rpj].y));
                         }
-                        if (data && data.stampCounter !== undefined) {
-                            window.stampCounter = data.stampCounter;
-                        }
-                        if (data && data.cropRect) {
-                            window.cropRect = Qt.rect(data.cropRect.x, data.cropRect.y, data.cropRect.width, data.cropRect.height);
-                            window.hasSelection = (data.cropRect.width > 0 && data.cropRect.height > 0);
-                        }
-                        if (data && data.backdropMode !== undefined) {
-                            window.backdropMode = data.backdropMode;
-                            window.backdropSolidColor = data.backdropSolidColor;
-                            window.backdropGradientStart = data.backdropGradientStart;
-                            window.backdropGradientEnd = data.backdropGradientEnd;
-                            window.backdropGradientAngle = data.backdropGradientAngle;
-                            window.backdropPadding = data.backdropPadding;
-                            window.backdropCornerRadius = data.backdropCornerRadius;
-                            window.backdropShadowStrength = data.backdropShadowStrength;
-                            window.backdropAspectRatio = data.backdropAspectRatio;
-                            window.customAspectRatio = data.customAspectRatio;
-                            if (data.backdropAlignment) window.backdropAlignment = data.backdropAlignment;
-                            window.hasUserCustomizedBackdrop = data.hasUserCustomizedBackdrop;
-                            window.autoBackdropGradientStart = data.autoBackdropGradientStart;
-                            window.autoBackdropGradientEnd = data.autoBackdropGradientEnd;
-                            window.autoBackdropSolidColor = data.autoBackdropSolidColor;
-                        }
-                        if (window.activeCanvas) window.activeCanvas.requestPaint();
-                    } catch (e) {
-                        console.error("Failed to parse strokes json:", e);
                     }
+                    StrokeProps.copyStrokeProperties(rs, stroke);
+                    restoredStrokes.push(stroke);
                 }
-                // Cleanup sidecar immediately
-                Proc.runCommand("clean-strokes", ["rm", "-f", "/tmp/dms_capture_strokes.json"]);
-                if (window.parentWidget) {
-                    window.parentWidget.restoringFromFloat = false;
-                }
-            });
-        } else {
-            // Delete sidecar just in case it exists from a previous float that was closed
-            Proc.runCommand("clean-strokes", ["rm", "-f", "/tmp/dms_capture_strokes.json"]);
+                window.strokes = restoredStrokes;
+            }
+            if (data && data.stampCounter !== undefined) {
+                window.stampCounter = data.stampCounter;
+            }
+            if (data && data.cropRect) {
+                window.cropRect = Qt.rect(data.cropRect.x, data.cropRect.y, data.cropRect.width, data.cropRect.height);
+                window.hasSelection = (data.cropRect.width > 0 && data.cropRect.height > 0);
+            }
+            if (data && data.backdropMode !== undefined) {
+                window.backdropMode = data.backdropMode;
+                window.backdropSolidColor = data.backdropSolidColor;
+                window.backdropGradientStart = data.backdropGradientStart;
+                window.backdropGradientEnd = data.backdropGradientEnd;
+                window.backdropGradientAngle = data.backdropGradientAngle;
+                window.backdropPadding = data.backdropPadding;
+                window.backdropCornerRadius = data.backdropCornerRadius;
+                window.backdropShadowStrength = data.backdropShadowStrength;
+                window.backdropAspectRatio = data.backdropAspectRatio;
+                window.customAspectRatio = data.customAspectRatio;
+                if (data.backdropAlignment) window.backdropAlignment = data.backdropAlignment;
+                window.hasUserCustomizedBackdrop = data.hasUserCustomizedBackdrop;
+                window.autoBackdropGradientStart = data.autoBackdropGradientStart;
+                window.autoBackdropGradientEnd = data.autoBackdropGradientEnd;
+                window.autoBackdropSolidColor = data.autoBackdropSolidColor;
+            }
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+            floatService.pendingState = null;
         }
 
         Qt.callLater(() => {
