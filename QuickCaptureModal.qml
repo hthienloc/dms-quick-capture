@@ -1764,6 +1764,15 @@ DankModal {
                         }
                         contrastSampler.requestPaint();
                         offscreenSampler.requestPaint();
+                    } else if (status === Image.Error) {
+                        if (typeof ToastService !== "undefined" && ToastService) {
+                            ToastService.showError(I18n.tr("Failed to load image."));
+                        }
+                        if (window.parentWidget) {
+                            window.parentWidget.closeOverlay();
+                        } else {
+                            window.close();
+                        }
                     }
                 }
 
@@ -2564,7 +2573,7 @@ DankModal {
                         anchors.fill: parent
                         color: Theme.withAlpha(Theme.surfaceContainer, 0.4)
                         z: 99999
-                        visible: window.isImageLoading
+                        visible: window.isImageLoading || opacity > 0.0
                         opacity: window.isImageLoading ? 1.0 : 0.0
                         
                         Behavior on opacity {

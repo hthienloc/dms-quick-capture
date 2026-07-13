@@ -168,7 +168,7 @@ PluginComponent {
                 if (typeof ToastService !== "undefined" && ToastService) {
                     ToastService.showError("Invalid or corrupted image file.");
                 }
-                modal.close();
+                root.closeOverlay();
                 return;
             }
 
@@ -186,7 +186,7 @@ PluginComponent {
                     if (typeof ToastService !== "undefined" && ToastService) {
                         ToastService.showError("Image is too small (" + w + "x" + h + "). Minimum: " + minSize + "px");
                     }
-                    modal.close();
+                    root.closeOverlay();
                     return;
                 }
             }
