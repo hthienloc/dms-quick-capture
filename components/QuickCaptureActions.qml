@@ -10,6 +10,7 @@ QtObject {
     property var parentWidget: null
     property var modal: null
     property var exportAndExecute: null
+    property var floatService: null
 
     signal closeRequested()
 
@@ -295,83 +296,69 @@ QtObject {
             return;
         }
 
+        if (!root.floatService) {
+            notifyError("Float service not available.");
+            return;
+        }
+
+        // Build annotation state from current modal
+        var strokesList = root.modal.strokes || [];
+        var serializedStrokes = [];
+        for (var si = 0; si < strokesList.length; si++) {
+            var s = strokesList[si];
+            var newStroke = {
+                tool: s.tool,
+                color: s.color,
+                width: s.width,
+                points: []
+            };
+            if (s.points) {
+                for (var pj = 0; pj < s.points.length; pj++) {
+                    newStroke.points.push({ x: s.points[pj].x, y: s.points[pj].y });
+                }
+            }
+            StrokeProps.copyStrokeProperties(s, newStroke);
+            serializedStrokes.push(newStroke);
+        }
+
+        var annotationState = {
+            strokes: serializedStrokes,
+            stampCounter: root.modal.stampCounter,
+            cropRect: {
+                x: root.modal.cropRect.x,
+                y: root.modal.cropRect.y,
+                width: root.modal.cropRect.width,
+                height: root.modal.cropRect.height
+            },
+            hasSelection: root.modal.hasSelection,
+            backdropMode: root.modal.backdropMode,
+            backdropSolidColor: root.modal.backdropSolidColor,
+            backdropGradientStart: root.modal.backdropGradientStart,
+            backdropGradientEnd: root.modal.backdropGradientEnd,
+            backdropGradientAngle: root.modal.backdropGradientAngle,
+            backdropPadding: root.modal.backdropPadding,
+            backdropCornerRadius: root.modal.backdropCornerRadius,
+            backdropShadowStrength: root.modal.backdropShadowStrength,
+            backdropAspectRatio: root.modal.backdropAspectRatio,
+            customAspectRatio: root.modal.customAspectRatio,
+            hasUserCustomizedBackdrop: root.modal.hasUserCustomizedBackdrop,
+            autoBackdropGradientStart: root.modal.autoBackdropGradientStart,
+            autoBackdropGradientEnd: root.modal.autoBackdropGradientEnd,
+            autoBackdropSolidColor: root.modal.autoBackdropSolidColor
+        };
+
         withExport((pngPath) => {
             convertIfNeeded(pngPath, (finalPath, originalPng) => {
-                // 1. Serialize strokes
-                let strokesList = root.modal.strokes || [];
-                let serializedStrokes = [];
-                for (let i = 0; i < strokesList.length; i++) {
-                    let s = strokesList[i];
-                    let newStroke = {
-                        tool: s.tool,
-                        color: s.color,
-                        width: s.width,
-                        points: []
-                    };
-                    if (s.points) {
-                        for (let j = 0; j < s.points.length; j++) {
-                            newStroke.points.push({ x: s.points[j].x, y: s.points[j].y });
-                        }
-                    }
-                    StrokeProps.copyStrokeProperties(s, newStroke);
-                    serializedStrokes.push(newStroke);
+                var pluginData = {};
+                if (root.parentWidget && root.parentWidget.pluginData) {
+                    pluginData = root.parentWidget.pluginData;
                 }
 
-                // 2. Serialize other states
-                let stateData = {
-                    strokes: serializedStrokes,
-                    stampCounter: root.modal.stampCounter,
-                    cropRect: {
-                        x: root.modal.cropRect.x,
-                        y: root.modal.cropRect.y,
-                        width: root.modal.cropRect.width,
-                        height: root.modal.cropRect.height
-                    },
-                    hasSelection: root.modal.hasSelection,
-                    backdropMode: root.modal.backdropMode,
-                    backdropSolidColor: root.modal.backdropSolidColor,
-                    backdropGradientStart: root.modal.backdropGradientStart,
-                    backdropGradientEnd: root.modal.backdropGradientEnd,
-                    backdropGradientAngle: root.modal.backdropGradientAngle,
-                    backdropPadding: root.modal.backdropPadding,
-                    backdropCornerRadius: root.modal.backdropCornerRadius,
-                    backdropShadowStrength: root.modal.backdropShadowStrength,
-                    backdropAspectRatio: root.modal.backdropAspectRatio,
-                    customAspectRatio: root.modal.customAspectRatio,
-                    hasUserCustomizedBackdrop: root.modal.hasUserCustomizedBackdrop,
-                    autoBackdropGradientStart: root.modal.autoBackdropGradientStart,
-                    autoBackdropGradientEnd: root.modal.autoBackdropGradientEnd,
-                    autoBackdropSolidColor: root.modal.autoBackdropSolidColor
-                };
+                var tempPaths = [finalPath];
+                if (originalPng) tempPaths.push(originalPng);
 
-                let jsonStr = JSON.stringify(stateData);
-
-                // 3. Write strokes to sidecar file
-                Proc.runCommand("write-strokes", ["python3", "-c", "import sys; open('/tmp/dms_capture_strokes.json', 'w').write(sys.argv[1])", jsonStr], (stdout, writeExitCode) => {
-                    if (writeExitCode !== 0) {
-                        console.error("Failed to write strokes JSON sidecar");
-                    }
-                    
-                    // 4. Float the baked image
-                    const floatDest = "/tmp/dms_capture_float/" + Date.now() + ".png";
-                    const floatBase = floatDest.replace(/\.png$/, "");
-
-                    Proc.runCommand("mkdir-float-dir", ["mkdir", "-p", "/tmp/dms_capture_float"], () => {
-                        Proc.runCommand("cp-float", ["cp", "-f", finalPath, floatDest], () => {
-                            Proc.runCommand("cp-float-bg", ["cp", "-f", "/tmp/dms_capture_bg.png", floatBase + "_bg.png"]);
-                            Proc.runCommand("cp-float-strokes", ["cp", "-f", "/tmp/dms_capture_strokes.json", floatBase + "_strokes.json"]);
-                            Proc.runCommand("float-capture", ["dms", "ipc", "call", "floaty", "floatFromUrl", "file://" + floatDest], (stdout, exitCode) => {
-                                if (exitCode === 0) {
-                                    root.closeRequested();
-                                } else {
-                                    notifyError("Failed to float image (make sure dms-floaty is running).");
-                                }
-                                cleanupTemp(finalPath);
-                                if (originalPng) cleanupTemp(originalPng);
-                            });
-                        });
-                    });
-                });
+                root.floatService.spawnWindow("file://" + finalPath, pluginData, annotationState, tempPaths);
+                root.closeRequested();
             });
         });
     }

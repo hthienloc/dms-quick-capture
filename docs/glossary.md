@@ -63,7 +63,7 @@ Terms used across the plugin, codebase, and settings to avoid ambiguity.
 | **Region capture** | Capture a selected screen region | |
 | **Fullscreen capture** | Capture the entire screen | |
 | **Export** | Save annotated image to file | PNG / WebP / JPEG |
-| **Float** | Detach current edit into an always-on-top window | Requires dms-floaty |
+| **Float** | Detach current edit into an always-on-top window | Managed by FloatService |
 | **Restore from float** | Reopen a floating image for continued editing | |
 | **Copy to clipboard** | Copy annotation to clipboard (no file save) | |
 
@@ -116,7 +116,6 @@ Terms used across the plugin, codebase, and settings to avoid ambiguity.
 |---|---|---|
 | **Modal** | The main capture window (fullscreen) | QuickCaptureModal.qml |
 | **Daemon** | Background service managing lifecycle | QuickCaptureDaemon.qml |
-| **Float window** | Small always-on-top window showing annotation | Managed by dms-floaty |
+| **Float window** | Small always-on-top window showing annotation | Managed by FloatService |
 | **IPC** | Inter-process communication | Uses `dms ipc call` |
-| **Stroke JSON** | File storing all annotations as JSON | `/tmp/dms_capture_strokes.json` |
-| **Sidecar** | JSON file accompanying a float image, stores backdrop + stroke state | |
+| **Stroke state** | Annotations stored per-window in FloatWindow.annotationState | In-memory | |
