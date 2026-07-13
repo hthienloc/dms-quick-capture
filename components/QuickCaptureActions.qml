@@ -301,7 +301,7 @@ QtObject {
             return;
         }
 
-        // Save modal state in FloatService before closing
+        // Build annotation state from current modal
         var strokesList = root.modal.strokes || [];
         var serializedStrokes = [];
         for (var si = 0; si < strokesList.length; si++) {
@@ -321,7 +321,7 @@ QtObject {
             serializedStrokes.push(newStroke);
         }
 
-        root.floatService.saveState({
+        var annotationState = {
             strokes: serializedStrokes,
             stampCounter: root.modal.stampCounter,
             cropRect: {
@@ -345,7 +345,7 @@ QtObject {
             autoBackdropGradientStart: root.modal.autoBackdropGradientStart,
             autoBackdropGradientEnd: root.modal.autoBackdropGradientEnd,
             autoBackdropSolidColor: root.modal.autoBackdropSolidColor
-        });
+        };
 
         withExport((pngPath) => {
             convertIfNeeded(pngPath, (finalPath, originalPng) => {
@@ -354,9 +354,10 @@ QtObject {
                     pluginData = root.parentWidget.pluginData;
                 }
 
-                root.floatService.spawnWindow("file://" + finalPath, pluginData);
-                cleanupTemp(finalPath);
-                if (originalPng) cleanupTemp(originalPng);
+                var tempPaths = [finalPath];
+                if (originalPng) tempPaths.push(originalPng);
+
+                root.floatService.spawnWindow("file://" + finalPath, pluginData, annotationState, tempPaths);
                 root.closeRequested();
             });
         });

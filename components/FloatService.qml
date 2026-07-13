@@ -8,9 +8,8 @@ Item {
 
     property var openWindows: []
     property var floatyComponent: null
-    property var pendingState: null
 
-    signal restoreRequested(string imageSource)
+    signal restoreRequested(string imageSource, var annotationState)
 
     function ensureComponent() {
         if (!root.floatyComponent) {
@@ -19,10 +18,10 @@ Item {
         return root.floatyComponent;
     }
 
-    function spawnWindow(imageSource, pluginData) {
+    function spawnWindow(imageSource, pluginData, annotationState, tempPaths) {
         var component = root.ensureComponent();
         if (!component || component.status === Component.Error) {
-            console.error("FloatService: failed to load FloatyWindow component", component ? component.errorString() : "null");
+            console.error("FloatService: failed to load FloatWindow component", component ? component.errorString() : "null");
             return;
         }
 
@@ -30,13 +29,18 @@ Item {
             var win = component.createObject(root, {
                 imageSource: imageSource,
                 pluginData: pluginData || {},
-                plugin: root
+                plugin: root,
+                annotationState: annotationState || null,
+                tempPaths: tempPaths || []
             });
 
             if (win !== null) {
                 root.openWindows = [...root.openWindows, win];
                 win.closing.connect(function() {
                     root.openWindows = root.openWindows.filter(function(w) { return w !== win; });
+                    for (var i = 0; i < (tempPaths || []).length; i++) {
+                        Proc.runCommand("float-cleanup-temp", ["rm", "-f", tempPaths[i]]);
+                    }
                 });
             } else {
                 ToastService.showError("Failed to create float window.");
@@ -71,11 +75,13 @@ Item {
         }
     }
 
-    function saveState(state) {
-        root.pendingState = state;
-    }
-
     function requestRestore(imageSource) {
-        root.restoreRequested(imageSource);
+        for (var i = 0; i < root.openWindows.length; i++) {
+            if (root.openWindows[i].imageSource === imageSource) {
+                root.restoreRequested(imageSource, root.openWindows[i].annotationState);
+                return;
+            }
+        }
+        root.restoreRequested(imageSource, null);
     }
 }

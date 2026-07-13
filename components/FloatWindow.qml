@@ -28,6 +28,8 @@ PanelWindow {
     property string spawnPosition: "bottom-left"
     property int maxHeight: 0
     property var plugin: null
+    property var annotationState: null
+    property var tempPaths: []
 
     readonly property real edgeSpacing: pluginData.edgeSpacing ?? Appearance.spacing.normal
 
@@ -54,7 +56,7 @@ PanelWindow {
     property int yPos: 400
 
     anchors { top: true; left: true }
-    WlrLayershell.namespace: "dms-floaty"
+    WlrLayershell.namespace: "dms-quick-capture-float"
     WlrLayershell.layer: {
         if (window.isPinned) {
             return isTop ? WlrLayershell.Overlay : WlrLayershell.Top;
@@ -69,9 +71,8 @@ PanelWindow {
         top: yPos
     }
 
-    // Dynamic width/height handled by states in container
-    implicitWidth: targetWidth
-    implicitHeight: targetHeight
+    implicitWidth: isMinimized ? minimizedSize : targetWidth
+    implicitHeight: isMinimized ? minimizedSize : targetHeight
 
     Timer {
         id: minimizeTimer
@@ -187,7 +188,9 @@ PanelWindow {
         }
     }
 
-    readonly property int minimizedSize: 40
+    readonly property int minimizedSize: pluginData.minimizedSize ?? 40
+    readonly property int resizeMin: pluginData.resizeMin ?? 100
+    readonly property int resizeMax: pluginData.resizeMax ?? 2000
 
     function close() {
         opacityToClose.start();
@@ -364,6 +367,10 @@ PanelWindow {
                 if (status === AnimatedImage.Ready) {
                     updateSize();
                     window.imageLoaded = true;
+                    for (var i = 0; i < window.tempPaths.length; i++) {
+                        Proc.runCommand("float-cleanup-temp", ["rm", "-f", window.tempPaths[i]]);
+                    }
+                    window.tempPaths = [];
                 } else if (status === AnimatedImage.Error) {
                     ToastService.showError("Failed to load image: " + window.imageSource);
                     window.closing();
@@ -395,7 +402,7 @@ PanelWindow {
                 if (img.implicitWidth <= 0 || img.implicitHeight <= 0) return;
                 let b = window.borderWidth;
                 let ratio = img.implicitWidth / img.implicitHeight;
-                let newWidth = Math.max(100, Math.min(2000, startWidth * scale));
+                let newWidth = Math.max(window.resizeMin, Math.min(window.resizeMax, startWidth * scale));
                 let newHeight = ((newWidth - 2 * b) / ratio) + 2 * b;
 
                 window.targetWidth = Math.round(newWidth);
@@ -454,7 +461,7 @@ PanelWindow {
                 let oldHeight = window.targetHeight;
                 let b = window.borderWidth;
                 let ratio = img.implicitWidth / img.implicitHeight;
-                let newWidth = Math.round(Math.max(100, Math.min(2000, oldWidth * scaleFactor)));
+                let newWidth = Math.round(Math.max(window.resizeMin, Math.min(window.resizeMax, oldWidth * scaleFactor)));
                 let newHeight = Math.round(((newWidth - 2 * b) / ratio) + 2 * b);
 
                 // Directional resize logic:
@@ -486,7 +493,6 @@ PanelWindow {
             State {
                 name: "minimized"
                 when: window.isMinimized
-                PropertyChanges { target: window; implicitWidth: minimizedSize; implicitHeight: minimizedSize }
                 PropertyChanges { target: container; radius: minimizedSize / 2; color: Theme.primary; border.width: 0; opacity: 0.5 }
                 PropertyChanges { target: img; opacity: 0 }
                 PropertyChanges { target: cloudIcon; opacity: 1 }
@@ -518,12 +524,8 @@ PanelWindow {
                         }
                     }
                     PropertyAction { 
-                        target: window
-                        properties: "implicitWidth,implicitHeight"
-                    }
-                    PropertyAction { 
                         target: container
-                        properties: "width,height,radius,color,border.width"
+                        properties: "radius,color,border.width"
                     }
                     PropertyAction { 
                         targets: [img, cloudIcon]
@@ -563,12 +565,8 @@ PanelWindow {
                         }
                     }
                     PropertyAction { 
-                        target: window
-                        properties: "implicitWidth,implicitHeight"
-                    }
-                    PropertyAction { 
                         target: container
-                        properties: "width,height,radius,color,border.width"
+                        properties: "radius,color,border.width"
                     }
                     PropertyAction { 
                         targets: [img, cloudIcon]
@@ -584,5 +582,6 @@ PanelWindow {
                     }
                 }
             }
-        ]    }
+        ]
+    }
 }
