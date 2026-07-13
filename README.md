@@ -120,7 +120,10 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 ## Pin-to-Desktop (Float)
 
 - **Ctrl + F** in the annotator to export and float the image instantly.
-- Left-click on any floating image to return it to the annotator for further editing.
+- **Left-click** the floating image to return it to the annotator for further editing.
+- **Right-click** the floating image to minimize it into a small cloud icon.
+- **Hover** the cloud icon to restore the floating image.
+- **Middle-click** the floating image to close it.
 
 ## IPC Commands
 
