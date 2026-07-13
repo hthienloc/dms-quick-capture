@@ -159,8 +159,6 @@ PluginComponent {
     function validateAndOpenCapturedImage(path) {
         modal.isImageValidated = false;
         modal.isQmlImageLoaded = false;
-        modal.shouldBeVisible = true;
-        modal.openCentered();
 
         Proc.runCommand("validate-image", ["file", "-b", path], function(stdout, exitCode) {
             const output = stdout.toLowerCase();
@@ -168,7 +166,6 @@ PluginComponent {
                 if (typeof ToastService !== "undefined" && ToastService) {
                     ToastService.showError("Invalid or corrupted image file.");
                 }
-                root.closeOverlay();
                 return;
             }
 
@@ -186,12 +183,13 @@ PluginComponent {
                     if (typeof ToastService !== "undefined" && ToastService) {
                         ToastService.showError("Image is too small (" + w + "x" + h + "). Minimum: " + minSize + "px");
                     }
-                    root.closeOverlay();
                     return;
                 }
             }
 
             modal.isImageValidated = true;
+            modal.shouldBeVisible = true;
+            modal.openCentered();
         });
     }
 
