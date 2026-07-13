@@ -73,7 +73,7 @@ Pressing these keys changes the active tool:
 - `Ctrl + C`: Copy the current canvas to the clipboard.
 - `Ctrl + S`: Save the canvas directly as a file.
 - `Ctrl + A`: Copy to clipboard and save as file simultaneously.
-- `Ctrl + F`: Float image (requires [dms-floaty](https://github.com/hthienloc/dms-floaty)).
+- `Ctrl + F`: Float image to always-on-top window.
 - `Ctrl + X`: Interactive canvas crop.
 
 ### Interactive Modifiers

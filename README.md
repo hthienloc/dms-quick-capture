@@ -112,17 +112,15 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 | `Ctrl + S` | Save to file |
 | `Ctrl + C` | Copy to clipboard |
 | `Ctrl + A` | Copy & Save |
-| `Ctrl + F` | Float image (requires dms-floaty) |
+| `Ctrl + F` | Float image to always-on-top window |
 | `Ctrl + X` | Crop / Resize |
 | `Ctrl + 1 – 4` | Select color slots 1 – 4 |
 | `Ctrl + Q – R` | Select color slots 5 – 8 (Q, W, E, R) |
 
 ## Pin-to-Desktop (Float)
 
-Requires the companion [dms-floaty](https://github.com/hthienloc/dms-floaty) plugin.
-
 - **Ctrl + F** in the annotator to export and float the image instantly.
-- Left-click on any floating image in Floaty to return it to the annotator for further editing.
+- Left-click on any floating image to return it to the annotator for further editing.
 
 ## IPC Commands
 

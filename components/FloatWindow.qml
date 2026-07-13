@@ -33,7 +33,7 @@ PanelWindow {
 
     onPluginDataChanged: {
         if (pluginData) {
-            spawnPosition = pluginData.spawnPosition || "center";
+            spawnPosition = pluginData.spawnPosition || "bottom-left";
             maxHeight = pluginData.maxHeight || 0;
             updateSize();
         }
