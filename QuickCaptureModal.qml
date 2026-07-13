@@ -1102,9 +1102,12 @@ DankModal {
     property rect ocrRect: Qt.rect(0, 0, 0, 0)
     property var exportCallback: null
 
+    property var restoreState: null
+
     FloatService {
         id: floatService
-        onRestoreRequested: function(imageSource) {
+        onRestoreRequested: function(imageSource, annotationState) {
+            window.restoreState = annotationState;
             window.shouldBeVisible = true;
             window.openCentered();
         }
@@ -1668,10 +1671,10 @@ DankModal {
         window.hasSelection = false;
         window.activeHandle = "none";
 
-        // Restore state from FloatService (in-memory) if available
-        if (floatService.pendingState) {
-            var data = floatService.pendingState;
-            if (data && data.strokes) {
+        // Restore state from FloatService if returning from float window
+        if (window.restoreState) {
+            var data = window.restoreState;
+            if (data.strokes) {
                 var restoredStrokes = [];
                 for (var rsi = 0; rsi < data.strokes.length; rsi++) {
                     var rs = data.strokes[rsi];
@@ -1691,14 +1694,14 @@ DankModal {
                 }
                 window.strokes = restoredStrokes;
             }
-            if (data && data.stampCounter !== undefined) {
+            if (data.stampCounter !== undefined) {
                 window.stampCounter = data.stampCounter;
             }
-            if (data && data.cropRect) {
+            if (data.cropRect) {
                 window.cropRect = Qt.rect(data.cropRect.x, data.cropRect.y, data.cropRect.width, data.cropRect.height);
                 window.hasSelection = (data.cropRect.width > 0 && data.cropRect.height > 0);
             }
-            if (data && data.backdropMode !== undefined) {
+            if (data.backdropMode !== undefined) {
                 window.backdropMode = data.backdropMode;
                 window.backdropSolidColor = data.backdropSolidColor;
                 window.backdropGradientStart = data.backdropGradientStart;
@@ -1716,7 +1719,7 @@ DankModal {
                 window.autoBackdropSolidColor = data.autoBackdropSolidColor;
             }
             if (window.activeCanvas) window.activeCanvas.requestPaint();
-            floatService.pendingState = null;
+            window.restoreState = null;
         }
 
         Qt.callLater(() => {

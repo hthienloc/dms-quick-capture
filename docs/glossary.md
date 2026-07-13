@@ -118,4 +118,4 @@ Terms used across the plugin, codebase, and settings to avoid ambiguity.
 | **Daemon** | Background service managing lifecycle | QuickCaptureDaemon.qml |
 | **Float window** | Small always-on-top window showing annotation | Managed by FloatService |
 | **IPC** | Inter-process communication | Uses `dms ipc call` |
-| **Stroke state** | Annotations stored in FloatService.pendingState | In-memory | |
+| **Stroke state** | Annotations stored per-window in FloatWindow.annotationState | In-memory | |
