@@ -16,7 +16,6 @@ PluginComponent {
     property bool isCapturing: false
     readonly property string captureMode: (pluginData.captureMode || "region")
     property string activeIpcMode: ""
-    property string resolvedDmsPath: "dms"
     property bool restoringFromFloat: false
     property bool isDownloading: false
     // Exposed so the widget surface can read annotation state without accessing internal modal id
@@ -31,7 +30,7 @@ PluginComponent {
         const mode = root.activeIpcMode !== "" ? root.activeIpcMode : root.captureMode;
         const format = "png";
         const cursorVal = pluginData.includeCursor ? "on" : "off";
-        const args = [root.resolvedDmsPath, "screenshot", mode, "--no-clipboard", "--dir", "/tmp", "--filename", "dms_capture_bg.png", "--format", format, "--cursor", cursorVal, "--no-notify"];
+        const args = ["dms", "screenshot", mode, "--no-clipboard", "--dir", "/tmp", "--filename", "dms_capture_bg.png", "--format", format, "--cursor", cursorVal, "--no-notify"];
 
         if (mode === "region" && pluginData.skipConfirm !== false) {
             args.push("--no-confirm");
@@ -327,21 +326,6 @@ PluginComponent {
             newInstances[pluginId] = root;
             pluginService.pluginInstances = newInstances;
         }
-
-        // Resolve dms path once at startup
-        Proc.runCommand("check-dms-local", ["test", "-x", "/usr/local/bin/dms"], (_, exitCode) => {
-            if (exitCode === 0) {
-                root.resolvedDmsPath = "/usr/local/bin/dms";
-            } else {
-                Proc.runCommand("check-dms-usr", ["test", "-x", "/usr/bin/dms"], (_, exitCodeUsr) => {
-                    if (exitCodeUsr === 0) {
-                        root.resolvedDmsPath = "/usr/bin/dms";
-                    } else {
-                        root.resolvedDmsPath = "dms";
-                    }
-                });
-            }
-        });
     }
 
     Component.onDestruction: {
