@@ -1658,6 +1658,8 @@ DankModal {
         window.recordPresetUsage({ tool: startTool, color: startColor, thickness: startThickness });
 
         window.strokes = [];
+        window.selectedStroke = null;
+        window.copiedStroke = null;
         window.stampCounter = 1;
         window.bgImageSource = "";
         if (window.restoreSource) {
@@ -3038,6 +3040,8 @@ DankModal {
     }
 
     function discardAndClose() {
+        window.selectedStroke = null;
+        window.copiedStroke = null;
         window.close();
     }
 }
