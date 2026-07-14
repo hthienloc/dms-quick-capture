@@ -32,10 +32,13 @@ Item {
         }
         StyledText {
             text: {
-                if (control.backdropAspectRatio === "auto") return I18n.tr("AUTO");
-                if (control.backdropAspectRatio === "custom") return control.customAspectRatio.toFixed(2);
-                return control.backdropAspectRatio;
+                var t;
+                if (control.backdropAspectRatio === "auto") t = I18n.tr("AUTO");
+                else if (control.backdropAspectRatio === "custom") t = control.customAspectRatio.toFixed(2);
+                else t = control.backdropAspectRatio;
+                return String(t).padStart(5);
             }
+            font.family: "monospace"
             font.pixelSize: compact ? tc.fontSizeCompact : Theme.fontSizeSmall
             color: Theme.surfaceText
             anchors.verticalCenter: parent.verticalCenter

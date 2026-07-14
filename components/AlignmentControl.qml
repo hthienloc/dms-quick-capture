@@ -35,7 +35,8 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
         }
         StyledText {
-            text: control._labelMap[control.backdropAlignment] ?? "C"
+            text: (control._labelMap[control.backdropAlignment] ?? "C").padEnd(2)
+            font.family: "monospace"
             font.pixelSize: compact ? tc.fontSizeCompact : Theme.fontSizeSmall
             color: Theme.surfaceText
             anchors.verticalCenter: parent.verticalCenter

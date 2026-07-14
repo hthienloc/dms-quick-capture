@@ -472,7 +472,8 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         StyledText {
-                            text: root.backdropPadding + "px"
+                            text: String(root.backdropPadding).padStart(3) + "px"
+                            font.family: "monospace"
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -507,7 +508,8 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         StyledText {
-                            text: root.backdropCornerRadius + "px"
+                            text: String(root.backdropCornerRadius).padStart(3) + "px"
+                            font.family: "monospace"
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -542,7 +544,8 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         StyledText {
-                            text: root.backdropShadowStrength + "%"
+                            text: String(root.backdropShadowStrength).padStart(3) + "%"
+                            font.family: "monospace"
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -578,7 +581,8 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         StyledText {
-                            text: root.backdropGradientAngle + "°"
+                            text: String(root.backdropGradientAngle).padStart(3) + "°"
+                            font.family: "monospace"
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -619,13 +623,15 @@ Rectangle {
             }
             
             Rectangle { 
-                visible: root.backdropMode !== "none"
+                opacity: root.backdropMode !== "none" ? 1 : 0
+                enabled: root.backdropMode !== "none"
                 width: tc.separatorThickness; height: tc.separatorLength; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter 
             }
             
             // Colors (Solid or Gradient)
             Row {
-                visible: root.backdropMode !== "none"
+                opacity: root.backdropMode !== "none" ? 1 : 0
+                enabled: root.backdropMode !== "none"
                 spacing: Theme.spacingS
                 anchors.verticalCenter: parent.verticalCenter
                                  BackdropColorSelectors {
@@ -713,7 +719,8 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         StyledText {
-                            text: root.backdropPadding
+                            text: String(root.backdropPadding).padStart(3)
+                            font.family: "monospace"
                             font.pixelSize: tc.fontSizeCompact
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -747,7 +754,8 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         StyledText {
-                            text: root.backdropCornerRadius
+                            text: String(root.backdropCornerRadius).padStart(3)
+                            font.family: "monospace"
                             font.pixelSize: tc.fontSizeCompact
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -781,7 +789,8 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         StyledText {
-                            text: root.backdropShadowStrength
+                            text: String(root.backdropShadowStrength).padStart(3)
+                            font.family: "monospace"
                             font.pixelSize: tc.fontSizeCompact
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -816,7 +825,8 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         StyledText {
-                            text: root.backdropGradientAngle
+                            text: String(root.backdropGradientAngle).padStart(3)
+                            font.family: "monospace"
                             font.pixelSize: tc.fontSizeCompact
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -857,13 +867,15 @@ Rectangle {
             }
             
             Rectangle { 
-                visible: root.backdropMode !== "none"
+                opacity: root.backdropMode !== "none" ? 1 : 0
+                enabled: root.backdropMode !== "none"
                 width: tc.separatorLength; height: tc.separatorThickness; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter 
             }
             
             // Colors (Solid or Gradient)
             Column {
-                visible: root.backdropMode !== "none"
+                opacity: root.backdropMode !== "none" ? 1 : 0
+                enabled: root.backdropMode !== "none"
                 spacing: Theme.spacingS
                 anchors.horizontalCenter: parent.horizontalCenter
                                  BackdropColorSelectors {
