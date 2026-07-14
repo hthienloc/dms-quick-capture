@@ -473,6 +473,7 @@ Rectangle {
                         }
                         StyledText {
                             text: root.backdropPadding + "px"
+                            width: 40; horizontalAlignment: Text.AlignRight
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -508,6 +509,7 @@ Rectangle {
                         }
                         StyledText {
                             text: root.backdropCornerRadius + "px"
+                            width: 40; horizontalAlignment: Text.AlignRight
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -543,6 +545,7 @@ Rectangle {
                         }
                         StyledText {
                             text: root.backdropShadowStrength + "%"
+                            width: 40; horizontalAlignment: Text.AlignRight
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -579,6 +582,7 @@ Rectangle {
                         }
                         StyledText {
                             text: root.backdropGradientAngle + "°"
+                            width: 40; horizontalAlignment: Text.AlignRight
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -619,13 +623,15 @@ Rectangle {
             }
             
             Rectangle { 
-                visible: root.backdropMode !== "none"
+                opacity: root.backdropMode !== "none" ? 1 : 0
+                enabled: root.backdropMode !== "none"
                 width: tc.separatorThickness; height: tc.separatorLength; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter 
             }
             
             // Colors (Solid or Gradient)
             Row {
-                visible: root.backdropMode !== "none"
+                opacity: root.backdropMode !== "none" ? 1 : 0
+                enabled: root.backdropMode !== "none"
                 spacing: Theme.spacingS
                 anchors.verticalCenter: parent.verticalCenter
                                  BackdropColorSelectors {
@@ -714,6 +720,7 @@ Rectangle {
                         }
                         StyledText {
                             text: root.backdropPadding
+                            width: tc.btnSize; horizontalAlignment: Text.AlignRight
                             font.pixelSize: tc.fontSizeCompact
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -748,6 +755,7 @@ Rectangle {
                         }
                         StyledText {
                             text: root.backdropCornerRadius
+                            width: tc.btnSize; horizontalAlignment: Text.AlignRight
                             font.pixelSize: tc.fontSizeCompact
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -782,6 +790,7 @@ Rectangle {
                         }
                         StyledText {
                             text: root.backdropShadowStrength
+                            width: tc.btnSize; horizontalAlignment: Text.AlignRight
                             font.pixelSize: tc.fontSizeCompact
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -817,6 +826,7 @@ Rectangle {
                         }
                         StyledText {
                             text: root.backdropGradientAngle
+                            width: tc.btnSize; horizontalAlignment: Text.AlignRight
                             font.pixelSize: tc.fontSizeCompact
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -857,13 +867,15 @@ Rectangle {
             }
             
             Rectangle { 
-                visible: root.backdropMode !== "none"
+                opacity: root.backdropMode !== "none" ? 1 : 0
+                enabled: root.backdropMode !== "none"
                 width: tc.separatorLength; height: tc.separatorThickness; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter 
             }
             
             // Colors (Solid or Gradient)
             Column {
-                visible: root.backdropMode !== "none"
+                opacity: root.backdropMode !== "none" ? 1 : 0
+                enabled: root.backdropMode !== "none"
                 spacing: Theme.spacingS
                 anchors.horizontalCenter: parent.horizontalCenter
                                  BackdropColorSelectors {
