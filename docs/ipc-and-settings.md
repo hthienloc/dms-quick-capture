@@ -14,28 +14,37 @@ dms ipc call quickCapture <command> [arg]
 
 ### Supported Commands
 
-| Command | Argument | Description |
+All commands accept an `action` parameter (`edit` / `float`) — use `float` to spawn an always-on-top window instead of the editor.
+
+| Command | Arguments | Description |
 | :--- | :--- | :--- |
-| `screenshot` | `default`, `region`, `full`, `all`, `output`, `window`, `last` | Triggers a screenshot capture using the specified mode. |
-| `selectFile` | *(none)* | Opens a file picker dialog to load an image for annotation. |
-| `fromClipboard` | *(none)* | Imports an image directly from the system clipboard. |
-| `openImage` | `absolute_file_path` | Opens a specific local image file in the annotator. |
-| `close` | *(none)* | Immediately closes the annotator interface. |
+| `screenshot` | `mode` (`default`, `region`, `full`, `all`, `output`, `window`, `last`) | Triggers a screenshot. |
+| `selectFile` | *(none)* | Opens file picker. |
+| `fromClipboard` | *(none)* | Imports image from clipboard. |
+| `openImage` | `path` | Opens a local image file. |
+| `close` | *(none)* | Closes the annotator. |
+
+```bash
+dms ipc call quickCapture screenshot region edit    # open editor
+dms ipc call quickCapture screenshot region float   # float directly
+```
 
 ### Integration Examples
 
 #### Hyprland Keybinds (`hyprland.conf`)
 ```ini
-bind = , Print, exec, dms ipc call quickCapture screenshot region
-bind = Shift, Print, exec, dms ipc call quickCapture screenshot full
-bind = Control, Print, exec, dms ipc call quickCapture fromClipboard
+bind = , Print, exec, dms ipc call quickCapture screenshot region edit
+bind = Shift, Print, exec, dms ipc call quickCapture screenshot full edit
+bind = Control, Print, exec, dms ipc call quickCapture fromClipboard edit
+# Float without editor:
+# bind = , Print, exec, dms ipc call quickCapture screenshot region float
 ```
 
 #### Niri Window Manager Config (`config.kdl`)
 ```kdl
 binds {
-    Print { spawn "dms" "ipc" "call" "quickCapture" "screenshot" "region"; }
-    Meta+Print { spawn "dms" "ipc" "call" "quickCapture" "screenshot" "window"; }
+    Print { spawn "dms" "ipc" "call" "quickCapture" "screenshot" "region" "edit"; }
+    Meta+Print { spawn "dms" "ipc" "call" "quickCapture" "screenshot" "window" "edit"; }
 }
 ```
 
