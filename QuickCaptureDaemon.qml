@@ -150,7 +150,7 @@ PluginComponent {
             }
 
             if (w > 0 && h > 0) {
-                const minSize = 16;
+                const minSize = pluginData.minImageSize ?? 16;
                 if (w < minSize || h < minSize) {
                     if (typeof ToastService !== "undefined" && ToastService) {
                         ToastService.showError("Image is too small (" + w + "x" + h + "). Minimum: " + minSize + "px");

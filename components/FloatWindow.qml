@@ -17,6 +17,7 @@ PanelWindow {
     property string imageSource: ""
     property bool isPinned: true 
     property int initialWidth: 400
+    readonly property int effectiveInitialWidth: pluginData.initialWidth ?? initialWidth
     
     // Settings from plugin
     property var pluginData: ({})
@@ -42,7 +43,7 @@ PanelWindow {
     }
     
     property bool isMinimized: false
-    property real targetWidth: initialWidth
+    property real targetWidth: effectiveInitialWidth
     property real targetHeight: 1
     property bool imageLoaded: false
     property bool manuallyMoved: false
@@ -285,7 +286,7 @@ PanelWindow {
         let b = window.borderWidth;
         
         // Calculate dimensions so the INNER area matches the aspect ratio
-        let w = initialWidth;
+        let w = effectiveInitialWidth;
         let h = ((w - 2 * b) / ratio) + 2 * b;
 
         if (maxHeight > 0 && h > maxHeight) {

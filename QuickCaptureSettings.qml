@@ -477,6 +477,7 @@ PluginSettings {
                     { label: I18n.tr("Shapes"),        icon: "category"           },
                     { label: I18n.tr("Backdrop"),      icon: "wallpaper"          },
                     { label: I18n.tr("Watermark"),     icon: "branding_watermark" },
+                    { label: I18n.tr("Float Window"),  icon: "open_in_new"        },
                     { label: I18n.tr("Presets"),       icon: "settings"           },
                     { label: I18n.tr("Radial"),        icon: "mouse"              },
                     { label: I18n.tr("Shortcuts"),     icon: "keyboard"           },
@@ -2165,9 +2166,169 @@ PluginSettings {
         }
     }
 
-    // ── Tab 11: Presets ──────────────────────────────────────────────────────────
+    // ── Tab 11: Float Window ─────────────────────────────────────────────────────
     Item {
         visible: tabBar.currentIndex === 11
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        implicitHeight: floatTabCol.implicitHeight
+        Column {
+            id: floatTabCol
+            width: parent.width
+            spacing: Theme.spacingM
+            SettingsCard {
+                id: floatCard
+                SectionTitle {
+                    text: I18n.tr("Float Window")
+                    icon: "open_in_new"
+                    showReset: autoMinimize.isDirty || minimizeDelay.isDirty || initialWidth.isDirty || maxHeight.isDirty || borderWidth.isDirty || borderColor.isDirty || transparentBg.isDirty || spawnPosition.isDirty || edgeSpacing.isDirty || autoTiling.isDirty
+                    onResetClicked: {
+                        autoMinimize.resetToDefault();
+                        minimizeDelay.resetToDefault();
+                        initialWidth.resetToDefault();
+                        maxHeight.resetToDefault();
+                        borderWidth.resetToDefault();
+                        borderColor.resetToDefault();
+                        transparentBg.resetToDefault();
+                        spawnPosition.resetToDefault();
+                        edgeSpacing.resetToDefault();
+                        autoTiling.resetToDefault();
+                    }
+                }
+
+                ToggleSettingPlus {
+                    id: autoMinimize
+                    settingKey: "autoMinimize"
+                    label: I18n.tr("Auto-minimize")
+                    description: I18n.tr("Automatically minimize the float window after a delay")
+                    defaultValue: false
+                }
+
+                SliderSettingPlus {
+                    id: minimizeDelay
+                    settingKey: "minimizeDelay"
+                    label: I18n.tr("Minimize Delay")
+                    defaultValue: 3000
+                    minimum: 500
+                    maximum: 10000
+                    unit: "ms"
+                    leftLabel: "500"
+                    rightLabel: "10000"
+                    visible: autoMinimize.value
+                    height: visible ? implicitHeight : 0
+                }
+
+                Separator {}
+
+                SliderSettingPlus {
+                    id: initialWidth
+                    settingKey: "initialWidth"
+                    label: I18n.tr("Initial Width")
+                    defaultValue: 400
+                    minimum: 100
+                    maximum: 2000
+                    unit: "px"
+                    leftLabel: "100"
+                    rightLabel: "2000"
+                }
+
+                SliderSettingPlus {
+                    id: maxHeight
+                    settingKey: "maxHeight"
+                    label: I18n.tr("Max Height (0 = no limit)")
+                    defaultValue: 0
+                    minimum: 0
+                    maximum: 2000
+                    unit: "px"
+                    leftLabel: "0"
+                    rightLabel: "2000"
+                }
+
+                Separator {}
+
+                SliderSettingPlus {
+                    id: borderWidth
+                    settingKey: "borderWidth"
+                    label: I18n.tr("Border Width")
+                    defaultValue: 2
+                    minimum: 0
+                    maximum: 20
+                    unit: "px"
+                    leftLabel: "0"
+                    rightLabel: "20"
+                }
+
+                SelectionSettingPlus {
+                    id: borderColor
+                    settingKey: "borderColor"
+                    label: I18n.tr("Border Color")
+                    options: [
+                        { label: I18n.tr("Outline Variant"), value: "outlineVariant" },
+                        { label: I18n.tr("Primary"), value: "primary" },
+                        { label: I18n.tr("Surface Container Highest"), value: "surfaceContainerHighest" },
+                        { label: I18n.tr("Transparent"), value: "transparent" }
+                    ]
+                    defaultValue: "outlineVariant"
+                }
+
+                Separator {}
+
+                ToggleSettingPlus {
+                    id: transparentBg
+                    settingKey: "transparentBg"
+                    label: I18n.tr("Transparent Background")
+                    description: I18n.tr("Show only the image on a transparent background")
+                    defaultValue: true
+                }
+
+                Separator {}
+
+                SelectionSettingPlus {
+                    id: spawnPosition
+                    settingKey: "spawnPosition"
+                    label: I18n.tr("Spawn Position")
+                    options: [
+                        { label: I18n.tr("Bottom Left"), value: "bottom-left" },
+                        { label: I18n.tr("Bottom Right"), value: "bottom-right" },
+                        { label: I18n.tr("Top Left"), value: "top-left" },
+                        { label: I18n.tr("Top Right"), value: "top-right" },
+                        { label: I18n.tr("Bottom"), value: "bottom" },
+                        { label: I18n.tr("Top"), value: "top" },
+                        { label: I18n.tr("Left"), value: "left" },
+                        { label: I18n.tr("Right"), value: "right" },
+                        { label: I18n.tr("Center"), value: "center" }
+                    ]
+                    defaultValue: "bottom-left"
+                }
+
+                SliderSettingPlus {
+                    id: edgeSpacing
+                    settingKey: "edgeSpacing"
+                    label: I18n.tr("Edge Spacing")
+                    defaultValue: 8
+                    minimum: 0
+                    maximum: 100
+                    unit: "px"
+                    leftLabel: "0"
+                    rightLabel: "100"
+                }
+
+                Separator {}
+
+                ToggleSettingPlus {
+                    id: autoTiling
+                    settingKey: "autoTiling"
+                    label: I18n.tr("Auto-tiling")
+                    description: I18n.tr("Automatically stack windows to avoid overlap")
+                    defaultValue: true
+                }
+            }
+        }
+    }
+
+    // ── Tab 12: Presets ───────────────────────────────────────────────────────────
+    Item {
+        visible: tabBar.currentIndex === 12
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: presetsTabCol.implicitHeight
@@ -2794,9 +2955,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 12: Radial ───────────────────────────────────────────────────────────
+    // ── Tab 13: Radial ───────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 12
+        visible: tabBar.currentIndex === 13
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: radialBehaviorsTabCol.implicitHeight
@@ -2870,9 +3031,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 13: Shortcuts ────────────────────────────────────────────────────────
+    // ── Tab 14: Shortcuts ────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 13
+        visible: tabBar.currentIndex === 14
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: shortcutsTabCol.implicitHeight
@@ -2966,9 +3127,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 14: Help ─────────────────────────────────────────────────────────────
+    // ── Tab 15: Help ─────────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 14
+        visible: tabBar.currentIndex === 15
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: helpTabCol.implicitHeight
