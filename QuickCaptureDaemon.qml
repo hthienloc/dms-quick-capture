@@ -19,7 +19,6 @@ PluginComponent {
     property string activeIpcMode: ""
     property bool isDownloading: false
     property string currentCapturePath: ""
-    property string captureAction: "edit" // "edit" | "float"
     // Exposed so the widget surface can read annotation state without accessing internal modal id
     readonly property bool isAnnotating: modal.shouldBeVisible
 
@@ -52,7 +51,10 @@ PluginComponent {
     }
 
     function triggerCapture(mode) {
-        // Strictly validate mode against allowlist to prevent command injection
+        root.triggerCaptureWithAction(mode, "edit");
+    }
+
+    function triggerCaptureWithAction(mode, action) {
         const allowedModes = ["region", "window", "full", "output", ""];
         if (mode && !allowedModes.includes(mode)) {
             console.warn("Invalid screenshot mode rejected: " + mode);
@@ -60,6 +62,7 @@ PluginComponent {
         }
 
         root.activeIpcMode = mode || "";
+        captureDelayTimer.captureAction = action || "edit";
         root.startCaptureAfterDelay();
     }
 
@@ -78,6 +81,7 @@ PluginComponent {
     }
 
     function startActualCapture() {
+        const action = captureDelayTimer.captureAction || "edit";
         root.currentCapturePath = root.capturePath();
         const filename = root.currentCapturePath.split("/").pop();
         const cmdStr = root.screenshotArgs(filename).map(arg => "'" + arg.replace(/'/g, "'\\''") + "'").join(" ") + " 2>&1";
@@ -87,16 +91,13 @@ PluginComponent {
                     root.isCapturing = false;
                     root.activeIpcMode = "";
                     if (fileExists === 0) {
-                        root.validateAndOpenCapturedImage(root.currentCapturePath);
-                    } else {
-                        root.captureAction = "edit";
+                        root.validateAndOpenCapturedImage(root.currentCapturePath, action);
                     }
                 });
             } else {
                 const failMode = root.screenshotMode();
                 root.isCapturing = false;
                 root.activeIpcMode = "";
-                root.captureAction = "edit";
                 if (typeof ToastService !== "undefined" && ToastService) {
                     const errorMsg = (stdout && stdout.trim()) ? stdout.trim() : I18n.tr("Screenshot failed (mode: %1).").arg(failMode);
                     ToastService.showError(errorMsg);
@@ -112,25 +113,34 @@ PluginComponent {
     }
 
     function selectImageAndAnnotate() {
+        root.selectImageAndAnnotateWithAction("edit");
+    }
+
+    function selectImageAndAnnotateWithAction(action) {
         root.closeControlCenter();
+        fileBrowserModal.captureAction = action || "edit";
         fileBrowserModal.open();
     }
 
     function fromClipboard() {
+        root.fromClipboardWithAction("edit");
+    }
+
+    function fromClipboardWithAction(action) {
         root.closeControlCenter();
         root.currentCapturePath = root.capturePath();
         const checkCmd = "if dms cl paste > " + root.currentCapturePath + " 2>/dev/null && file -b " + root.currentCapturePath + " | grep -qi \"image\"; then echo \"IMAGE\"; else TEXT=$(dms cl paste 2>/dev/null); if [ -n \"$TEXT\" ]; then echo \"TEXT:$TEXT\"; else echo \"EMPTY\"; fi; fi";
         Proc.runCommand("smart-paste", ["sh", "-c", checkCmd], (stdout, exitCode) => {
             const output = stdout.trim();
             if (output === "IMAGE") {
-                root.validateAndOpenCapturedImage(root.currentCapturePath);
+                root.validateAndOpenCapturedImage(root.currentCapturePath, action);
             } else if (output.startsWith("TEXT:")) {
                 let text = output.substring(5).trim();
                 if (text === "") {
                     if (typeof ToastService !== "undefined" && ToastService)
                         ToastService.showError("Clipboard text is not a valid URL or path.");
                 } else {
-                    root.loadImageFromUri(text);
+                    root.loadImageFromUriWithAction(text, action);
                 }
             } else {
                 if (typeof ToastService !== "undefined" && ToastService)
@@ -146,13 +156,10 @@ PluginComponent {
     }
 
     function openImageAsFloat(path) {
-        const action = root.captureAction;
-        root.captureAction = "edit";
-        if (action !== "float") return;
         floatServiceItem.spawnWindow("file://" + path, pluginData, null, [path]);
     }
 
-    function validateAndOpenCapturedImage(path) {
+    function validateAndOpenCapturedImage(path, action) {
         Proc.runCommand("validate-image", ["file", "-b", path], function(stdout, exitCode) {
             const output = stdout.toLowerCase();
             if (exitCode !== 0 || output.includes("empty") || !output.includes("image")) {
@@ -180,7 +187,7 @@ PluginComponent {
                 }
             }
 
-            if (root.captureAction === "float") {
+            if (action === "float") {
                 root.openImageAsFloat(path);
             } else {
                 root.openImageForEdit(path);
@@ -189,6 +196,10 @@ PluginComponent {
     }
 
     function loadImageFromUri(uri) {
+        root.loadImageFromUriWithAction(uri, "edit");
+    }
+
+    function loadImageFromUriWithAction(uri, action) {
         if (uri.startsWith("file://"))
             uri = uri.substring(7);
 
@@ -198,7 +209,7 @@ PluginComponent {
             Proc.runCommand("download-image", ["curl", "-s", "-L", "-o", root.currentCapturePath, uri], (stdout, exitCode) => {
                 root.isDownloading = false;
                 if (exitCode === 0) {
-                    root.validateAndOpenCapturedImage(root.currentCapturePath);
+                    root.validateAndOpenCapturedImage(root.currentCapturePath, action);
                 } else if (typeof ToastService !== "undefined" && ToastService) {
                     ToastService.showError("Failed to download image.");
                 }
@@ -207,7 +218,7 @@ PluginComponent {
             root.currentCapturePath = root.capturePath();
             Proc.runCommand("copy-image", ["cp", "-f", uri, root.currentCapturePath], (stdout, exitCode) => {
                 if (exitCode === 0) {
-                    root.validateAndOpenCapturedImage(root.currentCapturePath);
+                    root.validateAndOpenCapturedImage(root.currentCapturePath, action);
                 } else if (typeof ToastService !== "undefined" && ToastService) {
                     ToastService.showError("Failed to copy image.");
                 }
@@ -243,29 +254,25 @@ PluginComponent {
     // ── IPC handlers ─────────────────────────────────────────────────────────
     IpcHandler {
         function screenshot(mode: string, action: string) : string {
-            root.captureAction = action || "edit";
-            root.triggerCapture(mode === "default" ? "" : mode);
+            root.triggerCaptureWithAction(mode === "default" ? "" : mode, action || "edit");
             return "SUCCESS";
         }
 
         function selectFile(action: string) : string {
-            root.captureAction = action || "edit";
-            root.selectImageAndAnnotate();
+            root.selectImageAndAnnotateWithAction(action || "edit");
             return "SUCCESS";
         }
 
         function fromClipboard(action: string) : string {
-            root.captureAction = action || "edit";
-            root.fromClipboard();
+            root.fromClipboardWithAction(action || "edit");
             return "SUCCESS";
         }
 
         function openImage(path: string, action: string) : string {
-            root.captureAction = action || "edit";
             if (path.startsWith("file://")) {
                 path = path.substring(7);
             }
-            root.loadImageFromUri(path);
+            root.loadImageFromUriWithAction(path, action || "edit");
             return "SUCCESS";
         }
 
@@ -282,6 +289,7 @@ PluginComponent {
     // ── Capture delay timer ───────────────────────────────────────────────────
     Timer {
         id: captureDelayTimer
+        property string captureAction: "edit"
 
         interval: Math.max(50, Theme.popoutAnimationDuration + 50)
         repeat: false
@@ -304,14 +312,16 @@ PluginComponent {
     // ── File browser ──────────────────────────────────────────────────────────
     FileBrowserModal {
         id: fileBrowserModal
+        property string captureAction: "edit"
         browserTitle: I18n.tr("Select Image to Annotate")
         browserIcon: "image"
         fileExtensions: ["*.png", "*.jpg", "*.jpeg", "*.webp", "*.bmp"]
         onFileSelected: path => {
+            const action = fileBrowserModal.captureAction;
             root.currentCapturePath = root.capturePath();
             Proc.runCommand("copy-image", ["cp", "-f", path, root.currentCapturePath], (stdout, exitCode) => {
                 if (exitCode === 0) {
-                    root.validateAndOpenCapturedImage(root.currentCapturePath);
+                    root.validateAndOpenCapturedImage(root.currentCapturePath, action);
                 } else {
                     ToastService.showError("Failed to load image.");
                 }

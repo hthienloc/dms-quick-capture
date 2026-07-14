@@ -1109,14 +1109,13 @@ DankModal {
     property string currentCapturePath: ""
     property var floatService: null
 
-    onFloatServiceChanged: {
-        if (floatService) {
-            floatService.restoreRequested.connect(function(imageSource, annotationState) {
-                window.restoreSource = imageSource;
-                window.restoreState = annotationState;
-                window.shouldBeVisible = true;
-                window.openCentered();
-            });
+    Connections {
+        target: window.floatService
+        function onRestoreRequested(imageSource, annotationState) {
+            window.restoreSource = imageSource;
+            window.restoreState = annotationState;
+            window.shouldBeVisible = true;
+            window.openCentered();
         }
     }
 
