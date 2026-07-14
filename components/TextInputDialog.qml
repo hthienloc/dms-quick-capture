@@ -8,8 +8,8 @@ import "../dms-common"
 
 Popup {
     id: textInputDialog
-    width: 320
-    height: 160
+    width: 420
+    height: Math.min(Math.max(inputBackground.height + 120, 200), 400)
     padding: 0
     modal: false
     focus: true
@@ -59,15 +59,41 @@ Popup {
                 color: Theme.surfaceText
             }
 
-            DankTextField {
-                id: textInputField
+            Rectangle {
+                id: inputBackground
                 width: parent.width
-                placeholderText: I18n.tr("Type note...")
-                focus: true
-                onAccepted: {
-                    window.currentTypingText = textInputField.text;
-                    textInputDialog.close();
-                    window.commitTypingText();
+                height: Math.max(textInputField.implicitHeight, 72)
+                radius: Theme.cornerRadiusSmall
+                color: textInputField.activeFocus ? Theme.surfaceContainerHighest : Theme.surfaceContainerHigh
+                border.color: textInputField.activeFocus ? Theme.primary : Theme.outlineMedium
+                border.width: textInputField.activeFocus ? 2 : 1
+
+                TextArea {
+                    id: textInputField
+                    anchors.fill: parent
+                    anchors.margins: 1
+                    placeholderText: I18n.tr("Type note...")
+                    wrapMode: TextEdit.Wrap
+                    focus: true
+                    font.pixelSize: Theme.fontSizeNormal
+                    font.family: Theme.fontFamily
+                    color: Theme.surfaceText
+                    selectionColor: Theme.primaryContainer
+                    selectedTextColor: Theme.primary
+                    background: null
+                    topPadding: Theme.spacingS
+                    leftPadding: Theme.spacingS
+                    rightPadding: Theme.spacingS
+                    bottomPadding: Theme.spacingS
+
+                    Keys.onPressed: (event) => {
+                        if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && !(event.modifiers & Qt.ShiftModifier)) {
+                            window.currentTypingText = textInputField.text;
+                            textInputDialog.close();
+                            window.commitTypingText();
+                            event.accepted = true;
+                        }
+                    }
                 }
             }
 

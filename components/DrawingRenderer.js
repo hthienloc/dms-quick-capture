@@ -517,16 +517,23 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         ctx.textAlign = "left";
         ctx.textBaseline = "middle";
 
+        const lines = (stroke.text || "").split("\n");
+        const lineHeight = stroke.width * 1.35;
+
         if (stroke.hasBackground) {
-            const textMetrics = ctx.measureText(stroke.text);
-            const textWidth = textMetrics.width;
+            let maxWidth = 0;
+            for (let li = 0; li < lines.length; li++) {
+                const m = ctx.measureText(lines[li]);
+                if (m.width > maxWidth) maxWidth = m.width;
+            }
             const h = stroke.width;
             const padX = h * 0.3;
-            const padY = h * 0.15; // Further reduced vertical padding
+            const padY = h * 0.15;
+            const totalH = lines.length * lineHeight - (lineHeight - h);
             const rx = pt.x - padX;
             const ry = pt.y - padY;
-            const rw = textWidth + padX * 2;
-            const rh = h + padY * 2; // Symmetric height
+            const rw = maxWidth + padX * 2;
+            const rh = totalH + padY * 2;
             const radius = stroke.cornerRadius || 0;
 
             ctx.fillStyle = Helpers.getContrastingColor(stroke.color, Qt);
@@ -548,20 +555,23 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
                 ctx.fillRect(rx, ry, rw, rh);
             }
             
-            // Re-set fill color for text
             ctx.fillStyle = stroke.color;
         }
 
-        ctx.fillText(stroke.text, pt.x, pt.y + stroke.width / 2);
+        for (let li = 0; li < lines.length; li++) {
+            ctx.fillText(lines[li], pt.x, pt.y + li * lineHeight + stroke.width / 2);
+        }
 
         if (stroke.isUnderline) {
-            const textWidth = ctx.measureText(stroke.text).width;
             ctx.strokeStyle = stroke.color;
             ctx.lineWidth = Math.max(1.5, Math.round(stroke.width * 0.08));
-            ctx.beginPath();
-            ctx.moveTo(pt.x, pt.y + stroke.width * 1.1);
-            ctx.lineTo(pt.x + textWidth, pt.y + stroke.width * 1.1);
-            ctx.stroke();
+            for (let li = 0; li < lines.length; li++) {
+                const textWidth = ctx.measureText(lines[li]).width;
+                ctx.beginPath();
+                ctx.moveTo(pt.x, pt.y + li * lineHeight + stroke.width * 1.1);
+                ctx.lineTo(pt.x + textWidth, pt.y + li * lineHeight + stroke.width * 1.1);
+                ctx.stroke();
+            }
         }
     }
 }
