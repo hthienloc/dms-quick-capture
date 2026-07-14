@@ -873,8 +873,8 @@ DankModal {
     shouldBeVisible: false
     
     // Spacious modal dimensions occupying 90% width and 90% height of the screen
-    modalWidth: Math.round((window.targetScreen ? window.targetScreen.width : (Quickshell.screens[0] ? Quickshell.screens[0].width : 1920)) * 0.9)
-    modalHeight: Math.round((window.targetScreen ? window.targetScreen.height : (Quickshell.screens[0] ? Quickshell.screens[0].height : 1080)) * 0.9)
+    modalWidth: Math.round((window.targetScreen ? Math.min(window.targetScreen.width, window.targetScreen.height) : (Quickshell.screens[0] ? Math.min(Quickshell.screens[0].width, Quickshell.screens[0].height) : 1080)) * 0.9)
+    modalHeight: Math.round((window.targetScreen ? Math.max(window.targetScreen.width, window.targetScreen.height) : (Quickshell.screens[0] ? Math.max(Quickshell.screens[0].width, Quickshell.screens[0].height) : 1920)) * 0.9)
     enableShadow: true
     positioning: "center"
 
