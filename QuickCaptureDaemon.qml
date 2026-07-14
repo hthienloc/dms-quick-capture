@@ -18,14 +18,12 @@ PluginComponent {
     property string activeIpcMode: ""
     property bool isDownloading: false
     property string currentCapturePath: ""
-    property int _captureSeq: 0
     // Exposed so the widget surface can read annotation state without accessing internal modal id
     readonly property bool isAnnotating: modal.shouldBeVisible
 
     // ── Capture helpers ───────────────────────────────────────────────────────
     function capturePath() {
-        _captureSeq = (_captureSeq + 1) % 100000;
-        return "/tmp/dms_capture_" + Date.now() + "_" + _captureSeq + ".png";
+        return "/tmp/dms_capture_" + Date.now() + ".png";
     }
 
     function screenshotMode() {
