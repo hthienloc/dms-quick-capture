@@ -17,19 +17,25 @@ PluginComponent {
     readonly property string captureMode: (pluginData.captureMode || "region")
     property string activeIpcMode: ""
     property bool isDownloading: false
+    property string currentCapturePath: ""
     // Exposed so the widget surface can read annotation state without accessing internal modal id
     readonly property bool isAnnotating: modal.shouldBeVisible
 
     // ── Capture helpers ───────────────────────────────────────────────────────
+    function capturePath() {
+        return "/tmp/dms_capture_" + Date.now() + ".png";
+    }
+
     function screenshotMode() {
         return root.activeIpcMode !== "" ? root.activeIpcMode : root.captureMode;
     }
 
-    function screenshotArgs() {
+    function screenshotArgs(filename) {
+        filename = filename || "dms_capture_bg.png";
         const mode = root.activeIpcMode !== "" ? root.activeIpcMode : root.captureMode;
         const format = "png";
         const cursorVal = pluginData.includeCursor ? "on" : "off";
-        const args = ["dms", "screenshot", mode, "--no-clipboard", "--dir", "/tmp", "--filename", "dms_capture_bg.png", "--format", format, "--cursor", cursorVal, "--no-notify"];
+        const args = ["dms", "screenshot", mode, "--no-clipboard", "--dir", "/tmp", "--filename", filename, "--format", format, "--cursor", cursorVal, "--no-notify"];
 
         if (mode === "region" && pluginData.skipConfirm !== false) {
             args.push("--no-confirm");
@@ -70,38 +76,34 @@ PluginComponent {
     }
 
     function startActualCapture() {
-        // Delete any existing capture file before taking the screenshot.
-        // This lets us detect ESC cancellation when `dms screenshot region`
-        // incorrectly returns exit code 0 without writing a new file.
-        Proc.runCommand("pre-capture-cleanup", ["rm", "-f", "/tmp/dms_capture_bg.png"], () => {
-            const cmdStr = root.screenshotArgs().map(arg => "'" + arg.replace(/'/g, "'\\''") + "'").join(" ") + " 2>&1";
-            Proc.runCommand("screenshot-trigger", ["sh", "-c", cmdStr], (stdout, exitCode) => {
-                if (exitCode === 0) {
-                    // Verify the file was actually written before opening the editor.
-                    // If the user pressed ESC, dms may return 0 but write no file.
-                    Proc.runCommand("verify-capture", ["test", "-f", "/tmp/dms_capture_bg.png"], (_, fileExists) => {
-                        root.isCapturing = false;
-                        root.activeIpcMode = "";
-                        if (fileExists === 0) {
-                            root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
-                        }
-                    });
-                } else {
-                    const failMode = root.screenshotMode();
+        root.currentCapturePath = root.capturePath();
+        const filename = root.currentCapturePath.split("/").pop();
+        const cmdStr = root.screenshotArgs(filename).map(arg => "'" + arg.replace(/'/g, "'\\''") + "'").join(" ") + " 2>&1";
+        Proc.runCommand("screenshot-trigger", ["sh", "-c", cmdStr], (stdout, exitCode) => {
+            if (exitCode === 0) {
+                Proc.runCommand("verify-capture", ["test", "-f", root.currentCapturePath], (_, fileExists) => {
                     root.isCapturing = false;
                     root.activeIpcMode = "";
-                    if (typeof ToastService !== "undefined" && ToastService) {
-                        const errorMsg = (stdout && stdout.trim()) ? stdout.trim() : I18n.tr("Screenshot failed (mode: %1).").arg(failMode);
-                        ToastService.showError(errorMsg);
+                    if (fileExists === 0) {
+                        root.validateAndOpenCapturedImage(root.currentCapturePath);
                     }
+                });
+            } else {
+                const failMode = root.screenshotMode();
+                root.isCapturing = false;
+                root.activeIpcMode = "";
+                if (typeof ToastService !== "undefined" && ToastService) {
+                    const errorMsg = (stdout && stdout.trim()) ? stdout.trim() : I18n.tr("Screenshot failed (mode: %1).").arg(failMode);
+                    ToastService.showError(errorMsg);
                 }
-            }, 0, 60000);
-        });
+            }
+        }, 0, 60000);
     }
 
     function closeOverlay() {
         modal.shouldBeVisible = false;
         modal.close();
+        Proc.runCommand("cleanup-old-captures", ["sh", "-c", "find /tmp -name 'dms_capture_*.png' -mmin +60 -delete 2>/dev/null"]);
     }
 
     function selectImageAndAnnotate() {
@@ -111,11 +113,12 @@ PluginComponent {
 
     function fromClipboard() {
         root.closeControlCenter();
-        const checkCmd = "if dms cl paste > /tmp/dms_capture_bg.png 2>/dev/null && file -b /tmp/dms_capture_bg.png | grep -qi \"image\"; then echo \"IMAGE\"; else TEXT=$(dms cl paste 2>/dev/null); if [ -n \"$TEXT\" ]; then echo \"TEXT:$TEXT\"; else echo \"EMPTY\"; fi; fi";
+        root.currentCapturePath = root.capturePath();
+        const checkCmd = "if dms cl paste > " + root.currentCapturePath + " 2>/dev/null && file -b " + root.currentCapturePath + " | grep -qi \"image\"; then echo \"IMAGE\"; else TEXT=$(dms cl paste 2>/dev/null); if [ -n \"$TEXT\" ]; then echo \"TEXT:$TEXT\"; else echo \"EMPTY\"; fi; fi";
         Proc.runCommand("smart-paste", ["sh", "-c", checkCmd], (stdout, exitCode) => {
             const output = stdout.trim();
             if (output === "IMAGE") {
-                root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
+                root.validateAndOpenCapturedImage(root.currentCapturePath);
             } else if (output.startsWith("TEXT:")) {
                 let text = output.substring(5).trim();
                 if (text === "") {
@@ -159,6 +162,7 @@ PluginComponent {
                 }
             }
 
+            modal.currentCapturePath = path;
             modal.shouldBeVisible = true;
             modal.openCentered();
         });
@@ -170,18 +174,20 @@ PluginComponent {
 
         if (uri.startsWith("http://") || uri.startsWith("https://")) {
             root.isDownloading = true;
-            Proc.runCommand("download-image", ["curl", "-s", "-L", "-o", "/tmp/dms_capture_bg.png", uri], (stdout, exitCode) => {
+            root.currentCapturePath = root.capturePath();
+            Proc.runCommand("download-image", ["curl", "-s", "-L", "-o", root.currentCapturePath, uri], (stdout, exitCode) => {
                 root.isDownloading = false;
                 if (exitCode === 0) {
-                    root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
+                    root.validateAndOpenCapturedImage(root.currentCapturePath);
                 } else if (typeof ToastService !== "undefined" && ToastService) {
                     ToastService.showError("Failed to download image.");
                 }
             });
         } else {
-            Proc.runCommand("copy-image", ["cp", "-f", uri, "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
+            root.currentCapturePath = root.capturePath();
+            Proc.runCommand("copy-image", ["cp", "-f", uri, root.currentCapturePath], (stdout, exitCode) => {
                 if (exitCode === 0) {
-                    root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
+                    root.validateAndOpenCapturedImage(root.currentCapturePath);
                 } else if (typeof ToastService !== "undefined" && ToastService) {
                     ToastService.showError("Failed to copy image.");
                 }
@@ -239,11 +245,7 @@ PluginComponent {
             if (path.startsWith("file://")) {
                 path = path.substring(7);
             }
-            if (path === "/tmp/dms_capture_bg.png") {
-                root.validateAndOpenCapturedImage("/tmp/dms_capture_bg.png");
-            } else {
-                root.loadImageFromUri(path);
-            }
+            root.loadImageFromUri(path);
             return "SUCCESS";
         }
 
@@ -280,10 +282,10 @@ PluginComponent {
         browserIcon: "image"
         fileExtensions: ["*.png", "*.jpg", "*.jpeg", "*.webp", "*.bmp"]
         onFileSelected: path => {
-            Proc.runCommand("copy-image", ["cp", "-f", path, "/tmp/dms_capture_bg.png"], (stdout, exitCode) => {
+            root.currentCapturePath = root.capturePath();
+            Proc.runCommand("copy-image", ["cp", "-f", path, root.currentCapturePath], (stdout, exitCode) => {
                 if (exitCode === 0) {
-                    modal.shouldBeVisible = true;
-                    modal.openCentered();
+                    root.validateAndOpenCapturedImage(root.currentCapturePath);
                 } else {
                     ToastService.showError("Failed to load image.");
                 }

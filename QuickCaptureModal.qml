@@ -1106,6 +1106,7 @@ DankModal {
 
     property var restoreState: null
     property string restoreSource: ""
+    property string currentCapturePath: ""
 
     FloatService {
         id: floatService
@@ -1664,6 +1665,9 @@ DankModal {
         window.bgImageSource = "";
         if (window.restoreSource) {
             window.bgImageSource = window.restoreSource;
+        } else if (window.currentCapturePath) {
+            window.bgImageSource = "file://" + window.currentCapturePath;
+            window.currentCapturePath = "";
         } else {
             window.bgImageSource = "file:///tmp/dms_capture_bg.png";
         }
@@ -1714,6 +1718,9 @@ DankModal {
                     restoredStrokes.push(stroke);
                 }
                 window.strokes = restoredStrokes;
+            }
+            if (data.originalBackground) {
+                window.bgImageSource = data.originalBackground;
             }
             if (data.stampCounter !== undefined) {
                 window.stampCounter = data.stampCounter;

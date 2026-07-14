@@ -323,6 +323,7 @@ QtObject {
 
         var annotationState = {
             strokes: serializedStrokes,
+            originalBackground: root.modal.bgImageSource,
             stampCounter: root.modal.stampCounter,
             cropRect: {
                 x: root.modal.cropRect.x,
