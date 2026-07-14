@@ -1158,10 +1158,11 @@ PluginSettings {
             defaultValue: "focused"
         }
 
-        SelectionSettingPlus {
+        ButtonGroupSettingPlus {
             id: modalAspectRatio
             settingKey: "modalAspectRatio"
             label: I18n.tr("Modal Aspect Ratio")
+            description: I18n.tr("Choose modal shape for portrait or landscape screens.")
             options: [
                 { label: I18n.tr("Landscape"), value: "landscape" },
                 { label: I18n.tr("Portrait"), value: "portrait" }
