@@ -2,6 +2,7 @@ module dms.common
 ButtonGroupSettingPlus 1.0 ButtonGroupSettingPlus.qml
 ColorSettingPlus 1.0 ColorSettingPlus.qml
 CopyBox 1.0 CopyBox.qml
+DankDropdownPlus 1.0 DankDropdownPlus.qml
 DankSliderPlus 1.0 DankSliderPlus.qml
 InfoText 1.0 InfoText.qml
 NumericText 1.0 NumericText.qml

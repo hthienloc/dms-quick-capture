@@ -169,7 +169,7 @@ Item {
         }
 
         // ── Dropdown (Full Width) ─────────────────────────────────────────────
-        DankDropdown {
+        DankDropdownPlus {
             id: dropdown
             width: parent.width
             compactMode: true
