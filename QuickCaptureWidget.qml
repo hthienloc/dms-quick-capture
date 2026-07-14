@@ -58,7 +58,7 @@ PluginComponent {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: (mouse) => {
                     if (mouse.button === Qt.MiddleButton) {
-                        if (root.daemon) root.daemon.triggerCapture("full");
+                        if (root.daemon) root.daemon.triggerCaptureWithAction("full", "edit");
                     }
                 }
             }
@@ -104,7 +104,7 @@ PluginComponent {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: (mouse) => {
                     if (mouse.button === Qt.MiddleButton) {
-                        if (root.daemon) root.daemon.triggerCapture("full");
+                        if (root.daemon) root.daemon.triggerCaptureWithAction("full", "edit");
                     }
                 }
             }
@@ -113,10 +113,10 @@ PluginComponent {
 
     // ── Bar Pill interactions ─────────────────────────────────────────────────
     pillClickAction: function() {
-        if (root.daemon) root.daemon.triggerCapture();
+        if (root.daemon) root.daemon.triggerCaptureWithAction("", "edit");
     }
     pillRightClickAction: function() {
-        if (root.daemon) root.daemon.fromClipboard();
+        if (root.daemon) root.daemon.fromClipboardWithAction("edit");
     }
 
     // ── Control Center integration ────────────────────────────────────────────
@@ -125,6 +125,6 @@ PluginComponent {
     ccWidgetSecondaryText: root.isActive ? (daemon.isCapturing ? "Capturing..." : "Annotating") : "Ready"
     ccWidgetIsActive: root.isActive
     onCcWidgetToggled: {
-        if (root.daemon) root.daemon.triggerCapture();
+        if (root.daemon) root.daemon.triggerCaptureWithAction("", "edit");
     }
 }
