@@ -116,7 +116,7 @@ PluginComponent {
         if (root.daemon) root.daemon.triggerCaptureWithAction("", "edit");
     }
     pillRightClickAction: function() {
-        if (root.daemon) root.daemon.fromClipboard();
+        if (root.daemon) root.daemon.fromClipboardWithAction("edit");
     }
 
     // ── Control Center integration ────────────────────────────────────────────

@@ -108,18 +108,10 @@ PluginComponent {
         Proc.runCommand("cleanup-old-captures", ["sh", "-c", "find /tmp -name 'dms_capture_*.png' -mmin +60 -delete 2>/dev/null"]);
     }
 
-    function selectImageAndAnnotate() {
-        root.selectImageAndAnnotateWithAction("edit");
-    }
-
     function selectImageAndAnnotateWithAction(action) {
         root.closeControlCenter();
         fileBrowserModal.captureAction = action || "edit";
         fileBrowserModal.open();
-    }
-
-    function fromClipboard() {
-        root.fromClipboardWithAction("edit");
     }
 
     function fromClipboardWithAction(action) {
@@ -191,10 +183,6 @@ PluginComponent {
         });
     }
 
-    function loadImageFromUri(uri) {
-        root.loadImageFromUriWithAction(uri, "edit");
-    }
-
     function loadImageFromUriWithAction(uri, action) {
         if (uri.startsWith("file://"))
             uri = uri.substring(7);
@@ -240,7 +228,7 @@ PluginComponent {
             return;
         }
 
-        root.loadImageFromUri(urlStr);
+        root.loadImageFromUriWithAction(urlStr, "edit");
     }
 
     // ── Plugin identity ───────────────────────────────────────────────────────
