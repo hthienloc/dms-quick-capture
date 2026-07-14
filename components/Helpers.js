@@ -646,6 +646,51 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
 }
 
 /**
+ * Checks if a point (mx, my) is hovering over a resize handle of the given stroke.
+ * Returns the handle identifier or "none".
+ * Shapes: tl, tr, bl, br, tc, bc, lc, rc
+ * Lines: start, end
+ */
+function getStrokeHandleAt(mx, my, stroke, estimateTextWidthFn) {
+    if (!stroke || !stroke.points || stroke.points.length === 0) return "none";
+    const threshold = Constants.selectionHandleSize + 4;
+
+    if (stroke.tool === "rect" || stroke.tool === "ellipse" || stroke.tool === "redact" ||
+        stroke.tool === "pixelate" || stroke.tool === "spotlight") {
+        if (stroke.points.length < 2) return "none";
+        const p0 = stroke.points[0];
+        const p1 = stroke.points[stroke.points.length - 1];
+        const x1 = Math.min(p0.x, p1.x);
+        const y1 = Math.min(p0.y, p1.y);
+        const x2 = Math.max(p0.x, p1.x);
+        const y2 = Math.max(p0.y, p1.y);
+        const cx = (x1 + x2) / 2;
+        const cy = (y1 + y2) / 2;
+
+        if (Math.abs(mx - x1) <= threshold && Math.abs(my - y1) <= threshold) return "tl";
+        if (Math.abs(mx - x2) <= threshold && Math.abs(my - y1) <= threshold) return "tr";
+        if (Math.abs(mx - x1) <= threshold && Math.abs(my - y2) <= threshold) return "bl";
+        if (Math.abs(mx - x2) <= threshold && Math.abs(my - y2) <= threshold) return "br";
+        if (Math.abs(mx - cx) <= threshold && Math.abs(my - y1) <= threshold) return "tc";
+        if (Math.abs(mx - cx) <= threshold && Math.abs(my - y2) <= threshold) return "bc";
+        if (Math.abs(mx - x1) <= threshold && Math.abs(my - cy) <= threshold) return "lc";
+        if (Math.abs(mx - x2) <= threshold && Math.abs(my - cy) <= threshold) return "rc";
+        return "none";
+    }
+
+    if (stroke.tool === "line" || stroke.tool === "arrow") {
+        if (stroke.points.length < 2) return "none";
+        const p0 = stroke.points[0];
+        const p1 = stroke.points[stroke.points.length - 1];
+        if (Math.abs(mx - p0.x) <= threshold && Math.abs(my - p0.y) <= threshold) return "start";
+        if (Math.abs(mx - p1.x) <= threshold && Math.abs(my - p1.y) <= threshold) return "end";
+        return "none";
+    }
+
+    return "none";
+}
+
+/**
  * Smooths a polyline using a multi-pass weighted moving average.
  * Each pass replaces every interior point with:
  *   0.25 * prev + 0.5 * current + 0.25 * next

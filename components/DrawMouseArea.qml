@@ -54,26 +54,80 @@ MouseArea {
 
         if (window.currentTool === "select") {
             if (window.selectedStroke) {
-                const dx = absPt.x - window.pressCoords.x;
-                const dy = absPt.y - window.pressCoords.y;
-                if (window.selectedStroke.tool === "callout" && window.calloutDestDragging && window.originalPoints.length === 4) {
-                    const newPoints = [...window.selectedStroke.points];
-                    newPoints[2] = Qt.point(window.originalPoints[2].x + dx, window.originalPoints[2].y + dy);
-                    newPoints[3] = Qt.point(window.originalPoints[3].x + dx, window.originalPoints[3].y + dy);
-                    window.selectedStroke.points = newPoints;
-                } else {
-                    const newPoints = [];
-                    for (let i = 0; i < window.originalPoints.length; i++) {
-                        newPoints.push(Qt.point(window.originalPoints[i].x + dx, window.originalPoints[i].y + dy));
+                hoveredHandle = window.getSelectedStrokeHandleAt(absPt.x, absPt.y);
+
+                if (window.activeHandle === "none" && window.originalPoints.length > 0) {
+                    const dx = absPt.x - window.pressCoords.x;
+                    const dy = absPt.y - window.pressCoords.y;
+                    if (window.selectedStroke.tool === "callout" && window.calloutDestDragging && window.originalPoints.length === 4) {
+                        const newPoints = [...window.selectedStroke.points];
+                        newPoints[2] = Qt.point(window.originalPoints[2].x + dx, window.originalPoints[2].y + dy);
+                        newPoints[3] = Qt.point(window.originalPoints[3].x + dx, window.originalPoints[3].y + dy);
+                        window.selectedStroke.points = newPoints;
+                    } else {
+                        const newPoints = [];
+                        for (let i = 0; i < window.originalPoints.length; i++) {
+                            newPoints.push(Qt.point(window.originalPoints[i].x + dx, window.originalPoints[i].y + dy));
+                        }
+                        window.selectedStroke.points = newPoints;
                     }
-                    window.selectedStroke.points = newPoints;
+                    if (window.selectedStroke.tool === "redact") {
+                        window.selectedStroke.cachedCleanColor = undefined;
+                    }
+                } else if (window.activeHandle !== "none" && window.originalPoints.length > 0) {
+                    const dx = absPt.x - window.pressCoords.x;
+                    const dy = absPt.y - window.pressCoords.y;
+                    const orig = window.originalPoints;
+                    const tool = window.selectedStroke.tool;
+
+                    if (tool === "rect" || tool === "ellipse" || tool === "redact" ||
+                        tool === "pixelate" || tool === "spotlight") {
+                        const p0 = orig[0];
+                        const p1 = orig[orig.length - 1];
+                        let x1 = Math.min(p0.x, p1.x);
+                        let y1 = Math.min(p0.y, p1.y);
+                        let x2 = Math.max(p0.x, p1.x);
+                        let y2 = Math.max(p0.y, p1.y);
+                        const minSize = 10;
+
+                        switch (window.activeHandle) {
+                            case "tl": x1 = Math.min(x1 + dx, x2 - minSize); y1 = Math.min(y1 + dy, y2 - minSize); break;
+                            case "tr": x2 = Math.max(x2 + dx, x1 + minSize); y1 = Math.min(y1 + dy, y2 - minSize); break;
+                            case "bl": x1 = Math.min(x1 + dx, x2 - minSize); y2 = Math.max(y2 + dy, y1 + minSize); break;
+                            case "br": x2 = Math.max(x2 + dx, x1 + minSize); y2 = Math.max(y2 + dy, y1 + minSize); break;
+                            case "tc": y1 = Math.min(y1 + dy, y2 - minSize); break;
+                            case "bc": y2 = Math.max(y2 + dy, y1 + minSize); break;
+                            case "lc": x1 = Math.min(x1 + dx, x2 - minSize); break;
+                            case "rc": x2 = Math.max(x2 + dx, x1 + minSize); break;
+                        }
+
+                        const wasFlippedX = p0.x > p1.x;
+                        const wasFlippedY = p0.y > p1.y;
+                        const newP0 = Qt.point(wasFlippedX ? x2 : x1, wasFlippedY ? y2 : y1);
+                        const newP1 = Qt.point(wasFlippedX ? x1 : x2, wasFlippedY ? y1 : y2);
+
+                        const newPoints = [...window.selectedStroke.points];
+                        newPoints[0] = newP0;
+                        newPoints[newPoints.length - 1] = newP1;
+                        window.selectedStroke.points = newPoints;
+
+                        if (tool === "redact") {
+                            window.selectedStroke.cachedCleanColor = undefined;
+                        }
+                    } else if (tool === "line" || tool === "arrow") {
+                        const newPoints = [...window.selectedStroke.points];
+                        if (window.activeHandle === "start") {
+                            newPoints[0] = Qt.point(orig[0].x + dx, orig[0].y + dy);
+                        } else if (window.activeHandle === "end") {
+                            newPoints[newPoints.length - 1] = Qt.point(orig[orig.length - 1].x + dx, orig[orig.length - 1].y + dy);
+                        }
+                        window.selectedStroke.points = newPoints;
+                    }
                 }
-                 if (window.selectedStroke.tool === "redact") {
-                     window.selectedStroke.cachedCleanColor = undefined;
-                 }
-                 drawingCanvas.requestPaint();
+                drawingCanvas.requestPaint();
             } else {
                 hoveredStrokeIdx = window.findStrokeAt(absPt.x, absPt.y);
+                hoveredHandle = "none";
             }
             return;
         }
@@ -225,6 +279,7 @@ MouseArea {
         if (h === "tr" || h === "bl") return Qt.SizeBDiagCursor;
         if (h === "tc" || h === "bc") return Qt.SplitVCursor;
         if (h === "lc" || h === "rc") return Qt.SplitHCursor;
+        if (h === "start" || h === "end") return Qt.SizeAllCursor;
         if (window.currentTool === "colorpicker") {
             return Qt.CrossCursor;
         }
@@ -278,8 +333,19 @@ MouseArea {
             const strokeIdx = window.findStrokeAt(absPt.x, absPt.y);
             if (strokeIdx !== -1) {
                 const list = [...window.strokes];
-                list.splice(strokeIdx, 1);
+                const removed = list.splice(strokeIdx, 1);
                 window.strokes = list;
+                if (window.selectedStroke === removed[0]) {
+                    window.strokeWidth = window.preGrabStrokeWidth;
+                    window.textFontSize = window.preGrabTextFontSize;
+                    window.pixelateIntensity = window.preGrabPixelateIntensity;
+                    window.spotlightIntensity = window.preGrabSpotlightIntensity;
+                    window.calloutZoom = window.preGrabCalloutZoom;
+                    window.currentColor = window.preGrabColor;
+                    window.activeRedactMode = window.preGrabRedactMode;
+                    window.calloutLinkLines = window.preGrabCalloutLinkLines;
+                    window.selectedStroke = null;
+                }
                 drawingCanvas.requestPaint();
             }
             return;
@@ -287,7 +353,43 @@ MouseArea {
 
         const absPt = getAbsolutePoint(mouse.x, mouse.y);
         if (window.currentTool === "select") {
+            // Check if clicking on a resize handle
+            if (window.selectedStroke) {
+                const sh = window.getSelectedStrokeHandleAt(absPt.x, absPt.y);
+                if (sh !== "none") {
+                    window.activeHandle = sh;
+                    window.pressCoords = absPt;
+                    const orig = [];
+                    for (let p of window.selectedStroke.points) {
+                        orig.push(Qt.point(p.x, p.y));
+                    }
+                    window.originalPoints = orig;
+                    drawingCanvas.requestPaint();
+                    return;
+                }
+            }
+
             const strokeIdx = window.findStrokeAt(absPt.x, absPt.y);
+            if (strokeIdx === -1) {
+                // Clicked empty space — deselect
+                if (window.selectedStroke) {
+                    window.strokeWidth = window.preGrabStrokeWidth;
+                    window.textFontSize = window.preGrabTextFontSize;
+                    window.pixelateIntensity = window.preGrabPixelateIntensity;
+                    window.spotlightIntensity = window.preGrabSpotlightIntensity;
+                    window.calloutZoom = window.preGrabCalloutZoom;
+                    window.currentColor = window.preGrabColor;
+                    window.activeRedactMode = window.preGrabRedactMode;
+                    window.calloutLinkLines = window.preGrabCalloutLinkLines;
+                }
+                window.selectedStroke = null;
+                window.originalPoints = [];
+                window.activeHandle = "none";
+                hoveredHandle = "none";
+                drawingCanvas.requestPaint();
+                return;
+            }
+
             if (strokeIdx !== -1) {
                 const stroke = window.strokes[strokeIdx];
                 
@@ -483,15 +585,7 @@ MouseArea {
 
     onReleased: (mouse) => {
         if (window.currentTool === "select") {
-             window.selectedStroke = null;
-             window.strokeWidth = window.preGrabStrokeWidth;
-             window.textFontSize = window.preGrabTextFontSize;
-             window.pixelateIntensity = window.preGrabPixelateIntensity;
-             window.spotlightIntensity = window.preGrabSpotlightIntensity;
-             window.calloutZoom = window.preGrabCalloutZoom;
-             window.currentColor = window.preGrabColor;
-             window.activeRedactMode = window.preGrabRedactMode;
-             window.calloutLinkLines = window.preGrabCalloutLinkLines;
+             window.activeHandle = "none";
              window.calloutDestDragging = false;
              window.originalPoints = [];
              drawingCanvas.requestPaint();

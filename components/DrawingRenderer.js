@@ -577,6 +577,68 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
 }
 
 /**
+ * Draws resize handles for a selected stroke in select mode.
+ * 8-point handles for shapes, 2-point handles for lines.
+ * @param {object} ctx - The Canvas 2D context.
+ * @param {object} stroke - The selected stroke data object.
+ * @param {object} Theme - The Theme object.
+ */
+function drawSelectionHandles(ctx, stroke, Theme) {
+    if (!stroke || !stroke.points || stroke.points.length === 0) return;
+
+    const hs = Constants.selectionHandleSize;
+    const hh = hs / 2;
+
+    if (stroke.tool === "rect" || stroke.tool === "ellipse" || stroke.tool === "redact" ||
+        stroke.tool === "pixelate" || stroke.tool === "spotlight") {
+        if (stroke.points.length < 2) return;
+        const p0 = stroke.points[0];
+        const p1 = stroke.points[stroke.points.length - 1];
+        const x1 = Math.min(p0.x, p1.x);
+        const y1 = Math.min(p0.y, p1.y);
+        const x2 = Math.max(p0.x, p1.x);
+        const y2 = Math.max(p0.y, p1.y);
+        const cx = (x1 + x2) / 2;
+        const cy = (y1 + y2) / 2;
+
+        ctx.save();
+        ctx.strokeStyle = Theme.primary;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+        ctx.restore();
+
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = Theme.primary;
+        ctx.lineWidth = 1.5;
+        const handlePoints = [
+            {x: x1, y: y1}, {x: x2, y: y1}, {x: x1, y: y2}, {x: x2, y: y2},
+            {x: cx, y: y1}, {x: cx, y: y2}, {x: x1, y: cy}, {x: x2, y: cy}
+        ];
+        for (let p of handlePoints) {
+            ctx.fillRect(p.x - hh, p.y - hh, hs, hs);
+            ctx.strokeRect(p.x - hh, p.y - hh, hs, hs);
+        }
+        return;
+    }
+
+    if (stroke.tool === "line" || stroke.tool === "arrow") {
+        if (stroke.points.length < 2) return;
+        const p0 = stroke.points[0];
+        const p1 = stroke.points[stroke.points.length - 1];
+
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = Theme.primary;
+        ctx.lineWidth = 1.5;
+        ctx.fillRect(p0.x - hh, p0.y - hh, hs, hs);
+        ctx.strokeRect(p0.x - hh, p0.y - hh, hs, hs);
+        ctx.fillRect(p1.x - hh, p1.y - hh, hs, hs);
+        ctx.strokeRect(p1.x - hh, p1.y - hh, hs, hs);
+        return;
+    }
+}
+
+/**
  * Draws the selection (crop) overlay with dimming and handles.
  * @param {object} ctx - The Canvas 2D context.
  * @param {object} options - Selection options (cropRect, canvasWidth, canvasHeight, isCropMode)
