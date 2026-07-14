@@ -19,8 +19,8 @@ Grid {
     readonly property var modes: [
         { mode: "none", icon: "blur_off", tooltip: qsTr("No Backdrop") },
         { mode: "solid", icon: "format_color_fill", tooltip: qsTr("Solid Color") },
-        { mode: "gradient", icon: "gradient", tooltip: qsTr("Linear Gradient") },
         { mode: "radial", icon: "filter_tilt_shift", tooltip: qsTr("Radial Gradient") },
+        { mode: "gradient", icon: "gradient", tooltip: qsTr("Linear Gradient") },
         { mode: "conic", icon: "timelapse", tooltip: qsTr("Conic Gradient") }
     ]
 

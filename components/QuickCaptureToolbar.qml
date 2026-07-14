@@ -473,7 +473,7 @@ Rectangle {
                         }
                         StyledText {
                             text: root.backdropPadding + "px"
-                            width: 32; horizontalAlignment: Text.AlignRight
+                            width: 40; horizontalAlignment: Text.AlignRight
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -509,7 +509,7 @@ Rectangle {
                         }
                         StyledText {
                             text: root.backdropCornerRadius + "px"
-                            width: 32; horizontalAlignment: Text.AlignRight
+                            width: 40; horizontalAlignment: Text.AlignRight
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -545,7 +545,7 @@ Rectangle {
                         }
                         StyledText {
                             text: root.backdropShadowStrength + "%"
-                            width: 32; horizontalAlignment: Text.AlignRight
+                            width: 40; horizontalAlignment: Text.AlignRight
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -582,7 +582,7 @@ Rectangle {
                         }
                         StyledText {
                             text: root.backdropGradientAngle + "°"
-                            width: 32; horizontalAlignment: Text.AlignRight
+                            width: 40; horizontalAlignment: Text.AlignRight
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter

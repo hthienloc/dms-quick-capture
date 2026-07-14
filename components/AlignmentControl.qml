@@ -36,7 +36,7 @@ Item {
         }
         StyledText {
             text: control._labelMap[control.backdropAlignment] ?? "C"
-            width: compact ? 14 : 18; horizontalAlignment: Text.AlignHCenter
+            width: compact ? 18 : 22; horizontalAlignment: Text.AlignHCenter
             font.pixelSize: compact ? tc.fontSizeCompact : Theme.fontSizeSmall
             color: Theme.surfaceText
             anchors.verticalCenter: parent.verticalCenter
