@@ -9,7 +9,7 @@ import "../dms-common"
 Popup {
     id: textInputDialog
     width: 420
-    height: Math.min(Math.max(textInputField.implicitHeight + 100, 200), 400)
+    height: Math.min(Math.max(inputBackground.height + 120, 200), 400)
     padding: 0
     modal: false
     focus: true
@@ -59,26 +59,28 @@ Popup {
                 color: Theme.surfaceText
             }
 
-            ScrollView {
-                id: textScrollView
+            Rectangle {
+                id: inputBackground
                 width: parent.width
-                height: Math.min(textInputField.implicitHeight, 240)
-                clip: true
+                height: Math.max(textInputField.implicitHeight + textInputField.topPadding + textInputField.bottomPadding, 72)
+                radius: Theme.cornerRadiusSmall
+                color: textInputField.activeFocus ? Theme.surfaceContainerHighest : Theme.surfaceContainerHigh
+                border.color: textInputField.activeFocus ? Theme.primary : Theme.outlineMedium
+                border.width: textInputField.activeFocus ? 2 : 1
 
                 TextArea {
                     id: textInputField
-                    width: textScrollView.width
+                    anchors.fill: parent
+                    anchors.margins: 1
                     placeholderText: I18n.tr("Type note...")
                     wrapMode: TextEdit.Wrap
                     focus: true
                     font.pixelSize: Theme.fontSizeNormal
+                    font.family: Theme.fontFamily
                     color: Theme.surfaceText
-                    selectionColor: Theme.withAlpha(Theme.primary, 0.3)
-                    selectedTextColor: Theme.surfaceText
-                    background: Rectangle {
-                        color: Theme.surfaceContainerHigh
-                        radius: Theme.cornerRadiusSmall
-                    }
+                    selectionColor: Theme.primaryContainer
+                    selectedTextColor: Theme.primary
+                    background: null
                     topPadding: Theme.spacingS
                     leftPadding: Theme.spacingS
                     rightPadding: Theme.spacingS

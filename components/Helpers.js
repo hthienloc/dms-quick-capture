@@ -382,50 +382,53 @@ function extractDominantColors(imgData, Qt) {
  */
 function estimateTextWidth(text, fontSize, isBold, isMonospace) {
     if (!text) return 0;
-    let charWidthRatio = isMonospace ? 0.6 : 0.52;
-    if (isBold) charWidthRatio += 0.05;
+    const lines = String(text).split("\n");
+    let maxWidth = 0;
+    for (let li = 0; li < lines.length; li++) {
+        const line = lines[li];
+        if (!line) continue;
+        let charWidthRatio = isMonospace ? 0.6 : 0.52;
+        if (isBold) charWidthRatio += 0.05;
 
-    let estWidth = 0;
-    for (let c = 0; c < text.length; c++) {
-        const charCode = text.charCodeAt(c);
-        if (charCode > 255) {
-            // Treat known CJK and related ranges as wide; fall back to proportional width
-            const isCJKOrWideScript =
-                    // CJK Unified Ideographs
-                    (charCode >= 0x3400 && charCode <= 0x4DBF) ||
-                    (charCode >= 0x4E00 && charCode <= 0x9FFF) ||
-                    (charCode >= 0xF900 && charCode <= 0xFAFF) ||
-                    // Hiragana
-                    (charCode >= 0x3040 && charCode <= 0x309F) ||
-                    // Katakana
-                    (charCode >= 0x30A0 && charCode <= 0x30FF) ||
-                    // Hangul syllables
-                    (charCode >= 0xAC00 && charCode <= 0xD7AF);
+        let estWidth = 0;
+        for (let c = 0; c < line.length; c++) {
+            const charCode = line.charCodeAt(c);
+            if (charCode > 255) {
+                const isCJKOrWideScript =
+                        (charCode >= 0x3400 && charCode <= 0x4DBF) ||
+                        (charCode >= 0x4E00 && charCode <= 0x9FFF) ||
+                        (charCode >= 0xF900 && charCode <= 0xFAFF) ||
+                        (charCode >= 0x3040 && charCode <= 0x309F) ||
+                        (charCode >= 0x30A0 && charCode <= 0x30FF) ||
+                        (charCode >= 0xAC00 && charCode <= 0xD7AF);
 
-            if (isCJKOrWideScript) {
-                estWidth += fontSize * 0.9;
-            } else {
-                // Non-ASCII but not CJK (e.g. accented Latin/Vietnamese diacritics): proportional width
+                if (isCJKOrWideScript) {
+                    estWidth += fontSize * 0.9;
+                } else {
+                    estWidth += fontSize * charWidthRatio;
+                }
+            } else if (isMonospace) {
                 estWidth += fontSize * charWidthRatio;
-            }
-        } else if (isMonospace) {
-            estWidth += fontSize * charWidthRatio;
-        } else {
-            const char = text.charAt(c);
-            if ("iIlldt1|()[]{}".indexOf(char) !== -1) {
-                estWidth += fontSize * 0.28;
-            } else if ("mwMW".indexOf(char) !== -1) {
-                estWidth += fontSize * 0.8;
-            } else if (char >= "A" && char <= "Z") {
-                estWidth += fontSize * 0.65;
             } else {
-                estWidth += fontSize * charWidthRatio;
+                const ch = line.charAt(c);
+                if ("iIlldt1|()[]{}".indexOf(ch) !== -1) {
+                    estWidth += fontSize * 0.28;
+                } else if ("mwMW".indexOf(ch) !== -1) {
+                    estWidth += fontSize * 0.8;
+                } else if (ch >= "A" && ch <= "Z") {
+                    estWidth += fontSize * 0.65;
+                } else {
+                    estWidth += fontSize * charWidthRatio;
+                }
             }
         }
+
+        const maxW = fontSize * line.length * (isMonospace ? 1.2 : 1.6);
+        estWidth = Math.min(estWidth, maxW);
+        if (estWidth > maxWidth) maxWidth = estWidth;
     }
 
-    const maxW = fontSize * text.length * (isMonospace ? 1.2 : 1.6);
-    return Math.min(estWidth, maxW);
+    return maxWidth;
 }
 
 /**
@@ -446,11 +449,15 @@ function getStrokeBBox(stroke, estimateTextWidthFn) {
         const p0 = pts[0];
         const fontSize = stroke.width;
         const txt = stroke.text || "";
+        const lines = String(txt).split("\n");
+        const numLines = lines.length || 1;
+        const lineHeight = fontSize * 1.35;
+
         let textW = Constants.minTextWidth;
         if (estimateTextWidthFn) {
             textW = Math.max(Constants.minTextWidth, estimateTextWidthFn(txt, fontSize, stroke.isBold === true, stroke.isMonospace === true));
         }
-        let textH = fontSize;
+        let textH = fontSize + (numLines - 1) * lineHeight;
         let textX = p0.x;
         let textY = p0.y;
 
@@ -603,9 +610,12 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
             const p0 = stroke.points[0];
             const fontSize = stroke.width;
             const txt = stroke.text || "";
+            const lines = String(txt).split("\n");
+            const numLines = lines.length || 1;
+            const lineHeight = fontSize * 1.35;
 
             let textW = Math.max(Constants.minTextWidth, estimateTextWidthFn(txt, fontSize, stroke.isBold === true, stroke.isMonospace === true));
-            let textH = fontSize;
+            let textH = fontSize + (numLines - 1) * lineHeight;
             let textY = p0.y;
             let textX = p0.x;
 
