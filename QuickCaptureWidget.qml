@@ -113,7 +113,7 @@ PluginComponent {
 
     // ── Bar Pill interactions ─────────────────────────────────────────────────
     pillClickAction: function() {
-        if (root.daemon) root.daemon.triggerCaptureWithAction("", "edit");
+        if (root.daemon) root.daemon.triggerCaptureWithAction("default", "edit");
     }
     pillRightClickAction: function() {
         if (root.daemon) root.daemon.fromClipboardWithAction("edit");
@@ -125,6 +125,6 @@ PluginComponent {
     ccWidgetSecondaryText: root.isActive ? (daemon.isCapturing ? "Capturing..." : "Annotating") : "Ready"
     ccWidgetIsActive: root.isActive
     onCcWidgetToggled: {
-        if (root.daemon) root.daemon.triggerCaptureWithAction("", "edit");
+        if (root.daemon) root.daemon.triggerCaptureWithAction("default", "edit");
     }
 }

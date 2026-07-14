@@ -51,13 +51,14 @@ PluginComponent {
     }
 
     function triggerCaptureWithAction(mode, action) {
+        const normalizedMode = mode === "default" ? "" : (mode || "");
         const allowedModes = ["region", "window", "full", "output", ""];
-        if (mode && !allowedModes.includes(mode)) {
+        if (normalizedMode && !allowedModes.includes(normalizedMode)) {
             console.warn("Invalid screenshot mode rejected: " + mode);
             return;
         }
 
-        root.activeIpcMode = mode || "";
+        root.activeIpcMode = normalizedMode;
         captureDelayTimer.captureAction = action || "edit";
         root.startCaptureAfterDelay();
     }
@@ -238,7 +239,7 @@ PluginComponent {
     // ── IPC handlers ─────────────────────────────────────────────────────────
     IpcHandler {
         function screenshot(mode: string, action: string) : string {
-            root.triggerCaptureWithAction(mode === "default" ? "" : mode, action);
+            root.triggerCaptureWithAction(mode, action);
             return "SUCCESS";
         }
 
