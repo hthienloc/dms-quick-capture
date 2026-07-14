@@ -36,7 +36,7 @@ Item {
                 if (control.backdropAspectRatio === "custom") return control.customAspectRatio.toFixed(2);
                 return control.backdropAspectRatio;
             }
-            width: compact ? 40 : 50; horizontalAlignment: Text.AlignLeft
+            width: compact ? 30 : 38; horizontalAlignment: Text.AlignLeft
             font.pixelSize: compact ? tc.fontSizeCompact : Theme.fontSizeSmall
             color: Theme.surfaceText
             anchors.verticalCenter: parent.verticalCenter
