@@ -50,10 +50,6 @@ PluginComponent {
         return args;
     }
 
-    function triggerCapture(mode) {
-        root.triggerCaptureWithAction(mode, "edit");
-    }
-
     function triggerCaptureWithAction(mode, action) {
         const allowedModes = ["region", "window", "full", "output", ""];
         if (mode && !allowedModes.includes(mode)) {
