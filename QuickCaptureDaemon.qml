@@ -78,8 +78,6 @@ PluginComponent {
     function startActualCapture() {
         root.currentCapturePath = root.capturePath();
         const filename = root.currentCapturePath.split("/").pop();
-        // Clean up old capture files (>1 hour) to prevent disk usage accumulation
-        Proc.runCommand("cleanup-old-captures", ["sh", "-c", "find /tmp -name 'dms_capture_*.png' -mmin +60 -delete 2>/dev/null"]);
         const cmdStr = root.screenshotArgs(filename).map(arg => "'" + arg.replace(/'/g, "'\\''") + "'").join(" ") + " 2>&1";
         Proc.runCommand("screenshot-trigger", ["sh", "-c", cmdStr], (stdout, exitCode) => {
             if (exitCode === 0) {
@@ -105,6 +103,7 @@ PluginComponent {
     function closeOverlay() {
         modal.shouldBeVisible = false;
         modal.close();
+        Proc.runCommand("cleanup-old-captures", ["sh", "-c", "find /tmp -name 'dms_capture_*.png' -mmin +60 -delete 2>/dev/null"]);
     }
 
     function selectImageAndAnnotate() {
