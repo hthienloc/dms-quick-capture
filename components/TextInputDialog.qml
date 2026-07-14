@@ -62,7 +62,7 @@ Popup {
             Rectangle {
                 id: inputBackground
                 width: parent.width
-                height: Math.max(textInputField.implicitHeight + textInputField.topPadding + textInputField.bottomPadding, 72)
+                height: Math.max(textInputField.implicitHeight, 72)
                 radius: Theme.cornerRadiusSmall
                 color: textInputField.activeFocus ? Theme.surfaceContainerHighest : Theme.surfaceContainerHigh
                 border.color: textInputField.activeFocus ? Theme.primary : Theme.outlineMedium

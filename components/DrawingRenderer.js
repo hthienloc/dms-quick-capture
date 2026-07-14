@@ -517,7 +517,7 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         ctx.textAlign = "left";
         ctx.textBaseline = "middle";
 
-        const lines = String(stroke.text).split("\n");
+        const lines = (stroke.text || "").split("\n");
         const lineHeight = stroke.width * 1.35;
 
         if (stroke.hasBackground) {
