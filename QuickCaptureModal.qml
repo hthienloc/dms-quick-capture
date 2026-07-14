@@ -1383,6 +1383,12 @@ DankModal {
             return;
         }
         if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+            if (event.modifiers & Qt.ShiftModifier) {
+                window.currentTypingText += "\n";
+                if (window.activeCanvas) window.activeCanvas.requestPaint();
+                event.accepted = true;
+                return;
+            }
             window.commitTypingText();
             event.accepted = true;
             return;
@@ -2426,16 +2432,23 @@ DankModal {
                                     ctx.textAlign = "left";
                                     ctx.textBaseline = "middle";
 
+                                    const previewLines = String(window.currentTypingText + "|").split("\n");
+                                    const lineH = window.textFontSize * 1.35;
+
                                     if (window.textBackground) {
-                                        const textMetrics = ctx.measureText(window.currentTypingText + "|");
-                                        const textWidth = textMetrics.width;
+                                        let maxW = 0;
+                                        for (let li = 0; li < previewLines.length; li++) {
+                                            const m = ctx.measureText(previewLines[li]);
+                                            if (m.width > maxW) maxW = m.width;
+                                        }
                                         const h = window.textFontSize;
                                         const padX = h * 0.3;
                                         const padY = h * 0.15;
+                                        const totalH = previewLines.length * lineH - (lineH - h);
                                         const rx = window.typingCoords.x - padX;
                                         const ry = window.typingCoords.y - padY;
-                                        const rw = textWidth + padX * 2;
-                                        const rh = h + padY * 2;
+                                        const rw = maxW + padX * 2;
+                                        const rh = totalH + padY * 2;
                                         const radius = window.textCornerRadius;
 
                                         ctx.fillStyle = Helpers.getContrastingColor(window.currentColor.toString(), Qt);
@@ -2460,16 +2473,20 @@ DankModal {
                                         ctx.fillStyle = window.currentColor;
                                     }
 
-                                    ctx.fillText(window.currentTypingText + "|", window.typingCoords.x, window.typingCoords.y + window.textFontSize / 2);
+                                    for (let li = 0; li < previewLines.length; li++) {
+                                        ctx.fillText(previewLines[li], window.typingCoords.x, window.typingCoords.y + li * lineH + window.textFontSize / 2);
+                                    }
 
                                     if (window.textUnderline) {
-                                        const textWidth = ctx.measureText(window.currentTypingText + "|").width;
                                         ctx.strokeStyle = window.currentColor;
                                         ctx.lineWidth = Math.max(1.5, Math.round(window.textFontSize * 0.08));
-                                        ctx.beginPath();
-                                        ctx.moveTo(window.typingCoords.x, window.typingCoords.y + window.textFontSize * 1.05);
-                                        ctx.lineTo(window.typingCoords.x + textWidth, window.typingCoords.y + window.textFontSize * 1.05);
-                                        ctx.stroke();
+                                        for (let li = 0; li < previewLines.length; li++) {
+                                            const textWidth = ctx.measureText(previewLines[li]).width;
+                                            ctx.beginPath();
+                                            ctx.moveTo(window.typingCoords.x, window.typingCoords.y + li * lineH + window.textFontSize * 1.05);
+                                            ctx.lineTo(window.typingCoords.x + textWidth, window.typingCoords.y + li * lineH + window.textFontSize * 1.05);
+                                            ctx.stroke();
+                                        }
                                     }
                                 }
                             }

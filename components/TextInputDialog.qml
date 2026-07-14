@@ -8,8 +8,8 @@ import "../dms-common"
 
 Popup {
     id: textInputDialog
-    width: 320
-    height: 160
+    width: 420
+    height: Math.min(Math.max(textInputField.implicitHeight + 100, 200), 400)
     padding: 0
     modal: false
     focus: true
@@ -59,15 +59,39 @@ Popup {
                 color: Theme.surfaceText
             }
 
-            DankTextField {
-                id: textInputField
+            ScrollView {
+                id: textScrollView
                 width: parent.width
-                placeholderText: I18n.tr("Type note...")
-                focus: true
-                onAccepted: {
-                    window.currentTypingText = textInputField.text;
-                    textInputDialog.close();
-                    window.commitTypingText();
+                height: Math.min(textInputField.implicitHeight, 240)
+                clip: true
+
+                TextArea {
+                    id: textInputField
+                    width: textScrollView.width
+                    placeholderText: I18n.tr("Type note...")
+                    wrapMode: TextEdit.Wrap
+                    focus: true
+                    font.pixelSize: Theme.fontSizeNormal
+                    color: Theme.surfaceText
+                    selectionColor: Theme.withAlpha(Theme.primary, 0.3)
+                    selectedTextColor: Theme.surfaceText
+                    background: Rectangle {
+                        color: Theme.surfaceContainerHigh
+                        radius: Theme.cornerRadiusSmall
+                    }
+                    topPadding: Theme.spacingS
+                    leftPadding: Theme.spacingS
+                    rightPadding: Theme.spacingS
+                    bottomPadding: Theme.spacingS
+
+                    Keys.onPressed: (event) => {
+                        if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && !(event.modifiers & Qt.ShiftModifier)) {
+                            window.currentTypingText = textInputField.text;
+                            textInputDialog.close();
+                            window.commitTypingText();
+                            event.accepted = true;
+                        }
+                    }
                 }
             }
 
