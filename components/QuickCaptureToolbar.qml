@@ -291,7 +291,7 @@ Rectangle {
                 DankActionButton { iconName: "push_pin"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Float Window (Ctrl+F)"; onClicked: root.floatRequested() }
                 DankActionButton { iconName: "save"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Save (Ctrl+S)"; onClicked: root.saveRequested() }
                 DankActionButton { iconName: "content_copy"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Copy (Ctrl+C)"; onClicked: root.copyRequested() }
-                DankActionButton { iconName: "done_all"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Copy & Save (Enter)"; backgroundColor: Theme.withAlpha(Theme.primary, 0.1); iconColor: Theme.primary; onClicked: root.copyAndSaveRequested() }
+                DankActionButton { iconName: "done_all"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Copy & Save (Enter)"; iconColor: Theme.primary; onClicked: root.copyAndSaveRequested() }
             }
 
             Rectangle { width: tc.separatorThickness; height: tc.separatorLength; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
@@ -420,7 +420,7 @@ Rectangle {
             Column {
                 spacing: Theme.spacingXS; anchors.horizontalCenter: parent.horizontalCenter
                 DankActionButton { iconName: "undo"; buttonSize: tc.btnSize; iconSize: tc.iconSize; enabled: root.canUndo; opacity: enabled ? 1.0 : 0.4; onClicked: root.undoRequested() }
-                DankActionButton { iconName: "done_all"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Copy & Save (Enter)"; backgroundColor: Theme.withAlpha(Theme.primary, 0.1); iconColor: Theme.primary; onClicked: root.copyAndSaveRequested() }
+                DankActionButton { iconName: "done_all"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Copy & Save (Enter)"; iconColor: Theme.primary; onClicked: root.copyAndSaveRequested() }
             }
         }
     }
@@ -641,7 +641,7 @@ Rectangle {
                     backdropGradientEnd: root.backdropGradientEnd
                     gradientActiveSlot: root.gradientActiveSlot
                     itemSize: 24
-                    iconSize: 14
+                    iconSize: 18
                     onSetGradientActiveSlot: (slot) => root.gradientActiveSlot = slot
                     onAutoColorBalanceRequested: root.autoColorBalanceRequested()
                     onColorPickerRequested: (currentColor) => root.backdropColorPickerRequested(currentColor)
@@ -885,7 +885,7 @@ Rectangle {
                     backdropGradientEnd: root.backdropGradientEnd
                     gradientActiveSlot: root.gradientActiveSlot
                     itemSize: 24
-                    iconSize: 14
+                    iconSize: 18
                     onSetGradientActiveSlot: (slot) => root.gradientActiveSlot = slot
                     onAutoColorBalanceRequested: root.autoColorBalanceRequested()
                     onColorPickerRequested: (currentColor) => root.backdropColorPickerRequested(currentColor)

@@ -11,7 +11,7 @@ Row {
     property color backdropGradientEnd: Theme.secondary
     property string gradientActiveSlot: "start"
     property int itemSize: 24
-    property int iconSize: 14
+    property int iconSize: 18
 
     signal setGradientActiveSlot(string slot)
     signal autoColorBalanceRequested()
@@ -95,7 +95,7 @@ Row {
             iconName: "colorize"
             iconSize: controlRoot.iconSize
             backgroundColor: "transparent"
-            iconColor: Theme.primary
+            iconColor: Theme.surfaceText
         }
 
         MouseArea {
@@ -120,7 +120,7 @@ Row {
         iconName: "auto_awesome"
         iconSize: controlRoot.iconSize
         backgroundColor: "transparent"
-        iconColor: Theme.primary
+        iconColor: Theme.surfaceText
         onClicked: controlRoot.autoColorBalanceRequested()
     }
 }
