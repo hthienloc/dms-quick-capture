@@ -1124,12 +1124,13 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Styles")
             icon: "aspect_ratio"
-            showReset: overlayOpacity.isDirty || showCanvasBorder.isDirty || editQuality.isDirty || modalDisplayTarget.isDirty
+            showReset: overlayOpacity.isDirty || showCanvasBorder.isDirty || editQuality.isDirty || modalDisplayTarget.isDirty || modalAspectRatio.isDirty
             onResetClicked: {
                 overlayOpacity.resetToDefault();
                 showCanvasBorder.resetToDefault();
                 editQuality.resetToDefault();
                 modalDisplayTarget.resetToDefault();
+                modalAspectRatio.resetToDefault();
             }
         }
 
@@ -1155,6 +1156,17 @@ PluginSettings {
                 return list;
             }
             defaultValue: "focused"
+        }
+
+        SelectionSettingPlus {
+            id: modalAspectRatio
+            settingKey: "modalAspectRatio"
+            label: I18n.tr("Modal Aspect Ratio")
+            options: [
+                { label: I18n.tr("Landscape"), value: "landscape" },
+                { label: I18n.tr("Portrait"), value: "portrait" }
+            ]
+            defaultValue: "landscape"
         }
 
         Separator {}
