@@ -1,4 +1,3 @@
-import "../Common/fzf.js" as Fzf
 import QtQuick
 import QtQuick.Controls
 import Quickshell
