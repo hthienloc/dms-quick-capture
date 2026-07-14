@@ -470,16 +470,15 @@ PluginSettings {
                     { label: I18n.tr("Saving"),        icon: "save"               },
                     { label: I18n.tr("Notifications"), icon: "notifications"      },
                     { label: I18n.tr("Toolbar"),       icon: "dock"               },
-                    { label: I18n.tr("Palette"),       icon: "palette"            },
-                    { label: I18n.tr("Styles"),        icon: "aspect_ratio"       },
+                    { label: I18n.tr("Color Palette"),  icon: "palette"            },
+                    { label: I18n.tr("Editor"),        icon: "aspect_ratio"       },
                     { label: I18n.tr("Drawing"),       icon: "brush"              },
                     { label: I18n.tr("Text"),          icon: "format_size"        },
                     { label: I18n.tr("Shapes"),        icon: "category"           },
                     { label: I18n.tr("Backdrop"),      icon: "wallpaper"          },
                     { label: I18n.tr("Watermark"),     icon: "branding_watermark" },
                     { label: I18n.tr("Float Window"),  icon: "open_in_new"        },
-                    { label: I18n.tr("Presets"),       icon: "settings"           },
-                    { label: I18n.tr("Radial"),        icon: "mouse"              },
+                    { label: I18n.tr("Radial Menu"),   icon: "mouse"              },
                     { label: I18n.tr("Shortcuts"),     icon: "keyboard"           },
                     { label: I18n.tr("Help"),          icon: "menu_book"          }
                 ]
@@ -1110,7 +1109,7 @@ PluginSettings {
         }
     }
 
-    // ── Tab 5: Styles ────────────────────────────────────────────────────────────
+    // ── Tab 5: Editor ─────────────────────────────────────────────────────────────
     Item {
         visible: tabBar.currentIndex === 5
         width: parent.width
@@ -1123,7 +1122,7 @@ PluginSettings {
             SettingsCard {
                 id: backdropStylesCard
         SectionTitle {
-            text: I18n.tr("Styles")
+            text: I18n.tr("Editor")
             icon: "aspect_ratio"
             showReset: overlayOpacity.isDirty || showCanvasBorder.isDirty || editQuality.isDirty || modalDisplayTarget.isDirty || modalAspectRatio.isDirty
             onResetClicked: {
@@ -2326,7 +2325,7 @@ PluginSettings {
         }
     }
 
-    // ── Tab 12: Presets ───────────────────────────────────────────────────────────
+    // ── Tab 12: Radial Menu ───────────────────────────────────────────────────────
     Item {
         visible: tabBar.currentIndex === 12
         width: parent.width
@@ -2951,22 +2950,10 @@ PluginSettings {
                 }
             }
         }
-    }
-        }
-    }
 
-    // ── Tab 13: Radial ───────────────────────────────────────────────────────────
-    Item {
-        visible: tabBar.currentIndex === 13
-        width: parent.width
-        height: visible ? implicitHeight : 0
-        implicitHeight: radialBehaviorsTabCol.implicitHeight
-        Column {
-            id: radialBehaviorsTabCol
-            width: parent.width
-            spacing: Theme.spacingM
-            SettingsCard {
-                id: radialBehaviorsCard
+        // ── Radial Menu Behavior ──────────────────────────────────────────
+        Separator {}
+
         SectionTitle {
             text: I18n.tr("Radial Menu Settings")
             icon: "mouse"
@@ -2977,8 +2964,6 @@ PluginSettings {
                 radialMenuOpacity.resetToDefault();
             }
         }
-
-
 
         ToggleSettingPlus {
             id: radialHoverTrigger
@@ -3027,13 +3012,12 @@ PluginSettings {
             }
         }
     }
-
         }
     }
 
-    // ── Tab 14: Shortcuts ────────────────────────────────────────────────────────
+    // ── Tab 13: Shortcuts ────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 14
+        visible: tabBar.currentIndex === 13
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: shortcutsTabCol.implicitHeight
@@ -3127,9 +3111,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 15: Help ─────────────────────────────────────────────────────────────
+    // ── Tab 14: Help ─────────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 15
+        visible: tabBar.currentIndex === 14
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: helpTabCol.implicitHeight
