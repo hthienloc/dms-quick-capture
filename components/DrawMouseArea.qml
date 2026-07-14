@@ -419,6 +419,7 @@ MouseArea {
             if (strokeIdx === -1) {
                 // Clicked empty space — deselect
                 if (window.selectedStroke) {
+                    window.selectedStroke = null;
                     window.strokeWidth = window.preGrabStrokeWidth;
                     window.textFontSize = window.preGrabTextFontSize;
                     window.pixelateIntensity = window.preGrabPixelateIntensity;
@@ -428,7 +429,6 @@ MouseArea {
                     window.activeRedactMode = window.preGrabRedactMode;
                     window.calloutLinkLines = window.preGrabCalloutLinkLines;
                 }
-                window.selectedStroke = null;
                 window.originalPoints = [];
                 window.activeHandle = "none";
                 hoveredHandle = "none";
