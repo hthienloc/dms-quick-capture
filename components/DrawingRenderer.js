@@ -622,7 +622,7 @@ function drawSelectionHandles(ctx, stroke, Theme) {
         return;
     }
 
-    if (stroke.tool === "line" || stroke.tool === "arrow") {
+    if (stroke.tool === "line" || stroke.tool === "arrow" || stroke.tool === "highlighter") {
         if (stroke.points.length < 2) return;
         const p0 = stroke.points[0];
         const p1 = stroke.points[stroke.points.length - 1];
@@ -634,6 +634,61 @@ function drawSelectionHandles(ctx, stroke, Theme) {
         ctx.strokeRect(p0.x - hh, p0.y - hh, hs, hs);
         ctx.fillRect(p1.x - hh, p1.y - hh, hs, hs);
         ctx.strokeRect(p1.x - hh, p1.y - hh, hs, hs);
+        return;
+    }
+
+    if (stroke.tool === "stamp") {
+        const hasLeader = stroke.hasLeaderLine && stroke.points.length >= 2;
+        const stampPt = hasLeader ? stroke.points[1] : stroke.points[0];
+
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = Theme.primary;
+        ctx.lineWidth = 1.5;
+
+        if (hasLeader) {
+            const anchorPt = stroke.points[0];
+            ctx.fillRect(anchorPt.x - hh, anchorPt.y - hh, hs, hs);
+            ctx.strokeRect(anchorPt.x - hh, anchorPt.y - hh, hs, hs);
+        }
+
+        ctx.fillRect(stampPt.x - hh, stampPt.y - hh, hs, hs);
+        ctx.strokeRect(stampPt.x - hh, stampPt.y - hh, hs, hs);
+        return;
+    }
+
+    if (stroke.tool === "callout" && stroke.points.length === 4) {
+        const p0 = stroke.points[0];
+        const p1 = stroke.points[1];
+        const x1 = Math.min(p0.x, p1.x);
+        const y1 = Math.min(p0.y, p1.y);
+        const x2 = Math.max(p0.x, p1.x);
+        const y2 = Math.max(p0.y, p1.y);
+        const cx = (x1 + x2) / 2;
+        const cy = (y1 + y2) / 2;
+        const sw = x2 - x1;
+        const sh = y2 - y1;
+        if (sw <= 0 || sh <= 0) return;
+
+        ctx.save();
+        ctx.strokeStyle = Theme.primary;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.strokeRect(x1, y1, sw, sh);
+        ctx.restore();
+
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = Theme.primary;
+        ctx.lineWidth = 1.5;
+        const handlePoints = [
+            {x: x1, y: y1}, {x: x2, y: y1},
+            {x: x1, y: y2}, {x: x2, y: y2},
+            {x: cx, y: y1}, {x: cx, y: y2},
+            {x: x1, y: cy}, {x: x2, y: cy}
+        ];
+        for (let p of handlePoints) {
+            ctx.fillRect(p.x - hh, p.y - hh, hs, hs);
+            ctx.strokeRect(p.x - hh, p.y - hh, hs, hs);
+        }
         return;
     }
 }
