@@ -624,7 +624,7 @@ DankModal {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
     readonly property string textInputMode: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textInputMode !== undefined ? window.parentWidget.pluginData.textInputMode : "inline"
-    readonly property string toolbarPosition: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.toolbarPosition !== undefined ? window.parentWidget.pluginData.toolbarPosition : "top"
+    readonly property string toolbarPosition: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.toolbarPosition !== undefined ? window.parentWidget.pluginData.toolbarPosition : "bottom"
     readonly property bool configShowToolbar: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.showToolbar !== undefined ? window.parentWidget.pluginData.showToolbar : true
     readonly property bool enableMagnifier: true
     property bool toolbarVisible: true
@@ -1097,7 +1097,7 @@ DankModal {
     property bool hasSelection: false
     readonly property bool roundRect: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.roundRect !== undefined ? window.parentWidget.pluginData.roundRect : true
     readonly property bool roundHighlighter: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.roundHighlighter !== undefined ? window.parentWidget.pluginData.roundHighlighter : false
-    readonly property bool penAutoClose: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.penAutoClose !== undefined ? window.parentWidget.pluginData.penAutoClose : true
+    readonly property bool penAutoClose: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.penAutoClose !== undefined ? window.parentWidget.pluginData.penAutoClose : false
 
     property string activeHandle: "none" // "tl", "tr", "bl", "br", "new", "none"
     property point selectStart: Qt.point(0, 0)
