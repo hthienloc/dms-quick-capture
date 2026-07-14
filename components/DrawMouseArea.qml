@@ -54,8 +54,7 @@ MouseArea {
 
         if (window.currentTool === "select") {
             if (window.selectedStroke) {
-                const sh = window.getSelectedStrokeHandleAt(absPt.x, absPt.y);
-                hoveredHandle = sh !== "none" ? sh : "none";
+                hoveredHandle = window.getSelectedStrokeHandleAt(absPt.x, absPt.y);
 
                 if (window.activeHandle === "none" && window.originalPoints.length > 0) {
                     const dx = absPt.x - window.pressCoords.x;
@@ -337,6 +336,14 @@ MouseArea {
                 const removed = list.splice(strokeIdx, 1);
                 window.strokes = list;
                 if (window.selectedStroke === removed[0]) {
+                    window.strokeWidth = window.preGrabStrokeWidth;
+                    window.textFontSize = window.preGrabTextFontSize;
+                    window.pixelateIntensity = window.preGrabPixelateIntensity;
+                    window.spotlightIntensity = window.preGrabSpotlightIntensity;
+                    window.calloutZoom = window.preGrabCalloutZoom;
+                    window.currentColor = window.preGrabColor;
+                    window.activeRedactMode = window.preGrabRedactMode;
+                    window.calloutLinkLines = window.preGrabCalloutLinkLines;
                     window.selectedStroke = null;
                 }
                 drawingCanvas.requestPaint();
@@ -377,6 +384,8 @@ MouseArea {
                 }
                 window.selectedStroke = null;
                 window.originalPoints = [];
+                window.activeHandle = "none";
+                hoveredHandle = "none";
                 drawingCanvas.requestPaint();
                 return;
             }
