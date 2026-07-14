@@ -32,13 +32,11 @@ Item {
         }
         StyledText {
             text: {
-                var t;
-                if (control.backdropAspectRatio === "auto") t = I18n.tr("AUTO");
-                else if (control.backdropAspectRatio === "custom") t = control.customAspectRatio.toFixed(2);
-                else t = control.backdropAspectRatio;
-                return String(t).padStart(5);
+                if (control.backdropAspectRatio === "auto") return I18n.tr("AUTO");
+                if (control.backdropAspectRatio === "custom") return control.customAspectRatio.toFixed(2);
+                return control.backdropAspectRatio;
             }
-            font.family: "monospace"
+            width: compact ? 40 : 50; horizontalAlignment: Text.AlignLeft
             font.pixelSize: compact ? tc.fontSizeCompact : Theme.fontSizeSmall
             color: Theme.surfaceText
             anchors.verticalCenter: parent.verticalCenter

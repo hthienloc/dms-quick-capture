@@ -472,8 +472,8 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         StyledText {
-                            text: String(root.backdropPadding).padStart(3) + "px"
-                            font.family: "monospace"
+                            text: root.backdropPadding + "px"
+                            width: 42; horizontalAlignment: Text.AlignRight
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -508,8 +508,8 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         StyledText {
-                            text: String(root.backdropCornerRadius).padStart(3) + "px"
-                            font.family: "monospace"
+                            text: root.backdropCornerRadius + "px"
+                            width: 42; horizontalAlignment: Text.AlignRight
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -544,8 +544,8 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         StyledText {
-                            text: String(root.backdropShadowStrength).padStart(3) + "%"
-                            font.family: "monospace"
+                            text: root.backdropShadowStrength + "%"
+                            width: 42; horizontalAlignment: Text.AlignRight
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -581,8 +581,8 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         StyledText {
-                            text: String(root.backdropGradientAngle).padStart(3) + "°"
-                            font.family: "monospace"
+                            text: root.backdropGradientAngle + "°"
+                            width: 42; horizontalAlignment: Text.AlignRight
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -719,8 +719,8 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         StyledText {
-                            text: String(root.backdropPadding).padStart(3)
-                            font.family: "monospace"
+                            text: root.backdropPadding
+                            width: tc.btnSize; horizontalAlignment: Text.AlignRight
                             font.pixelSize: tc.fontSizeCompact
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -754,8 +754,8 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         StyledText {
-                            text: String(root.backdropCornerRadius).padStart(3)
-                            font.family: "monospace"
+                            text: root.backdropCornerRadius
+                            width: tc.btnSize; horizontalAlignment: Text.AlignRight
                             font.pixelSize: tc.fontSizeCompact
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -789,8 +789,8 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         StyledText {
-                            text: String(root.backdropShadowStrength).padStart(3)
-                            font.family: "monospace"
+                            text: root.backdropShadowStrength
+                            width: tc.btnSize; horizontalAlignment: Text.AlignRight
                             font.pixelSize: tc.fontSizeCompact
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -825,8 +825,8 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         StyledText {
-                            text: String(root.backdropGradientAngle).padStart(3)
-                            font.family: "monospace"
+                            text: root.backdropGradientAngle
+                            width: tc.btnSize; horizontalAlignment: Text.AlignRight
                             font.pixelSize: tc.fontSizeCompact
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
