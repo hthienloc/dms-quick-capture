@@ -18,12 +18,14 @@ PluginComponent {
     property string activeIpcMode: ""
     property bool isDownloading: false
     property string currentCapturePath: ""
+    property int _captureSeq: 0
     // Exposed so the widget surface can read annotation state without accessing internal modal id
     readonly property bool isAnnotating: modal.shouldBeVisible
 
     // ── Capture helpers ───────────────────────────────────────────────────────
     function capturePath() {
-        return "/tmp/dms_capture_" + Date.now() + ".png";
+        _captureSeq = (_captureSeq + 1) % 100000;
+        return "/tmp/dms_capture_" + Date.now() + "_" + _captureSeq + ".png";
     }
 
     function screenshotMode() {
@@ -78,28 +80,28 @@ PluginComponent {
     function startActualCapture() {
         root.currentCapturePath = root.capturePath();
         const filename = root.currentCapturePath.split("/").pop();
-        Proc.runCommand("pre-capture-cleanup", ["rm", "-f", "/tmp/dms_capture_bg.png"], () => {
-            const cmdStr = root.screenshotArgs(filename).map(arg => "'" + arg.replace(/'/g, "'\\''") + "'").join(" ") + " 2>&1";
-            Proc.runCommand("screenshot-trigger", ["sh", "-c", cmdStr], (stdout, exitCode) => {
-                if (exitCode === 0) {
-                    Proc.runCommand("verify-capture", ["test", "-f", root.currentCapturePath], (_, fileExists) => {
-                        root.isCapturing = false;
-                        root.activeIpcMode = "";
-                        if (fileExists === 0) {
-                            root.validateAndOpenCapturedImage(root.currentCapturePath);
-                        }
-                    });
-                } else {
-                    const failMode = root.screenshotMode();
+        // Clean up old capture files (>1 hour) to prevent disk usage accumulation
+        Proc.runCommand("cleanup-old-captures", ["sh", "-c", "find /tmp -name 'dms_capture_*.png' -mmin +60 -delete 2>/dev/null"]);
+        const cmdStr = root.screenshotArgs(filename).map(arg => "'" + arg.replace(/'/g, "'\\''") + "'").join(" ") + " 2>&1";
+        Proc.runCommand("screenshot-trigger", ["sh", "-c", cmdStr], (stdout, exitCode) => {
+            if (exitCode === 0) {
+                Proc.runCommand("verify-capture", ["test", "-f", root.currentCapturePath], (_, fileExists) => {
                     root.isCapturing = false;
                     root.activeIpcMode = "";
-                    if (typeof ToastService !== "undefined" && ToastService) {
-                        const errorMsg = (stdout && stdout.trim()) ? stdout.trim() : I18n.tr("Screenshot failed (mode: %1).").arg(failMode);
-                        ToastService.showError(errorMsg);
+                    if (fileExists === 0) {
+                        root.validateAndOpenCapturedImage(root.currentCapturePath);
                     }
+                });
+            } else {
+                const failMode = root.screenshotMode();
+                root.isCapturing = false;
+                root.activeIpcMode = "";
+                if (typeof ToastService !== "undefined" && ToastService) {
+                    const errorMsg = (stdout && stdout.trim()) ? stdout.trim() : I18n.tr("Screenshot failed (mode: %1).").arg(failMode);
+                    ToastService.showError(errorMsg);
                 }
-            }, 0, 60000);
-        });
+            }
+        }, 0, 60000);
     }
 
     function closeOverlay() {
