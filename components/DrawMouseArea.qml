@@ -114,12 +114,57 @@ MouseArea {
                         if (tool === "redact") {
                             window.selectedStroke.cachedCleanColor = undefined;
                         }
-                    } else if (tool === "line" || tool === "arrow") {
+                    } else if (tool === "line" || tool === "arrow" || tool === "highlighter") {
                         const newPoints = [...window.selectedStroke.points];
                         if (window.activeHandle === "start") {
                             newPoints[0] = Qt.point(orig[0].x + dx, orig[0].y + dy);
                         } else if (window.activeHandle === "end") {
                             newPoints[newPoints.length - 1] = Qt.point(orig[orig.length - 1].x + dx, orig[orig.length - 1].y + dy);
+                        }
+                        window.selectedStroke.points = newPoints;
+                    } else if (tool === "callout" && window.activeHandle && window.activeHandle.indexOf("src_") === 0 && orig.length === 4) {
+                        const p0 = orig[0];
+                        const p1 = orig[1];
+                        let x1 = Math.min(p0.x, p1.x);
+                        let y1 = Math.min(p0.y, p1.y);
+                        let x2 = Math.max(p0.x, p1.x);
+                        let y2 = Math.max(p0.y, p1.y);
+                        const minSize = 10;
+                        const h = window.activeHandle.slice(4);
+
+                        switch (h) {
+                            case "tl": x1 = Math.min(x1 + dx, x2 - minSize); y1 = Math.min(y1 + dy, y2 - minSize); break;
+                            case "tr": x2 = Math.max(x2 + dx, x1 + minSize); y1 = Math.min(y1 + dy, y2 - minSize); break;
+                            case "bl": x1 = Math.min(x1 + dx, x2 - minSize); y2 = Math.max(y2 + dy, y1 + minSize); break;
+                            case "br": x2 = Math.max(x2 + dx, x1 + minSize); y2 = Math.max(y2 + dy, y1 + minSize); break;
+                            case "tc": y1 = Math.min(y1 + dy, y2 - minSize); break;
+                            case "bc": y2 = Math.max(y2 + dy, y1 + minSize); break;
+                            case "lc": x1 = Math.min(x1 + dx, x2 - minSize); break;
+                            case "rc": x2 = Math.max(x2 + dx, x1 + minSize); break;
+                        }
+
+                        const wasFlippedX = p0.x > p1.x;
+                        const wasFlippedY = p0.y > p1.y;
+                        const newP0 = Qt.point(wasFlippedX ? x2 : x1, wasFlippedY ? y2 : y1);
+                        const newP1 = Qt.point(wasFlippedX ? x1 : x2, wasFlippedY ? y1 : y2);
+
+                        const newPoints = [...window.selectedStroke.points];
+                        newPoints[0] = newP0;
+                        newPoints[1] = newP1;
+
+                        const newSW = Math.abs(newP1.x - newP0.x);
+                        const newSH = Math.abs(newP1.y - newP0.y);
+                        const zoom = window.selectedStroke.width / 100.0;
+                        newPoints[3] = Qt.point(newPoints[2].x + newSW * zoom, newPoints[2].y + newSH * zoom);
+                        window.selectedStroke.points = newPoints;
+                    } else if (tool === "stamp") {
+                        const newPoints = [...window.selectedStroke.points];
+                        const hasLeader = window.selectedStroke.hasLeaderLine && window.selectedStroke.points.length >= 2;
+                        if (window.activeHandle === "anchor" && hasLeader) {
+                            newPoints[0] = Qt.point(orig[0].x + dx, orig[0].y + dy);
+                        } else if (window.activeHandle === "stamp") {
+                            const idx = hasLeader ? 1 : 0;
+                            newPoints[idx] = Qt.point(orig[idx].x + dx, orig[idx].y + dy);
                         }
                         window.selectedStroke.points = newPoints;
                     }
@@ -275,11 +320,12 @@ MouseArea {
 
     cursorShape: {
         const h = (window.activeHandle !== "none" && window.activeHandle !== "new") ? window.activeHandle : hoveredHandle;
-        if (h === "tl" || h === "br") return Qt.SizeFDiagCursor;
-        if (h === "tr" || h === "bl") return Qt.SizeBDiagCursor;
-        if (h === "tc" || h === "bc") return Qt.SplitVCursor;
-        if (h === "lc" || h === "rc") return Qt.SplitHCursor;
-        if (h === "start" || h === "end") return Qt.SizeAllCursor;
+        const hs = (h && h.length > 4) ? h.slice(-3) : h;
+        if (h === "tl" || h === "br" || hs === "_tl" || hs === "_br") return Qt.SizeFDiagCursor;
+        if (h === "tr" || h === "bl" || hs === "_tr" || hs === "_bl") return Qt.SizeBDiagCursor;
+        if (h === "tc" || h === "bc" || hs === "_tc" || hs === "_bc") return Qt.SplitVCursor;
+        if (h === "lc" || h === "rc" || hs === "_lc" || hs === "_rc") return Qt.SplitHCursor;
+        if (h === "start" || h === "end" || h === "stamp" || h === "anchor") return Qt.SizeAllCursor;
         if (window.currentTool === "colorpicker") {
             return Qt.CrossCursor;
         }

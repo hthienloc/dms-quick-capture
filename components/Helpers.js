@@ -678,12 +678,47 @@ function getStrokeHandleAt(mx, my, stroke, estimateTextWidthFn) {
         return "none";
     }
 
-    if (stroke.tool === "line" || stroke.tool === "arrow") {
+    if (stroke.tool === "line" || stroke.tool === "arrow" || stroke.tool === "highlighter") {
         if (stroke.points.length < 2) return "none";
         const p0 = stroke.points[0];
         const p1 = stroke.points[stroke.points.length - 1];
         if (Math.abs(mx - p0.x) <= threshold && Math.abs(my - p0.y) <= threshold) return "start";
         if (Math.abs(mx - p1.x) <= threshold && Math.abs(my - p1.y) <= threshold) return "end";
+        return "none";
+    }
+
+    if (stroke.tool === "stamp") {
+        const hasLeader = stroke.hasLeaderLine && stroke.points.length >= 2;
+        const stampPt = hasLeader ? stroke.points[1] : stroke.points[0];
+        const stampRadius = stroke.width * Constants.stampRadiusMultiplier + Constants.stampSelectThresholdOffset;
+        const dx = mx - stampPt.x;
+        const dy = my - stampPt.y;
+        if (dx * dx + dy * dy <= stampRadius * stampRadius) return "stamp";
+        if (hasLeader) {
+            const anchorPt = stroke.points[0];
+            if (Math.abs(mx - anchorPt.x) <= threshold && Math.abs(my - anchorPt.y) <= threshold) return "anchor";
+        }
+        return "none";
+    }
+
+    if (stroke.tool === "callout" && stroke.points.length === 4) {
+        const p0 = stroke.points[0];
+        const p1 = stroke.points[1];
+        const x1 = Math.min(p0.x, p1.x);
+        const y1 = Math.min(p0.y, p1.y);
+        const x2 = Math.max(p0.x, p1.x);
+        const y2 = Math.max(p0.y, p1.y);
+        const cx = (x1 + x2) / 2;
+        const cy = (y1 + y2) / 2;
+
+        if (Math.abs(mx - x1) <= threshold && Math.abs(my - y1) <= threshold) return "src_tl";
+        if (Math.abs(mx - x2) <= threshold && Math.abs(my - y1) <= threshold) return "src_tr";
+        if (Math.abs(mx - x1) <= threshold && Math.abs(my - y2) <= threshold) return "src_bl";
+        if (Math.abs(mx - x2) <= threshold && Math.abs(my - y2) <= threshold) return "src_br";
+        if (Math.abs(mx - cx) <= threshold && Math.abs(my - y1) <= threshold) return "src_tc";
+        if (Math.abs(mx - cx) <= threshold && Math.abs(my - y2) <= threshold) return "src_bc";
+        if (Math.abs(mx - x1) <= threshold && Math.abs(my - cy) <= threshold) return "src_lc";
+        if (Math.abs(mx - x2) <= threshold && Math.abs(my - cy) <= threshold) return "src_rc";
         return "none";
     }
 
