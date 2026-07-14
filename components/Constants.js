@@ -27,3 +27,6 @@ const stampTextFontSizeMultiplier = 1.2;
 const stampTextOffsetMultiplier = 0.1;
 const textPaddingMultiplierX = 0.3;
 const textPaddingMultiplierY = 0.15;
+
+// Selection resize handles
+const selectionHandleSize = 8;

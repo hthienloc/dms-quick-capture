@@ -1190,6 +1190,11 @@ DankModal {
         return Helpers.findStrokeAt(mx, my, window.strokes, window.estimateTextWidth);
     }
 
+    function getSelectedStrokeHandleAt(mx, my) {
+        if (!window.selectedStroke) return "none";
+        return Helpers.getStrokeHandleAt(mx, my, window.selectedStroke, window.estimateTextWidth);
+    }
+
     function exportAndExecute(callback) {
         if (window.isTyping) {
             window.commitTypingText();
@@ -2418,6 +2423,11 @@ DankModal {
                                 // Draw selected stroke
                                 if (selectedStroke && selectedStroke.tool !== "spotlight" && selectedStroke.tool !== "pixelate") {
                                     drawStroke(ctx, selectedStroke);
+                                }
+
+                                // Draw selection resize handles in select mode
+                                if (selectedStroke && window.currentTool === "select") {
+                                    DrawingRenderer.drawSelectionHandles(ctx, selectedStroke, Theme);
                                 }
 
                                 // Draw temporary live typing text
