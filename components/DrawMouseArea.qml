@@ -122,7 +122,7 @@ MouseArea {
                             newPoints[newPoints.length - 1] = Qt.point(orig[orig.length - 1].x + dx, orig[orig.length - 1].y + dy);
                         }
                         window.selectedStroke.points = newPoints;
-                    } else if (tool === "callout" && window.activeHandle.indexOf("src_") === 0) {
+                    } else if (tool === "callout" && window.activeHandle && window.activeHandle.indexOf("src_") === 0 && orig.length === 4) {
                         const p0 = orig[0];
                         const p1 = orig[1];
                         let x1 = Math.min(p0.x, p1.x);
@@ -320,12 +320,12 @@ MouseArea {
 
     cursorShape: {
         const h = (window.activeHandle !== "none" && window.activeHandle !== "new") ? window.activeHandle : hoveredHandle;
-        const hs = h.length > 4 ? h.slice(-3) : h;
+        const hs = (h && h.length > 4) ? h.slice(-3) : h;
         if (h === "tl" || h === "br" || hs === "_tl" || hs === "_br") return Qt.SizeFDiagCursor;
         if (h === "tr" || h === "bl" || hs === "_tr" || hs === "_bl") return Qt.SizeBDiagCursor;
         if (h === "tc" || h === "bc" || hs === "_tc" || hs === "_bc") return Qt.SplitVCursor;
         if (h === "lc" || h === "rc" || hs === "_lc" || hs === "_rc") return Qt.SplitHCursor;
-        if (h === "start" || h === "end") return Qt.SizeAllCursor;
+        if (h === "start" || h === "end" || h === "stamp" || h === "anchor") return Qt.SizeAllCursor;
         if (window.currentTool === "colorpicker") {
             return Qt.CrossCursor;
         }
