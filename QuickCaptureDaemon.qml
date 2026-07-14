@@ -1,4 +1,5 @@
 import "./dms-common"
+import "./components"
 import QtQuick
 import QtQuick.Controls
 import Quickshell
@@ -18,6 +19,7 @@ PluginComponent {
     property string activeIpcMode: ""
     property bool isDownloading: false
     property string currentCapturePath: ""
+    property string captureAction: "edit" // "edit" | "float"
     // Exposed so the widget surface can read annotation state without accessing internal modal id
     readonly property bool isAnnotating: modal.shouldBeVisible
 
@@ -86,12 +88,15 @@ PluginComponent {
                     root.activeIpcMode = "";
                     if (fileExists === 0) {
                         root.validateAndOpenCapturedImage(root.currentCapturePath);
+                    } else {
+                        root.captureAction = "edit";
                     }
                 });
             } else {
                 const failMode = root.screenshotMode();
                 root.isCapturing = false;
                 root.activeIpcMode = "";
+                root.captureAction = "edit";
                 if (typeof ToastService !== "undefined" && ToastService) {
                     const errorMsg = (stdout && stdout.trim()) ? stdout.trim() : I18n.tr("Screenshot failed (mode: %1).").arg(failMode);
                     ToastService.showError(errorMsg);
@@ -134,6 +139,19 @@ PluginComponent {
         });
     }
 
+    function openImageForEdit(path) {
+        modal.currentCapturePath = path;
+        modal.shouldBeVisible = true;
+        modal.openCentered();
+    }
+
+    function openImageAsFloat(path) {
+        const action = root.captureAction;
+        root.captureAction = "edit";
+        if (action !== "float") return;
+        floatServiceItem.spawnWindow("file://" + path, pluginData, null, [path]);
+    }
+
     function validateAndOpenCapturedImage(path) {
         Proc.runCommand("validate-image", ["file", "-b", path], function(stdout, exitCode) {
             const output = stdout.toLowerCase();
@@ -162,9 +180,11 @@ PluginComponent {
                 }
             }
 
-            modal.currentCapturePath = path;
-            modal.shouldBeVisible = true;
-            modal.openCentered();
+            if (root.captureAction === "float") {
+                root.openImageAsFloat(path);
+            } else {
+                root.openImageForEdit(path);
+            }
         });
     }
 
@@ -222,26 +242,26 @@ PluginComponent {
 
     // ── IPC handlers ─────────────────────────────────────────────────────────
     IpcHandler {
-        function screenshot(mode: string) : string {
-            if (mode === "default") {
-                root.triggerCapture("");
-            } else {
-                root.triggerCapture(mode);
-            }
+        function screenshot(mode: string, action: string) : string {
+            root.captureAction = action || "edit";
+            root.triggerCapture(mode === "default" ? "" : mode);
             return "SUCCESS";
         }
 
-        function selectFile() : string {
+        function selectFile(action: string) : string {
+            root.captureAction = action || "edit";
             root.selectImageAndAnnotate();
             return "SUCCESS";
         }
 
-        function fromClipboard() : string {
+        function fromClipboard(action: string) : string {
+            root.captureAction = action || "edit";
             root.fromClipboard();
             return "SUCCESS";
         }
 
-        function openImage(path: string) : string {
+        function openImage(path: string, action: string) : string {
+            root.captureAction = action || "edit";
             if (path.startsWith("file://")) {
                 path = path.substring(7);
             }
@@ -268,11 +288,17 @@ PluginComponent {
         onTriggered: root.startActualCapture()
     }
 
+    // ── Float service ─────────────────────────────────────────────────────────
+    FloatService {
+        id: floatServiceItem
+    }
+
     // ── Modal ─────────────────────────────────────────────────────────────────
     QuickCaptureModal {
         id: modal
 
         parentWidget: root
+        floatService: floatServiceItem
     }
 
     // ── File browser ──────────────────────────────────────────────────────────

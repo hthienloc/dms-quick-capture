@@ -1107,14 +1107,16 @@ DankModal {
     property var restoreState: null
     property string restoreSource: ""
     property string currentCapturePath: ""
+    property var floatService: null
 
-    FloatService {
-        id: floatService
-        onRestoreRequested: function(imageSource, annotationState) {
-            window.restoreSource = imageSource;
-            window.restoreState = annotationState;
-            window.shouldBeVisible = true;
-            window.openCentered();
+    onFloatServiceChanged: {
+        if (floatService) {
+            floatService.restoreRequested.connect(function(imageSource, annotationState) {
+                window.restoreSource = imageSource;
+                window.restoreState = annotationState;
+                window.shouldBeVisible = true;
+                window.openCentered();
+            });
         }
     }
 
@@ -1123,7 +1125,7 @@ DankModal {
         parentWidget: window.parentWidget
         modal: window
         exportAndExecute: window.exportAndExecute
-        floatService: floatService
+        floatService: window.floatService
         onCloseRequested: window.discardAndClose()
     }
 
