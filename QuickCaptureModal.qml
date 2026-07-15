@@ -19,14 +19,9 @@ DankModal {
 
     readonly property var rootWindow: window
 
-    CaptureConfig {
-        id: config
+    CaptureConfig { 
+        id: config 
         pluginData: (window.parentWidget && window.parentWidget.pluginData) ? window.parentWidget.pluginData : ({})
-    }
-
-    OcrQrEngine {
-        id: ocrEngine
-        modal: window
     }
 
     Image {
@@ -777,10 +772,150 @@ DankModal {
         });
     }
 
-    function runOcr() { ocrEngine.runOcr(); }
-    function executeOcr() { ocrEngine.executeOcr(); }
-    function runQrScan() { ocrEngine.runQrScan(); }
-    function executeQrScan() { ocrEngine.executeQrScan(); }
+    function runOcr() {
+        window.ocrRect = Qt.rect(0, 0, 0, 0);
+        window.currentTool = "ocr";
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
+        if (typeof ToastService !== "undefined" && ToastService) {
+            ToastService.showInfo(I18n.tr("OCR: Draw a rectangle on the image to scan"));
+        }
+    }
+
+    function executeOcr() {
+        const r = window.ocrRect;
+        if (r.width < 10 || r.height < 10) {
+            window.ocrRect = Qt.rect(0, 0, 0, 0);
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+            return;
+        }
+
+        // Account for crop offset when mapping to source image coordinates
+        const cropOffsetX = window.hasSelection ? window.cropRect.x : 0;
+        const cropOffsetY = window.hasSelection ? window.cropRect.y : 0;
+        const ix = Math.round(r.x + cropOffsetX);
+        const iy = Math.round(r.y + cropOffsetY);
+        const iw = Math.round(r.width);
+        const ih = Math.round(r.height);
+
+        let bgPath = decodeURIComponent(window.bgImageSource.toString());
+        if (bgPath.startsWith("file://")) bgPath = bgPath.substring(7);
+        const qIdx = bgPath.indexOf("?");
+        if (qIdx !== -1) bgPath = bgPath.substring(0, qIdx);
+        let ocrLang = "eng";
+
+        const uniqueId = Date.now() + "_" + Math.floor(Math.random() * 1000000);
+        const tempCropPath = "/tmp/dms_ocr_crop_" + uniqueId + ".png";
+        Proc.runCommand("crop-ocr-temp", ["magick", bgPath, "-crop", iw + "x" + ih + "+" + ix + "+" + iy, tempCropPath], (stdout1, exitCode1) => {
+            if (exitCode1 === 0) {
+                Proc.runCommand("run-ocr", ["tesseract", tempCropPath, "-", "-l", ocrLang], (stdout2, exitCode2) => {
+                    Proc.runCommand("cleanup-ocr-temp", ["rm", "-f", tempCropPath]);
+
+                    if (exitCode2 === 0) {
+                        const result = stdout2.trim();
+                        if (result) {
+                            DMSService.sendRequest("clipboard.copy", { "text": result }, function(response) {
+                                if (typeof ToastService !== "undefined" && ToastService) {
+                                    ToastService.showInfo(I18n.tr("OCR: %1 chars copied to clipboard").arg(result.length));
+                                }
+                            });
+                        } else {
+                            if (typeof ToastService !== "undefined" && ToastService) {
+                                ToastService.showInfo(I18n.tr("OCR: No text detected"));
+                            }
+                        }
+                    } else {
+                        if (typeof ToastService !== "undefined" && ToastService) {
+                            ToastService.showError(I18n.tr("OCR failed during text extraction"));
+                        }
+                    }
+                    window.currentTool = window.lastActiveTool;
+                    window.ocrRect = Qt.rect(0, 0, 0, 0);
+                    if (window.activeCanvas) window.activeCanvas.requestPaint();
+                });
+            } else {
+                if (typeof ToastService !== "undefined" && ToastService) {
+                    ToastService.showError(I18n.tr("OCR failed: Could not crop image"));
+                }
+                window.currentTool = window.lastActiveTool;
+                window.ocrRect = Qt.rect(0, 0, 0, 0);
+                if (window.activeCanvas) window.activeCanvas.requestPaint();
+            }
+        });
+    }
+
+    function runQrScan() {
+        window.ocrRect = Qt.rect(0, 0, 0, 0);
+        window.currentTool = "qr";
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
+        if (typeof ToastService !== "undefined" && ToastService) {
+            ToastService.showInfo(I18n.tr("QR Scan: Draw a rectangle on the image to scan"));
+        }
+    }
+
+    function executeQrScan() {
+        const r = window.ocrRect;
+        if (r.width < 10 || r.height < 10) {
+            window.ocrRect = Qt.rect(0, 0, 0, 0);
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+            return;
+        }
+
+        // Account for crop offset when mapping to source image coordinates
+        const cropOffsetX = window.hasSelection ? window.cropRect.x : 0;
+        const cropOffsetY = window.hasSelection ? window.cropRect.y : 0;
+        const ix = Math.round(r.x + cropOffsetX);
+        const iy = Math.round(r.y + cropOffsetY);
+        const iw = Math.round(r.width);
+        const ih = Math.round(r.height);
+
+        let bgPath = decodeURIComponent(window.bgImageSource.toString());
+        if (bgPath.startsWith("file://")) bgPath = bgPath.substring(7);
+        const qIdx = bgPath.indexOf("?");
+        if (qIdx !== -1) bgPath = bgPath.substring(0, qIdx);
+
+        const uniqueId = Date.now() + "_" + Math.floor(Math.random() * 1000000);
+        const tempCropPath = "/tmp/dms_qr_crop_" + uniqueId + ".png";
+        Proc.runCommand("crop-qr-temp", ["magick", bgPath, "-crop", iw + "x" + ih + "+" + ix + "+" + iy, tempCropPath], (stdout1, exitCode1) => {
+            if (exitCode1 === 0) {
+                Proc.runCommand("run-qr-scan", ["zbarimg", "--raw", "-q", tempCropPath], (stdout2, exitCode2) => {
+                    Proc.runCommand("cleanup-qr-temp", ["rm", "-f", tempCropPath]);
+
+                    if (exitCode2 === 0) {
+                        const result = stdout2.trim();
+                        if (result) {
+                            DMSService.sendRequest("clipboard.copy", { "text": result }, function(response) {
+                                if (typeof ToastService !== "undefined" && ToastService) {
+                                    ToastService.showInfo(I18n.tr("QR Decoded: Copied to clipboard"));
+                                }
+                            });
+                        } else {
+                            if (typeof ToastService !== "undefined" && ToastService) {
+                                ToastService.showInfo(I18n.tr("QR Scan: No QR code detected"));
+                            }
+                        }
+                    } else if (exitCode2 === 4) {
+                        if (typeof ToastService !== "undefined" && ToastService) {
+                            ToastService.showInfo(I18n.tr("QR Scan: No QR code detected"));
+                        }
+                    } else {
+                        if (typeof ToastService !== "undefined" && ToastService) {
+                            ToastService.showError(I18n.tr("QR Scan failed or command execution error"));
+                        }
+                    }
+                    window.currentTool = window.lastActiveTool;
+                    window.ocrRect = Qt.rect(0, 0, 0, 0);
+                    if (window.activeCanvas) window.activeCanvas.requestPaint();
+                });
+            } else {
+                if (typeof ToastService !== "undefined" && ToastService) {
+                    ToastService.showError(I18n.tr("QR Scan failed: Could not crop image"));
+                }
+                window.currentTool = window.lastActiveTool;
+                window.ocrRect = Qt.rect(0, 0, 0, 0);
+                if (window.activeCanvas) window.activeCanvas.requestPaint();
+            }
+        });
+    }
 
     shouldBeVisible: false
     
