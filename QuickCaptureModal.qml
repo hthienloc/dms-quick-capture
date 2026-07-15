@@ -233,15 +233,15 @@ DankModal {
     property int pixelateIntensity: 8
     property bool pixelateRandomize: true
     onPixelateRandomizeChanged: {
-        if (selectedStroke && selectedStroke.tool === "pixelate") {
-            selectedStroke.randomize = window.pixelateRandomize;
-            if (window.pixelateRandomize && selectedStroke.randomSeed === undefined) {
-                selectedStroke.randomSeed = Math.floor(Math.random() * 2147483647);
+        if (window.selectedStroke && window.selectedStroke.tool === "pixelate") {
+            window.selectedStroke.randomize = window.pixelateRandomize;
+            if (window.pixelateRandomize && window.selectedStroke.randomSeed === undefined) {
+                window.selectedStroke.randomSeed = Math.floor(Math.random() * 2147483647);
             }
-            const idx = window.strokes.indexOf(selectedStroke);
+            const idx = window.strokes.indexOf(window.selectedStroke);
             if (idx !== -1) {
                 const list = [...window.strokes];
-                list[idx] = selectedStroke;
+                list[idx] = window.selectedStroke;
                 window.strokes = list;
             }
             if (window.activeCanvas) window.activeCanvas.requestPaint();
