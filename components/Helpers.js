@@ -535,7 +535,19 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
                 }
                 if (dist < threshold) return i;
             }
-        } else if (stroke.tool === "rect" || stroke.tool === "redact" || stroke.tool === "pixelate" || stroke.tool === "spotlight") {
+        } else if (stroke.tool === "rect") {
+            const p0 = stroke.points[0];
+            const p1 = stroke.points[stroke.points.length - 1];
+            const x1 = Math.min(p0.x, p1.x);
+            const x2 = Math.max(p0.x, p1.x);
+            const y1 = Math.min(p0.y, p1.y);
+            const y2 = Math.max(p0.y, p1.y);
+            if (mx >= x1 - threshold && mx <= x2 + threshold && my >= y1 - threshold && my <= y2 + threshold) {
+                const dx = Math.min(Math.abs(mx - x1), Math.abs(mx - x2));
+                const dy = Math.min(Math.abs(my - y1), Math.abs(my - y2));
+                if (dx <= threshold || dy <= threshold) return i;
+            }
+        } else if (stroke.tool === "redact" || stroke.tool === "pixelate" || stroke.tool === "spotlight") {
             const p0 = stroke.points[0];
             const p1 = stroke.points[stroke.points.length - 1];
             const x1 = Math.min(p0.x, p1.x);
