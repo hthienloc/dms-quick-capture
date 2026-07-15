@@ -89,8 +89,6 @@ PluginComponent {
                     root.activeIpcMode = "";
                     if (fileExists === 0) {
                         root.validateAndOpenCapturedImage(root.currentCapturePath, action);
-                    } else if (typeof ToastService !== "undefined" && ToastService) {
-                        ToastService.showError(I18n.tr("Screenshot failed: no image was saved."));
                     }
                 });
             } else {
