@@ -84,13 +84,22 @@ PluginComponent {
         const cmdStr = root.screenshotArgs(filename).map(arg => "'" + arg.replace(/'/g, "'\\''") + "'").join(" ") + " 2>&1";
         Proc.runCommand("screenshot-trigger", ["sh", "-c", cmdStr], (stdout, exitCode) => {
             if (exitCode === 0) {
+                if (stdout && stdout.trim().toLowerCase().includes("error")) {
+                    root.isCapturing = false;
+                    root.activeIpcMode = "";
+                    if (typeof ToastService !== "undefined" && ToastService) {
+                        ToastService.showError(stdout.trim());
+                    }
+                    return;
+                }
                 Proc.runCommand("verify-capture", ["test", "-f", root.currentCapturePath], (_, fileExists) => {
                     root.isCapturing = false;
                     root.activeIpcMode = "";
                     if (fileExists === 0) {
                         root.validateAndOpenCapturedImage(root.currentCapturePath, action);
                     } else if (typeof ToastService !== "undefined" && ToastService) {
-                        ToastService.showError(I18n.tr("Screenshot failed: no image was saved."));
+                        const errMsg = (stdout && stdout.trim()) ? stdout.trim() : I18n.tr("Screenshot failed: no image was saved.");
+                        ToastService.showError(errMsg);
                     }
                 });
             } else {
