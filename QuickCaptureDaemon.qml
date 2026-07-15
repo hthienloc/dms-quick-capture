@@ -34,9 +34,8 @@ PluginComponent {
 
     function screenshotArgs(filename) {
         const mode = root.activeIpcMode !== "" ? root.activeIpcMode : root.captureMode;
-        const format = "png";
         const cursorVal = pluginData.includeCursor ? "on" : "off";
-        const args = ["dms", "screenshot", mode, "--no-clipboard", "--dir", "/tmp", "--filename", filename, "--format", format, "--cursor", cursorVal, "--no-notify"];
+        const args = ["dms", "screenshot", mode, "--no-clipboard", "--dir", "/tmp", "--filename", filename, "--format", "png", "--cursor", cursorVal, "--no-notify"];
 
         if (mode === "region" && pluginData.skipConfirm !== false) {
             args.push("--no-confirm");
