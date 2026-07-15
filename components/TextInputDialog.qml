@@ -25,7 +25,7 @@ Popup {
 
     onOpened: {
         Qt.callLater(() => {
-            textInputField.text = "";
+            textInputField.text = window.currentTypingText;
             textInputField.forceActiveFocus();
         });
     }
@@ -34,6 +34,7 @@ Popup {
         if (window.isTyping) {
             window.isTyping = false;
             window.currentTypingText = "";
+            window.editingStroke = null;
             if (window.activeCanvas) window.activeCanvas.requestPaint();
             if (modalFocusScope) {
                 modalFocusScope.forceActiveFocus();

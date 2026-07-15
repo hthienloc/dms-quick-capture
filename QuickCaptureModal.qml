@@ -629,6 +629,7 @@ DankModal {
     property bool isTyping: false
     property point typingCoords: Qt.point(0,0)
     property string currentTypingText: ""
+    property var editingStroke: null
 
     // Helper to decode hex color to RGB
     function hexToRgb(hex) { return Helpers.hexToRgb(hex, Qt); }
@@ -1430,6 +1431,7 @@ DankModal {
 
     function handleTypingKey(event) {
         if (event.key === Qt.Key_Escape) {
+            window.editingStroke = null;
             window.isTyping = false;
             window.currentTypingText = "";
             if (window.activeCanvas) window.activeCanvas.requestPaint();
@@ -3055,7 +3057,37 @@ DankModal {
     function commitTypingText() {
         if (!window.isTyping) return;
         const textStr = window.currentTypingText.trim();
-        if (textStr.length > 0) {
+        if (window.editingStroke) {
+            if (textStr.length > 0) {
+                const s = window.editingStroke;
+                s.text = textStr;
+                s.color = window.currentColor.toString();
+                s.width = window.textFontSize;
+                s.isMonospace = window.textFontFamily === "monospace";
+                s.fontFamily = window.textFontFamily;
+                s.isBold = window.textBold;
+                s.isItalic = window.textItalic;
+                s.isUnderline = window.textUnderline;
+                s.hasBackground = window.textBackground;
+                s.cornerRadius = window.textCornerRadius;
+                s.points = [Qt.point(window.typingCoords.x, window.typingCoords.y)];
+                const idx = window.strokes.indexOf(s);
+                if (idx !== -1) {
+                    const list = [...window.strokes];
+                    list[idx] = s;
+                    window.strokes = list;
+                }
+                if (window.currentTool === "select") {
+                    window.selectedStroke = s;
+                }
+            } else {
+                const list = [...window.strokes];
+                const idx = list.indexOf(window.editingStroke);
+                if (idx !== -1) list.splice(idx, 1);
+                window.strokes = list;
+            }
+            window.editingStroke = null;
+        } else if (textStr.length > 0) {
             window.pushStroke({
                 tool: "text",
                 color: window.currentColor.toString(),
