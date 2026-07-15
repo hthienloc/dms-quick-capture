@@ -231,6 +231,19 @@ DankModal {
     // Intensity Management
     property int strokeWidth: 8
     property int pixelateIntensity: 8
+    property bool pixelateRandomize: false
+    onPixelateRandomizeChanged: {
+        if (selectedStroke && selectedStroke.tool === "pixelate") {
+            selectedStroke.randomize = window.pixelateRandomize;
+            const idx = window.strokes.indexOf(selectedStroke);
+            if (idx !== -1) {
+                const list = [...window.strokes];
+                list[idx] = selectedStroke;
+                window.strokes = list;
+            }
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+        }
+    }
     property int spotlightIntensity: 50
     property int textFontSize: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textFontSize !== undefined ? window.parentWidget.pluginData.textFontSize : 36
     property int calloutZoom: 150
@@ -2578,8 +2591,9 @@ DankModal {
                             lineOptionsToolbar: lineOptionsToolbar
                             arrowOptionsToolbar: arrowOptionsToolbar
                             redactOptionsToolbar: redactOptionsToolbar
-                            calloutOptionsToolbar: calloutOptionsToolbar
-                        }
+                             calloutOptionsToolbar: calloutOptionsToolbar
+                             pixelateOptionsToolbar: pixelateOptionsToolbar
+                         }
 
                         SizePreviewCard {
                             id: sizePreviewItem
@@ -2899,6 +2913,13 @@ DankModal {
                     toolbarPosition: window.toolbarPosition
                     currentLinkLines: window.calloutLinkLines
                     onLinkLinesSelected: (count) => window.calloutLinkLines = count
+                }
+
+                PixelateOptionsToolbar {
+                    id: pixelateOptionsToolbar
+                    toolbarPosition: window.toolbarPosition
+                    randomizeActive: window.pixelateRandomize
+                    onRandomizeToggled: window.pixelateRandomize = !window.pixelateRandomize
                 }
 
                 MoreToolsMenu {
