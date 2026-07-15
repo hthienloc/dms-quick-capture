@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Controls
 import qs.Common
 import qs.Widgets
-import ".."
 import "Helpers.js" as Helpers
 
 Rectangle {
