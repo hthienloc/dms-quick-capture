@@ -35,7 +35,7 @@ PluginComponent {
     function screenshotArgs(filename) {
         const mode = root.activeIpcMode !== "" ? root.activeIpcMode : root.captureMode;
         const cursorVal = pluginData.includeCursor ? "on" : "off";
-        const args = ["dms", "screenshot", mode, "--no-clipboard", "--dir", "/tmp", "--filename", filename, "--format", "png", "--cursor", cursorVal, "--no-notify"];
+        const args = ["dms", "screenshot", mode, "--no-clipboard", "--dir", "/tmp", "--filename", filename, "--format", "png", "--cursor", cursorVal, "--no-notify", "--json"];
 
         if (mode === "region" && pluginData.skipConfirm !== false) {
             args.push("--no-confirm");
@@ -82,18 +82,27 @@ PluginComponent {
         const filename = root.currentCapturePath.split("/").pop();
         const cmdStr = root.screenshotArgs(filename).map(arg => "'" + arg.replace(/'/g, "'\\''") + "'").join(" ") + " 2>&1";
         Proc.runCommand("screenshot-trigger", ["sh", "-c", cmdStr], (stdout, exitCode) => {
-            if (exitCode === 0) {
-                Proc.runCommand("verify-capture", ["test", "-f", root.currentCapturePath], (_, fileExists) => {
-                    root.isCapturing = false;
-                    root.activeIpcMode = "";
-                    if (fileExists === 0) {
-                        root.validateAndOpenCapturedImage(root.currentCapturePath, action);
+            root.isCapturing = false;
+            root.activeIpcMode = "";
+            try {
+                const trimmed = stdout.trim();
+                const startIdx = trimmed.indexOf("{");
+                const endIdx = trimmed.lastIndexOf("}");
+                const meta = startIdx !== -1 && endIdx > startIdx
+                    ? JSON.parse(trimmed.substring(startIdx, endIdx + 1))
+                    : JSON.parse(trimmed);
+                if (meta.status === "success") {
+                    root.currentCapturePath = meta.path;
+                    root.validateAndOpenCapturedImage(meta.path, action, meta.width, meta.height);
+                } else if (meta.status !== "aborted") {
+                    const failMode = root.screenshotMode();
+                    if (typeof ToastService !== "undefined" && ToastService) {
+                        const errorMsg = meta.message || meta.error || I18n.tr("Screenshot failed (mode: %1).").arg(failMode);
+                        ToastService.showError(errorMsg);
                     }
-                });
-            } else {
+                }
+            } catch (e) {
                 const failMode = root.screenshotMode();
-                root.isCapturing = false;
-                root.activeIpcMode = "";
                 if (typeof ToastService !== "undefined" && ToastService) {
                     const errorMsg = (stdout && stdout.trim()) ? stdout.trim() : I18n.tr("Screenshot failed (mode: %1).").arg(failMode);
                     ToastService.showError(errorMsg);
@@ -147,40 +156,36 @@ PluginComponent {
         floatServiceItem.spawnWindow("file://" + path, pluginData, null, [path]);
     }
 
-    function validateAndOpenCapturedImage(path, action) {
-        Proc.runCommand("validate-image", ["file", "-b", path], function(stdout, exitCode) {
-            const output = stdout.toLowerCase();
-            if (exitCode !== 0 || output.includes("empty") || !output.includes("image")) {
+    function validateAndOpenCapturedImage(path, action, width, height) {
+        if (width !== undefined && height !== undefined) {
+            const minSize = pluginData.minImageSize ?? 16;
+            if (width < minSize || height < minSize) {
                 if (typeof ToastService !== "undefined" && ToastService) {
-                    ToastService.showError("Invalid or corrupted image file.");
+                    ToastService.showError("Image is too small (" + width + "x" + height + "). Minimum: " + minSize + "px");
                 }
                 return;
             }
-
-            let w = 0, h = 0;
-            let re = /(\d+)\s*x\s*(\d+)/g;
-            let match;
-            while ((match = re.exec(stdout)) !== null) {
-                w = parseInt(match[1]);
-                h = parseInt(match[2]);
-            }
-
-            if (w > 0 && h > 0) {
-                const minSize = pluginData.minImageSize ?? 16;
-                if (w < minSize || h < minSize) {
+            openAction(path, action);
+        } else {
+            Proc.runCommand("validate-image", ["file", "-b", path], function(stdout, exitCode) {
+                const output = stdout.toLowerCase();
+                if (exitCode !== 0 || output.includes("empty") || !output.includes("image")) {
                     if (typeof ToastService !== "undefined" && ToastService) {
-                        ToastService.showError("Image is too small (" + w + "x" + h + "). Minimum: " + minSize + "px");
+                        ToastService.showError("Invalid or corrupted image file.");
                     }
                     return;
                 }
-            }
+                openAction(path, action);
+            });
+        }
+    }
 
-            if (action === "float") {
-                root.openImageAsFloat(path);
-            } else {
-                root.openImageForEdit(path);
-            }
-        });
+    function openAction(path, action) {
+        if (action === "float") {
+            root.openImageAsFloat(path);
+        } else {
+            root.openImageForEdit(path);
+        }
     }
 
     function loadImageFromUriWithAction(uri, action) {

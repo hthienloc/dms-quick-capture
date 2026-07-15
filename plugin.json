@@ -17,7 +17,7 @@
         "widget": "./QuickCaptureWidget.qml"
     },
     "settings": "./QuickCaptureSettings.qml",
-    "requires_dms": ">=1.5.0",
+    "requires_dms": ">=1.5.1",
     "requires": [],
     "permissions": [
         "settings_read",
