@@ -583,7 +583,7 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
  * @param {object} stroke - The selected stroke data object.
  * @param {object} Theme - The Theme object.
  */
-function drawSelectionHandles(ctx, stroke, Theme) {
+function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn) {
     if (!stroke || !stroke.points || stroke.points.length === 0) return;
 
     const hs = Constants.selectionHandleSize;
@@ -653,6 +653,37 @@ function drawSelectionHandles(ctx, stroke, Theme) {
 
         ctx.fillRect(stampPt.x - hh, stampPt.y - hh, hs, hs);
         ctx.strokeRect(stampPt.x - hh, stampPt.y - hh, hs, hs);
+        return;
+    }
+
+    if (stroke.tool === "text") {
+        const p = stroke.points[0];
+        const fontSize = stroke.width;
+        const txt = stroke.text || "";
+        const lines = String(txt).split("\n");
+        const numLines = lines.length || 1;
+        const lineH = fontSize * 1.35;
+        let tw = Constants.minTextWidth;
+        if (estimateTextWidthFn) {
+            tw = Math.max(Constants.minTextWidth, estimateTextWidthFn(txt, fontSize, stroke.isBold === true, stroke.isMonospace === true));
+        }
+        let th = fontSize + (numLines - 1) * lineH;
+        let tx = p.x;
+        let ty = p.y;
+        if (stroke.hasBackground) {
+            const px = fontSize * Constants.textPaddingMultiplierX;
+            const py = fontSize * Constants.textPaddingMultiplierY;
+            tx -= px;
+            ty -= py;
+            tw += px * 2;
+            th += py * 2;
+        }
+        ctx.save();
+        ctx.strokeStyle = Theme.primary;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.strokeRect(tx, ty, tw, th);
+        ctx.restore();
         return;
     }
 

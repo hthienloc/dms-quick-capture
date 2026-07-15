@@ -2484,7 +2484,7 @@ DankModal {
 
                                 // Draw selection resize handles in select mode
                                 if (selectedStroke && window.currentTool === "select") {
-                                    DrawingRenderer.drawSelectionHandles(ctx, selectedStroke, Theme);
+                                    DrawingRenderer.drawSelectionHandles(ctx, selectedStroke, Theme, window.estimateTextWidth);
                                 }
 
                                 // Draw temporary live typing text
