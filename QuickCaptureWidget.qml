@@ -105,7 +105,13 @@ PluginComponent {
             color: itemMouse.containsMouse || pinArea.containsMouse ? Theme.surfaceContainerHigh : "transparent"
             radius: Theme.cornerRadiusSmall
 
-            property bool floatMode: false
+            function execMode(action) {
+                const mk = modelData.modeKey;
+                if (mk === "clipboard") root.daemon.fromClipboardWithAction(action);
+                else if (mk === "selectFile") root.daemon.selectImageAndAnnotateWithAction(action);
+                else root.daemon.triggerCaptureWithAction(mk, action);
+                root.closePopout();
+            }
 
             Row {
                 anchors.left: parent.left
@@ -138,11 +144,9 @@ PluginComponent {
                 anchors.verticalCenter: parent.verticalCenter
                 name: "push_pin"
                 size: 16
-                opacity: itemMouse.containsMouse || pinArea.containsMouse || itemRect.floatMode ? 1 : 0
-                color: itemRect.floatMode ? Theme.primary : Theme.surfaceText
-                rotation: itemRect.floatMode ? 45 : 0
+                opacity: itemMouse.containsMouse || pinArea.containsMouse ? 1 : 0
+                color: pinArea.containsMouse ? Theme.primary : Theme.surfaceText
                 Behavior on opacity { NumberAnimation { duration: 100 } }
-                Behavior on rotation { NumberAnimation { duration: 150; easing.type: Easing.OutQuad } }
             }
 
             MouseArea {
@@ -152,12 +156,7 @@ PluginComponent {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
-                    const action = itemRect.floatMode ? "float" : "edit";
-                    const mk = modelData.modeKey;
-                    if (mk === "clipboard") root.daemon.fromClipboardWithAction(action);
-                    else if (mk === "selectFile") root.daemon.selectImageAndAnnotateWithAction(action);
-                    else root.daemon.triggerCaptureWithAction(mk, action);
-                    root.closePopout();
+                    execMode("edit");
                 }
             }
 
@@ -170,7 +169,7 @@ PluginComponent {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
-                    itemRect.floatMode = !itemRect.floatMode;
+                    execMode("float");
                 }
             }
         }
