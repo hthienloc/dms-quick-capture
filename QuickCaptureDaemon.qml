@@ -16,6 +16,7 @@ PluginComponent {
     // ── State ────────────────────────────────────────────────────────────────
     property bool isCapturing: false
     readonly property string captureMode: (pluginData.captureMode || "region")
+    readonly property var allowedModes: ["region", "window", "full", "output", "all", "last", ""]
     property string activeIpcMode: ""
     property bool isDownloading: false
     property string currentCapturePath: ""
@@ -52,7 +53,7 @@ PluginComponent {
 
     function triggerCaptureWithAction(mode, action) {
         const normalizedMode = mode === "default" ? "" : (mode || "");
-        const allowedModes = ["region", "window", "full", "output", ""];
+        const allowedModes = root.allowedModes;
         if (normalizedMode && !allowedModes.includes(normalizedMode)) {
             console.warn("Invalid screenshot mode rejected: " + mode);
             return;

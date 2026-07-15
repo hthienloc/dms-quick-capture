@@ -19,6 +19,163 @@ PluginComponent {
     pluginId: "quickCapture"
     pluginService: PluginService
 
+    // ── Popout (left-click menu) ──────────────────────────────────────────────
+    popoutWidth: 240
+    popoutHeight: 400
+
+    popoutContent: Component {
+        PopoutComponent {
+            width: root.popoutWidth
+            headerText: I18n.tr("Quick Capture")
+            detailsText: I18n.tr("Select capture mode")
+            showCloseButton: true
+            closePopout: () => root.closePopout()
+
+            Column {
+                width: parent.width
+                spacing: 2
+                topPadding: Theme.spacingS
+                bottomPadding: Theme.spacingS
+
+                Repeater {
+                    model: [
+                        { icon: "screenshot_region", text: I18n.tr("Region"), modeKey: "region", isDefault: true },
+                        { icon: "fullscreen", text: I18n.tr("Full Screen"), modeKey: "full", isDefault: false },
+                        { icon: "crop_square", text: I18n.tr("Active Window"), modeKey: "window", isDefault: false },
+                    ]
+
+                    delegate: menuItemComp
+                }
+
+                Rectangle {
+                    width: parent.width - Theme.spacingL
+                    height: 6
+                    color: "transparent"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Rectangle {
+                        width: parent.width
+                        height: 1
+                        color: Theme.withAlpha(Theme.outline, 0.12)
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                Repeater {
+                    model: [
+                        { icon: "grid_view", text: I18n.tr("All Outputs"), modeKey: "all" },
+                        { icon: "display_settings", text: I18n.tr("Specific Output"), modeKey: "output" },
+                        { icon: "restart_alt", text: I18n.tr("Last Region"), modeKey: "last" },
+                    ]
+
+                    delegate: menuItemComp
+                }
+
+                Rectangle {
+                    width: parent.width - Theme.spacingL
+                    height: 6
+                    color: "transparent"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Rectangle {
+                        width: parent.width
+                        height: 1
+                        color: Theme.withAlpha(Theme.outline, 0.12)
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                Repeater {
+                    model: [
+                        { icon: "content_paste", text: I18n.tr("From Clipboard"), modeKey: "clipboard" },
+                        { icon: "folder_open", text: I18n.tr("From File"), modeKey: "selectFile" },
+                    ]
+
+                    delegate: menuItemComp
+                }
+            }
+        }
+    }
+
+    Component {
+        id: menuItemComp
+
+        Rectangle {
+            id: itemRect
+            width: parent.width
+            height: 36
+            color: itemMouse.containsMouse || pinArea.containsMouse ? Theme.surfaceContainerHigh : "transparent"
+            radius: Theme.cornerRadiusSmall
+
+            function execMode(action) {
+                if (!root.daemon) return;
+                const mk = modelData.modeKey;
+                if (mk === "clipboard") root.daemon.fromClipboardWithAction(action);
+                else if (mk === "selectFile") root.daemon.selectImageAndAnnotateWithAction(action);
+                else root.daemon.triggerCaptureWithAction(mk, action);
+                root.closePopout();
+            }
+
+            Row {
+                anchors.left: parent.left
+                anchors.leftMargin: Theme.spacingM
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.spacingS + 28
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.spacingS
+
+                DankIcon {
+                    name: modelData.icon
+                    size: 18
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: modelData.isDefault ? Theme.primary : Theme.surfaceText
+                }
+
+                StyledText {
+                    text: modelData.text
+                    font.pixelSize: Theme.fontSizeNormal
+                    font.bold: modelData.isDefault === true
+                    color: modelData.isDefault ? Theme.primary : Theme.surfaceText
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+
+            DankIcon {
+                id: pinIcon
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.spacingS
+                anchors.verticalCenter: parent.verticalCenter
+                name: "push_pin"
+                size: 16
+                opacity: itemMouse.containsMouse || pinArea.containsMouse ? 1 : 0
+                color: pinArea.containsMouse ? Theme.primary : Theme.surfaceText
+                Behavior on opacity { NumberAnimation { duration: 100 } }
+            }
+
+            MouseArea {
+                id: itemMouse
+                anchors.fill: parent
+                anchors.rightMargin: 28
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    execMode("edit");
+                }
+            }
+
+            MouseArea {
+                id: pinArea
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                width: 28
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    execMode("float");
+                }
+            }
+        }
+    }
+
     // ── Horizontal bar pill ───────────────────────────────────────────────────
     horizontalBarPill: Component {
         Item {
@@ -58,7 +215,7 @@ PluginComponent {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: (mouse) => {
                     if (mouse.button === Qt.MiddleButton) {
-                        if (root.daemon) root.daemon.triggerCaptureWithAction("full", "edit");
+                        if (root.daemon) root.daemon.triggerCaptureWithAction("default", "edit");
                     }
                 }
             }
@@ -104,7 +261,7 @@ PluginComponent {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: (mouse) => {
                     if (mouse.button === Qt.MiddleButton) {
-                        if (root.daemon) root.daemon.triggerCaptureWithAction("full", "edit");
+                        if (root.daemon) root.daemon.triggerCaptureWithAction("default", "edit");
                     }
                 }
             }
@@ -112,9 +269,7 @@ PluginComponent {
     }
 
     // ── Bar Pill interactions ─────────────────────────────────────────────────
-    pillClickAction: function() {
-        if (root.daemon) root.daemon.triggerCaptureWithAction("default", "edit");
-    }
+    // popout auto-opens on left click when pillClickAction is not set and popoutContent is defined
     pillRightClickAction: function() {
         if (root.daemon) root.daemon.fromClipboardWithAction("edit");
     }
