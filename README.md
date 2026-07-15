@@ -127,13 +127,16 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 
 ## IPC Commands
 
+Each command accepts an `action` parameter — use `edit` to open the editor or `float` to spawn an always-on-top window.
+
 ```bash
-dms ipc call quickCapture <command> [arg]
+dms ipc call quickCapture screenshot region edit   # open editor
+dms ipc call quickCapture screenshot region float  # float directly
 ```
 
-| Command | Argument | Description |
-|---------|----------|-------------|
-| `screenshot` | `mode` | Trigger capture (`default`, `region`, `full`, `all`, `output`, `window`, `last`) |
+| Command | Arguments | Description |
+|---------|-----------|-------------|
+| `screenshot` | `mode` (`default`, `region`, `full`, `all`, `output`, `window`, `last`) | Trigger capture |
 | `selectFile` | — | Open file browser to pick an image |
 | `fromClipboard` | — | Annotate image from clipboard |
 | `openImage` | `path` | Open a specific image in the annotator |
@@ -143,8 +146,10 @@ dms ipc call quickCapture <command> [arg]
 
 ```kdl
 binds {
-    Print { spawn "dms" "ipc" "call" "quickCapture" "screenshot" "default"; }
-    Meta+Print { spawn "dms" "ipc" "call" "quickCapture" "screenshot" "window"; }
+    Print { spawn "dms" "ipc" "call" "quickCapture" "screenshot" "region" "edit"; }
+    Meta+Print { spawn "dms" "ipc" "call" "quickCapture" "screenshot" "window" "edit"; }
+    # Float without editor:
+    # Control+Print { spawn "dms" "ipc" "call" "quickCapture" "screenshot" "full" "float"; }
 }
 ```
 

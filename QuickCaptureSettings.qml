@@ -3136,54 +3136,102 @@ PluginSettings {
             spacing: Theme.spacingM
             visible: ipcTitle.isExpanded
 
-            CopyBox {
-                label: I18n.tr("Trigger Screenshot (Default)")
-                text: "dms ipc call quickCapture screenshot default"
+            StyledText {
+                width: parent.width
+                text: I18n.tr("Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).")
+                wrapMode: Text.WordWrap
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceVariantText
             }
 
             CopyBox {
-                label: I18n.tr("Trigger Screenshot (Interactive Region)")
-                text: "dms ipc call quickCapture screenshot region"
+                label: I18n.tr("Screenshot (Default) — Edit")
+                text: "dms ipc call quickCapture screenshot default edit"
+            }
+            CopyBox {
+                label: I18n.tr("Screenshot (Default) — Float")
+                text: "dms ipc call quickCapture screenshot default float"
             }
 
             CopyBox {
-                label: I18n.tr("Trigger Screenshot (Full Screen)")
-                text: "dms ipc call quickCapture screenshot full"
+                label: I18n.tr("Screenshot (Interactive Region) — Edit")
+                text: "dms ipc call quickCapture screenshot region edit"
+            }
+            CopyBox {
+                label: I18n.tr("Screenshot (Interactive Region) — Float")
+                text: "dms ipc call quickCapture screenshot region float"
             }
 
             CopyBox {
-                label: I18n.tr("Trigger Screenshot (All Combined Outputs)")
-                text: "dms ipc call quickCapture screenshot all"
+                label: I18n.tr("Screenshot (Full Screen) — Edit")
+                text: "dms ipc call quickCapture screenshot full edit"
+            }
+            CopyBox {
+                label: I18n.tr("Screenshot (Full Screen) — Float")
+                text: "dms ipc call quickCapture screenshot full float"
             }
 
             CopyBox {
-                label: I18n.tr("Trigger Screenshot (Specific Output)")
-                text: "dms ipc call quickCapture screenshot output"
+                label: I18n.tr("Screenshot (All Combined Outputs) — Edit")
+                text: "dms ipc call quickCapture screenshot all edit"
+            }
+            CopyBox {
+                label: I18n.tr("Screenshot (All Combined Outputs) — Float")
+                text: "dms ipc call quickCapture screenshot all float"
             }
 
             CopyBox {
-                label: I18n.tr("Trigger Screenshot (Focused Window)")
-                text: "dms ipc call quickCapture screenshot window"
+                label: I18n.tr("Screenshot (Specific Output) — Edit")
+                text: "dms ipc call quickCapture screenshot output edit"
+            }
+            CopyBox {
+                label: I18n.tr("Screenshot (Specific Output) — Float")
+                text: "dms ipc call quickCapture screenshot output float"
             }
 
             CopyBox {
-                label: I18n.tr("Trigger Screenshot (Last Selected Region)")
-                text: "dms ipc call quickCapture screenshot last"
+                label: I18n.tr("Screenshot (Focused Window) — Edit")
+                text: "dms ipc call quickCapture screenshot window edit"
+            }
+            CopyBox {
+                label: I18n.tr("Screenshot (Focused Window) — Float")
+                text: "dms ipc call quickCapture screenshot window float"
             }
 
             CopyBox {
-                label: I18n.tr("Select Image File")
-                text: "dms ipc call quickCapture selectFile"
+                label: I18n.tr("Screenshot (Last Selected Region) — Edit")
+                text: "dms ipc call quickCapture screenshot last edit"
+            }
+            CopyBox {
+                label: I18n.tr("Screenshot (Last Selected Region) — Float")
+                text: "dms ipc call quickCapture screenshot last float"
             }
 
             CopyBox {
-                label: I18n.tr("Edit Image from Clipboard")
-                text: "dms ipc call quickCapture fromClipboard"
+                label: I18n.tr("Select Image File — Edit")
+                text: "dms ipc call quickCapture selectFile edit"
+            }
+            CopyBox {
+                label: I18n.tr("Select Image File — Float")
+                text: "dms ipc call quickCapture selectFile float"
             }
 
             CopyBox {
-                label: I18n.tr("Open Specific Image Path")
-                text: "dms ipc call quickCapture openImage /path/to/image.png"
+                label: I18n.tr("Edit Image from Clipboard — Edit")
+                text: "dms ipc call quickCapture fromClipboard edit"
+            }
+            CopyBox {
+                label: I18n.tr("Edit Image from Clipboard — Float")
+                text: "dms ipc call quickCapture fromClipboard float"
+            }
+
+            CopyBox {
+                label: I18n.tr("Open Specific Image Path — Edit")
+                text: "dms ipc call quickCapture openImage /path/to/image.png edit"
+            }
+            CopyBox {
+                label: I18n.tr("Open Specific Image Path — Float")
+                text: "dms ipc call quickCapture openImage /path/to/image.png float"
             }
 
             CopyBox {
@@ -3195,7 +3243,7 @@ PluginSettings {
 
             CopyBox {
                 label: I18n.tr("Niri Binding Example")
-                text: "binds {\n    Print { spawn \"dms\" \"ipc\" \"call\" \"quickCapture\" \"screenshot\" \"default\"; }\n}"
+                text: "binds {\n    Print { spawn \"dms\" \"ipc\" \"call\" \"quickCapture\" \"screenshot\" \"region\" \"edit\"; }\n}"
             }
         }
     }
