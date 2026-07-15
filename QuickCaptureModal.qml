@@ -691,7 +691,7 @@ DankModal {
         const originalW = window.bgImageItem ? window.bgImageItem.sourceSize.width : 1;
         const originalH = window.bgImageItem ? window.bgImageItem.sourceSize.height : 1;
 
-        let bgPath = "/tmp/dms_capture_bg.png";
+        let bgPath = "";
         if (window.bgImageSource) {
             let srcStr = window.bgImageSource.toString();
             const qIdx = srcStr.indexOf("?");
@@ -705,6 +705,7 @@ DankModal {
             }
         }
 
+        if (!bgPath) return;
         Proc.runCommand("rotate-image", ["mogrify", "-rotate", "90", bgPath], (stdout, exitCode) => {
             if (exitCode === 0) {
                 if (window.hasSelection) {
@@ -735,7 +736,7 @@ DankModal {
     function mirrorScreenshot() {
         const originalW = window.bgImageItem ? window.bgImageItem.sourceSize.width : 1;
 
-        let bgPath = "/tmp/dms_capture_bg.png";
+        let bgPath = "";
         if (window.bgImageSource) {
             let srcStr = window.bgImageSource.toString();
             const qIdx = srcStr.indexOf("?");
@@ -749,6 +750,7 @@ DankModal {
             }
         }
 
+        if (!bgPath) return;
         Proc.runCommand("mirror-image", ["mogrify", "-flop", bgPath], (stdout, exitCode) => {
             if (exitCode === 0) {
                 if (window.hasSelection) {
@@ -1580,8 +1582,6 @@ DankModal {
         } else if (window.currentCapturePath) {
             window.bgImageSource = "file://" + window.currentCapturePath;
             window.currentCapturePath = "";
-        } else {
-            window.bgImageSource = "file:///tmp/dms_capture_bg.png";
         }
         window.isScreenshotDark = false;
         window.hasSampledContrast = false;

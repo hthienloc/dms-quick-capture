@@ -33,7 +33,6 @@ PluginComponent {
     }
 
     function screenshotArgs(filename) {
-        filename = filename || "dms_capture_bg.png";
         const mode = root.activeIpcMode !== "" ? root.activeIpcMode : root.captureMode;
         const format = "png";
         const cursorVal = pluginData.includeCursor ? "on" : "off";
