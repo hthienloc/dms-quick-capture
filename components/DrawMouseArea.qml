@@ -490,6 +490,9 @@ MouseArea {
                 else if (stroke.tool === "pixelate") {
                     window.pixelateIntensity = stroke.width;
                     window.pixelateRandomize = stroke.randomize === true;
+                    if (window.pixelateRandomize && stroke.randomSeed === undefined) {
+                        stroke.randomSeed = Math.floor(Math.random() * 2147483647);
+                    }
                 }
                 else if (stroke.tool === "spotlight") window.spotlightIntensity = stroke.width;
                 else if (stroke.tool === "callout") window.calloutZoom = stroke.width;
@@ -635,7 +638,8 @@ MouseArea {
              arrowHeadStyle: window.currentTool === "arrow" ? window.activeArrowHeadStyle : "single-filled",
              redactMode: window.currentTool === "redact" ? window.activeRedactMode : "solid",
              calloutLinkLines: window.currentTool === "callout" ? window.calloutLinkLines : 1,
-             randomize: window.currentTool === "pixelate" ? window.pixelateRandomize : false
+             randomize: window.currentTool === "pixelate" ? window.pixelateRandomize : false,
+             randomSeed: window.currentTool === "pixelate" ? Math.floor(Math.random() * 2147483647) : 0
          };
          drawingCanvas.requestPaint();
     }

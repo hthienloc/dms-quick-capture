@@ -88,7 +88,7 @@ Item {
 
                 DankIcon {
                     anchors.centerIn: parent
-                    name: "shuffle"
+                    name: "visibility_lock"
                     size: tc.subToolbarIconSize
                     color: root.randomizeActive ? Theme.primary : Theme.surfaceText
                 }

@@ -306,8 +306,12 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
                             let sx, sy, sampleSize;
                             if (stroke.randomize) {
                                 sampleSize = 1;
-                                sx = Math.min(x + Math.floor(Math.random() * bw), imgW - 1);
-                                sy = Math.min(y + Math.floor(Math.random() * bh), imgH - 1);
+                                const seed = stroke.randomSeed !== undefined ? stroke.randomSeed : 0;
+                                let h = (x * 374761393 + y * 668265263 + seed) >>> 0;
+                                h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0;
+                                h = (h ^ (h >>> 16)) >>> 0;
+                                sx = Math.min(x + (h % bw), imgW - 1);
+                                sy = Math.min(y + ((h >>> 8) % bh), imgH - 1);
                             } else {
                                 sampleSize = Math.max(1, Math.round(blockSize / 5));
                                 sx = Math.min(x + Math.floor(bw / 2), rx + rw - 1);
