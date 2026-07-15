@@ -39,9 +39,9 @@ PluginComponent {
 
                 Repeater {
                     model: [
-                        { icon: "screenshot_region", text: I18n.tr("Capture Region"), action: () => root.daemon.triggerCaptureWithAction("region", "edit"), isDefault: true },
-                        { icon: "fullscreen", text: I18n.tr("Capture Full Screen"), action: () => root.daemon.triggerCaptureWithAction("full", "edit"), isDefault: false },
-                        { icon: "crop_square", text: I18n.tr("Capture Active Window"), action: () => root.daemon.triggerCaptureWithAction("window", "edit"), isDefault: false },
+                        { icon: "screenshot_region", text: I18n.tr("Region"), action: () => root.daemon.triggerCaptureWithAction("region", "edit"), isDefault: true },
+                        { icon: "fullscreen", text: I18n.tr("Full Screen"), action: () => root.daemon.triggerCaptureWithAction("full", "edit"), isDefault: false },
+                        { icon: "crop_square", text: I18n.tr("Active Window"), action: () => root.daemon.triggerCaptureWithAction("window", "edit"), isDefault: false },
                     ]
 
                     delegate: menuItemComp
@@ -62,9 +62,9 @@ PluginComponent {
 
                 Repeater {
                     model: [
-                        { icon: "grid_view", text: I18n.tr("Capture All Outputs"), action: () => root.daemon.triggerCaptureWithAction("all", "edit") },
-                        { icon: "display_settings", text: I18n.tr("Capture Specific Output"), action: () => root.daemon.triggerCaptureWithAction("output", "edit") },
-                        { icon: "restart_alt", text: I18n.tr("Capture Last Region"), action: () => root.daemon.triggerCaptureWithAction("last", "edit") },
+                        { icon: "grid_view", text: I18n.tr("All Outputs"), action: () => root.daemon.triggerCaptureWithAction("all", "edit") },
+                        { icon: "display_settings", text: I18n.tr("Specific Output"), action: () => root.daemon.triggerCaptureWithAction("output", "edit") },
+                        { icon: "restart_alt", text: I18n.tr("Last Region"), action: () => root.daemon.triggerCaptureWithAction("last", "edit") },
                     ]
 
                     delegate: menuItemComp
@@ -85,8 +85,8 @@ PluginComponent {
 
                 Repeater {
                     model: [
-                        { icon: "content_paste", text: I18n.tr("Import from Clipboard"), action: () => root.daemon.fromClipboardWithAction("edit") },
-                        { icon: "folder_open", text: I18n.tr("Import from File"), action: () => root.daemon.selectImageAndAnnotateWithAction("edit") },
+                        { icon: "content_paste", text: I18n.tr("From Clipboard"), action: () => root.daemon.fromClipboardWithAction("edit") },
+                        { icon: "folder_open", text: I18n.tr("From File"), action: () => root.daemon.selectImageAndAnnotateWithAction("edit") },
                     ]
 
                     delegate: menuItemComp
