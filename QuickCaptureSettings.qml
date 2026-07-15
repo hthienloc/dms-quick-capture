@@ -2341,7 +2341,7 @@ PluginSettings {
 
         property int presetActiveIndex: 0
 
-        property var activePresetTools: Constants.defaultRadialTools
+        property var activePresetTools: [...Constants.defaultRadialTools]
         property var activePresetColors: ["primary", "primary", "primary", "primary", "primary", "primary", "#000000", "#ffffff"]
         property var activePresetThicknesses: [6, 6, 6, 6, 6, 6, 6, 6]
 

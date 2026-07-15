@@ -1,11 +1,13 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.Services
 
 QtObject {
     property var modal
 
     function runOcr() {
+        if (!modal) return;
         modal.ocrRect = Qt.rect(0, 0, 0, 0);
         modal.currentTool = "ocr";
         if (modal.activeCanvas) modal.activeCanvas.requestPaint();
@@ -15,6 +17,7 @@ QtObject {
     }
 
     function executeOcr() {
+        if (!modal || !modal.bgImageSource) return;
         const r = modal.ocrRect;
         if (r.width < 10 || r.height < 10) {
             modal.ocrRect = Qt.rect(0, 0, 0, 0);
@@ -76,6 +79,7 @@ QtObject {
     }
 
     function runQrScan() {
+        if (!modal) return;
         modal.ocrRect = Qt.rect(0, 0, 0, 0);
         modal.currentTool = "qr";
         if (modal.activeCanvas) modal.activeCanvas.requestPaint();
@@ -85,6 +89,7 @@ QtObject {
     }
 
     function executeQrScan() {
+        if (!modal || !modal.bgImageSource) return;
         const r = modal.ocrRect;
         if (r.width < 10 || r.height < 10) {
             modal.ocrRect = Qt.rect(0, 0, 0, 0);
