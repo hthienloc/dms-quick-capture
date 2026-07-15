@@ -102,7 +102,7 @@ PluginComponent {
             id: itemRect
             width: parent.width
             height: 36
-            color: itemMouse.containsMouse ? Theme.surfaceContainerHigh : "transparent"
+            color: itemMouse.containsMouse || pinArea.containsMouse ? Theme.surfaceContainerHigh : "transparent"
             radius: Theme.cornerRadiusSmall
 
             property bool floatMode: false
@@ -138,7 +138,7 @@ PluginComponent {
                 anchors.verticalCenter: parent.verticalCenter
                 name: "push_pin"
                 size: 16
-                opacity: itemMouse.containsMouse || itemRect.floatMode ? 1 : 0
+                opacity: itemMouse.containsMouse || pinArea.containsMouse || itemRect.floatMode ? 1 : 0
                 color: itemRect.floatMode ? Theme.primary : Theme.surfaceText
                 rotation: itemRect.floatMode ? 45 : 0
                 Behavior on opacity { NumberAnimation { duration: 100 } }
