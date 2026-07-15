@@ -3,7 +3,7 @@
     "id": "quickCapture",
     "name": "Quick Capture",
     "description": "Instant screenshot and overlay annotation utility for Wayland",
-    "version": "3.0.1",
+    "version": "3.1.0",
     "author": "Loc Huynh",
     "icon": "screenshot_region",
     "type": "composite",
