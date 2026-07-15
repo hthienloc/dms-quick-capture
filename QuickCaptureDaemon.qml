@@ -85,7 +85,12 @@ PluginComponent {
             root.isCapturing = false;
             root.activeIpcMode = "";
             try {
-                const meta = JSON.parse(stdout.trim());
+                const trimmed = stdout.trim();
+                const startIdx = trimmed.indexOf("{");
+                const endIdx = trimmed.lastIndexOf("}");
+                const meta = startIdx !== -1 && endIdx > startIdx
+                    ? JSON.parse(trimmed.substring(startIdx, endIdx + 1))
+                    : JSON.parse(trimmed);
                 if (meta.status === "success") {
                     root.currentCapturePath = meta.path;
                     root.validateAndOpenCapturedImage(meta.path, action, meta.width, meta.height);
@@ -160,8 +165,22 @@ PluginComponent {
                 }
                 return;
             }
+            openAction(path, action);
+        } else {
+            Proc.runCommand("validate-image", ["file", "-b", path], function(stdout, exitCode) {
+                const output = stdout.toLowerCase();
+                if (exitCode !== 0 || output.includes("empty") || !output.includes("image")) {
+                    if (typeof ToastService !== "undefined" && ToastService) {
+                        ToastService.showError("Invalid or corrupted image file.");
+                    }
+                    return;
+                }
+                openAction(path, action);
+            });
         }
+    }
 
+    function openAction(path, action) {
         if (action === "float") {
             root.openImageAsFloat(path);
         } else {
