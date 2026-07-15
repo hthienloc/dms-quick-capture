@@ -1705,7 +1705,6 @@ DankModal {
 
                 QuickCaptureToolbar {
                     id: toolbarCard
-                    config: config
                     Component.onCompleted: window.toolbarItem = toolbarCard
                     z: 100
                     visible: window.toolbarVisible
@@ -2695,7 +2694,6 @@ DankModal {
 
                 RadialMenu {
                     id: radialMenu
-                    config: config
                     presets: window.radialPresets
                     hoverTrigger: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.radialHoverTrigger !== undefined ? window.parentWidget.pluginData.radialHoverTrigger : false
                     hoverDelay: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.radialHoverDelay !== undefined ? window.parentWidget.pluginData.radialHoverDelay : 300

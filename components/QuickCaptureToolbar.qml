@@ -2,14 +2,15 @@ import QtQuick
 import QtQuick.Controls
 import qs.Common
 import qs.Widgets
+import ".."
 import "Helpers.js" as Helpers
 
 Rectangle {
     id: root
 
     property var pluginData: ({})
-    property var config: ({})
     ToolbarConstants { id: tc }
+    CaptureConfig { id: config; pluginData: root.pluginData }
 
     property string currentTool: "crop"
     property string activeToolType: currentTool
