@@ -138,6 +138,20 @@ DankModal {
         if (currentTool !== "crop" && currentTool !== "backdrop" && currentTool !== "select" && currentTool !== "colorpicker") {
             lastActiveTool = currentTool;
         }
+        if (currentTool !== "select" && window.selectedStroke) {
+            const restoreColor = window.preGrabColor;
+            window.selectedStroke = null;
+            window.originalPoints = [];
+            window.strokeWidth = window.preGrabStrokeWidth;
+            window.textFontSize = window.preGrabTextFontSize;
+            window.pixelateIntensity = window.preGrabPixelateIntensity;
+            window.spotlightIntensity = window.preGrabSpotlightIntensity;
+            window.calloutZoom = window.preGrabCalloutZoom;
+            window.currentColor = restoreColor;
+            window.activeRedactMode = window.preGrabRedactMode;
+            window.calloutLinkLines = window.preGrabCalloutLinkLines;
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+        }
         if (currentTool === "colorpicker") {
             window._lastSampledX = -1;
             window._lastSampledY = -1;
