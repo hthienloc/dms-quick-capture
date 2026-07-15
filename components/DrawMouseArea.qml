@@ -330,7 +330,7 @@ MouseArea {
             return Qt.CrossCursor;
         }
         if (window.currentTool === "select") {
-            return window.selectedStroke ? Qt.ClosedHandCursor : (hoveredStrokeIdx !== -1 ? Qt.OpenHandCursor : Qt.ArrowCursor);
+            return pressed && window.selectedStroke ? Qt.ClosedHandCursor : (hoveredStrokeIdx !== -1 ? Qt.OpenHandCursor : Qt.ArrowCursor);
         }
         return Qt.CrossCursor;
     }
