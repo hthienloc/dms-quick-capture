@@ -163,6 +163,38 @@ DankModal {
             const defaultMode = (config && config.pluginData && config.pluginData["backdropDefaultMode"]) || Constants.defaultBackdropMode;
             window.backdropMode = defaultMode;
         }
+        if (currentTool === "select" && !window.selectedStroke && window.strokes.length > 0) {
+            const s = window.strokes[window.strokes.length - 1];
+            window.preGrabStrokeWidth = window.strokeWidth;
+            window.preGrabTextFontSize = window.textFontSize;
+            window.preGrabPixelateIntensity = window.pixelateIntensity;
+            window.preGrabSpotlightIntensity = window.spotlightIntensity;
+            window.preGrabCalloutZoom = window.calloutZoom;
+            window.preGrabColor = window.currentColor;
+            window.preGrabRedactMode = window.activeRedactMode;
+            window.preGrabCalloutLinkLines = window.calloutLinkLines;
+            window.selectedStroke = s;
+            window.currentColor = s.color;
+            if (s.tool === "text") window.textFontSize = s.width;
+            else if (s.tool === "pixelate") window.pixelateIntensity = s.width;
+            else if (s.tool === "spotlight") window.spotlightIntensity = s.width;
+            else if (s.tool === "callout") window.calloutZoom = s.width;
+            else window.strokeWidth = s.width;
+            if (s.tool === "line" && s.lineStyle) window.activeLineStyle = s.lineStyle;
+            if (s.tool === "arrow") {
+                if (s.arrowLineStyle) window.activeArrowLineStyle = s.arrowLineStyle;
+                if (s.arrowHeadStyle) window.activeArrowHeadStyle = s.arrowHeadStyle;
+            }
+            if (s.tool === "redact" && s.redactMode) window.activeRedactMode = s.redactMode;
+            if (s.tool === "callout") window.calloutLinkLines = s.calloutLinkLines !== undefined ? s.calloutLinkLines : 1;
+            const reorder = [...window.strokes];
+            const idx = reorder.indexOf(s);
+            if (idx !== -1) {
+                reorder.splice(idx, 1);
+                reorder.push(s);
+            }
+            window.strokes = reorder;
+        }
         window.requestPaintAll();
     }
 
