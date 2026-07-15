@@ -52,7 +52,7 @@ PluginComponent {
 
     function triggerCaptureWithAction(mode, action) {
         const normalizedMode = mode === "default" ? "" : (mode || "");
-        const allowedModes = ["region", "window", "full", "output", ""];
+        const allowedModes = ["region", "window", "full", "output", "all", "last", ""];
         if (normalizedMode && !allowedModes.includes(normalizedMode)) {
             console.warn("Invalid screenshot mode rejected: " + mode);
             return;
