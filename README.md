@@ -1,5 +1,7 @@
 # DMS Quick Capture & Annotate
 
+<img src="screenshot.png" width="800" alt="Screenshot">
+
 <p align="center">
   <a href="https://github.com/AvengeMedia/dms-plugin-registry/issues/432">
     <img src="https://img.shields.io/badge/Upvote%20on%20DMS%20Plugin%20Registry-%E2%86%91-blue?style=flat-square" alt="Upvote on DMS Plugin Registry"/>
