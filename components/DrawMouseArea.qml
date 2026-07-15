@@ -22,6 +22,7 @@ MouseArea {
     required property var arrowOptionsToolbar
     required property var redactOptionsToolbar
     required property var calloutOptionsToolbar
+    required property var pixelateOptionsToolbar
 
     property string activeHandle: "none"
     property string hoveredHandle: "none"
@@ -371,6 +372,9 @@ MouseArea {
                 } else if (window.currentTool === "callout") {
                     calloutOptionsToolbar.open(mapped.x, mapped.y);
                     return;
+                } else if (window.currentTool === "pixelate") {
+                    pixelateOptionsToolbar.open(mapped.x, mapped.y);
+                    return;
                 }
             }
             radialMenu.open(mapped.x, mapped.y);
@@ -483,7 +487,13 @@ MouseArea {
 
                 // Sync internal state with stroke's intensity
                 if (stroke.tool === "text") window.textFontSize = stroke.width;
-                else if (stroke.tool === "pixelate") window.pixelateIntensity = stroke.width;
+                else if (stroke.tool === "pixelate") {
+                    window.pixelateIntensity = stroke.width;
+                    window.pixelateRandomize = stroke.randomize === true;
+                    if (window.pixelateRandomize && stroke.randomSeed === undefined) {
+                        stroke.randomSeed = Math.floor(Math.random() * 2147483647);
+                    }
+                }
                 else if (stroke.tool === "spotlight") window.spotlightIntensity = stroke.width;
                 else if (stroke.tool === "callout") window.calloutZoom = stroke.width;
                 else window.strokeWidth = stroke.width;
@@ -627,7 +637,9 @@ MouseArea {
              arrowLineStyle: window.currentTool === "arrow" ? window.activeArrowLineStyle : "solid",
              arrowHeadStyle: window.currentTool === "arrow" ? window.activeArrowHeadStyle : "single-filled",
              redactMode: window.currentTool === "redact" ? window.activeRedactMode : "solid",
-             calloutLinkLines: window.currentTool === "callout" ? window.calloutLinkLines : 1
+             calloutLinkLines: window.currentTool === "callout" ? window.calloutLinkLines : 1,
+             randomize: window.currentTool === "pixelate" ? window.pixelateRandomize : false,
+             randomSeed: window.currentTool === "pixelate" ? Math.floor(Math.random() * 2147483647) : 0
          };
          drawingCanvas.requestPaint();
     }

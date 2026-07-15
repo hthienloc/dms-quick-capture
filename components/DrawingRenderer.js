@@ -296,7 +296,6 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
 
                 if (config.bgImageItem && config.bgImageItem.status === 1 /* Image.Ready */) {
                     const blockSize = Math.max(8, Math.min(36, stroke.width * 3));
-                    const sampleSize = Math.max(1, Math.round(blockSize / 5));
                     const imgW = config.bgImageItem.sourceSize.width;
                     const imgH = config.bgImageItem.sourceSize.height;
                     for (let y = ry; y < ry + rh; y += blockSize) {
@@ -304,10 +303,22 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
                             const bw = Math.min(blockSize, rx + rw - x);
                             const bh = Math.min(blockSize, ry + rh - y);
                             if (bw <= 0 || bh <= 0) continue;
-                            let sx = Math.min(x + Math.floor(bw / 2), rx + rw - 1);
-                            let sy = Math.min(y + Math.floor(bh / 2), ry + rh - 1);
-                            sx = Math.max(0, Math.min(sx, Math.max(0, imgW - sampleSize)));
-                            sy = Math.max(0, Math.min(sy, Math.max(0, imgH - sampleSize)));
+                            let sx, sy, sampleSize;
+                            if (stroke.randomize) {
+                                sampleSize = 1;
+                                const seed = stroke.randomSeed !== undefined ? stroke.randomSeed : 0;
+                                let h = (x * 374761393 + y * 668265263 + seed) >>> 0;
+                                h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0;
+                                h = (h ^ (h >>> 16)) >>> 0;
+                                sx = Math.max(0, Math.min(x + (h % bw), imgW - 1));
+                                sy = Math.max(0, Math.min(y + ((h >>> 8) % bh), imgH - 1));
+                            } else {
+                                sampleSize = Math.max(1, Math.round(blockSize / 5));
+                                sx = Math.min(x + Math.floor(bw / 2), rx + rw - 1);
+                                sy = Math.min(y + Math.floor(bh / 2), ry + rh - 1);
+                                sx = Math.max(0, Math.min(sx, Math.max(0, imgW - sampleSize)));
+                                sy = Math.max(0, Math.min(sy, Math.max(0, imgH - sampleSize)));
+                            }
                             ctx.drawImage(config.bgImageItem, sx, sy, sampleSize, sampleSize, x, y, bw, bh);
                         }
                     }
