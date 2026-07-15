@@ -672,7 +672,6 @@ DankModal {
     readonly property string textInputMode: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textInputMode !== undefined ? window.parentWidget.pluginData.textInputMode : "inline"
     readonly property string toolbarPosition: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.toolbarPosition !== undefined ? window.parentWidget.pluginData.toolbarPosition : "bottom"
     readonly property bool configShowToolbar: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.showToolbar !== undefined ? window.parentWidget.pluginData.showToolbar : true
-    readonly property bool enableMagnifier: true
     property bool toolbarVisible: true
     onConfigShowToolbarChanged: {
         window.toolbarVisible = window.configShowToolbar;
@@ -686,7 +685,7 @@ DankModal {
         const originalW = window.bgImageItem ? window.bgImageItem.sourceSize.width : 1;
         const originalH = window.bgImageItem ? window.bgImageItem.sourceSize.height : 1;
 
-        let bgPath = "/tmp/dms_capture_bg.png";
+        let bgPath = "";
         if (window.bgImageSource) {
             let srcStr = window.bgImageSource.toString();
             const qIdx = srcStr.indexOf("?");
@@ -700,6 +699,7 @@ DankModal {
             }
         }
 
+        if (!bgPath) return;
         Proc.runCommand("rotate-image", ["mogrify", "-rotate", "90", bgPath], (stdout, exitCode) => {
             if (exitCode === 0) {
                 if (window.hasSelection) {
@@ -730,7 +730,7 @@ DankModal {
     function mirrorScreenshot() {
         const originalW = window.bgImageItem ? window.bgImageItem.sourceSize.width : 1;
 
-        let bgPath = "/tmp/dms_capture_bg.png";
+        let bgPath = "";
         if (window.bgImageSource) {
             let srcStr = window.bgImageSource.toString();
             const qIdx = srcStr.indexOf("?");
@@ -744,6 +744,7 @@ DankModal {
             }
         }
 
+        if (!bgPath) return;
         Proc.runCommand("mirror-image", ["mogrify", "-flop", bgPath], (stdout, exitCode) => {
             if (exitCode === 0) {
                 if (window.hasSelection) {
@@ -1074,8 +1075,7 @@ DankModal {
         const val = pData["preset_" + index + "_tool"];
         if (val !== undefined) return val;
         
-        const defaultTools = ["pen", "arrow", "rect", "highlighter", "ellipse", "stamp", "redact", "pixelate"];
-        return defaultTools[index] || "none";
+        return Constants.defaultRadialTools[index] || "none";
     }
 
     function getPresetColor(index) {
@@ -1715,8 +1715,6 @@ DankModal {
         } else if (window.currentCapturePath) {
             window.bgImageSource = "file://" + window.currentCapturePath;
             window.currentCapturePath = "";
-        } else {
-            window.bgImageSource = "file:///tmp/dms_capture_bg.png";
         }
         window.isScreenshotDark = false;
         window.hasSampledContrast = false;

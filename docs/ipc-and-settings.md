@@ -9,7 +9,7 @@ This reference outlines the IPC interface, keyboard/mouse shortcut registries, a
 You can interact with Quick Capture from external scripts, keyboard shortcut managers, or status bar launchers using the DMS IPC commands:
 
 ```bash
-dms ipc call quickCapture <command> [arg]
+dms ipc call quickCapture <command> [arg] edit|float
 ```
 
 ### Supported Commands
@@ -19,9 +19,9 @@ All commands accept an `action` parameter (`edit` / `float`) — use `float` to 
 | Command | Arguments | Description |
 | :--- | :--- | :--- |
 | `screenshot` | `mode` (`default`, `region`, `full`, `all`, `output`, `window`, `last`) | Triggers a screenshot. |
-| `selectFile` | *(none)* | Opens file picker. |
-| `fromClipboard` | *(none)* | Imports image from clipboard. |
-| `openImage` | `path` | Opens a local image file. |
+| `selectFile` | `action` (`edit` / `float`) | Opens file picker. |
+| `fromClipboard` | `action` (`edit` / `float`) | Imports image from clipboard. |
+| `openImage` | `path`, `action` (`edit` / `float`) | Opens a local image file. |
 | `close` | *(none)* | Closes the annotator. |
 
 ```bash

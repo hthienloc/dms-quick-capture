@@ -28,5 +28,8 @@ const stampTextOffsetMultiplier = 0.1;
 const textPaddingMultiplierX = 0.3;
 const textPaddingMultiplierY = 0.15;
 
+// Default radial menu preset tools
+const defaultRadialTools = ["pen", "arrow", "rect", "highlighter", "ellipse", "stamp", "redact", "pixelate"];
+
 // Selection resize handles
 const selectionHandleSize = 8;

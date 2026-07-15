@@ -8,7 +8,6 @@ Item {
     z: 1000
 
     CaptureConfig { id: config }
-
     property var presets: []
     property int selectedIndex: -1
     
