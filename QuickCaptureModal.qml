@@ -3070,7 +3070,7 @@ DankModal {
                 s.isUnderline = window.textUnderline;
                 s.hasBackground = window.textBackground;
                 s.cornerRadius = window.textCornerRadius;
-                s.points = [Qt.point(window.typingCoords.x, window.typingCoords.y)];
+                s.points = [window.typingCoords];
                 const idx = window.strokes.indexOf(s);
                 if (idx !== -1) {
                     const list = [...window.strokes];

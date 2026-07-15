@@ -90,8 +90,8 @@ Popup {
                     Keys.onPressed: (event) => {
                         if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && !(event.modifiers & Qt.ShiftModifier)) {
                             window.currentTypingText = textInputField.text;
-                            textInputDialog.close();
                             window.commitTypingText();
+                            textInputDialog.close();
                             event.accepted = true;
                         }
                     }
@@ -109,8 +109,8 @@ Popup {
                     textColor: Theme.primaryText
                     onClicked: {
                         window.currentTypingText = textInputField.text;
-                        textInputDialog.close();
                         window.commitTypingText();
+                        textInputDialog.close();
                     }
                 }
 
