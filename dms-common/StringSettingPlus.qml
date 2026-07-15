@@ -29,6 +29,7 @@ Item {
     readonly property bool isDirty: value !== defaultValue
 
     function resetToDefault() {
+        console.log(`[StringSettingPlus] Resetting ${settingKey}`);
         value = defaultValue;
         textField.text = defaultValue;
     }

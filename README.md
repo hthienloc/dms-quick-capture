@@ -8,7 +8,7 @@
 
 Screenshot and vector annotation plugin for DankMaterialShell (DMS).
 
-<img src="screenshot.png" width="800" alt="Screenshot">
+
 
 ## Requirements
 

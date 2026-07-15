@@ -23,6 +23,7 @@ Item {
     readonly property bool isDirty: String(value) !== String(defaultValue)
 
     function resetToDefault() {
+        console.log(`[SelectionSettingPlus] Resetting ${settingKey}`);
         value = defaultValue;
         dropdown.currentValue = root.valueToLabel[defaultValue] || defaultValue;
     }

@@ -22,6 +22,7 @@ Item {
     readonly property bool isDirty: value !== defaultValue
 
     function resetToDefault() {
+        console.log(`[ToggleSettingPlus] Resetting ${settingKey} to ${defaultValue}`);
         value = defaultValue;
     }
 
