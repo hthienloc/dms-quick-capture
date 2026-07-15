@@ -678,11 +678,12 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn) {
             tw += px * 2;
             th += py * 2;
         }
+        const sp = 6;
         ctx.save();
         ctx.strokeStyle = Theme.primary;
         ctx.lineWidth = 1;
         ctx.setLineDash([4, 4]);
-        ctx.strokeRect(tx, ty, tw, th);
+        ctx.strokeRect(tx - sp, ty - sp, tw + sp * 2, th + sp * 2);
         ctx.restore();
         return;
     }
