@@ -19,6 +19,121 @@ PluginComponent {
     pluginId: "quickCapture"
     pluginService: PluginService
 
+    // ── Popout (left-click menu) ──────────────────────────────────────────────
+    popoutWidth: 240
+    popoutHeight: 400
+
+    popoutContent: Component {
+        PopoutComponent {
+            width: root.popoutWidth
+            headerText: I18n.tr("Quick Capture")
+            detailsText: I18n.tr("Select capture mode")
+            showCloseButton: true
+            closePopout: () => root.closePopout()
+
+            Column {
+                width: parent.width
+                spacing: 2
+                topPadding: Theme.spacingS
+                bottomPadding: Theme.spacingS
+
+                Repeater {
+                    model: [
+                        { icon: "screenshot_region", text: I18n.tr("Capture Region"), action: () => root.daemon.triggerCaptureWithAction("region", "edit"), isDefault: true },
+                        { icon: "fullscreen", text: I18n.tr("Capture Full Screen"), action: () => root.daemon.triggerCaptureWithAction("full", "edit"), isDefault: false },
+                        { icon: "crop_square", text: I18n.tr("Capture Active Window"), action: () => root.daemon.triggerCaptureWithAction("window", "edit"), isDefault: false },
+                    ]
+
+                    delegate: menuItemComp
+                }
+
+                MenuSeparator {}
+
+                Repeater {
+                    model: [
+                        { icon: "grid_view", text: I18n.tr("Capture All Outputs"), action: () => root.daemon.triggerCaptureWithAction("all", "edit") },
+                        { icon: "display_settings", text: I18n.tr("Capture Specific Output"), action: () => root.daemon.triggerCaptureWithAction("output", "edit") },
+                        { icon: "restart_alt", text: I18n.tr("Capture Last Region"), action: () => root.daemon.triggerCaptureWithAction("last", "edit") },
+                    ]
+
+                    delegate: menuItemComp
+                }
+
+                MenuSeparator {}
+
+                Repeater {
+                    model: [
+                        { icon: "content_paste", text: I18n.tr("Import from Clipboard"), action: () => root.daemon.fromClipboardWithAction("edit") },
+                        { icon: "folder_open", text: I18n.tr("Import from File"), action: () => root.daemon.selectImageAndAnnotateWithAction("edit") },
+                    ]
+
+                    delegate: menuItemComp
+                }
+            }
+        }
+    }
+
+    Component {
+        id: menuItemComp
+
+        Rectangle {
+            width: parent.width
+            height: 36
+            color: mouseArea.containsMouse ? Theme.surfaceContainerHigh : "transparent"
+            radius: Theme.cornerRadiusSmall
+
+            Row {
+                anchors.left: parent.left
+                anchors.leftMargin: Theme.spacingM
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.spacingS
+
+                DankIcon {
+                    name: modelData.icon
+                    size: 18
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: modelData.isDefault ? Theme.primary : Theme.surfaceText
+                }
+
+                StyledText {
+                    text: modelData.text
+                    font.pixelSize: Theme.fontSizeNormal
+                    font.bold: modelData.isDefault === true
+                    color: modelData.isDefault ? Theme.primary : Theme.surfaceText
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+
+            MouseArea {
+                id: mouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    modelData.action();
+                    root.closePopout();
+                }
+            }
+        }
+    }
+
+    Component {
+        id: MenuSeparator
+
+        Rectangle {
+            width: parent.width - Theme.spacingL
+            height: 6
+            color: "transparent"
+
+            Rectangle {
+                width: parent.width
+                height: 1
+                color: Theme.withAlpha(Theme.outline, 0.12)
+                anchors.verticalCenter: parent.verticalCenter
+            }
+        }
+    }
+
     // ── Horizontal bar pill ───────────────────────────────────────────────────
     horizontalBarPill: Component {
         Item {
@@ -58,7 +173,7 @@ PluginComponent {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: (mouse) => {
                     if (mouse.button === Qt.MiddleButton) {
-                        if (root.daemon) root.daemon.triggerCaptureWithAction("full", "edit");
+                        if (root.daemon) root.daemon.triggerCaptureWithAction("default", "edit");
                     }
                 }
             }
@@ -104,7 +219,7 @@ PluginComponent {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: (mouse) => {
                     if (mouse.button === Qt.MiddleButton) {
-                        if (root.daemon) root.daemon.triggerCaptureWithAction("full", "edit");
+                        if (root.daemon) root.daemon.triggerCaptureWithAction("default", "edit");
                     }
                 }
             }
@@ -113,7 +228,7 @@ PluginComponent {
 
     // ── Bar Pill interactions ─────────────────────────────────────────────────
     pillClickAction: function() {
-        if (root.daemon) root.daemon.triggerCaptureWithAction("default", "edit");
+        root.triggerPopout();
     }
     pillRightClickAction: function() {
         if (root.daemon) root.daemon.fromClipboardWithAction("edit");
