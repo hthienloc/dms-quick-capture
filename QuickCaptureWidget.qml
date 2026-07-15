@@ -39,9 +39,9 @@ PluginComponent {
 
                 Repeater {
                     model: [
-                        { icon: "screenshot_region", text: I18n.tr("Region"), action: () => root.daemon.triggerCaptureWithAction("region", "edit"), isDefault: true },
-                        { icon: "fullscreen", text: I18n.tr("Full Screen"), action: () => root.daemon.triggerCaptureWithAction("full", "edit"), isDefault: false },
-                        { icon: "crop_square", text: I18n.tr("Active Window"), action: () => root.daemon.triggerCaptureWithAction("window", "edit"), isDefault: false },
+                        { icon: "screenshot_region", text: I18n.tr("Region"), modeKey: "region", isDefault: true },
+                        { icon: "fullscreen", text: I18n.tr("Full Screen"), modeKey: "full", isDefault: false },
+                        { icon: "crop_square", text: I18n.tr("Active Window"), modeKey: "window", isDefault: false },
                     ]
 
                     delegate: menuItemComp
@@ -62,9 +62,9 @@ PluginComponent {
 
                 Repeater {
                     model: [
-                        { icon: "grid_view", text: I18n.tr("All Outputs"), action: () => root.daemon.triggerCaptureWithAction("all", "edit") },
-                        { icon: "display_settings", text: I18n.tr("Specific Output"), action: () => root.daemon.triggerCaptureWithAction("output", "edit") },
-                        { icon: "restart_alt", text: I18n.tr("Last Region"), action: () => root.daemon.triggerCaptureWithAction("last", "edit") },
+                        { icon: "grid_view", text: I18n.tr("All Outputs"), modeKey: "all" },
+                        { icon: "display_settings", text: I18n.tr("Specific Output"), modeKey: "output" },
+                        { icon: "restart_alt", text: I18n.tr("Last Region"), modeKey: "last" },
                     ]
 
                     delegate: menuItemComp
@@ -85,8 +85,8 @@ PluginComponent {
 
                 Repeater {
                     model: [
-                        { icon: "content_paste", text: I18n.tr("From Clipboard"), action: () => root.daemon.fromClipboardWithAction("edit") },
-                        { icon: "folder_open", text: I18n.tr("From File"), action: () => root.daemon.selectImageAndAnnotateWithAction("edit") },
+                        { icon: "content_paste", text: I18n.tr("From Clipboard"), modeKey: "clipboard" },
+                        { icon: "folder_open", text: I18n.tr("From File"), modeKey: "selectFile" },
                     ]
 
                     delegate: menuItemComp
@@ -99,14 +99,19 @@ PluginComponent {
         id: menuItemComp
 
         Rectangle {
+            id: itemRect
             width: parent.width
             height: 36
-            color: mouseArea.containsMouse ? Theme.surfaceContainerHigh : "transparent"
+            color: itemMouse.containsMouse ? Theme.surfaceContainerHigh : "transparent"
             radius: Theme.cornerRadiusSmall
+
+            property bool floatMode: false
 
             Row {
                 anchors.left: parent.left
                 anchors.leftMargin: Theme.spacingM
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.spacingS + 28
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: Theme.spacingS
 
@@ -126,14 +131,46 @@ PluginComponent {
                 }
             }
 
+            DankIcon {
+                id: pinIcon
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.spacingS
+                anchors.verticalCenter: parent.verticalCenter
+                name: "push_pin"
+                size: 16
+                opacity: itemMouse.containsMouse || itemRect.floatMode ? 1 : 0
+                color: itemRect.floatMode ? Theme.primary : Theme.surfaceText
+                rotation: itemRect.floatMode ? 45 : 0
+                Behavior on opacity { NumberAnimation { duration: 100 } }
+                Behavior on rotation { NumberAnimation { duration: 150; easing.type: Easing.OutQuad } }
+            }
+
             MouseArea {
-                id: mouseArea
+                id: itemMouse
                 anchors.fill: parent
+                anchors.rightMargin: 28
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
-                    modelData.action();
+                    const action = itemRect.floatMode ? "float" : "edit";
+                    const mk = modelData.modeKey;
+                    if (mk === "clipboard") root.daemon.fromClipboardWithAction(action);
+                    else if (mk === "selectFile") root.daemon.selectImageAndAnnotateWithAction(action);
+                    else root.daemon.triggerCaptureWithAction(mk, action);
                     root.closePopout();
+                }
+            }
+
+            MouseArea {
+                id: pinArea
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                width: 28
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    itemRect.floatMode = !itemRect.floatMode;
                 }
             }
         }
