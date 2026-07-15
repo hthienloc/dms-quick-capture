@@ -232,9 +232,7 @@ PluginComponent {
     }
 
     // ── Bar Pill interactions ─────────────────────────────────────────────────
-    pillClickAction: function() {
-        root.triggerPopout();
-    }
+    // popout auto-opens on left click when pillClickAction is not set and popoutContent is defined
     pillRightClickAction: function() {
         if (root.daemon) root.daemon.fromClipboardWithAction("edit");
     }
