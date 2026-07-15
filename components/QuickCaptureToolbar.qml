@@ -9,8 +9,8 @@ Rectangle {
     id: root
 
     property var pluginData: ({})
+    property var config: ({})
     ToolbarConstants { id: tc }
-    CaptureConfig { id: config; pluginData: root.pluginData }
 
     property string currentTool: "crop"
     property string activeToolType: currentTool
