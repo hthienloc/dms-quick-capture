@@ -131,7 +131,6 @@ Item {
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             onClicked: {
-                console.log(`[SectionTitle] Reset button clicked for: ${root.text}`);
                 root.resetClicked();
             }
         }

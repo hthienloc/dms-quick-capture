@@ -37,7 +37,6 @@ Item {
     readonly property bool isDirty: Math.round(value) !== Math.round(defaultValue)
 
     function resetToDefault() {
-        console.log(`[SliderSettingPlus] Resetting ${settingKey}`);
         value = defaultValue;
         dankSlider.value = defaultValue;
     }

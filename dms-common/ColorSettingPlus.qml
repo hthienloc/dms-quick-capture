@@ -29,7 +29,6 @@ Item {
     }
 
     function resetToDefault() {
-        console.log(`[ColorSettingPlus] Resetting ${settingKey}`);
         value = defaultValue;
     }
 

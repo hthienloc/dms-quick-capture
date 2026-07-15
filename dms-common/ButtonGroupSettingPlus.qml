@@ -22,7 +22,6 @@ Item {
     readonly property bool isDirty: String(value) !== String(defaultValue)
 
     function resetToDefault() {
-        console.log(`[ButtonGroupSettingPlus] Resetting ${settingKey}`);
         value = defaultValue;
     }
 
