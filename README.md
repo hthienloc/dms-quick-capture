@@ -176,6 +176,8 @@ binds {
 - **[Snapzy](https://github.com/duongductrong/Snapzy)** — Inspiration for the float image / continue-editing workflow
 - **vky** and **bodify** (Discord) — Actively reporting bugs and contributing valuable feedback to help polish and improve the plugin
 
+Cảm ơn tất cả những người đã ủng hộ, contribute code và góp ý, và cả cộng đồng DankMaterialShell.
+
 
 ## License
 
