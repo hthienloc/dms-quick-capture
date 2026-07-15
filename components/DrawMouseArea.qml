@@ -632,6 +632,31 @@ MouseArea {
          drawingCanvas.requestPaint();
     }
 
+    onDoubleClicked: (mouse) => {
+        if (window.currentTool !== "select") return;
+        const absPt = getAbsolutePoint(mouse.x, mouse.y);
+        const strokeIdx = window.findStrokeAt(absPt.x, absPt.y);
+        if (strokeIdx === -1) return;
+        const stroke = window.strokes[strokeIdx];
+        if (stroke.tool !== "text" || !stroke.points || stroke.points.length === 0) return;
+
+        window.editingStroke = stroke;
+        window.selectedStroke = null;
+        window.typingCoords = Qt.point(stroke.points[0].x, stroke.points[0].y);
+        window.currentTypingText = stroke.text;
+        window.isTyping = true;
+        window.currentColor = stroke.color;
+        window.textFontSize = stroke.width;
+        window.textBold = stroke.isBold;
+        window.textItalic = stroke.isItalic;
+        window.textUnderline = stroke.isUnderline;
+        window.textBackground = stroke.hasBackground;
+        window.textCornerRadius = stroke.cornerRadius;
+        window.textFontFamily = stroke.fontFamily;
+        textInputDialog.open();
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
+    }
+
     onReleased: (mouse) => {
         if (window.currentTool === "select") {
              window.activeHandle = "none";

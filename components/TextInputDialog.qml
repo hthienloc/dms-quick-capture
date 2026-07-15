@@ -25,7 +25,7 @@ Popup {
 
     onOpened: {
         Qt.callLater(() => {
-            textInputField.text = "";
+            textInputField.text = window.currentTypingText;
             textInputField.forceActiveFocus();
         });
     }
@@ -34,6 +34,7 @@ Popup {
         if (window.isTyping) {
             window.isTyping = false;
             window.currentTypingText = "";
+            window.editingStroke = null;
             if (window.activeCanvas) window.activeCanvas.requestPaint();
             if (modalFocusScope) {
                 modalFocusScope.forceActiveFocus();
@@ -89,8 +90,8 @@ Popup {
                     Keys.onPressed: (event) => {
                         if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && !(event.modifiers & Qt.ShiftModifier)) {
                             window.currentTypingText = textInputField.text;
-                            textInputDialog.close();
                             window.commitTypingText();
+                            textInputDialog.close();
                             event.accepted = true;
                         }
                     }
@@ -108,8 +109,8 @@ Popup {
                     textColor: Theme.primaryText
                     onClicked: {
                         window.currentTypingText = textInputField.text;
-                        textInputDialog.close();
                         window.commitTypingText();
+                        textInputDialog.close();
                     }
                 }
 
