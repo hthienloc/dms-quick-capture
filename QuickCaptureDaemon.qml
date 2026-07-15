@@ -89,8 +89,12 @@ PluginComponent {
                 if (meta.status === "success") {
                     root.currentCapturePath = meta.path;
                     root.validateAndOpenCapturedImage(meta.path, action, meta.width, meta.height);
-                } else {
-                    throw new Error(meta.message || meta.error || "Screenshot failed");
+                } else if (meta.status !== "aborted") {
+                    const failMode = root.screenshotMode();
+                    if (typeof ToastService !== "undefined" && ToastService) {
+                        const errorMsg = meta.message || meta.error || I18n.tr("Screenshot failed (mode: %1).").arg(failMode);
+                        ToastService.showError(errorMsg);
+                    }
                 }
             } catch (e) {
                 const failMode = root.screenshotMode();
