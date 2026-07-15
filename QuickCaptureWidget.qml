@@ -106,6 +106,7 @@ PluginComponent {
             radius: Theme.cornerRadiusSmall
 
             function execMode(action) {
+                if (!root.daemon) return;
                 const mk = modelData.modeKey;
                 if (mk === "clipboard") root.daemon.fromClipboardWithAction(action);
                 else if (mk === "selectFile") root.daemon.selectImageAndAnnotateWithAction(action);
