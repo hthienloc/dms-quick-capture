@@ -47,7 +47,18 @@ PluginComponent {
                     delegate: menuItemComp
                 }
 
-                MenuSeparator {}
+                Rectangle {
+                    width: parent.width - Theme.spacingL
+                    height: 6
+                    color: "transparent"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Rectangle {
+                        width: parent.width
+                        height: 1
+                        color: Theme.withAlpha(Theme.outline, 0.12)
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
 
                 Repeater {
                     model: [
@@ -59,7 +70,18 @@ PluginComponent {
                     delegate: menuItemComp
                 }
 
-                MenuSeparator {}
+                Rectangle {
+                    width: parent.width - Theme.spacingL
+                    height: 6
+                    color: "transparent"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Rectangle {
+                        width: parent.width
+                        height: 1
+                        color: Theme.withAlpha(Theme.outline, 0.12)
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
 
                 Repeater {
                     model: [
@@ -113,23 +135,6 @@ PluginComponent {
                     modelData.action();
                     root.closePopout();
                 }
-            }
-        }
-    }
-
-    Component {
-        id: menuSeparator
-
-        Rectangle {
-            width: parent.width - Theme.spacingL
-            height: 6
-            color: "transparent"
-
-            Rectangle {
-                width: parent.width
-                height: 1
-                color: Theme.withAlpha(Theme.outline, 0.12)
-                anchors.verticalCenter: parent.verticalCenter
             }
         }
     }
