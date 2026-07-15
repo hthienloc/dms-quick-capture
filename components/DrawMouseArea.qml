@@ -169,6 +169,9 @@ MouseArea {
                         window.selectedStroke.points = newPoints;
                     }
                 }
+                if (window.originalPoints.length === 0) {
+                    hoveredStrokeIdx = window.findStrokeAt(absPt.x, absPt.y);
+                }
                 drawingCanvas.requestPaint();
             } else {
                 hoveredStrokeIdx = window.findStrokeAt(absPt.x, absPt.y);
