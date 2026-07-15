@@ -1,4 +1,5 @@
 import "./dms-common"
+import "components/Constants.js" as Constants
 import QtQuick
 import Quickshell
 import qs.Common
@@ -2340,7 +2341,7 @@ PluginSettings {
 
         property int presetActiveIndex: 0
 
-        property var activePresetTools: ["pen", "arrow", "rect", "highlighter", "ellipse", "stamp", "redact", "pixelate"]
+        property var activePresetTools: Constants.defaultRadialTools
         property var activePresetColors: ["primary", "primary", "primary", "primary", "primary", "primary", "#000000", "#ffffff"]
         property var activePresetThicknesses: [6, 6, 6, 6, 6, 6, 6, 6]
 

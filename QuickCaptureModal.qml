@@ -940,8 +940,7 @@ DankModal {
         const val = pData["preset_" + index + "_tool"];
         if (val !== undefined) return val;
         
-        const defaultTools = ["pen", "arrow", "rect", "highlighter", "ellipse", "stamp", "redact", "pixelate"];
-        return defaultTools[index] || "none";
+        return Constants.defaultRadialTools[index] || "none";
     }
 
     function getPresetColor(index) {
