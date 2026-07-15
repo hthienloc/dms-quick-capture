@@ -118,7 +118,7 @@ PluginComponent {
     }
 
     Component {
-        id: MenuSeparator
+        id: menuSeparator
 
         Rectangle {
             width: parent.width - Theme.spacingL
