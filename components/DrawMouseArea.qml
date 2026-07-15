@@ -825,28 +825,25 @@ MouseArea {
                  window.strokes = [...window.strokes];
              }
              
-             window.previewX = wheel.x;
-             window.previewY = wheel.y;
-             window.showSizePreview = true;
-             previewTimer.restart();
-             
-             drawingCanvas.requestPaint();
-             wheel.accepted = true;
-             return;
-         }
-
-         const tool = window.effectiveTool;
-         let multiplier = 1;
-         if (tool === "text" || tool === "pixelate") multiplier = 2;
-         else if (tool === "spotlight") multiplier = 5;
-         else if (tool === "callout") multiplier = 10;
-
-         window.updateActiveIntensity(window.activeIntensity + (step * multiplier));
-
-         window.previewX = wheel.x;
-         window.previewY = wheel.y;
-         window.showSizePreview = true;
-         previewTimer.restart();
+              drawingCanvas.requestPaint();
+              wheel.accepted = true;
+              return;
+          }
+ 
+          const tool = window.effectiveTool;
+          let multiplier = 1;
+          if (tool === "text" || tool === "pixelate") multiplier = 2;
+          else if (tool === "spotlight") multiplier = 5;
+          else if (tool === "callout") multiplier = 10;
+ 
+          window.updateActiveIntensity(window.activeIntensity + (step * multiplier));
+ 
+          if (!window.selectedStroke) {
+              window.previewX = wheel.x;
+              window.previewY = wheel.y;
+              window.showSizePreview = true;
+              previewTimer.restart();
+          }
          wheel.accepted = true;
      }
 }
