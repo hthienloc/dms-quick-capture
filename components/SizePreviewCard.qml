@@ -18,7 +18,7 @@ Rectangle {
     readonly property bool _hasStroke: window.selectedStroke != null
 
     width: _hasStroke ? shapeWidth : 0
-    height: _hasStroke ? width : 0
+    height: width
     radius: _hasStroke ? shapeRadius : 0
     color: "transparent"
     border.color: _hasStroke ? shapeBorderColor : "transparent"
@@ -73,11 +73,12 @@ Rectangle {
     }
 
     StyledText {
+        id: valueLabel
         anchors.top: _hasStroke ? parent.bottom : undefined
         anchors.topMargin: 4 / drawingCanvas.scale
         anchors.horizontalCenter: _hasStroke ? parent.horizontalCenter : undefined
         x: _hasStroke ? 0 : 8 / drawingCanvas.scale
-        y: _hasStroke ? 0 : -height - 4 / drawingCanvas.scale
+        y: _hasStroke ? 0 : -valueLabel.height - 4 / drawingCanvas.scale
         text: {
             if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "callout") {
                 if (window.calloutDestDragging) {
