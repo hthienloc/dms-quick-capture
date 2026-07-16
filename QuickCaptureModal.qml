@@ -647,9 +647,6 @@ DankModal {
     property string currentTypingText: ""
     property var editingStroke: null
 
-    // Helper to decode hex color to RGB
-    function hexToRgb(hex) { return Helpers.hexToRgb(hex, Qt); }
-
     backgroundOpacity: {
         const data = window.parentWidget && window.parentWidget.pluginData;
         if (!data) return 0.6;
@@ -693,10 +690,6 @@ DankModal {
     property bool toolbarVisible: true
     onConfigShowToolbarChanged: {
         window.toolbarVisible = window.configShowToolbar;
-    }
-
-    function openCentered() {
-        open();
     }
 
     function rotateScreenshot() {
@@ -1179,7 +1172,7 @@ DankModal {
             window.restoreSource = imageSource;
             window.restoreState = annotationState;
             window.shouldBeVisible = true;
-            window.openCentered();
+            window.open();
         }
     }
 
@@ -1215,10 +1208,6 @@ DankModal {
         return "none";
     }
 
-    function isInsideCropRect(mx, my) {
-        return Helpers.isInsideCropRect(mx, my, window.hasSelection, window.cropRect);
-    }
-
     function clampCropRect(x, y, w, h) {
         const bw = window.screenshotWidth;
         const bh = window.screenshotHeight;
@@ -1242,10 +1231,6 @@ DankModal {
         const val = pd[key];
         if (!val) return defaultValue;
         return config.resolveColor(val);
-    }
-
-    function constrainSquarePoint(start, point) {
-        return Helpers.constrainSquarePoint(start, point, Qt);
     }
 
     function estimateTextWidth(text, fontSize, isBold, isMonospace) {
@@ -1279,8 +1264,6 @@ DankModal {
         }
         window.exportCanvasItem.requestPaint();
     }
-
-    function shortcutToken(key) { return Helpers.shortcutToken(key, Qt); }
 
     function formatHexColor(color) { return Helpers.formatHexColor(color); }
 
@@ -1441,10 +1424,6 @@ DankModal {
         return window.currentColor;
     }
 
-    function shortcutColor(color) {
-        return color === "primary" ? Theme.primary : color;
-    }
-
     function handleTypingKey(event) {
         if (event.key === Qt.Key_Escape) {
             window.editingStroke = null;
@@ -1479,7 +1458,7 @@ DankModal {
     }
 
     function handleShortcutKey(event) {
-        const token = window.shortcutToken(event.key);
+        const token = Helpers.shortcutToken(event.key, Qt);
         const hasCtrl = event.modifiers & Qt.ControlModifier;
 
         if (event.key === Qt.Key_Escape) {
@@ -1565,13 +1544,13 @@ DankModal {
         }
 
         if (hasCtrl) {
-            const colorShortcut = config.findByKey(config.colorShortcuts, token);
+            const colorShortcut = Helpers.findByKey(config.colorShortcuts, token);
             if (colorShortcut) {
                 let idx = config.colorShortcuts.indexOf(colorShortcut);
                 if (idx !== -1) {
                     window.activeColorSlotIndex = idx;
                 }
-                window.currentColor = window.shortcutColor(colorShortcut.color);
+                window.currentColor = colorShortcut.color === "primary" ? Theme.primary : colorShortcut.color;
                 event.accepted = true;
             }
             return;
@@ -1589,7 +1568,7 @@ DankModal {
             return;
         }
 
-        const toolShortcut = config.findByKey(config.toolShortcuts, token);
+        const toolShortcut = Helpers.findByKey(config.toolShortcuts, token);
         if (toolShortcut) {
             if (toolShortcut.tool === "colorpicker") {
                 if (!window.openColorPickerModal()) {

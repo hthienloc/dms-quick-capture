@@ -217,8 +217,6 @@ QtObject {
         { key: "R", color: accentColors[6] }
     ]
 
-    function findByKey(items, key) { return Helpers.findByKey(items, key); }
-
     function resolveColor(rawColor) {
         if (!rawColor) return Theme.primary;
         if (typeof rawColor !== "string") {

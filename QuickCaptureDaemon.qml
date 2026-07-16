@@ -113,12 +113,6 @@ PluginComponent {
         }, 0, 60000);
     }
 
-    function closeOverlay() {
-        modal.shouldBeVisible = false;
-        modal.close();
-        Proc.runCommand("cleanup-old-captures", ["sh", "-c", "find /tmp -name 'dms_capture_*.png' -mmin +60 -delete 2>/dev/null"]);
-    }
-
     function selectImageAndAnnotateWithAction(action) {
         root.closeControlCenter();
         fileBrowserModal.captureAction = action || "edit";
@@ -178,7 +172,7 @@ PluginComponent {
         } else {
             modal.currentCapturePath = path;
             modal.shouldBeVisible = true;
-            modal.openCentered();
+            modal.open();
         }
     }
 

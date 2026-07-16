@@ -117,10 +117,6 @@ QtObject {
         }
     }
 
-    function notifyInfo(message, imagePath) {
-        root.sendNotification(message, imagePath);
-    }
-
     function notifyWarning(message) {
         if (typeof ToastService !== "undefined" && ToastService) {
             ToastService.showWarning(message);
@@ -217,7 +213,7 @@ QtObject {
                     if (exitCode === 0) {
                         const notifyPath = targetPath.replace(/^~/, Quickshell.env("HOME"));
                         const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && originalPng) ? originalPng : notifyPath;
-                        notifyInfo(I18n.tr("Screenshot saved to %1/%2").arg(saveDir).arg(filename), iconPath);
+                        root.sendNotification(I18n.tr("Screenshot saved to %1/%2").arg(saveDir).arg(filename), iconPath);
                         root.closeRequested();
                     } else {
                         notifyError("Failed to save screenshot file.");
@@ -235,7 +231,7 @@ QtObject {
                 const clipSource = originalPng || finalPath;
                 copyFileToClipboard(clipSource, (stdout, exitCode) => {
                     if (exitCode === 0) {
-                        notifyInfo(I18n.tr("Screenshot copied to clipboard."), clipSource);
+                        root.sendNotification(I18n.tr("Screenshot copied to clipboard."), clipSource);
                         root.closeRequested();
                     } else {
                         notifyError("Failed to copy screenshot to clipboard.");
@@ -258,7 +254,7 @@ QtObject {
                             if (saveCode === 0) {
                                 const notifyPath = targetPath.replace(/^~/, Quickshell.env("HOME"));
                                 const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && originalPng) ? originalPng : notifyPath;
-                                notifyInfo(I18n.tr("Screenshot copied to clipboard and saved to %1").arg(saveDir), iconPath);
+                                root.sendNotification(I18n.tr("Screenshot copied to clipboard and saved to %1").arg(saveDir), iconPath);
                             } else {
                                 notifyWarning("Screenshot copied to clipboard but failed to save file.");
                             }
