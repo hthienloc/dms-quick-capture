@@ -28,6 +28,25 @@ dms plugins install quickCapture
 git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialShell/plugins/quickCapture
 ```
 
+### Revert to a previous version
+
+```bash
+cd ~/.config/DankMaterialShell/plugins/quickCapture
+git checkout v3.1.0    # replace with the desired version tag
+```
+
+To go back to the latest release:
+
+```bash
+git checkout v3.2.0
+```
+
+To track the development branch again:
+
+```bash
+git checkout main && git pull
+```
+
 ## Quick Start
 
 | Action | Result |
