@@ -148,16 +148,6 @@ PluginComponent {
         });
     }
 
-    function openImageForEdit(path) {
-        modal.currentCapturePath = path;
-        modal.shouldBeVisible = true;
-        modal.openCentered();
-    }
-
-    function openImageAsFloat(path) {
-        floatServiceItem.spawnWindow("file://" + path, pluginData, null, [path]);
-    }
-
     function validateAndOpenCapturedImage(path, action, width, height) {
         if (width !== undefined && height !== undefined) {
             const minSize = pluginData.minImageSize ?? 16;
@@ -167,7 +157,7 @@ PluginComponent {
                 }
                 return;
             }
-            openAction(path, action);
+            root.openAction(path, action);
         } else {
             Proc.runCommand("validate-image", ["file", "-b", path], function(stdout, exitCode) {
                 const output = stdout.toLowerCase();
@@ -177,16 +167,18 @@ PluginComponent {
                     }
                     return;
                 }
-                openAction(path, action);
+                root.openAction(path, action);
             });
         }
     }
 
     function openAction(path, action) {
         if (action === "float") {
-            root.openImageAsFloat(path);
+            floatServiceItem.spawnWindow("file://" + path, pluginData, null, [path]);
         } else {
-            root.openImageForEdit(path);
+            modal.currentCapturePath = path;
+            modal.shouldBeVisible = true;
+            modal.openCentered();
         }
     }
 
