@@ -1542,7 +1542,7 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Backdrop Defaults")
             icon: "wallpaper"
-            showReset: backdropAutoApply.isDirty || backdropDefaultMode.isDirty || backdropDefaultPadding.isDirty || backdropDefaultRadius.isDirty || backdropDefaultShadow.isDirty || backdropDefaultAngle.isDirty || backdropDefaultAspectRatio.isDirty || backdropDefaultSolidColor.isDirty || backdropDefaultGradientStart.isDirty || backdropDefaultGradientEnd.isDirty
+            showReset: backdropAutoApply.isDirty || backdropDefaultMode.isDirty || backdropDefaultPadding.isDirty || backdropDefaultRadius.isDirty || backdropDefaultShadow.isDirty || backdropDefaultAngle.isDirty || backdropDefaultAspectRatio.isDirty || backdropDefaultAlignment.isDirty || backdropDefaultSolidColor.isDirty || backdropDefaultGradientStart.isDirty || backdropDefaultGradientEnd.isDirty
             onResetClicked: {
                 backdropAutoApply.resetToDefault();
                 backdropDefaultMode.resetToDefault();
@@ -1554,6 +1554,7 @@ PluginSettings {
                 backdropDefaultShadow.resetToDefault();
                 backdropDefaultAngle.resetToDefault();
                 backdropDefaultAspectRatio.resetToDefault();
+                backdropDefaultAlignment.resetToDefault();
             }
         }
 
@@ -1674,22 +1675,42 @@ PluginSettings {
 
         Separator {}
 
-        SelectionSettingPlus {
-            id: backdropDefaultAspectRatio
-            settingKey: "backdropDefaultAspectRatio"
-            label: I18n.tr("Default Aspect Ratio")
-            options: [
-                { label: I18n.tr("Auto"), value: "auto" },
-                { label: "1:1", value: "1:1" },
-                { label: "16:9", value: "16:9" },
-                { label: "9:16", value: "9:16" },
-                { label: "4:3", value: "4:3" },
-                { label: "3:2", value: "3:2" },
-                { label: "21:9", value: "21:9" }
-            ]
-            defaultValue: "auto"
+            SelectionSettingPlus {
+                id: backdropDefaultAspectRatio
+                settingKey: "backdropDefaultAspectRatio"
+                label: I18n.tr("Default Aspect Ratio")
+                options: [
+                    { label: I18n.tr("Auto"), value: "auto" },
+                    { label: "1:1", value: "1:1" },
+                    { label: "16:9", value: "16:9" },
+                    { label: "9:16", value: "9:16" },
+                    { label: "4:3", value: "4:3" },
+                    { label: "3:2", value: "3:2" },
+                    { label: "21:9", value: "21:9" }
+                ]
+                defaultValue: "auto"
+            }
+
+            Separator {}
+
+            SelectionSettingPlus {
+                id: backdropDefaultAlignment
+                settingKey: "backdropDefaultAlignment"
+                label: I18n.tr("Default Alignment")
+                options: [
+                    { label: I18n.tr("Top Left"), value: "top-left" },
+                    { label: I18n.tr("Top Center"), value: "top-center" },
+                    { label: I18n.tr("Top Right"), value: "top-right" },
+                    { label: I18n.tr("Center Left"), value: "center-left" },
+                    { label: I18n.tr("Center"), value: "center" },
+                    { label: I18n.tr("Center Right"), value: "center-right" },
+                    { label: I18n.tr("Bottom Left"), value: "bottom-left" },
+                    { label: I18n.tr("Bottom Center"), value: "bottom-center" },
+                    { label: I18n.tr("Bottom Right"), value: "bottom-right" }
+                ]
+                defaultValue: "center"
+            }
         }
-    }
         }
     }
 

@@ -1757,6 +1757,7 @@ DankModal {
         window.backdropShadowStrength = backdropConfigValue("backdropDefaultShadow", Constants.defaultBackdropShadowStrength, true);
         window.backdropGradientAngle = backdropConfigValue("backdropDefaultAngle", Constants.defaultBackdropGradientAngle, true);
         window.backdropAspectRatio = backdropConfigValue("backdropDefaultAspectRatio", Constants.defaultBackdropAspectRatio, false);
+        window.backdropAlignment = backdropConfigValue("backdropDefaultAlignment", Constants.defaultBackdropAlignment, false);
         window.cropRect = Qt.rect(0, 0, 0, 0);
         window.hasSelection = false;
         window.activeHandle = "none";
