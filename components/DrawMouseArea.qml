@@ -713,9 +713,8 @@ MouseArea {
                  window.cropRect = window.clampCropRect(window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height);
                  if (Math.min(window.cropRect.width, window.cropRect.height) >= 16) {
                      window.hasSelection = true;
-                     if (window.activeHandle === "new") {
-                         // Automatically enter edit mode with pen on new selection
-                         window.currentTool = "pen";
+                      if (window.activeHandle === "new") {
+                         window.currentTool = window.lastActiveTool;
                      }
                  } else {
                      window.hasSelection = false;
