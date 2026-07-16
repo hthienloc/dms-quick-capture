@@ -697,32 +697,35 @@ MouseArea {
              return;
         }
 
-         if (window.currentTool === "crop") {
-            if (window.activeHandle === "new" || window.activeHandle === "tl" || window.activeHandle === "tr" || window.activeHandle === "bl" || window.activeHandle === "br") {
-                // Check for accidental click (too small) BEFORE clamping
-                if (Math.min(window.cropRect.width, window.cropRect.height) <= 3) {
-                    if (window.strokes.length === 0) {
-                        window.discardAndClose();
-                    } else {
-                        window.hasSelection = false;
-                        window.cropRect = Qt.rect(0, 0, 0, 0);
-                    }
-                    return;
-                }
-                window.cropRect = window.clampCropRect(window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height);
-                if (Math.min(window.cropRect.width, window.cropRect.height) >= 16) {
-                    window.hasSelection = true;
-                    // Automatically enter edit mode with the pen tool once selection is made/resized!
-                    window.currentTool = "pen";
-                } else {
-                    window.hasSelection = false;
-                    window.cropRect = Qt.rect(0, 0, 0, 0);
-                }
-            }
-            window.activeHandle = "none";
-            drawingCanvas.requestPaint();
-            return;
-        }
+          if (window.currentTool === "crop") {
+             if (window.activeHandle === "new" || window.activeHandle === "tl" || window.activeHandle === "tr" || window.activeHandle === "bl" || window.activeHandle === "br"
+                 || window.activeHandle === "tc" || window.activeHandle === "bc" || window.activeHandle === "lc" || window.activeHandle === "rc") {
+                 // Check for accidental click (too small) BEFORE clamping
+                 if (Math.min(window.cropRect.width, window.cropRect.height) <= 3) {
+                     if (window.strokes.length === 0) {
+                         window.discardAndClose();
+                     } else {
+                         window.hasSelection = false;
+                         window.cropRect = Qt.rect(0, 0, 0, 0);
+                     }
+                     return;
+                 }
+                 window.cropRect = window.clampCropRect(window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height);
+                 if (Math.min(window.cropRect.width, window.cropRect.height) >= 16) {
+                     window.hasSelection = true;
+                     if (window.activeHandle === "new") {
+                         // Automatically enter edit mode with pen on new selection
+                         window.currentTool = "pen";
+                     }
+                 } else {
+                     window.hasSelection = false;
+                     window.cropRect = Qt.rect(0, 0, 0, 0);
+                 }
+             }
+             window.activeHandle = "none";
+             drawingCanvas.requestPaint();
+             return;
+         }
 
         if (window.currentTool === "ocr") {
             window.activeHandle = "none";
