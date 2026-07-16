@@ -60,7 +60,7 @@ PluginComponent {
                     DankIcon {
                         id: folderIcon
                         anchors.centerIn: parent
-                        name: "folder_open"
+                        name: "open_in_new"
                         size: Theme.iconSize - 4
                         color: folderArea.containsMouse ? Theme.primary : Theme.surfaceVariantText
                         scale: folderBtn.pressed ? 0.6 : 1.0
