@@ -91,18 +91,27 @@ Row {
         anchors.verticalCenter: parent.verticalCenter
 
         DankActionButton {
-            anchors.centerIn: parent
-            width: controlRoot.itemSize
-            height: controlRoot.itemSize
+            anchors.fill: parent
             iconName: "colorize"
             iconSize: controlRoot.iconSize
             backgroundColor: "transparent"
             iconColor: Theme.surfaceText
             tooltipText: I18n.tr("Pick Color")
-            onClicked: {
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            cursorShape: Qt.PointingHandCursor
+            onClicked: (mouse) => {
                 let col = controlRoot.backdropMode === "solid" ? controlRoot.backdropSolidColor :
                           (controlRoot.gradientActiveSlot === "start" ? controlRoot.backdropGradientStart : controlRoot.backdropGradientEnd);
-                controlRoot.colorPickerRequested(col)
+                let targetSlot = controlRoot.backdropMode === "solid" ? "solid" : controlRoot.gradientActiveSlot;
+                if (mouse.button === Qt.RightButton) {
+                    controlRoot.eyedropperRequested(targetSlot)
+                } else {
+                    controlRoot.colorPickerRequested(col)
+                }
             }
         }
     }
