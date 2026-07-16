@@ -74,11 +74,9 @@ Rectangle {
 
     StyledText {
         id: valueLabel
-        anchors.top: _showShape ? parent.bottom : undefined
+        anchors.top: parent.bottom
         anchors.topMargin: 4 / drawingCanvas.scale
-        anchors.horizontalCenter: _showShape ? parent.horizontalCenter : undefined
-        x: _showShape ? 0 : 8 / drawingCanvas.scale
-        y: _showShape ? 0 : -valueLabel.height - 4 / drawingCanvas.scale
+        anchors.horizontalCenter: parent.horizontalCenter
         text: {
             if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "callout") {
                 if (window.calloutDestDragging) {
