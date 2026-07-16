@@ -75,7 +75,7 @@ Rectangle {
     StyledText {
         id: valueLabel
         anchors.top: parent.bottom
-        anchors.topMargin: 4 / drawingCanvas.scale
+        anchors.topMargin: 16 / drawingCanvas.scale
         anchors.horizontalCenter: parent.horizontalCenter
         text: {
             if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "callout") {
