@@ -51,9 +51,9 @@ git checkout main && git pull
 
 | Action | Result |
 |--------|--------|
-| **Left Click** (bar icon) | Interactive region capture |
-| **Middle Click** (bar icon) | Fullscreen capture (all monitors) |
-| **Right Click** (bar icon) | Annotate image from clipboard |
+| **Left Click** (bar icon) | Open widget popout |
+| **Middle Click** (bar icon) | Default action (configured in settings) |
+| **Right Click** (bar icon) | Paste image or image URL from clipboard |
 | **Drop Image** (bar icon) | Drag any image onto the icon to annotate |
 | **Print** (keyboard) | Capture using default mode (requires keybind setup) |
 
