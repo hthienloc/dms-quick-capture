@@ -88,12 +88,6 @@ PluginComponent {
                     color: outputMouse.containsMouse ? Theme.surfaceContainerHigh : "transparent"
                     radius: Theme.cornerRadiusSmall
 
-                    function exec(action) {
-                        if (!root.daemon) return;
-                        root.outputExpanded = !root.outputExpanded;
-                        if (root.outputExpanded) root.refreshOutputList();
-                    }
-
                     // ── Tree root branch ────────────────────────
                     Rectangle {
                         x: Theme.spacingM + 8
@@ -122,7 +116,11 @@ PluginComponent {
                         id: outputMouse
                         anchors.fill: parent
                         hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                        onClicked: outputHeader.exec("edit")
+                        onClicked: {
+                            if (!root.daemon) return;
+                            root.outputExpanded = !root.outputExpanded;
+                            if (root.outputExpanded) root.refreshOutputList();
+                        }
                     }
                 }
 

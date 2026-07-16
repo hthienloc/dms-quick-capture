@@ -279,7 +279,7 @@ MouseArea {
                      }
                  } else if ((mouse.modifiers & Qt.ShiftModifier) && (window.currentTool === "ellipse" || window.currentTool === "rect" || window.currentTool === "redact" || window.currentTool === "pixelate" || window.currentTool === "spotlight" || window.currentTool === "callout")) {
                      if (window.currentStroke.points[0]) {
-                         finalPt = window.constrainSquarePoint(window.currentStroke.points[0], absPt);
+                         finalPt = Helpers.constrainSquarePoint(window.currentStroke.points[0], absPt, Qt);
                      }
                  }
 

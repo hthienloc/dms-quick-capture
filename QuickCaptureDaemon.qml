@@ -178,7 +178,7 @@ PluginComponent {
         } else {
             modal.currentCapturePath = path;
             modal.shouldBeVisible = true;
-            modal.openCentered();
+            modal.open();
         }
     }
 
