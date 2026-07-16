@@ -783,12 +783,9 @@ function drawSelectionOverlay(ctx, options, Theme) {
         ctx.setLineDash([]);
 
         if (!options.isOcrMode) {
-            // 8 resize handles (crop mode only)
-            const hs = 10;
-            const hh = hs / 2;
-            ctx.fillStyle = Theme.primary;
-            ctx.strokeStyle = "#ffffff";
-            ctx.lineWidth = 1.5;
+            const arm = 12;
+            const edgeLen = 16;
+            const sw = 2;
 
             const x1 = cr.x;
             const y1 = cr.y;
@@ -797,25 +794,57 @@ function drawSelectionOverlay(ctx, options, Theme) {
             const cx = (x1 + x2) / 2;
             const cy = (y1 + y2) / 2;
 
-            // 4 Corners
-            ctx.fillRect(x1 - hh, y1 - hh, hs, hs);
-            ctx.strokeRect(x1 - hh, y1 - hh, hs, hs);
-            ctx.fillRect(x2 - hh, y1 - hh, hs, hs);
-            ctx.strokeRect(x2 - hh, y1 - hh, hs, hs);
-            ctx.fillRect(x1 - hh, y2 - hh, hs, hs);
-            ctx.strokeRect(x1 - hh, y2 - hh, hs, hs);
-            ctx.fillRect(x2 - hh, y2 - hh, hs, hs);
-            ctx.strokeRect(x2 - hh, y2 - hh, hs, hs);
+            // Helper: draw a path twice for contrast (white outline + primary fill)
+            function drawHandlePath(drawFn) {
+                ctx.save();
+                ctx.strokeStyle = "#ffffff";
+                ctx.lineWidth = sw + 2;
+                drawFn();
+                ctx.stroke();
+                ctx.strokeStyle = Theme.primary;
+                ctx.lineWidth = sw;
+                drawFn();
+                ctx.stroke();
+                ctx.restore();
+            }
 
-            // 4 Edge centers
-            ctx.fillRect(cx - hh, y1 - hh, hs, hs);
-            ctx.strokeRect(cx - hh, y1 - hh, hs, hs);
-            ctx.fillRect(cx - hh, y2 - hh, hs, hs);
-            ctx.strokeRect(cx - hh, y2 - hh, hs, hs);
-            ctx.fillRect(x1 - hh, cy - hh, hs, hs);
-            ctx.strokeRect(x1 - hh, cy - hh, hs, hs);
-            ctx.fillRect(x2 - hh, cy - hh, hs, hs);
-            ctx.strokeRect(x2 - hh, cy - hh, hs, hs);
+            // 4 Corners — L-shape brackets
+            drawHandlePath(() => {
+                // Top-left
+                ctx.beginPath();
+                ctx.moveTo(x1, y1 + arm);
+                ctx.lineTo(x1, y1);
+                ctx.lineTo(x1 + arm, y1);
+                // Top-right
+                ctx.moveTo(x2 - arm, y1);
+                ctx.lineTo(x2, y1);
+                ctx.lineTo(x2, y1 + arm);
+                // Bottom-left
+                ctx.moveTo(x1, y2 - arm);
+                ctx.lineTo(x1, y2);
+                ctx.lineTo(x1 + arm, y2);
+                // Bottom-right
+                ctx.moveTo(x2 - arm, y2);
+                ctx.lineTo(x2, y2);
+                ctx.lineTo(x2, y2 - arm);
+            });
+
+            // 4 Edge centers — short line segments
+            drawHandlePath(() => {
+                // Top
+                ctx.beginPath();
+                ctx.moveTo(cx - edgeLen / 2, y1);
+                ctx.lineTo(cx + edgeLen / 2, y1);
+                // Bottom
+                ctx.moveTo(cx - edgeLen / 2, y2);
+                ctx.lineTo(cx + edgeLen / 2, y2);
+                // Left
+                ctx.moveTo(x1, cy - edgeLen / 2);
+                ctx.lineTo(x1, cy + edgeLen / 2);
+                // Right
+                ctx.moveTo(x2, cy - edgeLen / 2);
+                ctx.lineTo(x2, cy + edgeLen / 2);
+            });
         }
     } else {
         // Dim full canvas slightly before selection
