@@ -86,31 +86,23 @@ Row {
     }
 
     Item {
-        width: controlRoot.itemSize
+        width: controlRoot.itemSize + 8
         height: controlRoot.itemSize
         anchors.verticalCenter: parent.verticalCenter
 
         DankActionButton {
-            anchors.fill: parent
+            anchors.centerIn: parent
+            width: controlRoot.itemSize
+            height: controlRoot.itemSize
             iconName: "colorize"
             iconSize: controlRoot.iconSize
             backgroundColor: "transparent"
             iconColor: Theme.surfaceText
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-            cursorShape: Qt.PointingHandCursor
-            onClicked: (mouse) => {
+            tooltipText: I18n.tr("Pick Color")
+            onClicked: {
                 let col = controlRoot.backdropMode === "solid" ? controlRoot.backdropSolidColor :
                           (controlRoot.gradientActiveSlot === "start" ? controlRoot.backdropGradientStart : controlRoot.backdropGradientEnd);
-                let targetSlot = controlRoot.backdropMode === "solid" ? "solid" : controlRoot.gradientActiveSlot;
-                if (mouse.button === Qt.RightButton) {
-                    controlRoot.eyedropperRequested(targetSlot)
-                } else {
-                    controlRoot.colorPickerRequested(col)
-                }
+                controlRoot.colorPickerRequested(col)
             }
         }
     }
@@ -121,6 +113,7 @@ Row {
         iconSize: controlRoot.iconSize
         backgroundColor: "transparent"
         iconColor: Theme.surfaceText
+        tooltipText: I18n.tr("Auto Balance")
         onClicked: controlRoot.autoColorBalanceRequested()
     }
 }
