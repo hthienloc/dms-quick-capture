@@ -783,9 +783,9 @@ function drawSelectionOverlay(ctx, options, Theme) {
         ctx.setLineDash([]);
 
         if (!options.isOcrMode) {
-            const arm = 12;
-            const edgeLen = 16;
-            const sw = 2;
+            const arm = 16;
+            const edgeLen = 20;
+            const sw = 2.5;
 
             const x1 = cr.x;
             const y1 = cr.y;
