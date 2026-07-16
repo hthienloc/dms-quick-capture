@@ -698,8 +698,8 @@ MouseArea {
         }
 
           if (window.currentTool === "crop") {
-             if (window.activeHandle === "new" || window.activeHandle === "tl" || window.activeHandle === "tr" || window.activeHandle === "bl" || window.activeHandle === "br"
-                 || window.activeHandle === "tc" || window.activeHandle === "bc" || window.activeHandle === "lc" || window.activeHandle === "rc") {
+              var resizeHandles = ["new", "tl", "tr", "bl", "br", "tc", "bc", "lc", "rc"];
+              if (resizeHandles.indexOf(window.activeHandle) >= 0) {
                  // Check for accidental click (too small) BEFORE clamping
                  if (Math.min(window.cropRect.width, window.cropRect.height) <= 3) {
                      if (window.strokes.length === 0) {
@@ -721,11 +721,11 @@ MouseArea {
                      window.hasSelection = false;
                      window.cropRect = Qt.rect(0, 0, 0, 0);
                  }
-             }
-             window.activeHandle = "none";
-             drawingCanvas.requestPaint();
-             return;
-         }
+              }
+              window.activeHandle = "none";
+              drawingCanvas.requestPaint();
+              return;
+          }
 
         if (window.currentTool === "ocr") {
             window.activeHandle = "none";
