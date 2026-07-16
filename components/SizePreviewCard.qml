@@ -7,14 +7,25 @@ import "../dms-common"
 
 Rectangle {
     id: sizePreviewItem
-    
+
     required property var window
     required property var drawingCanvas
 
     visible: window.showSizePreview
     x: window.previewX - (width / 2)
     y: window.previewY - (height / 2)
-    width: {
+
+    readonly property bool _showShape: window.effectiveTool !== "spotlight"
+
+    width: _showShape ? shapeWidth : 0
+    height: width
+    radius: _showShape ? shapeRadius : 0
+    color: "transparent"
+    border.color: _showShape ? shapeBorderColor : "transparent"
+    border.width: _showShape ? 1.5 / drawingCanvas.scale : 0
+    z: 20
+
+    readonly property real shapeWidth: {
         let base = window.activeIntensity;
         const tool = window.effectiveTool;
         if (tool === "highlighter") {
@@ -30,27 +41,25 @@ Rectangle {
                 const bw = window.selectedStroke.borderWidth !== undefined ? window.selectedStroke.borderWidth : 2;
                 base = bw * 2;
             } else {
-                base = 40; // Small anchor size for text feedback
+                base = 40;
             }
         }
         return base * window.editScale;
     }
-    height: width
-    radius: {
+    readonly property real shapeRadius: {
         const tool = window.effectiveTool;
-        if (tool === "highlighter") return window.roundHighlighter ? width / 2 : 0;
+        if (tool === "highlighter") return window.roundHighlighter ? shapeWidth / 2 : 0;
         if (tool === "spotlight" || tool === "rect" || tool === "redact") return window.roundRect ? (Theme.cornerRadius * window.editScale) : 0;
         if (tool === "pixelate" || tool === "text") return 0;
         if (tool === "callout") {
             if (window.currentTool === "select" && !window.calloutDestDragging && window.selectedStroke) {
-                return width / 2;
+                return shapeWidth / 2;
             }
             return 0;
         }
-        return width / 2;
+        return shapeWidth / 2;
     }
-    color: "transparent"
-    border.color: {
+    readonly property color shapeBorderColor: {
         if (window.effectiveTool === "callout") {
             if (window.currentTool === "select" && !window.calloutDestDragging && window.selectedStroke) {
                 return Theme.primary;
@@ -62,13 +71,14 @@ Rectangle {
         }
         return Theme.primary;
     }
-    border.width: 1.5 / drawingCanvas.scale
-    z: 20
 
     StyledText {
-        anchors.top: parent.bottom
+        id: valueLabel
+        anchors.top: _showShape ? parent.bottom : undefined
         anchors.topMargin: 4 / drawingCanvas.scale
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenter: _showShape ? parent.horizontalCenter : undefined
+        x: _showShape ? 0 : 8 / drawingCanvas.scale
+        y: _showShape ? 0 : -valueLabel.height - 4 / drawingCanvas.scale
         text: {
             if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "callout") {
                 if (window.calloutDestDragging) {
