@@ -47,6 +47,7 @@ PluginComponent {
 
             headerActions: Component {
                 Rectangle {
+                    id: folderBtn
                     width: 32
                     height: 32
                     radius: 16
@@ -54,11 +55,16 @@ PluginComponent {
 
                     Behavior on color { ColorAnimation { duration: Theme.shorterDuration; easing.type: Theme.standardEasing } }
 
+                    property bool pressed: false
+
                     DankIcon {
+                        id: folderIcon
                         anchors.centerIn: parent
                         name: "folder_open"
                         size: Theme.iconSize - 4
                         color: folderArea.containsMouse ? Theme.primary : Theme.surfaceVariantText
+                        scale: folderBtn.pressed ? 0.6 : 1.0
+                        Behavior on scale { NumberAnimation { duration: 400; easing.type: Easing.OutBack } }
                     }
 
                     MouseArea {
@@ -66,7 +72,11 @@ PluginComponent {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
+                        onPressed: folderBtn.pressed = true
+                        onReleased: folderBtn.pressed = false
+                        onCanceled: folderBtn.pressed = false
                         onClicked: {
+                            folderBtn.pressed = false
                             const dir = root.pluginData.saveDirectory || "~/Pictures/Screenshots";
                             Proc.runCommand("open-screenshot-dir", ["sh", "-c", "xdg-open " + dir], null);
                         }
