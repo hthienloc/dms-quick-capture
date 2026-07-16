@@ -15,14 +15,14 @@ Rectangle {
     x: window.previewX - (width / 2)
     y: window.previewY - (height / 2)
 
-    readonly property bool _hasStroke: window.selectedStroke != null
+    readonly property bool _showShape: window.effectiveTool !== "spotlight"
 
-    width: _hasStroke ? shapeWidth : 0
+    width: _showShape ? shapeWidth : 0
     height: width
-    radius: _hasStroke ? shapeRadius : 0
+    radius: _showShape ? shapeRadius : 0
     color: "transparent"
-    border.color: _hasStroke ? shapeBorderColor : "transparent"
-    border.width: _hasStroke ? 1.5 / drawingCanvas.scale : 0
+    border.color: _showShape ? shapeBorderColor : "transparent"
+    border.width: _showShape ? 1.5 / drawingCanvas.scale : 0
     z: 20
 
     readonly property real shapeWidth: {
@@ -74,11 +74,11 @@ Rectangle {
 
     StyledText {
         id: valueLabel
-        anchors.top: _hasStroke ? parent.bottom : undefined
+        anchors.top: _showShape ? parent.bottom : undefined
         anchors.topMargin: 4 / drawingCanvas.scale
-        anchors.horizontalCenter: _hasStroke ? parent.horizontalCenter : undefined
-        x: _hasStroke ? 0 : 8 / drawingCanvas.scale
-        y: _hasStroke ? 0 : -valueLabel.height - 4 / drawingCanvas.scale
+        anchors.horizontalCenter: _showShape ? parent.horizontalCenter : undefined
+        x: _showShape ? 0 : 8 / drawingCanvas.scale
+        y: _showShape ? 0 : -valueLabel.height - 4 / drawingCanvas.scale
         text: {
             if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "callout") {
                 if (window.calloutDestDragging) {
