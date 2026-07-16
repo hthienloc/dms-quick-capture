@@ -260,6 +260,7 @@ MouseArea {
                     window.currentStroke.points.push(absPt);
                 }
               } else if (window.currentTool === "redact" && window.activeRedactShape === "freehand") {
+                 if (!window.currentStroke.freehandPoints) window.currentStroke.freehandPoints = [];
                  window.currentStroke.freehandPoints.push(absPt);
                  window.currentStroke.points = [window.currentStroke.points[0], absPt];
               } else if (window.currentTool === "redact") {

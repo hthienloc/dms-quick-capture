@@ -247,11 +247,12 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
                 }
                 ctx.closePath();
             } else if (shape === "ellipse") {
-                ctx.beginPath();
+                ctx.save();
                 ctx.translate(rx + rw / 2, ry + rh / 2);
                 ctx.scale(rw / 2, rh / 2);
+                ctx.beginPath();
                 ctx.arc(0, 0, 1, 0, 2 * Math.PI);
-                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.restore();
             } else if (shape === "roundRect") {
                 const radius = Math.min(Theme.cornerRadius, Math.min(rw, rh) / 2);
                 ctx.beginPath();

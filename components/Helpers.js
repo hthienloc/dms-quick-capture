@@ -548,13 +548,25 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
                 if (dx <= threshold || dy <= threshold) return i;
             }
         } else if (stroke.tool === "redact") {
-            const p0 = stroke.points[0];
-            const p1 = stroke.points[stroke.points.length - 1];
-            const x1 = Math.min(p0.x, p1.x);
-            const x2 = Math.max(p0.x, p1.x);
-            const y1 = Math.min(p0.y, p1.y);
-            const y2 = Math.max(p0.y, p1.y);
             const shape = stroke.redactShape || "rect";
+            let x1, x2, y1, y2;
+            if (shape === "freehand" && stroke.freehandPoints && stroke.freehandPoints.length > 0) {
+                x1 = Infinity; x2 = -Infinity; y1 = Infinity; y2 = -Infinity;
+                for (let j = 0; j < stroke.freehandPoints.length; j++) {
+                    const p = stroke.freehandPoints[j];
+                    if (p.x < x1) x1 = p.x;
+                    if (p.x > x2) x2 = p.x;
+                    if (p.y < y1) y1 = p.y;
+                    if (p.y > y2) y2 = p.y;
+                }
+            } else {
+                const p0 = stroke.points[0];
+                const p1 = stroke.points[stroke.points.length - 1];
+                x1 = Math.min(p0.x, p1.x);
+                x2 = Math.max(p0.x, p1.x);
+                y1 = Math.min(p0.y, p1.y);
+                y2 = Math.max(p0.y, p1.y);
+            }
             if (shape === "ellipse") {
                 const rx = Math.max((x2 - x1) / 2, 1);
                 const ry = Math.max((y2 - y1) / 2, 1);
@@ -562,10 +574,6 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
                 const cy = y1 + ry;
                 const normalized = Math.pow((mx - cx) / rx, 2) + Math.pow((my - cy) / ry, 2);
                 if (normalized <= 1.1) return i;
-            } else if (shape === "freehand" && stroke.freehandPoints) {
-                if (mx >= x1 - Constants.rectSelectionPadding && mx <= x2 + Constants.rectSelectionPadding && my >= y1 - Constants.rectSelectionPadding && my <= y2 + Constants.rectSelectionPadding) {
-                    return i;
-                }
             } else {
                 if (mx >= x1 - Constants.rectSelectionPadding && mx <= x2 + Constants.rectSelectionPadding && my >= y1 - Constants.rectSelectionPadding && my <= y2 + Constants.rectSelectionPadding) {
                     return i;
