@@ -259,8 +259,23 @@ MouseArea {
                 } else {
                     window.currentStroke.points.push(absPt);
                 }
-             } else if (window.currentTool === "rect" || window.currentTool === "ellipse" || window.currentTool === "arrow" || window.currentTool === "line"
-                      || window.currentTool === "redact" || window.currentTool === "pixelate" || window.currentTool === "highlighter" || window.currentTool === "spotlight" || window.currentTool === "callout") {
+              } else if (window.currentTool === "redact" && window.activeRedactShape === "freehand") {
+                 window.currentStroke.freehandPoints.push(absPt);
+                 window.currentStroke.points = [window.currentStroke.points[0], absPt];
+              } else if (window.currentTool === "redact") {
+                 let finalPt = absPt;
+                 if ((mouse.modifiers & Qt.ShiftModifier)) {
+                     if (window.currentStroke.points[0]) {
+                         finalPt = Helpers.constrainSquarePoint(window.currentStroke.points[0], absPt, Qt);
+                     }
+                 }
+                 if (window.currentStroke.points.length > 1) {
+                      window.currentStroke.points[window.currentStroke.points.length - 1] = finalPt;
+                  } else {
+                      window.currentStroke.points.push(finalPt);
+                  }
+              } else if (window.currentTool === "rect" || window.currentTool === "ellipse" || window.currentTool === "arrow" || window.currentTool === "line"
+                       || window.currentTool === "pixelate" || window.currentTool === "highlighter" || window.currentTool === "spotlight" || window.currentTool === "callout") {
                   
                  let finalPt = absPt;
                  if ((mouse.modifiers & Qt.ShiftModifier) && (window.currentTool === "line" || window.currentTool === "arrow" || window.currentTool === "highlighter")) {
@@ -396,6 +411,7 @@ MouseArea {
                     window.calloutZoom = window.preGrabCalloutZoom;
                     window.currentColor = window.preGrabColor;
                     window.activeRedactMode = window.preGrabRedactMode;
+                    window.activeRedactShape = window.preGrabRedactShape;
                     window.calloutLinkLines = window.preGrabCalloutLinkLines;
                     window.selectedStroke = null;
                 }
@@ -434,6 +450,7 @@ MouseArea {
                     window.calloutZoom = window.preGrabCalloutZoom;
                     window.currentColor = window.preGrabColor;
                     window.activeRedactMode = window.preGrabRedactMode;
+                    window.activeRedactShape = window.preGrabRedactShape;
                     window.calloutLinkLines = window.preGrabCalloutLinkLines;
                 }
                 window.originalPoints = [];
@@ -455,6 +472,7 @@ MouseArea {
                     window.preGrabCalloutZoom = window.calloutZoom;
                     window.preGrabColor = window.currentColor;
                     window.preGrabRedactMode = window.activeRedactMode;
+                    window.preGrabRedactShape = window.activeRedactShape;
                     window.preGrabCalloutLinkLines = window.calloutLinkLines;
                 }
                 
@@ -469,6 +487,9 @@ MouseArea {
                 }
                 if (stroke.tool === "redact" && stroke.redactMode) {
                     window.activeRedactMode = stroke.redactMode;
+                }
+                if (stroke.tool === "redact" && stroke.redactShape) {
+                    window.activeRedactShape = stroke.redactShape;
                 }
                 if (stroke.tool === "callout") {
                     window.calloutLinkLines = stroke.calloutLinkLines !== undefined ? stroke.calloutLinkLines : 1;
@@ -629,18 +650,20 @@ MouseArea {
         }
 
          window.currentStroke = {
-             tool: window.currentTool,
-             color: window.currentColor.toString(),
-             width: window.activeIntensity,
-             points: [getAbsolutePoint(mouse.x, mouse.y)],
-             lineStyle: window.currentTool === "line" ? window.activeLineStyle : "solid",
-             arrowLineStyle: window.currentTool === "arrow" ? window.activeArrowLineStyle : "solid",
-             arrowHeadStyle: window.currentTool === "arrow" ? window.activeArrowHeadStyle : "single-filled",
-             redactMode: window.currentTool === "redact" ? window.activeRedactMode : "solid",
-             calloutLinkLines: window.currentTool === "callout" ? window.calloutLinkLines : 1,
-             randomize: window.currentTool === "pixelate" ? window.pixelateRandomize : false,
-             randomSeed: window.currentTool === "pixelate" ? Math.floor(Math.random() * 2147483647) : 0
-         };
+              tool: window.currentTool,
+              color: window.currentColor.toString(),
+              width: window.activeIntensity,
+              points: [getAbsolutePoint(mouse.x, mouse.y)],
+              lineStyle: window.currentTool === "line" ? window.activeLineStyle : "solid",
+              arrowLineStyle: window.currentTool === "arrow" ? window.activeArrowLineStyle : "solid",
+              arrowHeadStyle: window.currentTool === "arrow" ? window.activeArrowHeadStyle : "single-filled",
+              redactMode: window.currentTool === "redact" ? window.activeRedactMode : "solid",
+              redactShape: window.currentTool === "redact" ? window.activeRedactShape : "rect",
+              freehandPoints: window.currentTool === "redact" && window.activeRedactShape === "freehand" ? [] : undefined,
+              calloutLinkLines: window.currentTool === "callout" ? window.calloutLinkLines : 1,
+              randomize: window.currentTool === "pixelate" ? window.pixelateRandomize : false,
+              randomSeed: window.currentTool === "pixelate" ? Math.floor(Math.random() * 2147483647) : 0
+          };
          drawingCanvas.requestPaint();
     }
 

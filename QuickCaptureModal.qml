@@ -80,6 +80,21 @@ DankModal {
         }
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
+    property string activeRedactShape: "rect" // rect, roundRect, ellipse, freehand
+    onActiveRedactShapeChanged: {
+        if (window.selectedStroke && window.selectedStroke.tool === "redact") {
+            window.selectedStroke.redactShape = window.activeRedactShape;
+            const idx = window.strokes.indexOf(window.selectedStroke);
+            if (idx !== -1) {
+                window.strokes[idx] = window.selectedStroke;
+                window.strokes = [...window.strokes];
+            }
+        }
+        if (window.currentStroke && window.currentStroke.tool === "redact") {
+            window.currentStroke.redactShape = window.activeRedactShape;
+        }
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
+    }
     onActiveLineStyleChanged: {
         if (window.selectedStroke && window.selectedStroke.tool === "line") {
             window.selectedStroke.lineStyle = window.activeLineStyle;
@@ -149,6 +164,7 @@ DankModal {
             window.calloutZoom = window.preGrabCalloutZoom;
             window.currentColor = restoreColor;
             window.activeRedactMode = window.preGrabRedactMode;
+            window.activeRedactShape = window.preGrabRedactShape;
             window.calloutLinkLines = window.preGrabCalloutLinkLines;
             if (window.activeCanvas) window.activeCanvas.requestPaint();
         }
@@ -172,6 +188,7 @@ DankModal {
             window.preGrabCalloutZoom = window.calloutZoom;
             window.preGrabColor = window.currentColor;
             window.preGrabRedactMode = window.activeRedactMode;
+            window.preGrabRedactShape = window.activeRedactShape;
             window.preGrabCalloutLinkLines = window.calloutLinkLines;
             window.selectedStroke = s;
             window.currentColor = s.color;
@@ -186,6 +203,7 @@ DankModal {
                 if (s.arrowHeadStyle) window.activeArrowHeadStyle = s.arrowHeadStyle;
             }
             if (s.tool === "redact" && s.redactMode) window.activeRedactMode = s.redactMode;
+            if (s.tool === "redact" && s.redactShape) window.activeRedactShape = s.redactShape;
             if (s.tool === "callout") window.calloutLinkLines = s.calloutLinkLines !== undefined ? s.calloutLinkLines : 1;
             const reorder = [...window.strokes];
             const idx = reorder.indexOf(s);
@@ -637,6 +655,7 @@ DankModal {
     property int preGrabCalloutZoom: 150
     property color preGrabColor: Theme.primary
     property string preGrabRedactMode: "solid"
+    property string preGrabRedactShape: "rect"
     property int preGrabCalloutLinkLines: 1
     property point pressCoords: Qt.point(0, 0)
     property var originalPoints: []
@@ -1064,10 +1083,12 @@ DankModal {
             window.preGrabStrokeWidth = window.strokeWidth;
             window.preGrabColor = window.currentColor;
             window.preGrabRedactMode = window.activeRedactMode;
+            window.preGrabRedactShape = window.activeRedactShape;
             window.preGrabCalloutLinkLines = window.calloutLinkLines;
             window.strokeWidth = pasted.width;
             window.currentColor = pasted.color;
             if (pasted.tool === "redact" && pasted.redactMode) window.activeRedactMode = pasted.redactMode;
+            if (pasted.tool === "redact" && pasted.redactShape) window.activeRedactShape = pasted.redactShape;
             window.selectedStroke = pasted;
             window.pressCoords = absPt;
             window.originalPoints = newPoints;
@@ -2887,7 +2908,9 @@ DankModal {
                     id: redactOptionsToolbar
                     toolbarPosition: window.toolbarPosition
                     currentMode: window.activeRedactMode
+                    currentShape: window.activeRedactShape
                     onModeSelected: (mode) => window.activeRedactMode = mode
+                    onShapeSelected: (shape) => window.activeRedactShape = shape
                 }
 
                 CalloutOptionsToolbar {

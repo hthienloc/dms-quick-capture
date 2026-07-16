@@ -547,7 +547,31 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
                 const dy = Math.min(Math.abs(my - y1), Math.abs(my - y2));
                 if (dx <= threshold || dy <= threshold) return i;
             }
-        } else if (stroke.tool === "redact" || stroke.tool === "pixelate" || stroke.tool === "spotlight") {
+        } else if (stroke.tool === "redact") {
+            const p0 = stroke.points[0];
+            const p1 = stroke.points[stroke.points.length - 1];
+            const x1 = Math.min(p0.x, p1.x);
+            const x2 = Math.max(p0.x, p1.x);
+            const y1 = Math.min(p0.y, p1.y);
+            const y2 = Math.max(p0.y, p1.y);
+            const shape = stroke.redactShape || "rect";
+            if (shape === "ellipse") {
+                const rx = Math.max((x2 - x1) / 2, 1);
+                const ry = Math.max((y2 - y1) / 2, 1);
+                const cx = x1 + rx;
+                const cy = y1 + ry;
+                const normalized = Math.pow((mx - cx) / rx, 2) + Math.pow((my - cy) / ry, 2);
+                if (normalized <= 1.1) return i;
+            } else if (shape === "freehand" && stroke.freehandPoints) {
+                if (mx >= x1 - Constants.rectSelectionPadding && mx <= x2 + Constants.rectSelectionPadding && my >= y1 - Constants.rectSelectionPadding && my <= y2 + Constants.rectSelectionPadding) {
+                    return i;
+                }
+            } else {
+                if (mx >= x1 - Constants.rectSelectionPadding && mx <= x2 + Constants.rectSelectionPadding && my >= y1 - Constants.rectSelectionPadding && my <= y2 + Constants.rectSelectionPadding) {
+                    return i;
+                }
+            }
+        } else if (stroke.tool === "pixelate" || stroke.tool === "spotlight") {
             const p0 = stroke.points[0];
             const p1 = stroke.points[stroke.points.length - 1];
             const x1 = Math.min(p0.x, p1.x);

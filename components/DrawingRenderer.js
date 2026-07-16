@@ -228,27 +228,50 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         const ry = Math.floor(Math.min(p0.y, p1.y));
         const rw = Math.floor(Math.abs(p1.x - p0.x));
         const rh = Math.floor(Math.abs(p1.y - p0.y));
-        
-        if (rw > 0 && rh > 0) {
-            const radius = config.roundRect ? Math.min(Theme.cornerRadius, Math.min(rw, rh) / 2) : 0;
-            const mode = stroke.redactMode || "solid";
+        const shape = stroke.redactShape || "rect";
+        const mode = stroke.redactMode || "solid";
 
+        const hasArea = shape === "freehand"
+            ? (stroke.freehandPoints && stroke.freehandPoints.length > 1)
+            : (rw > 0 && rh > 0);
+
+        if (hasArea) {
             ctx.save();
-            ctx.beginPath();
-            ctx.moveTo(rx + radius, ry);
-            ctx.lineTo(rx + rw - radius, ry);
-            ctx.arcTo(rx + rw, ry, rx + rw, ry + radius, radius);
-            ctx.lineTo(rx + rw, ry + rh - radius);
-            ctx.arcTo(rx + rw, ry + rh, rx + rw - radius, ry + rh, radius);
-            ctx.lineTo(rx + radius, ry + rh);
-            ctx.arcTo(rx, ry + rh, rx, ry + rh - radius, radius);
-            ctx.lineTo(rx, ry + radius);
-            ctx.arcTo(rx, ry, rx + radius, ry, radius);
-            ctx.closePath();
+
+            if (shape === "freehand" && stroke.freehandPoints) {
+                ctx.beginPath();
+                const pts = stroke.freehandPoints;
+                ctx.moveTo(pts[0].x, pts[0].y);
+                for (let i = 1; i < pts.length; i++) {
+                    ctx.lineTo(pts[i].x, pts[i].y);
+                }
+                ctx.closePath();
+            } else if (shape === "ellipse") {
+                ctx.beginPath();
+                ctx.translate(rx + rw / 2, ry + rh / 2);
+                ctx.scale(rw / 2, rh / 2);
+                ctx.arc(0, 0, 1, 0, 2 * Math.PI);
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+            } else if (shape === "roundRect") {
+                const radius = Math.min(Theme.cornerRadius, Math.min(rw, rh) / 2);
+                ctx.beginPath();
+                ctx.moveTo(rx + radius, ry);
+                ctx.lineTo(rx + rw - radius, ry);
+                ctx.arcTo(rx + rw, ry, rx + rw, ry + radius, radius);
+                ctx.lineTo(rx + rw, ry + rh - radius);
+                ctx.arcTo(rx + rw, ry + rh, rx + rw - radius, ry + rh, radius);
+                ctx.lineTo(rx + radius, ry + rh);
+                ctx.arcTo(rx, ry + rh, rx, ry + rh - radius, radius);
+                ctx.lineTo(rx, ry + radius);
+                ctx.arcTo(rx, ry, rx + radius, ry, radius);
+                ctx.closePath();
+            } else {
+                ctx.beginPath();
+                ctx.rect(rx, ry, rw, rh);
+            }
 
             if (mode === "clean" && config.offscreenSampler) {
                 if (stroke.isCurrent) {
-                    // Extremely cheap 1x1 pixel read for 60 FPS real-time preview dragging
                     try {
                         const octx = config.offscreenSampler.getContext("2d");
                         const imgData = octx.getImageData(rx, ry, 1, 1);
@@ -257,7 +280,6 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
                         ctx.fillStyle = "rgba(128, 128, 128, 0.5)";
                     }
                 } else {
-                    // Compute accurate dominant color exactly once and cache it on the stroke!
                     if (!stroke.cachedCleanColor) {
                         stroke.cachedCleanColor = Helpers.getBoundaryColorOrGradient(ctx, rx, ry, rw, rh, config.offscreenSampler, Qt);
                     }
