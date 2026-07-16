@@ -869,12 +869,10 @@ MouseArea {
  
           window.updateActiveIntensity(window.activeIntensity + (step * multiplier));
  
-          if (!window.selectedStroke) {
-              window.previewX = wheel.x;
-              window.previewY = wheel.y;
-              window.showSizePreview = true;
-              previewTimer.restart();
-          }
+          window.previewX = wheel.x;
+          window.previewY = wheel.y;
+          window.showSizePreview = true;
+          previewTimer.restart();
          wheel.accepted = true;
      }
 }
