@@ -42,8 +42,37 @@ PluginComponent {
             width: root.popoutWidth
             headerText: I18n.tr("Quick Capture")
             detailsText: I18n.tr("Select capture mode")
-            showCloseButton: true
+            showCloseButton: false
             closePopout: () => root.closePopout()
+
+            headerActions: Component {
+                Rectangle {
+                    width: 32
+                    height: 32
+                    radius: 16
+                    color: folderArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15) : "transparent"
+
+                    Behavior on color { ColorAnimation { duration: Theme.shorterDuration; easing.type: Theme.standardEasing } }
+
+                    DankIcon {
+                        anchors.centerIn: parent
+                        name: "folder_open"
+                        size: Theme.iconSize - 4
+                        color: folderArea.containsMouse ? Theme.primary : Theme.surfaceVariantText
+                    }
+
+                    MouseArea {
+                        id: folderArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            const dir = root.pluginData.saveDirectory || "~/Pictures/Screenshots";
+                            Proc.runCommand("open-screenshot-dir", ["sh", "-c", "xdg-open " + dir], null);
+                        }
+                    }
+                }
+            }
 
             Column {
                 width: parent.width
