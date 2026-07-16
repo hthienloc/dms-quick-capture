@@ -1277,7 +1277,7 @@ DankModal {
             console.warn("exportCanvasItem is not initialized yet");
             return;
         }
-        if (window.hasSelection) {
+        if (window.hasSelection && window.effectiveBackdropMode === "none") {
             window.exportCanvasItem.width = window.cropRect.width / window.dpr;
             window.exportCanvasItem.height = window.cropRect.height / window.dpr;
         } else if (window.activeCanvas) {
