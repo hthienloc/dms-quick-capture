@@ -1,6 +1,7 @@
 import "./dms-common"
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import qs.Common
 import qs.Modules.Plugins
 import qs.Services
@@ -19,9 +20,27 @@ PluginComponent {
     pluginId: "quickCapture"
     pluginService: PluginService
 
+    property bool outputExpanded: false
+    property var outputList: []
+    function refreshOutputList() {
+        Proc.runCommand("list-outputs", ["dms", "screenshot", "list"], (stdout) => {
+            const list = [];
+            for (const line of stdout.trim().split("\n")) {
+                const m = line.match(/^(\S+):\s*(\d+x\d+)/);
+                if (m) list.push({ label: m[1] + "  (" + m[2] + ")", value: m[1] });
+            }
+            if (list.length === 0) {
+                list.push({ label: "DP-1", value: "DP-1" });
+                list.push({ label: "eDP-1", value: "eDP-1" });
+                list.push({ label: "HDMI-A-1", value: "HDMI-A-1" });
+            }
+            outputList = list;
+        });
+    }
+
     // ── Popout (left-click menu) ──────────────────────────────────────────────
     popoutWidth: 240
-    popoutHeight: 400
+    popoutHeight: outputExpanded ? 400 + Math.min(outputList.length, 5) * 32 : 400
 
     popoutContent: Component {
         PopoutComponent {
@@ -60,14 +79,208 @@ PluginComponent {
                     }
                 }
 
-                Repeater {
-                    model: [
-                        { icon: "grid_view", text: I18n.tr("All Outputs"), modeKey: "all" },
-                        { icon: "display_settings", text: I18n.tr("Specific Output"), modeKey: "output" },
-                        { icon: "restart_alt", text: I18n.tr("Last Region"), modeKey: "last" },
-                    ]
+                Rectangle {
+                    width: parent.width
+                    height: 36
+                    color: itemMouse1.containsMouse ? Theme.surfaceContainerHigh : "transparent"
+                    radius: Theme.cornerRadiusSmall
 
-                    delegate: menuItemComp
+                    function exec(action) {
+                        if (!root.daemon) return;
+                        root.daemon.triggerCaptureWithAction("all", action);
+                        root.closePopout();
+                    }
+
+                    Row {
+                        anchors.left: parent.left; anchors.leftMargin: Theme.spacingM
+                        anchors.right: parent.right; anchors.rightMargin: Theme.spacingS + 28
+                        anchors.verticalCenter: parent.verticalCenter; spacing: Theme.spacingS
+                        DankIcon { name: "grid_view"; size: 18; anchors.verticalCenter: parent.verticalCenter; color: Theme.surfaceText }
+                        StyledText { text: I18n.tr("All Outputs"); font.pixelSize: Theme.fontSizeNormal; color: Theme.surfaceText; anchors.verticalCenter: parent.verticalCenter }
+                    }
+
+                    MouseArea {
+                        id: itemMouse1
+                        anchors.fill: parent; anchors.rightMargin: 28
+                        hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                        onClicked: exec("edit")
+                    }
+                    MouseArea {
+                        anchors.right: parent.right; anchors.top: parent.top
+                        anchors.bottom: parent.bottom; width: 28
+                        hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                        onClicked: exec("float")
+                    }
+                }
+
+                Rectangle {
+                    id: outputHeader
+                    width: parent.width; height: 36
+                    color: outputMouse.containsMouse ? Theme.surfaceContainerHigh : "transparent"
+                    radius: Theme.cornerRadiusSmall
+
+                    function exec(action) {
+                        if (!root.daemon) return;
+                        root.outputExpanded = !root.outputExpanded;
+                        if (root.outputExpanded) root.refreshOutputList();
+                    }
+
+                    // ── Tree root branch ────────────────────────
+                    Rectangle {
+                        x: Theme.spacingM + 8
+                        y: parent.height / 2
+                        width: 2
+                        height: parent.height / 2 + (parent.height % 2)
+                        color: Theme.outlineVariant
+                        visible: root.outputExpanded && root.outputList.length > 0
+                    }
+
+                    Row {
+                        anchors.left: parent.left; anchors.leftMargin: Theme.spacingM
+                        anchors.right: parent.right; anchors.rightMargin: Theme.spacingS + 24
+                        anchors.verticalCenter: parent.verticalCenter; spacing: Theme.spacingS
+                        DankIcon { name: "display_settings"; size: 18; anchors.verticalCenter: parent.verticalCenter; color: Theme.surfaceText }
+                        StyledText { text: I18n.tr("Specific Output"); font.pixelSize: Theme.fontSizeNormal; color: Theme.surfaceText; anchors.verticalCenter: parent.verticalCenter }
+                    }
+                    DankIcon {
+                        anchors.right: parent.right; anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        name: root.outputExpanded ? "expand_more" : "expand_less"
+                        size: 16; color: Theme.surfaceText
+                    }
+
+                    MouseArea {
+                        id: outputMouse
+                        anchors.fill: parent
+                        hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                        onClicked: outputHeader.exec("edit")
+                    }
+                }
+
+                Repeater {
+                    model: root.outputExpanded ? root.outputList : []
+
+                    delegate: Rectangle {
+                        width: parent.width; height: root.outputExpanded ? 32 : 0
+                        visible: root.outputExpanded
+                        color: subMouse.containsMouse || pinArea.containsMouse ? Theme.surfaceContainerHigh : "transparent"
+                        radius: Theme.cornerRadiusSmall
+                        clip: true
+
+                        Behavior on height { NumberAnimation { duration: 100 } }
+
+                        // ── Tree connector ─────────────────────
+                        Rectangle {
+                            x: Theme.spacingM + 8
+                            y: 0
+                            width: 2
+                            height: parent.height
+                            color: Theme.outlineVariant
+                            visible: index < root.outputList.length - 1
+                        }
+                        Rectangle {
+                            x: Theme.spacingM + 8
+                            y: 0
+                            width: 2
+                            height: parent.height / 2
+                            color: Theme.outlineVariant
+                            visible: index === root.outputList.length - 1
+                        }
+                        Rectangle {
+                            x: Theme.spacingM + 6
+                            y: parent.height / 2 - 3
+                            width: 6
+                            height: 6
+                            radius: 3
+                            color: Theme.outlineVariant
+                        }
+
+                        Row {
+                            anchors.left: parent.left; anchors.leftMargin: Theme.spacingM + 20
+                            anchors.right: parent.right; anchors.rightMargin: Theme.spacingS + 28
+                            anchors.verticalCenter: parent.verticalCenter; spacing: Theme.spacingS
+                            StyledText {
+                                text: modelData.label
+                                font.pixelSize: Theme.fontSizeNormal - 1
+                                color: Theme.surfaceText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        DankIcon {
+                            id: pinIcon
+                            anchors.right: parent.right; anchors.rightMargin: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            name: "push_pin"
+                            size: 14
+                            opacity: subMouse.containsMouse || pinArea.containsMouse ? 1 : 0
+                            color: pinArea.containsMouse ? Theme.primary : Theme.surfaceText
+                            Behavior on opacity { NumberAnimation { duration: 100 } }
+                        }
+
+                        MouseArea {
+                            id: subMouse
+                            anchors.fill: parent; anchors.rightMargin: 28
+                            hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (root.daemon) {
+                                    root.daemon.captureOutputName = modelData.value;
+                                    root.daemon.triggerCaptureWithAction("output", "edit");
+                                }
+                                root.closePopout();
+                                root.outputExpanded = false;
+                            }
+                        }
+
+                        MouseArea {
+                            id: pinArea
+                            anchors.right: parent.right
+                            anchors.top: parent.top; anchors.bottom: parent.bottom
+                            width: 28
+                            hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (root.daemon) {
+                                    root.daemon.captureOutputName = modelData.value;
+                                    root.daemon.triggerCaptureWithAction("output", "float");
+                                }
+                                root.closePopout();
+                                root.outputExpanded = false;
+                            }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width; height: 36
+                    color: itemMouse3.containsMouse ? Theme.surfaceContainerHigh : "transparent"
+                    radius: Theme.cornerRadiusSmall
+
+                    function exec(action) {
+                        if (!root.daemon) return;
+                        root.daemon.triggerCaptureWithAction("last", action);
+                        root.closePopout();
+                    }
+
+                    Row {
+                        anchors.left: parent.left; anchors.leftMargin: Theme.spacingM
+                        anchors.right: parent.right; anchors.rightMargin: Theme.spacingS + 28
+                        anchors.verticalCenter: parent.verticalCenter; spacing: Theme.spacingS
+                        DankIcon { name: "restart_alt"; size: 18; anchors.verticalCenter: parent.verticalCenter; color: Theme.surfaceText }
+                        StyledText { text: I18n.tr("Last Region"); font.pixelSize: Theme.fontSizeNormal; color: Theme.surfaceText; anchors.verticalCenter: parent.verticalCenter }
+                    }
+
+                    MouseArea {
+                        id: itemMouse3
+                        anchors.fill: parent; anchors.rightMargin: 28
+                        hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                        onClicked: exec("edit")
+                    }
+                    MouseArea {
+                        anchors.right: parent.right; anchors.top: parent.top
+                        anchors.bottom: parent.bottom; width: 28
+                        hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                        onClicked: exec("float")
+                    }
                 }
 
                 Rectangle {

@@ -20,6 +20,7 @@ PluginComponent {
     property string activeIpcMode: ""
     property bool isDownloading: false
     property string currentCapturePath: ""
+    property string captureOutputName: ""
     // Exposed so the widget surface can read annotation state without accessing internal modal id
     readonly property bool isAnnotating: modal.shouldBeVisible
 
@@ -42,7 +43,7 @@ PluginComponent {
         }
 
         if (mode === "output") {
-            const outName = pluginData.outputTargetName || "DP-1";
+            const outName = root.captureOutputName || pluginData.outputTargetName || "DP-1";
             args.push("--output", outName);
         }
 
@@ -84,6 +85,7 @@ PluginComponent {
         Proc.runCommand("screenshot-trigger", ["sh", "-c", cmdStr], (stdout, exitCode) => {
             root.isCapturing = false;
             root.activeIpcMode = "";
+            root.captureOutputName = "";
             try {
                 const trimmed = stdout.trim();
                 const startIdx = trimmed.indexOf("{");
