@@ -29,11 +29,6 @@ PluginComponent {
                 const m = line.match(/^(\S+):\s*(\d+x\d+)/);
                 if (m) list.push({ label: m[1] + "  (" + m[2] + ")", value: m[1] });
             }
-            if (list.length === 0) {
-                list.push({ label: "DP-1", value: "DP-1" });
-                list.push({ label: "eDP-1", value: "eDP-1" });
-                list.push({ label: "HDMI-A-1", value: "HDMI-A-1" });
-            }
             outputList = list;
         });
     }
@@ -79,38 +74,12 @@ PluginComponent {
                     }
                 }
 
-                Rectangle {
-                    width: parent.width
-                    height: 36
-                    color: itemMouse1.containsMouse ? Theme.surfaceContainerHigh : "transparent"
-                    radius: Theme.cornerRadiusSmall
-
-                    function exec(action) {
-                        if (!root.daemon) return;
-                        root.daemon.triggerCaptureWithAction("all", action);
-                        root.closePopout();
-                    }
-
-                    Row {
-                        anchors.left: parent.left; anchors.leftMargin: Theme.spacingM
-                        anchors.right: parent.right; anchors.rightMargin: Theme.spacingS + 28
-                        anchors.verticalCenter: parent.verticalCenter; spacing: Theme.spacingS
-                        DankIcon { name: "grid_view"; size: 18; anchors.verticalCenter: parent.verticalCenter; color: Theme.surfaceText }
-                        StyledText { text: I18n.tr("All Outputs"); font.pixelSize: Theme.fontSizeNormal; color: Theme.surfaceText; anchors.verticalCenter: parent.verticalCenter }
-                    }
-
-                    MouseArea {
-                        id: itemMouse1
-                        anchors.fill: parent; anchors.rightMargin: 28
-                        hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                        onClicked: exec("edit")
-                    }
-                    MouseArea {
-                        anchors.right: parent.right; anchors.top: parent.top
-                        anchors.bottom: parent.bottom; width: 28
-                        hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                        onClicked: exec("float")
-                    }
+                Repeater {
+                    model: [
+                        { icon: "restart_alt", text: I18n.tr("Last Region"), modeKey: "last" },
+                        { icon: "grid_view", text: I18n.tr("All Outputs"), modeKey: "all" },
+                    ]
+                    delegate: menuItemComp
                 }
 
                 Rectangle {
@@ -130,7 +99,7 @@ PluginComponent {
                         x: Theme.spacingM + 8
                         y: parent.height / 2
                         width: 2
-                        height: parent.height / 2 + (parent.height % 2)
+                        height: parent.height / 2 + (parent.height % 2) + 2
                         color: Theme.outlineVariant
                         visible: root.outputExpanded && root.outputList.length > 0
                     }
@@ -165,8 +134,6 @@ PluginComponent {
                         visible: root.outputExpanded
                         color: subMouse.containsMouse || pinArea.containsMouse ? Theme.surfaceContainerHigh : "transparent"
                         radius: Theme.cornerRadiusSmall
-                        clip: true
-
                         Behavior on height { NumberAnimation { duration: 100 } }
 
                         // ── Tree connector ─────────────────────
@@ -174,7 +141,7 @@ PluginComponent {
                             x: Theme.spacingM + 8
                             y: 0
                             width: 2
-                            height: parent.height
+                            height: parent.height + 2
                             color: Theme.outlineVariant
                             visible: index < root.outputList.length - 1
                         }
@@ -182,7 +149,7 @@ PluginComponent {
                             x: Theme.spacingM + 8
                             y: 0
                             width: 2
-                            height: parent.height / 2
+                            height: parent.height / 2 + 2
                             color: Theme.outlineVariant
                             visible: index === root.outputList.length - 1
                         }
@@ -250,37 +217,16 @@ PluginComponent {
                     }
                 }
 
-                Rectangle {
-                    width: parent.width; height: 36
-                    color: itemMouse3.containsMouse ? Theme.surfaceContainerHigh : "transparent"
-                    radius: Theme.cornerRadiusSmall
-
-                    function exec(action) {
-                        if (!root.daemon) return;
-                        root.daemon.triggerCaptureWithAction("last", action);
-                        root.closePopout();
-                    }
-
-                    Row {
-                        anchors.left: parent.left; anchors.leftMargin: Theme.spacingM
-                        anchors.right: parent.right; anchors.rightMargin: Theme.spacingS + 28
-                        anchors.verticalCenter: parent.verticalCenter; spacing: Theme.spacingS
-                        DankIcon { name: "restart_alt"; size: 18; anchors.verticalCenter: parent.verticalCenter; color: Theme.surfaceText }
-                        StyledText { text: I18n.tr("Last Region"); font.pixelSize: Theme.fontSizeNormal; color: Theme.surfaceText; anchors.verticalCenter: parent.verticalCenter }
-                    }
-
-                    MouseArea {
-                        id: itemMouse3
-                        anchors.fill: parent; anchors.rightMargin: 28
-                        hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                        onClicked: exec("edit")
-                    }
-                    MouseArea {
-                        anchors.right: parent.right; anchors.top: parent.top
-                        anchors.bottom: parent.bottom; width: 28
-                        hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                        onClicked: exec("float")
-                    }
+                StyledText {
+                    width: parent.width
+                    height: root.outputExpanded && root.outputList.length === 0 ? 32 : 0
+                    visible: root.outputExpanded && root.outputList.length === 0
+                    padding: Theme.spacingM + 20
+                    text: I18n.tr("No output available")
+                    font.pixelSize: Theme.fontSizeNormal - 2
+                    font.italic: true
+                    color: Theme.surfaceVariantText
+                    verticalAlignment: Text.AlignVCenter
                 }
 
                 Rectangle {
