@@ -74,13 +74,6 @@ MouseArea {
                     }
                     if (window.selectedStroke.tool === "redact") {
                         window.selectedStroke.cachedCleanColor = undefined;
-                        if (window.selectedStroke.redactShape === "freehand" && window.selectedStroke.freehandPoints) {
-                            const shifted = [];
-                            for (let i = 0; i < window.selectedStroke.freehandPoints.length; i++) {
-                                shifted.push(Qt.point(window.selectedStroke.freehandPoints[i].x + dx, window.selectedStroke.freehandPoints[i].y + dy));
-                            }
-                            window.selectedStroke.freehandPoints = shifted;
-                        }
                     }
                 } else if (window.activeHandle !== "none" && window.originalPoints.length > 0) {
                     const dx = absPt.x - window.pressCoords.x;
@@ -266,11 +259,7 @@ MouseArea {
                 } else {
                     window.currentStroke.points.push(absPt);
                 }
-              } else if (window.currentTool === "redact" && window.activeRedactShape === "freehand") {
-                 if (!window.currentStroke.freehandPoints) window.currentStroke.freehandPoints = [];
-                 window.currentStroke.freehandPoints.push(absPt);
-                 window.currentStroke.points = [window.currentStroke.points[0], absPt];
-              } else if (window.currentTool === "redact") {
+               } else if (window.currentTool === "redact") {
                  let finalPt = absPt;
                  if ((mouse.modifiers & Qt.ShiftModifier)) {
                      if (window.currentStroke.points[0]) {
@@ -667,7 +656,6 @@ MouseArea {
               arrowHeadStyle: window.currentTool === "arrow" ? window.activeArrowHeadStyle : "single-filled",
               redactMode: window.currentTool === "redact" ? window.activeRedactMode : "solid",
               redactShape: window.currentTool === "redact" ? window.activeRedactShape : "rect",
-              freehandPoints: window.currentTool === "redact" && window.activeRedactShape === "freehand" ? [] : undefined,
               calloutLinkLines: window.currentTool === "callout" ? window.calloutLinkLines : 1,
               randomize: window.currentTool === "pixelate" ? window.pixelateRandomize : false,
               randomSeed: window.currentTool === "pixelate" ? Math.floor(Math.random() * 2147483647) : 0

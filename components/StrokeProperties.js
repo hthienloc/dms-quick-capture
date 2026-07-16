@@ -17,7 +17,6 @@ function copyStrokeProperties(source, target) {
     if (source.arrowHeadStyle !== undefined) target.arrowHeadStyle = source.arrowHeadStyle;
     if (source.redactMode !== undefined) target.redactMode = source.redactMode;
     if (source.redactShape !== undefined) target.redactShape = source.redactShape;
-    if (source.freehandPoints !== undefined) target.freehandPoints = source.freehandPoints.slice();
     if (source.hasLeaderLine !== undefined) target.hasLeaderLine = source.hasLeaderLine;
     if (source.calloutLinkLines !== undefined) target.calloutLinkLines = source.calloutLinkLines;
     if (source.id !== undefined) target.id = source.id;

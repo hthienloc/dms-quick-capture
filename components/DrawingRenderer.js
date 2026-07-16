@@ -231,22 +231,10 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         const shape = stroke.redactShape || "rect";
         const mode = stroke.redactMode || "solid";
 
-        const hasArea = shape === "freehand"
-            ? (stroke.freehandPoints && stroke.freehandPoints.length > 1)
-            : (rw > 0 && rh > 0);
-
-        if (hasArea) {
+        if (rw > 0 && rh > 0) {
             ctx.save();
 
-            if (shape === "freehand" && stroke.freehandPoints) {
-                ctx.beginPath();
-                const pts = stroke.freehandPoints;
-                ctx.moveTo(pts[0].x, pts[0].y);
-                for (let i = 1; i < pts.length; i++) {
-                    ctx.lineTo(pts[i].x, pts[i].y);
-                }
-                ctx.closePath();
-            } else if (shape === "ellipse") {
+            if (shape === "ellipse") {
                 ctx.save();
                 ctx.translate(rx + rw / 2, ry + rh / 2);
                 ctx.scale(rw / 2, rh / 2);
@@ -626,24 +614,12 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn) {
     if (stroke.tool === "rect" || stroke.tool === "ellipse" || stroke.tool === "redact" ||
         stroke.tool === "pixelate" || stroke.tool === "spotlight") {
         if (stroke.points.length < 2) return;
-        let x1, y1, x2, y2;
-        if (stroke.tool === "redact" && stroke.redactShape === "freehand" && stroke.freehandPoints && stroke.freehandPoints.length > 0) {
-            x1 = Infinity; x2 = -Infinity; y1 = Infinity; y2 = -Infinity;
-            for (let j = 0; j < stroke.freehandPoints.length; j++) {
-                const p = stroke.freehandPoints[j];
-                if (p.x < x1) x1 = p.x;
-                if (p.x > x2) x2 = p.x;
-                if (p.y < y1) y1 = p.y;
-                if (p.y > y2) y2 = p.y;
-            }
-        } else {
-            const p0 = stroke.points[0];
-            const p1 = stroke.points[stroke.points.length - 1];
-            x1 = Math.min(p0.x, p1.x);
-            y1 = Math.min(p0.y, p1.y);
-            x2 = Math.max(p0.x, p1.x);
-            y2 = Math.max(p0.y, p1.y);
-        }
+        const p0 = stroke.points[0];
+        const p1 = stroke.points[stroke.points.length - 1];
+        const x1 = Math.min(p0.x, p1.x);
+        const y1 = Math.min(p0.y, p1.y);
+        const x2 = Math.max(p0.x, p1.x);
+        const y2 = Math.max(p0.y, p1.y);
         const cx = (x1 + x2) / 2;
         const cy = (y1 + y2) / 2;
 

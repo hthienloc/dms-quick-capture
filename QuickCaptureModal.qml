@@ -80,14 +80,11 @@ DankModal {
         }
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
-    property string activeRedactShape: "rect" // rect, roundRect, ellipse, freehand
+    property string activeRedactShape: "rect" // rect, roundRect, ellipse
     onActiveRedactShapeChanged: {
         if (window.selectedStroke && window.selectedStroke.tool === "redact") {
             window.selectedStroke.redactShape = window.activeRedactShape;
             window.selectedStroke.cachedCleanColor = undefined;
-            if (window.activeRedactShape === "freehand" && !window.selectedStroke.freehandPoints) {
-                window.selectedStroke.freehandPoints = [];
-            }
             const idx = window.strokes.indexOf(window.selectedStroke);
             if (idx !== -1) {
                 window.strokes[idx] = window.selectedStroke;
@@ -96,9 +93,6 @@ DankModal {
         }
         if (window.currentStroke && window.currentStroke.tool === "redact") {
             window.currentStroke.redactShape = window.activeRedactShape;
-            if (window.activeRedactShape === "freehand" && !window.currentStroke.freehandPoints) {
-                window.currentStroke.freehandPoints = [];
-            }
         }
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
@@ -1084,9 +1078,6 @@ DankModal {
             points: newPoints
         };
         StrokeProps.copyStrokeProperties(window.copiedStroke, pasted);
-        if (window.copiedStroke.freehandPoints) {
-            pasted.freehandPoints = window.copiedStroke.freehandPoints.map(p => Qt.point(p.x + dx, p.y + dy));
-        }
         window.pushStroke(pasted);
         
         if (window.currentTool === "select") {

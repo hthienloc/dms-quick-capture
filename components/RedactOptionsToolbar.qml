@@ -124,8 +124,7 @@ Item {
                     model: [
                         { icon: "crop_square", shape: "rect", tooltip: qsTr("Rectangle") },
                         { icon: "rounded_corner", shape: "roundRect", tooltip: qsTr("Rounded Rectangle") },
-                        { icon: "circle", shape: "ellipse", tooltip: qsTr("Ellipse") },
-                        { icon: "gesture", shape: "freehand", tooltip: qsTr("Freehand") }
+                        { icon: "circle", shape: "ellipse", tooltip: qsTr("Ellipse") }
                     ]
 
                     delegate: Rectangle {
