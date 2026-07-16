@@ -85,8 +85,9 @@ PluginComponent {
                 Rectangle {
                     id: outputHeader
                     width: parent.width; height: 36
-                    color: outputMouse.containsMouse ? Theme.surfaceContainerHigh : "transparent"
-                    radius: Theme.cornerRadiusSmall
+                    color: outputMouse.containsMouse ? Theme.primaryHoverLight : "transparent"
+                    radius: Theme.cornerRadius
+                    Behavior on color { ColorAnimation { duration: Theme.shorterDuration; easing.type: Theme.standardEasing } }
 
                     // ── Tree root branch ────────────────────────
                     Rectangle {
@@ -112,10 +113,19 @@ PluginComponent {
                         size: 16; color: Theme.surfaceText
                     }
 
+                    DankRipple {
+                        id: outputRipple
+                        anchors.fill: parent
+                        rippleColor: Theme.primary
+                        cornerRadius: outputHeader.radius
+                        clip: true
+                    }
+
                     MouseArea {
                         id: outputMouse
                         anchors.fill: parent
                         hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                        onPressed: mouse => outputRipple.trigger(mouse.x, mouse.y)
                         onClicked: {
                             if (!root.daemon) return;
                             root.outputExpanded = !root.outputExpanded;
@@ -130,9 +140,10 @@ PluginComponent {
                     delegate: Rectangle {
                         width: parent.width; height: root.outputExpanded ? 32 : 0
                         visible: root.outputExpanded
-                        color: subMouse.containsMouse || pinArea.containsMouse ? Theme.surfaceContainerHigh : "transparent"
-                        radius: Theme.cornerRadiusSmall
+                        color: subMouse.containsMouse || pinArea.containsMouse ? Theme.primaryHoverLight : "transparent"
+                        radius: Theme.cornerRadius
                         Behavior on height { NumberAnimation { duration: 100 } }
+                        Behavior on color { ColorAnimation { duration: Theme.shorterDuration; easing.type: Theme.standardEasing } }
 
                         // ── Tree connector ─────────────────────
                         Rectangle {
@@ -183,10 +194,19 @@ PluginComponent {
                             Behavior on opacity { NumberAnimation { duration: 100 } }
                         }
 
+                        DankRipple {
+                            id: subRipple
+                            anchors.fill: parent
+                            rippleColor: Theme.primary
+                            cornerRadius: parent.radius
+                            clip: true
+                        }
+
                         MouseArea {
                             id: subMouse
                             anchors.fill: parent; anchors.rightMargin: 28
                             hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                            onPressed: mouse => subRipple.trigger(mouse.x, mouse.y)
                             onClicked: {
                                 if (root.daemon) {
                                     root.daemon.captureOutputName = modelData.value;
@@ -203,6 +223,7 @@ PluginComponent {
                             anchors.top: parent.top; anchors.bottom: parent.bottom
                             width: 28
                             hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                            onPressed: mouse => subRipple.trigger(mouse.x + parent.width - 28, mouse.y)
                             onClicked: {
                                 if (root.daemon) {
                                     root.daemon.captureOutputName = modelData.value;
@@ -259,8 +280,12 @@ PluginComponent {
             id: itemRect
             width: parent.width
             height: 36
-            color: itemMouse.containsMouse || pinArea.containsMouse ? Theme.surfaceContainerHigh : "transparent"
-            radius: Theme.cornerRadiusSmall
+            color: itemMouse.containsMouse || pinArea.containsMouse ? Theme.primaryHoverLight : "transparent"
+            radius: Theme.cornerRadius
+            scale: (itemMouse.pressed || pinArea.pressed) && !itemMouse.drag.active ? 0.98 : 1.0
+
+            Behavior on color { ColorAnimation { duration: Theme.shorterDuration; easing.type: Theme.standardEasing } }
+            Behavior on scale { NumberAnimation { duration: 80; easing.type: Easing.OutQuad } }
 
             function execMode(action) {
                 if (!root.daemon) return;
@@ -295,6 +320,14 @@ PluginComponent {
                 }
             }
 
+            DankRipple {
+                id: itemRipple
+                anchors.fill: parent
+                rippleColor: Theme.primary
+                cornerRadius: itemRect.radius
+                clip: true
+            }
+
             DankIcon {
                 id: pinIcon
                 anchors.right: parent.right
@@ -313,9 +346,8 @@ PluginComponent {
                 anchors.rightMargin: 28
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    execMode("edit");
-                }
+                onPressed: mouse => itemRipple.trigger(mouse.x, mouse.y)
+                onClicked: execMode("edit")
             }
 
             MouseArea {
@@ -326,9 +358,8 @@ PluginComponent {
                 width: 28
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    execMode("float");
-                }
+                onPressed: mouse => itemRipple.trigger(mouse.x + parent.width - 28, mouse.y)
+                onClicked: execMode("float")
             }
         }
     }
