@@ -74,6 +74,13 @@ MouseArea {
                     }
                     if (window.selectedStroke.tool === "redact") {
                         window.selectedStroke.cachedCleanColor = undefined;
+                        if (window.selectedStroke.redactShape === "freehand" && window.selectedStroke.freehandPoints) {
+                            const shifted = [];
+                            for (let i = 0; i < window.selectedStroke.freehandPoints.length; i++) {
+                                shifted.push(Qt.point(window.selectedStroke.freehandPoints[i].x + dx, window.selectedStroke.freehandPoints[i].y + dy));
+                            }
+                            window.selectedStroke.freehandPoints = shifted;
+                        }
                     }
                 } else if (window.activeHandle !== "none" && window.originalPoints.length > 0) {
                     const dx = absPt.x - window.pressCoords.x;
