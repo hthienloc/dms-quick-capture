@@ -647,9 +647,6 @@ DankModal {
     property string currentTypingText: ""
     property var editingStroke: null
 
-    // Helper to decode hex color to RGB
-    function hexToRgb(hex) { return Helpers.hexToRgb(hex, Qt); }
-
     backgroundOpacity: {
         const data = window.parentWidget && window.parentWidget.pluginData;
         if (!data) return 0.6;
@@ -1209,10 +1206,6 @@ DankModal {
         if (Math.abs(mx - x2) <= threshold && my >= y1 && my <= y2) return "rc";
 
         return "none";
-    }
-
-    function isInsideCropRect(mx, my) {
-        return Helpers.isInsideCropRect(mx, my, window.hasSelection, window.cropRect);
     }
 
     function clampCropRect(x, y, w, h) {
