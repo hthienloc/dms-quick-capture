@@ -4,7 +4,6 @@ import Quickshell.Io
 import qs.Common
 import qs.Services
 import qs.Widgets
-import "../dms-common"
 
 Item {
     id: root
@@ -49,6 +48,8 @@ Item {
             root.entries = list
         })
     }
+
+    Component.onCompleted: refresh()
 
     Column {
         anchors.fill: parent
