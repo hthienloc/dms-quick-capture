@@ -173,11 +173,18 @@ Item {
                                     iconName: "open_in_new"
                                     iconSize: 18
                                     buttonSize: 36
-                                    backgroundColor: Qt.rgba(0, 0, 0, 0.55)
-                                    iconColor: "white"
                                     visible: cardHover.hovered
                                     tooltipText: I18n.tr("Open")
                                     onClicked: Proc.runCommand("open-card", ["xdg-open", modelData.savedPath])
+
+                                    property bool _ovHovered: false
+                                    backgroundColor: _ovHovered ? Qt.rgba(0.3, 0.3, 0.3, 0.8) : Qt.rgba(0, 0, 0, 0.55)
+                                    iconColor: "white"
+                                    scale: _ovHovered ? 1.15 : 1.0
+                                    onEntered: _ovHovered = true
+                                    onExited: _ovHovered = false
+                                    Behavior on backgroundColor { ColorAnimation { duration: Theme.shorterDuration } }
+                                    Behavior on scale { NumberAnimation { duration: Theme.shorterDuration } }
                                 }
 
                                 DankActionButton {
@@ -188,8 +195,6 @@ Item {
                                     iconName: parent._copied ? "check" : "content_copy"
                                     iconSize: 18
                                     buttonSize: 36
-                                    backgroundColor: Qt.rgba(0, 0, 0, 0.55)
-                                    iconColor: parent._copied ? "#4caf50" : "white"
                                     visible: cardHover.hovered
                                     tooltipText: parent._copied ? I18n.tr("Copied") : I18n.tr("Copy")
                                     onClicked: {
@@ -198,6 +203,15 @@ Item {
                                             "dms cl copy \"" + modelData.savedPath.replace(/"/g, "\\\"") + "\""])
                                         ToastService.showInfo(I18n.tr("Image copied to clipboard"))
                                     }
+
+                                    property bool _ovHovered: false
+                                    backgroundColor: _ovHovered ? Qt.rgba(0.3, 0.3, 0.3, 0.8) : Qt.rgba(0, 0, 0, 0.55)
+                                    iconColor: parent._copied ? "#4caf50" : "white"
+                                    scale: _ovHovered ? 1.15 : 1.0
+                                    onEntered: _ovHovered = true
+                                    onExited: _ovHovered = false
+                                    Behavior on backgroundColor { ColorAnimation { duration: Theme.shorterDuration } }
+                                    Behavior on scale { NumberAnimation { duration: Theme.shorterDuration } }
                                 }
                             }
                         }
