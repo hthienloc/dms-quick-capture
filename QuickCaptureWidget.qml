@@ -34,7 +34,7 @@ PluginComponent {
     }
 
     // ── Popout (left-click menu) ──────────────────────────────────────────────
-    popoutWidth: 280
+    popoutWidth: 250
     popoutHeight: outputExpanded ? 400 + Math.min(outputList.length, 5) * 32 : 400
 
     popoutContent: Component {
