@@ -364,4 +364,50 @@ Item {
             }
         }
     }
+
+    Shortcut {
+        sequence: "Left"
+        enabled: root.visible && root.entries.length > 0
+        onActivated: {
+            if (root.previewIndex >= 0)
+                root.previewIndex = Math.max(0, root.previewIndex - 1)
+            else
+                root.currentPage = Math.max(0, root.currentPage - 1)
+        }
+    }
+    Shortcut {
+        sequence: "A"
+        enabled: root.visible && root.entries.length > 0
+        onActivated: {
+            if (root.previewIndex >= 0)
+                root.previewIndex = Math.max(0, root.previewIndex - 1)
+            else
+                root.currentPage = Math.max(0, root.currentPage - 1)
+        }
+    }
+    Shortcut {
+        sequence: "Right"
+        enabled: root.visible && root.entries.length > 0
+        onActivated: {
+            if (root.previewIndex >= 0)
+                root.previewIndex = Math.min(root.entries.length - 1, root.previewIndex + 1)
+            else
+                root.currentPage = Math.min(root.totalPages - 1, root.currentPage + 1)
+        }
+    }
+    Shortcut {
+        sequence: "D"
+        enabled: root.visible && root.entries.length > 0
+        onActivated: {
+            if (root.previewIndex >= 0)
+                root.previewIndex = Math.min(root.entries.length - 1, root.previewIndex + 1)
+            else
+                root.currentPage = Math.min(root.totalPages - 1, root.currentPage + 1)
+        }
+    }
+    Shortcut {
+        sequence: "Escape"
+        enabled: root.previewIndex >= 0
+        onActivated: root.previewIndex = -1
+    }
 }
