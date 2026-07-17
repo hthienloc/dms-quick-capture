@@ -115,7 +115,7 @@ Item {
                     Row {
                         spacing: 10
                         height: parent.height
-                        x: -root.currentPage * (carouselView.cardW * root.itemsPerPage + 10 * (root.itemsPerPage - 1))
+                        x: -root.currentPage * root.itemsPerPage * (carouselView.cardW + 10)
 
                         Behavior on x { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
 
