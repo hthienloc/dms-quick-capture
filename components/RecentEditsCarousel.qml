@@ -138,6 +138,7 @@ Item {
                                     clip: true
 
                                     Behavior on border.color { ColorAnimation { duration: Theme.shorterDuration } }
+                                    Behavior on border.width { NumberAnimation { duration: Theme.shorterDuration } }
 
                                     Image {
                                         anchors.fill: parent
@@ -175,7 +176,8 @@ Item {
                                     iconSize: 18
                                     buttonSize: 36
                                     radius: height / 2
-                                    visible: cardHover.hovered
+                                    opacity: cardHover.hovered ? 1 : 0
+                                    enabled: cardHover.hovered
                                     tooltipText: I18n.tr("Open")
                                     onClicked: Proc.runCommand("open-card", ["xdg-open", modelData.savedPath])
 
@@ -187,6 +189,7 @@ Item {
                                     onExited: _ovHovered = false
                                     Behavior on backgroundColor { ColorAnimation { duration: Theme.shorterDuration } }
                                     Behavior on scale { NumberAnimation { duration: Theme.shorterDuration } }
+                                    Behavior on opacity { NumberAnimation { duration: Theme.shorterDuration } }
                                 }
 
                                 DankActionButton {
@@ -198,7 +201,8 @@ Item {
                                     iconSize: 18
                                     buttonSize: 36
                                     radius: height / 2
-                                    visible: cardHover.hovered
+                                    opacity: cardHover.hovered ? 1 : 0
+                                    enabled: cardHover.hovered
                                     tooltipText: parent._copied ? I18n.tr("Copied") : I18n.tr("Copy")
                                     onClicked: {
                                         parent._copied = true
@@ -214,6 +218,7 @@ Item {
                                     onExited: _ovHovered = false
                                     Behavior on backgroundColor { ColorAnimation { duration: Theme.shorterDuration } }
                                     Behavior on scale { NumberAnimation { duration: Theme.shorterDuration } }
+                                    Behavior on opacity { NumberAnimation { duration: Theme.shorterDuration } }
                                 }
                             }
                         }
