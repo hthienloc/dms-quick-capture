@@ -298,54 +298,56 @@ Item {
                 onTriggered: parent._previewCopied = false
             }
 
-            DankButton {
+            Row {
+                anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.margins: 8
-                iconName: "open_in_new"
-                text: I18n.tr("Open")
-                buttonHeight: 36
-                horizontalPadding: 16
-                backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, 0.9)
-                textColor: Theme.surfaceText
-                onClicked: {
-                    if (root.previewEntry)
-                        Proc.runCommand("open-preview", ["xdg-open", root.previewEntry.savedPath])
-                }
-            }
+                anchors.bottomMargin: 12
+                spacing: 8
 
-            DankButton {
-                anchors.bottom: parent.bottom
-                anchors.right: parent.right
-                anchors.margins: 8
-                iconName: parent._previewCopied ? "check" : "content_copy"
-                text: parent._previewCopied ? I18n.tr("Copied") : I18n.tr("Copy")
-                buttonHeight: 36
-                horizontalPadding: 16
-                backgroundColor: parent._previewCopied
-                    ? Qt.rgba(0.3, 0.7, 0.3, 0.9)
-                    : Theme.withAlpha(Theme.primary, 0.9)
-                textColor: parent._previewCopied ? "white" : Theme.onPrimary
-                onClicked: {
-                    if (root.previewEntry) {
-                        parent._previewCopied = true
-                        Proc.runCommand("copy-preview", ["sh", "-c",
-                            "wl-copy < \"" + root.previewEntry.savedPath.replace(/"/g, "\\\"") + "\""])
-                        ToastService.showInfo(I18n.tr("Image copied to clipboard"))
+                DankButton {
+                    iconName: "open_in_new"
+                    text: I18n.tr("Open")
+                    buttonHeight: 36
+                    horizontalPadding: 16
+                    backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, 0.9)
+                    textColor: Theme.surfaceText
+                    onClicked: {
+                        if (root.previewEntry)
+                            Proc.runCommand("open-preview", ["xdg-open", root.previewEntry.savedPath])
+                    }
+                }
+
+                DankButton {
+                    iconName: parent._previewCopied ? "check" : "content_copy"
+                    text: parent._previewCopied ? I18n.tr("Copied") : I18n.tr("Copy")
+                    buttonHeight: 36
+                    horizontalPadding: 16
+                    backgroundColor: parent._previewCopied
+                        ? Qt.rgba(0.3, 0.7, 0.3, 0.9)
+                        : Theme.withAlpha(Theme.primary, 0.9)
+                    textColor: parent._previewCopied ? "white" : Theme.onPrimary
+                    onClicked: {
+                        if (root.previewEntry) {
+                            parent._previewCopied = true
+                            Proc.runCommand("copy-preview", ["sh", "-c",
+                                "wl-copy < \"" + root.previewEntry.savedPath.replace(/"/g, "\\\"") + "\""])
+                            ToastService.showInfo(I18n.tr("Image copied to clipboard"))
+                        }
                     }
                 }
             }
 
-            DankButton {
+            DankActionButton {
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.margins: 8
                 iconName: "delete"
-                text: I18n.tr("Delete")
-                buttonHeight: 36
-                horizontalPadding: 16
-                backgroundColor: Qt.rgba(1, 0, 0, 0.3)
-                textColor: "#ff6b6b"
+                iconSize: 18
+                buttonSize: 32
+                radius: height / 2
+                backgroundColor: Qt.rgba(1, 0, 0, 0.25)
+                iconColor: "#ff6b6b"
+                tooltipText: I18n.tr("Delete")
                 onClicked: {
                     if (root.previewEntry) {
                         var delPath = root.previewEntry.savedPath
