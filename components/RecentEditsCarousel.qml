@@ -173,6 +173,7 @@ Item {
                                     iconName: "open_in_new"
                                     iconSize: 18
                                     buttonSize: 36
+                                    radius: height / 2
                                     visible: cardHover.hovered
                                     tooltipText: I18n.tr("Open")
                                     onClicked: Proc.runCommand("open-card", ["xdg-open", modelData.savedPath])
@@ -195,6 +196,7 @@ Item {
                                     iconName: parent._copied ? "check" : "content_copy"
                                     iconSize: 18
                                     buttonSize: 36
+                                    radius: height / 2
                                     visible: cardHover.hovered
                                     tooltipText: parent._copied ? I18n.tr("Copied") : I18n.tr("Copy")
                                     onClicked: {
