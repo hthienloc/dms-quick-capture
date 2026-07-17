@@ -3261,6 +3261,11 @@ PluginSettings {
                 text: "dms ipc call quickCapture close"
             }
 
+            CopyBox {
+                label: I18n.tr("Show Recent Edits History")
+                text: "dms ipc call quickCapture showHistory"
+            }
+
             Separator { opacity: 0.1 }
 
             CopyBox {
