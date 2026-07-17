@@ -201,8 +201,7 @@ Item {
                                     tooltipText: parent._copied ? I18n.tr("Copied") : I18n.tr("Copy")
                                     onClicked: {
                                         parent._copied = true
-                                        Proc.runCommand("copy-card", ["sh", "-c",
-                                            "wl-copy < \"" + modelData.savedPath.replace(/"/g, "\\\"") + "\""])
+                                        DMSService.sendRequest("clipboard.copyFile", { "filePath": modelData.savedPath })
                                         ToastService.showInfo(I18n.tr("Image copied to clipboard"))
                                     }
 
@@ -329,8 +328,7 @@ Item {
                     onClicked: {
                         if (root.previewEntry) {
                             parent._previewCopied = true
-                            Proc.runCommand("copy-preview", ["sh", "-c",
-                                "wl-copy < \"" + root.previewEntry.savedPath.replace(/"/g, "\\\"") + "\""])
+                            DMSService.sendRequest("clipboard.copyFile", { "filePath": root.previewEntry.savedPath })
                             ToastService.showInfo(I18n.tr("Image copied to clipboard"))
                         }
                     }
