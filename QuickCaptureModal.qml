@@ -960,13 +960,15 @@ DankModal {
     // Chrome = boardContainer margins plus the edge the toolbar occupies (56px rail + its margin)
     readonly property real _chromeW: Theme.spacingM * 2 + (window.toolbarVisible && !_toolbarHorizontal ? 56 + Theme.spacingM : 0)
     readonly property real _chromeH: Theme.spacingM * 2 + (window.toolbarVisible && _toolbarHorizontal ? 56 + Theme.spacingM : 0)
-    readonly property real _minModalW: (_toolbarHorizontal && window.toolbarItem) ? window.toolbarItem.width + Theme.spacingM * 2 : 400
-    readonly property real _minModalH: (!_toolbarHorizontal && window.toolbarItem) ? window.toolbarItem.height + Theme.spacingM * 2 : 300
-    readonly property bool _bgSizeKnown: window.bgImageItem !== null && window.bgImageItem.status === Image.Ready && window.bgImageItem.sourceSize.width > 0
+    readonly property real _minModalW: _toolbarHorizontal && window.toolbarItem?.width ? window.toolbarItem.width + Theme.spacingM * 2 : 400
+    readonly property real _minModalH: !_toolbarHorizontal && window.toolbarItem?.height ? window.toolbarItem.height + Theme.spacingM * 2 : 300
+    readonly property bool _bgSizeKnown: window.bgImageItem?.status === Image.Ready
+                                         && (window.bgImageItem?.sourceSize.width ?? 0) > 0
+                                         && (window.bgImageItem?.sourceSize.height ?? 0) > 0
     // Compositor scale (not Screen.devicePixelRatio, which reports the integer buffer scale)
     readonly property real _outputScale: (window.targetScreen && CompositorService.getScreenScale(window.targetScreen)) || 1
-    modalWidth: _bgSizeKnown ? Math.round(Math.min(_maxModalW, Math.max(_minModalW, window.bgImageItem.sourceSize.width / _outputScale + _chromeW))) : _maxModalW
-    modalHeight: _bgSizeKnown ? Math.round(Math.min(_maxModalH, Math.max(_minModalH, window.bgImageItem.sourceSize.height / _outputScale + _chromeH))) : _maxModalH
+    modalWidth: _bgSizeKnown ? Math.round(Math.min(_maxModalW, Math.max(_minModalW, (window.bgImageItem?.sourceSize.width ?? 0) / _outputScale + _chromeW))) : _maxModalW
+    modalHeight: _bgSizeKnown ? Math.round(Math.min(_maxModalH, Math.max(_minModalH, (window.bgImageItem?.sourceSize.height ?? 0) / _outputScale + _chromeH))) : _maxModalH
     enableShadow: true
     positioning: "center"
 
