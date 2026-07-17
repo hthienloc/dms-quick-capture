@@ -324,6 +324,7 @@ PluginComponent {
         keepContentLoaded: true
         closeOnEscapeKey: true
         closeOnBackgroundClick: true
+        onBackgroundClicked: close()
 
         content: Component {
             RecentEditsCarousel {

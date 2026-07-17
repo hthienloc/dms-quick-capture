@@ -146,57 +146,57 @@ Item {
                                         fillMode: Image.PreserveAspectFit
                                         asynchronous: true
                                     }
+                                }
 
-                                    HoverHandler { id: cardHover }
+                                HoverHandler { id: cardHover }
 
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: root.previewIndex = modelData._glIdx
-                                    }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: root.previewIndex = modelData._glIdx
+                                }
 
-                                    DankActionButton {
-                                        anchors.top: parent.top
-                                        anchors.right: parent.right
-                                        anchors.margins: 6
-                                        z: 1
-                                        iconName: "open_in_new"
-                                        iconSize: 18
-                                        buttonSize: 36
-                                        backgroundColor: Qt.rgba(0, 0, 0, 0.55)
-                                        iconColor: "white"
-                                        visible: cardHover.hovered
-                                        tooltipText: I18n.tr("Open")
-                                        onClicked: Proc.runCommand("open-card", ["xdg-open", modelData.savedPath])
-                                    }
+                                property bool _copied: false
 
-                                    property bool _copied: false
+                                Timer {
+                                    interval: 1500
+                                    repeat: false
+                                    running: parent._copied
+                                    onTriggered: parent._copied = false
+                                }
 
-                                    Timer {
-                                        interval: 1500
-                                        repeat: false
-                                        running: parent._copied
-                                        onTriggered: parent._copied = false
-                                    }
+                                DankActionButton {
+                                    anchors.top: parent.top
+                                    anchors.right: parent.right
+                                    anchors.margins: 6
+                                    z: 1
+                                    iconName: "open_in_new"
+                                    iconSize: 18
+                                    buttonSize: 36
+                                    backgroundColor: Qt.rgba(0, 0, 0, 0.55)
+                                    iconColor: "white"
+                                    visible: cardHover.hovered
+                                    tooltipText: I18n.tr("Open")
+                                    onClicked: Proc.runCommand("open-card", ["xdg-open", modelData.savedPath])
+                                }
 
-                                    DankActionButton {
-                                        anchors.bottom: parent.bottom
-                                        anchors.right: parent.right
-                                        anchors.margins: 6
-                                        z: 1
-                                        iconName: parent._copied ? "check" : "content_copy"
-                                        iconSize: 18
-                                        buttonSize: 36
-                                        backgroundColor: Qt.rgba(0, 0, 0, 0.55)
-                                        iconColor: parent._copied ? "#4caf50" : "white"
-                                        visible: cardHover.hovered
-                                        tooltipText: parent._copied ? I18n.tr("Copied") : I18n.tr("Copy")
-                                        onClicked: {
-                                            parent._copied = true
-                                            Proc.runCommand("copy-card", ["sh", "-c",
-                                                "dms cl copy \"" + modelData.savedPath.replace(/"/g, "\\\"") + "\""])
-                                            ToastService.showInfo(I18n.tr("Image copied to clipboard"))
-                                        }
+                                DankActionButton {
+                                    anchors.bottom: parent.bottom
+                                    anchors.right: parent.right
+                                    anchors.margins: 6
+                                    z: 1
+                                    iconName: parent._copied ? "check" : "content_copy"
+                                    iconSize: 18
+                                    buttonSize: 36
+                                    backgroundColor: Qt.rgba(0, 0, 0, 0.55)
+                                    iconColor: parent._copied ? "#4caf50" : "white"
+                                    visible: cardHover.hovered
+                                    tooltipText: parent._copied ? I18n.tr("Copied") : I18n.tr("Copy")
+                                    onClicked: {
+                                        parent._copied = true
+                                        Proc.runCommand("copy-card", ["sh", "-c",
+                                            "dms cl copy \"" + modelData.savedPath.replace(/"/g, "\\\"") + "\""])
+                                        ToastService.showInfo(I18n.tr("Image copied to clipboard"))
                                     }
                                 }
                             }
