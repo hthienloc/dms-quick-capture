@@ -8,6 +8,7 @@ import qs.Common
 import qs.Modules.Plugins
 import qs.Services
 import qs.Widgets
+import qs.Modals.Common
 import qs.Modals.FileBrowser
 
 PluginComponent {
@@ -304,6 +305,31 @@ PluginComponent {
                 }
             });
             close();
+        }
+    }
+
+    // ── History carousel modal ────────────────────────────────────────────────
+    function showHistoryCarousel() {
+        historyCarouselItem.refresh()
+        historyModal.shouldBeVisible = true
+        historyModal.open()
+    }
+
+    DankModal {
+        id: historyModal
+        shouldBeVisible: false
+        positioning: "center"
+        enableShadow: true
+
+        readonly property real _screenW: targetScreen ? targetScreen.width : (Quickshell.screens[0] ? Quickshell.screens[0].width : 1920)
+        readonly property real _screenH: targetScreen ? targetScreen.height : (Quickshell.screens[0] ? Quickshell.screens[0].height : 1080)
+        modalWidth: Math.round(_screenW * 0.9)
+        modalHeight: Math.round(_screenH * (historyCarouselItem.heightFraction))
+
+        RecentEditsCarousel {
+            id: historyCarouselItem
+            anchors.fill: parent
+            daemon: root
         }
     }
 
