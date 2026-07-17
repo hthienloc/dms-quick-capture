@@ -34,7 +34,7 @@ PluginComponent {
     }
 
     // ── Popout (left-click menu) ──────────────────────────────────────────────
-    popoutWidth: 240
+    popoutWidth: 250
     popoutHeight: outputExpanded ? 400 + Math.min(outputList.length, 5) * 32 : 400
 
     popoutContent: Component {
@@ -46,39 +46,79 @@ PluginComponent {
             closePopout: () => root.closePopout()
 
             headerActions: Component {
-                Rectangle {
-                    id: folderBtn
-                    width: 32
-                    height: 32
-                    radius: 16
-                    color: folderArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15) : "transparent"
+                Row {
+                    spacing: 4
 
-                    Behavior on color { ColorAnimation { duration: Theme.shorterDuration; easing.type: Theme.standardEasing } }
+                    Rectangle {
+                        id: folderBtn
+                        width: 32
+                        height: 32
+                        radius: 16
+                        color: folderArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15) : "transparent"
 
-                    property bool pressed: false
+                        Behavior on color { ColorAnimation { duration: Theme.shorterDuration; easing.type: Theme.standardEasing } }
 
-                    DankIcon {
-                        id: folderIcon
-                        anchors.centerIn: parent
-                        name: "open_in_new"
-                        size: Theme.iconSize - 4
-                        color: folderArea.containsMouse ? Theme.primary : Theme.surfaceVariantText
-                        scale: folderBtn.pressed ? 0.6 : 1.0
-                        Behavior on scale { NumberAnimation { duration: 400; easing.type: Easing.OutBack } }
+                        property bool pressed: false
+
+                        DankIcon {
+                            id: folderIcon
+                            anchors.centerIn: parent
+                            name: "open_in_new"
+                            size: Theme.iconSize - 4
+                            color: folderArea.containsMouse ? Theme.primary : Theme.surfaceVariantText
+                            scale: folderBtn.pressed ? 0.6 : 1.0
+                            Behavior on scale { NumberAnimation { duration: 400; easing.type: Easing.OutBack } }
+                        }
+
+                        MouseArea {
+                            id: folderArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onPressed: folderBtn.pressed = true
+                            onReleased: folderBtn.pressed = false
+                            onCanceled: folderBtn.pressed = false
+                            onClicked: {
+                                folderBtn.pressed = false
+                                const dir = root.pluginData.saveDirectory || "~/Pictures/Screenshots";
+                                Proc.runCommand("open-screenshot-dir", ["sh", "-c", "xdg-open " + dir], null);
+                            }
+                        }
                     }
 
-                    MouseArea {
-                        id: folderArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onPressed: folderBtn.pressed = true
-                        onReleased: folderBtn.pressed = false
-                        onCanceled: folderBtn.pressed = false
-                        onClicked: {
-                            folderBtn.pressed = false
-                            const dir = root.pluginData.saveDirectory || "~/Pictures/Screenshots";
-                            Proc.runCommand("open-screenshot-dir", ["sh", "-c", "xdg-open " + dir], null);
+                    Rectangle {
+                        id: historyBtn
+                        width: 32
+                        height: 32
+                        radius: 16
+                        color: historyArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15) : "transparent"
+
+                        Behavior on color { ColorAnimation { duration: Theme.shorterDuration; easing.type: Theme.standardEasing } }
+
+                        property bool pressed: false
+
+                        DankIcon {
+                            anchors.centerIn: parent
+                            name: "history"
+                            size: Theme.iconSize - 4
+                            color: historyArea.containsMouse ? Theme.primary : Theme.surfaceVariantText
+                            scale: historyBtn.pressed ? 0.6 : 1.0
+                            Behavior on scale { NumberAnimation { duration: 400; easing.type: Easing.OutBack } }
+                        }
+
+                        MouseArea {
+                            id: historyArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onPressed: historyBtn.pressed = true
+                            onReleased: historyBtn.pressed = false
+                            onCanceled: historyBtn.pressed = false
+                            onClicked: {
+                                historyBtn.pressed = false
+                                root.closePopout()
+                                if (root.daemon) root.daemon.showHistoryCarousel()
+                            }
                         }
                     }
                 }

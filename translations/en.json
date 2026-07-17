@@ -58,5 +58,13 @@
   "Thickness": "Thickness",
   "Tool": "Tool",
   "Underline": "Underline",
-  "Window capture mode is only supported on Hyprland or DWL.": "Window capture mode is only supported on Hyprland or DWL."
+  "Window capture mode is only supported on Hyprland or DWL.": "Window capture mode is only supported on Hyprland or DWL.",
+  "Preview": "Preview",
+  "Recent Edits": "Recent Edits",
+  "No saved images yet": "No saved images yet",
+  "Open": "Open",
+  "Copy": "Copy",
+  "Copied": "Copied",
+  "Image copied to clipboard": "Image copied to clipboard",
+  "Delete": "Delete"
 }

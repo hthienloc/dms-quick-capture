@@ -8,6 +8,7 @@ import qs.Common
 import qs.Modules.Plugins
 import qs.Services
 import qs.Widgets
+import qs.Modals.Common
 import qs.Modals.FileBrowser
 
 PluginComponent {
@@ -305,6 +306,36 @@ PluginComponent {
             });
             close();
         }
+    }
+
+    // ── History carousel modal ────────────────────────────────────────────────
+    function showHistoryCarousel() {
+        if (historyModal.contentLoader && historyModal.contentLoader.item)
+            historyModal.contentLoader.item.refresh()
+        historyModal.shouldBeVisible = true
+        historyModal.open()
+    }
+
+    DankModal {
+        id: historyModal
+        shouldBeVisible: false
+        positioning: "center"
+        enableShadow: true
+        keepContentLoaded: true
+        closeOnEscapeKey: true
+        closeOnBackgroundClick: true
+        onBackgroundClicked: close()
+
+        content: Component {
+            RecentEditsCarousel {
+                daemon: root
+            }
+        }
+
+        readonly property real _screenW: targetScreen ? targetScreen.width : (Quickshell.screens[0] ? Quickshell.screens[0].width : 1920)
+        readonly property real _screenH: targetScreen ? targetScreen.height : (Quickshell.screens[0] ? Quickshell.screens[0].height : 1080)
+        modalWidth: Math.round(_screenW * 0.9)
+        modalHeight: Math.round(_screenH * (historyModal.contentLoader && historyModal.contentLoader.item ? historyModal.contentLoader.item.heightFraction : 0.45))
     }
 
     // ── Lifecycle: register self so widget surface can delegate to daemon ─────
