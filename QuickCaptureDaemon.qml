@@ -321,6 +321,15 @@ PluginComponent {
         positioning: "center"
         enableShadow: true
 
+        onBackgroundClicked: close()
+
+        modalFocusScope.Keys.onPressed: (event) => {
+            if (event.key === Qt.Key_Escape) {
+                close()
+                event.accepted = true
+            }
+        }
+
         readonly property real _screenW: targetScreen ? targetScreen.width : (Quickshell.screens[0] ? Quickshell.screens[0].width : 1920)
         readonly property real _screenH: targetScreen ? targetScreen.height : (Quickshell.screens[0] ? Quickshell.screens[0].height : 1080)
         modalWidth: Math.round(_screenW * 0.9)
