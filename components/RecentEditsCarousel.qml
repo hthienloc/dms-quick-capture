@@ -49,7 +49,7 @@ Item {
         })
     }
 
-    Component.onCompleted: refresh()
+    onDaemonChanged: { if (root.daemon && root.daemon.pluginData) refresh() }
 
     Column {
         anchors.fill: parent
