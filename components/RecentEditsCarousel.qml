@@ -75,7 +75,8 @@ Item {
 
             StyledText {
                 anchors.centerIn: parent
-                text: root.previewIndex >= 0 ? I18n.tr("Preview") : (root.daemon ? root.daemon.pluginData.saveDirectory : I18n.tr("Recent Edits"))
+                text: root.previewIndex >= 0 ? I18n.tr("Preview") : 
+                     (root.daemon && root.daemon.pluginData ? root.daemon.pluginData.saveDirectory || "~/Pictures/Screenshots" : I18n.tr("Recent Edits"))
                 font.pixelSize: Theme.fontSizeNormal
                 font.bold: true
                 color: Theme.surfaceText
