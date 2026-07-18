@@ -14,7 +14,7 @@ dms ipc call quickCapture <command> [arg] edit|float
 
 ### Supported Commands
 
-All commands accept an `action` parameter (`edit` / `float`) — use `float` to spawn an always-on-top window instead of the editor.
+Commands that capture or open images accept an `action` parameter (`edit` / `float`) — use `float` to spawn an always-on-top window instead of the editor.
 
 | Command | Arguments | Description |
 | :--- | :--- | :--- |
@@ -23,6 +23,7 @@ All commands accept an `action` parameter (`edit` / `float`) — use `float` to 
 | `fromClipboard` | `action` (`edit` / `float`) | Imports image from clipboard. |
 | `openImage` | `path`, `action` (`edit` / `float`) | Opens a local image file. |
 | `close` | *(none)* | Closes the annotator. |
+| `showHistory` | *(none)* | Opens the Recent Edits history carousel. |
 
 ```bash
 dms ipc call quickCapture screenshot region edit    # open editor

@@ -146,7 +146,7 @@ git checkout main && git pull
 
 ## IPC Commands
 
-Each command accepts an `action` parameter — use `edit` to open the editor or `float` to spawn an always-on-top window.
+Commands that capture or open images accept an `action` parameter — use `edit` to open the editor or `float` to spawn an always-on-top window.
 
 ```bash
 dms ipc call quickCapture <command> [arg] edit|float
@@ -162,6 +162,7 @@ dms ipc call quickCapture screenshot region float  # float directly
 | `fromClipboard` | — | Annotate image from clipboard |
 | `openImage` | `path` | Open a specific image in the annotator |
 | `close` | — | Close the annotator window |
+| `showHistory` | — | Open Recent Edits history carousel |
 
 ### Keybinding Examples (Niri)
 
