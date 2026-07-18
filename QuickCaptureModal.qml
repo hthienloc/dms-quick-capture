@@ -2116,9 +2116,21 @@ DankModal {
                             } else {
                                 popover.x = pt.x + (controlItem.width - popover.width) / 2;
                                 if (window.toolbarPosition === "bottom") {
-                                    popover.y = pt.y - popover.height - Theme.spacingXS;
+                                    // Popover above control: use anchor binding so height changes don't overlap toolbar
+                                    if (popover._anchorIsAbove !== undefined) {
+                                        popover._anchorY = pt.y;
+                                        popover._anchorIsAbove = true;
+                                    } else {
+                                        popover.y = pt.y - popover.height - Theme.spacingXS;
+                                    }
                                 } else {
-                                    popover.y = pt.y + controlItem.height + Theme.spacingXS;
+                                    // Popover below control: use anchor binding so height changes don't overlap toolbar
+                                    if (popover._anchorIsAbove !== undefined) {
+                                        popover._anchorY = pt.y + controlItem.height + Theme.spacingXS;
+                                        popover._anchorIsAbove = false;
+                                    } else {
+                                        popover.y = pt.y + controlItem.height + Theme.spacingXS;
+                                    }
                                 }
                             }
                             popover.open();
@@ -3050,6 +3062,13 @@ DankModal {
                     backdropAspectRatio: window.backdropAspectRatio
                     customAspectRatio: window.customAspectRatio
                     presets: window.aspectPresets
+
+                    // Anchor-based positioning so popover stays correctly placed
+                    // when height changes (e.g. customActive toggles the slider section)
+                    property real _anchorY: 0
+                    property bool _anchorIsAbove: false
+                    y: _anchorIsAbove ? (_anchorY - height - Theme.spacingXS) : _anchorY
+
                     onChangeBackdropAspectRatio: (ratio) => {
                         window.backdropAspectRatio = ratio;
                         if (window.activeCanvas) window.activeCanvas.requestPaint();
