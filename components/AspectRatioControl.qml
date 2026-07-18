@@ -32,7 +32,7 @@ Item {
         }
         StyledText {
             text: {
-                if (control.backdropAspectRatio === "auto") return I18n.tr("AUTO");
+                if (control.backdropAspectRatio === "auto") return "AT";
                 if (control.backdropAspectRatio === "custom") return control.customAspectRatio.toFixed(2);
                 return control.backdropAspectRatio;
             }
@@ -58,7 +58,7 @@ Item {
         }
         StyledText {
             text: {
-                if (control.backdropAspectRatio === "auto") return I18n.tr("AUTO");
+                if (control.backdropAspectRatio === "auto") return "AT";
                 if (control.backdropAspectRatio === "custom") return control.customAspectRatio.toFixed(2);
                 return control.backdropAspectRatio;
             }

@@ -93,7 +93,8 @@ Grid {
     Item {
         width: controlRoot.itemSize + 8
         height: controlRoot.itemSize
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenter: controlRoot.isVertical ? undefined : parent.verticalCenter
+        anchors.horizontalCenter: controlRoot.isVertical ? parent.horizontalCenter : undefined
 
         DankActionButton {
             anchors.fill: parent
@@ -128,6 +129,7 @@ Grid {
         backgroundColor: "transparent"
         iconColor: Theme.surfaceText
         tooltipText: I18n.tr("Auto Balance")
+        anchors.horizontalCenter: controlRoot.isVertical ? parent.horizontalCenter : undefined
         onClicked: controlRoot.autoColorBalanceRequested()
     }
 }
