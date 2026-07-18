@@ -110,6 +110,8 @@ Rectangle {
         property int gridSpacingValue: tc.gridSpacing
         signal colorSelected(color col, int index)
         columns: cols
+        rows: cols === 2 ? 4 : 2
+        flow: cols === 2 ? Grid.TopToBottom : Grid.LeftToRight
         spacing: gridSpacingValue
         Repeater {
             model: paletteGrid.paletteModel
