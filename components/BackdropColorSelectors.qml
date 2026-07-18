@@ -5,6 +5,8 @@ import qs.Widgets
 Grid {
     id: controlRoot
 
+    ToolbarConstants { id: tc }
+
     property string backdropMode: "none"
     property color backdropSolidColor: Theme.primary
     property color backdropGradientStart: Theme.primary
@@ -26,7 +28,7 @@ Grid {
 
     Item {
         visible: controlRoot.backdropMode === "solid"
-        width: controlRoot.itemSize + 8
+        width: tc.verticalSelectorItemWidth
         height: controlRoot.itemSize
 
         Rectangle {
@@ -55,7 +57,7 @@ Grid {
 
     Item {
         visible: controlRoot.isGradient
-        width: controlRoot.isVertical ? (controlRoot.itemSize + 8) : (controlRoot.itemSize * 2 + Theme.spacingXS)
+        width: controlRoot.isVertical ? tc.verticalSelectorItemWidth : (controlRoot.itemSize * 2 + Theme.spacingXS)
         height: controlRoot.isVertical ? (controlRoot.itemSize * 2 + Theme.spacingXS) : controlRoot.itemSize
 
         Grid {
@@ -101,7 +103,7 @@ Grid {
     }
 
     Item {
-        width: controlRoot.itemSize + 8
+        width: tc.verticalSelectorItemWidth
         height: controlRoot.itemSize
 
         DankActionButton {
@@ -131,7 +133,7 @@ Grid {
     }
 
     Item {
-        width: controlRoot.itemSize + 8
+        width: tc.verticalSelectorItemWidth
         height: controlRoot.itemSize
 
         DankActionButton {

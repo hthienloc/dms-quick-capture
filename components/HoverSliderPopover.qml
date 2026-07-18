@@ -7,8 +7,8 @@ Rectangle {
 
     ToolbarConstants { id: tc }
 
-    width: isVertical ? tc.btnSize : 120
-    height: isVertical ? 120 : tc.btnSize
+    width: isVertical ? tc.btnSize : tc.customRatioPopoverHeight
+    height: isVertical ? tc.customRatioPopoverHeight : tc.btnSize
     color: Theme.surfaceContainer
     border.color: Theme.withAlpha(Theme.outline, 0.15)
     border.width: 1
@@ -24,6 +24,12 @@ Rectangle {
     onValueChanged: slider.value = value
 
     signal userValueChanged(int val)
+
+    function valueFromRatio(ratio) {
+        let rawVal = minimum + ratio * (maximum - minimum);
+        let newVal = stepSize > 1 ? Math.round(rawVal / stepSize) * stepSize : Math.round(rawVal);
+        return Math.max(minimum, Math.min(maximum, newVal));
+    }
 
     visible: opacity > 0
     opacity: 0
@@ -144,10 +150,9 @@ Rectangle {
                 cursorShape: Qt.PointingHandCursor
                 
                 function updateValue(mouseY) {
+                    if (verticalSliderContainer.height <= 0) return;
                     let ratio = 1 - Math.max(0, Math.min(1, mouseY / verticalSliderContainer.height));
-                    let rawVal = popoverRoot.minimum + ratio * (popoverRoot.maximum - popoverRoot.minimum);
-                    let newVal = popoverRoot.stepSize > 1 ? Math.round(rawVal / popoverRoot.stepSize) * popoverRoot.stepSize : Math.round(rawVal);
-                    newVal = Math.max(popoverRoot.minimum, Math.min(popoverRoot.maximum, newVal));
+                    let newVal = popoverRoot.valueFromRatio(ratio);
                     if (newVal !== popoverRoot.value) {
                         popoverRoot.userValueChanged(newVal);
                     }

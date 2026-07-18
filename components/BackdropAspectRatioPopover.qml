@@ -22,7 +22,7 @@ Rectangle {
     readonly property int _sliderMax: Math.round(customRatioMax * 100)
 
     width: 220
-    height: customActive ? 120 : tc.popoverHeight
+    height: customActive ? tc.customRatioPopoverHeight : tc.popoverHeight
     color: Theme.surfaceContainer
     border.color: Theme.withAlpha(Theme.outline, 0.15)
     border.width: 1
@@ -127,18 +127,28 @@ Rectangle {
 
 
             // Slider section (Visible only when custom is active)
-            Row {
+            Item {
                 id: sliderSection
                 visible: popoverRoot.customActive
-                spacing: Theme.spacingS
                 width: parent.width
-                anchors.horizontalCenter: parent.horizontalCenter
+                height: Math.max(ratioText.implicitHeight, slider.implicitHeight, valueText.implicitHeight)
 
                 StyledText {
                     id: ratioText
                     text: I18n.tr("Ratio")
                     font.pixelSize: tc.fontSizeCompact
                     color: Theme.surfaceVariantText
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                StyledText {
+                    id: valueText
+                    text: popoverRoot.customAspectRatio.toFixed(2)
+                    font.pixelSize: tc.fontSizeCompact
+                    font.weight: Font.Medium
+                    color: Theme.surfaceText
+                    anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
@@ -146,7 +156,10 @@ Rectangle {
                     id: slider
                     minimum: popoverRoot._sliderMin
                     maximum: popoverRoot._sliderMax
-                    width: parent.width - ratioText.implicitWidth - valueText.implicitWidth - sliderSection.spacing * 2 - 4
+                    anchors.left: ratioText.right
+                    anchors.right: valueText.left
+                    anchors.leftMargin: Theme.spacingS
+                    anchors.rightMargin: Theme.spacingS
                     showValue: false
                     onSliderValueChanged: val => popoverRoot.changeCustomAspectRatio(val / 100.0)
                     anchors.verticalCenter: parent.verticalCenter
@@ -156,15 +169,6 @@ Rectangle {
                         property: "value"
                         value: Math.round(popoverRoot.customAspectRatio * 100)
                     }
-                }
-
-                StyledText {
-                    id: valueText
-                    text: popoverRoot.customAspectRatio.toFixed(2)
-                    font.pixelSize: tc.fontSizeCompact
-                    font.weight: Font.Medium
-                    color: Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
                 }
             }
         }

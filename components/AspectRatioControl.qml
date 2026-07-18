@@ -15,8 +15,8 @@ Item {
     signal exited()
     signal wheeled(int delta)
 
-    width: compact ? tc.btnSize : row.implicitWidth
-    height: compact ? 40 : tc.btnSize
+    width: compact ? (tc.btnSize + 8) : row.implicitWidth
+    height: compact ? tc.compactControlHeight : tc.btnSize
 
     Row {
         id: row
