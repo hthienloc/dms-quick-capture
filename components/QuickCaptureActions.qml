@@ -85,7 +85,7 @@ QtObject {
         }
     }
 
-    function sendNotification(message, imagePath) {
+    function sendNotification(message, imagePath, openPath) {
         if (!message) return;
         const hasParent = root.parentWidget && root.parentWidget.pluginData;
         const mode = hasParent ? (root.parentWidget.pluginData.postNotification || "notification") : "notification";
@@ -107,12 +107,10 @@ QtObject {
                 icon = "image-x-generic";
             }
 
-            const args = ["notify-send", "-a", "Quick Capture", "-i", icon, I18n.tr("Quick Capture"), message];
-            if (imagePath && !imagePath.toLowerCase().endsWith(".pdf")) {
-                let cleanPath = imagePath.replace(/^file:\/\//, "");
-                args.push("-h", "string:image-path:" + cleanPath);
-                args.push("-h", "string:image_path:" + cleanPath);
-            }
+            const args = ["dms", "notify", "--app", "Quick Capture"];
+            if (icon) args.push("--icon", icon);
+            if (openPath) args.push("--file", openPath);
+            args.push("--timeout", "5000", I18n.tr("Quick Capture"), message);
             Proc.runCommand("system-notify", args);
         }
     }
@@ -213,7 +211,7 @@ QtObject {
                     if (exitCode === 0) {
                         const notifyPath = targetPath.replace(/^~/, Quickshell.env("HOME"));
                         const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && originalPng) ? originalPng : notifyPath;
-                        root.sendNotification(I18n.tr("Screenshot saved to %1/%2").arg(saveDir).arg(filename), iconPath);
+                        root.sendNotification(I18n.tr("Screenshot saved to %1/%2").arg(saveDir).arg(filename), iconPath, notifyPath);
                         root.closeRequested();
                     } else {
                         notifyError("Failed to save screenshot file.");
@@ -254,7 +252,7 @@ QtObject {
                             if (saveCode === 0) {
                                 const notifyPath = targetPath.replace(/^~/, Quickshell.env("HOME"));
                                 const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && originalPng) ? originalPng : notifyPath;
-                                root.sendNotification(I18n.tr("Screenshot copied to clipboard and saved to %1").arg(saveDir), iconPath);
+                                root.sendNotification(I18n.tr("Screenshot copied to clipboard and saved to %1").arg(saveDir), iconPath, notifyPath);
                             } else {
                                 notifyWarning("Screenshot copied to clipboard but failed to save file.");
                             }
