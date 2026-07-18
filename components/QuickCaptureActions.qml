@@ -85,7 +85,7 @@ QtObject {
         }
     }
 
-    function sendNotification(message, imagePath, openPath) {
+    function sendNotification(title, message, imagePath, openPath) {
         if (!message) return;
         const hasParent = root.parentWidget && root.parentWidget.pluginData;
         const mode = hasParent ? (root.parentWidget.pluginData.postNotification || "notification") : "notification";
@@ -110,7 +110,7 @@ QtObject {
             const args = ["dms", "notify", "--app", "Quick Capture"];
             if (icon) args.push("--icon", icon);
             if (openPath) args.push("--file", openPath);
-            args.push("--timeout", "5000", I18n.tr("Quick Capture"), message);
+            args.push("--timeout", "5000", title, message);
             Proc.runCommand("system-notify", args);
         }
     }
@@ -211,7 +211,7 @@ QtObject {
                     if (exitCode === 0) {
                         const notifyPath = targetPath.replace(/^~/, Quickshell.env("HOME"));
                         const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && originalPng) ? originalPng : notifyPath;
-                        root.sendNotification(I18n.tr("Screenshot saved to %1/%2").arg(saveDir).arg(filename), iconPath, notifyPath);
+                        root.sendNotification(I18n.tr("Screenshot Saved"), I18n.tr("Screenshot saved to %1/%2").arg(saveDir).arg(filename), iconPath, notifyPath);
                         root.closeRequested();
                     } else {
                         notifyError("Failed to save screenshot file.");
@@ -229,7 +229,7 @@ QtObject {
                 const clipSource = originalPng || finalPath;
                 copyFileToClipboard(clipSource, (stdout, exitCode) => {
                     if (exitCode === 0) {
-                        root.sendNotification(I18n.tr("Screenshot copied to clipboard."), clipSource);
+                        root.sendNotification(I18n.tr("Screenshot Copied"), I18n.tr("Screenshot copied to clipboard."), clipSource);
                         root.closeRequested();
                     } else {
                         notifyError("Failed to copy screenshot to clipboard.");
@@ -252,7 +252,7 @@ QtObject {
                             if (saveCode === 0) {
                                 const notifyPath = targetPath.replace(/^~/, Quickshell.env("HOME"));
                                 const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && originalPng) ? originalPng : notifyPath;
-                                root.sendNotification(I18n.tr("Screenshot copied to clipboard and saved to %1").arg(saveDir), iconPath, notifyPath);
+                                root.sendNotification(I18n.tr("Screenshot Saved"), I18n.tr("Screenshot copied to clipboard and saved to %1").arg(saveDir), iconPath, notifyPath);
                             } else {
                                 notifyWarning("Screenshot copied to clipboard but failed to save file.");
                             }
