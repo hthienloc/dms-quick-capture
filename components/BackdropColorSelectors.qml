@@ -20,7 +20,7 @@ Grid {
     signal eyedropperRequested(string slot)
 
     columns: isVertical ? 1 : 4
-    spacing: Theme.spacingXS
+    spacing: isVertical ? 10 : Theme.spacingXS
     anchors.verticalCenter: isVertical ? undefined : parent.verticalCenter
     anchors.horizontalCenter: isVertical ? parent.horizontalCenter : undefined
 
