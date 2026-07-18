@@ -55,14 +55,14 @@ git checkout main && git pull
 | **Middle Click** (bar icon) | Default action (configured in settings) |
 | **Right Click** (bar icon) | Paste image or image URL from clipboard |
 | **Drop Image** (bar icon) | Drag any image onto the icon to annotate |
-| **Print** (keyboard) | Capture using default mode (requires keybind setup) |
+| **<kbd>Print</kbd>** (keyboard) | Capture using default mode (requires keybind setup) |
 
 **Typical workflow:**
 
-1. **Trigger capture** — click the bar icon, use Control Center, or press `Print`.
+1. **Trigger capture** — click the bar icon, use Control Center, or press <kbd>Print</kbd>.
 2. **Select area** — drag to choose the screenshot region.
 3. **Annotate** — use the toolbar, keyboard shortcuts, or radial menus.
-4. **Finish** — press `Enter` (action depends on settings) or `Esc` to discard.
+4. **Finish** — press <kbd>Enter</kbd> (action depends on settings) or <kbd>Esc</kbd> to discard.
 
 ## Annotation Tools
 
@@ -70,32 +70,32 @@ git checkout main && git pull
 
 | Shortcut | Tool |
 |----------|------|
-| `1` | Pen |
-| `2` | Line |
-| `3` | Arrow |
-| `4` | Rectangle |
-| `Q` | Ellipse |
-| `W` | Text |
-| `E` | Pixelate |
-| `R` | Redact |
-| `A` | Stamp |
-| `S` | Highlighter |
-| `D` | Focus Spotlight |
-| `F` | Color Picker (Ink/Eyedropper) |
-| `T` | Eraser |
-| `Z` | Area Zoom (Callout) |
-| `B` | Backdrop Options |
-| `V` | Select |
-| `X` | Toggle Hide/Show Annotations |
-| `Tab` | Toggle between 2 latest radial presets |
+| <kbd>1</kbd> | Pen |
+| <kbd>2</kbd> | Line |
+| <kbd>3</kbd> | Arrow |
+| <kbd>4</kbd> | Rectangle |
+| <kbd>Q</kbd> | Ellipse |
+| <kbd>W</kbd> | Text |
+| <kbd>E</kbd> | Pixelate |
+| <kbd>R</kbd> | Redact |
+| <kbd>A</kbd> | Stamp |
+| <kbd>S</kbd> | Highlighter |
+| <kbd>D</kbd> | Focus Spotlight |
+| <kbd>F</kbd> | Color Picker (Ink/Eyedropper) |
+| <kbd>T</kbd> | Eraser |
+| <kbd>Z</kbd> | Area Zoom (Callout) |
+| <kbd>B</kbd> | Backdrop Options |
+| <kbd>V</kbd> | Select |
+| <kbd>X</kbd> | Toggle Hide/Show Annotations |
+| <kbd>Tab</kbd> | Toggle between 2 latest radial presets |
 
 ### Drawing & Editing
 
 - **Thickness:** Scroll **Mouse Wheel** to scale brush / font size.
 - **Quick Erase:** **Middle-click** on any element to delete it.
-- **Copy / Duplicate:** Select a vector with the **Select** tool (`V`), then press **C** to duplicate. Pressing **C** without a selection pastes the last copied vector at the cursor.
-- **Undo:** `Ctrl + Z`.
-- **Shift Constraint:** Hold **Shift** while drawing to constrain shapes:
+- **Copy / Duplicate:** Select a vector with the **Select** tool (<kbd>V</kbd>), then press **<kbd>C</kbd>** to duplicate. Pressing **<kbd>C</kbd>** without a selection pastes the last copied vector at the cursor.
+- **Undo:** <kbd>Ctrl</kbd> + <kbd>Z</kbd>.
+- **Shift Constraint:** Hold **<kbd>Shift</kbd>** while drawing to constrain shapes:
 
   | Tool | Shift Behavior |
   |------|----------------|
@@ -109,36 +109,34 @@ git checkout main && git pull
 | Interaction | Menu / Popover |
 |-------------|----------------|
 | **Right-click** on canvas | 8 customizable tool presets |
-| **Shift+Right-click** (Stamp active) | Open Stamp Options mini-toolbar (Numeric, Alphabetic, Roman) |
-| **Shift+Right-click** (Text active) | Open Text Options mini-toolbar (Bold, Italic, Underline, Background) |
-| **Shift+Right-click** (Line active) | Open Line Options mini-toolbar (Solid, Dashed, Dotted) |
+| **<kbd>Shift</kbd>+Right-click** (Stamp active) | Open Stamp Options mini-toolbar (Numeric, Alphabetic, Roman) |
+| **<kbd>Shift</kbd>+Right-click** (Text active) | Open Text Options mini-toolbar (Bold, Italic, Underline, Background) |
+| **<kbd>Shift</kbd>+Right-click** (Line active) | Open Line Options mini-toolbar (Solid, Dashed, Dotted) |
 
 ### Special Tools
 
-- **Magnifier Lens:** Hold **G** to activate a magnifying circular lens. Scroll **Mouse Wheel** while holding **G** to adjust zoom (1.5× – 4×).
-- **Area Zoom (Callout):** Press **Z** to draw a magnified callout box. Adjust zoom (100%–500%) with scroll wheel.
+- **Magnifier Lens:** Hold **<kbd>G</kbd>** to activate a magnifying circular lens. Scroll **Mouse Wheel** while holding **<kbd>G</kbd>** to adjust zoom (1.5× – 4×).
+- **Area Zoom (Callout):** Press **<kbd>Z</kbd>** to draw a magnified callout box. Adjust zoom (100%–500%) with scroll wheel.
 - **Text Tool:** Supports Bold, Italic, Underline, and auto-contrast Background via the radial menu.
 
 ## Keyboard Shortcuts
 
-> Tool selection shortcuts (`1`, `2`, … , `V`, `Tab`) are listed in the [Annotation Tools](#annotation-tools) section above.
-
 | Key | Action |
 |-----|--------|
-| `Enter` | Done (save/copy per settings) |
-| `Esc` | Discard & Close |
-| `Ctrl + Z` | Undo last stroke |
-| `Ctrl + S` | Save to file |
-| `Ctrl + C` | Copy to clipboard |
-| `Ctrl + A` | Copy & Save |
-| `Ctrl + F` | Float image to always-on-top window |
-| `Ctrl + X` | Crop / Resize |
-| `Ctrl + 1 – 4` | Select color slots 1 – 4 |
-| `Ctrl + Q – R` | Select color slots 5 – 8 (Q, W, E, R) |
+| <kbd>Enter</kbd> | Done (save/copy per settings) |
+| <kbd>Esc</kbd> | Discard & Close |
+| <kbd>Ctrl</kbd> + <kbd>Z</kbd> | Undo last stroke |
+| <kbd>Ctrl</kbd> + <kbd>S</kbd> | Save to file |
+| <kbd>Ctrl</kbd> + <kbd>C</kbd> | Copy to clipboard |
+| <kbd>Ctrl</kbd> + <kbd>A</kbd> | Copy & Save |
+| <kbd>Ctrl</kbd> + <kbd>F</kbd> | Float image to always-on-top window |
+| <kbd>Ctrl</kbd> + <kbd>X</kbd> | Crop / Resize |
+| <kbd>Ctrl</kbd> + <kbd>1</kbd> – <kbd>4</kbd> | Select color slots 1 – 4 |
+| <kbd>Ctrl</kbd> + <kbd>Q</kbd> – <kbd>R</kbd> | Select color slots 5 – 8 (Q, W, E, R) |
 
 ## Pin-to-Desktop (Float)
 
-- **Ctrl + F** in the annotator to export and float the image instantly.
+- **<kbd>Ctrl</kbd> + <kbd>F</kbd>** in the annotator to export and float the image instantly.
 - **Left-click** the floating image to return it to the annotator for further editing.
 - **Right-click** the floating image to minimize it into a small cloud icon.
 - **Hover** the cloud icon to restore the floating image.
