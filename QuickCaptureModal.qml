@@ -2160,7 +2160,8 @@ DankModal {
                         scale: drawingCanvas.scale
                         transformOrigin: drawingCanvas.transformOrigin
                         clip: true
-                        visible: window.effectiveBackdropMode === "none"
+                        visible: true
+                        z: window.effectiveBackdropMode !== "none" ? 1.5 : 0
 
                         Image {
                             id: staticBgImage
@@ -2168,14 +2169,25 @@ DankModal {
                             cache: false
                             smooth: true
                             mipmap: true
-                            
-                            // Handle crop positioning
-                            x: window.hasActiveCropSelection ? -window.cropRect.x * window.editScale : 0
-                            y: window.hasActiveCropSelection ? -window.cropRect.y * window.editScale : 0
-                            
-                            // Scale to original size if cropped, otherwise fit to canvas
-                            width: window.hasActiveCropSelection ? window.bgImageItem.sourceSize.width * window.editScale : parent.width
-                            height: window.hasActiveCropSelection ? window.bgImageItem.sourceSize.height * window.editScale : parent.height
+
+                            // Handle crop + backdrop positioning
+                            x: ((window.effectiveBackdropMode !== "none" ? window.screenshotXOffset : 0)
+                                - (window.hasActiveCropSelection ? window.cropRect.x : 0))
+                               * window.editScale
+                            y: ((window.effectiveBackdropMode !== "none" ? window.screenshotYOffset : 0)
+                                - (window.hasActiveCropSelection ? window.cropRect.y : 0))
+                               * window.editScale
+
+                            width: window.hasActiveCropSelection
+                                ? window.bgImageItem.sourceSize.width * window.editScale
+                                : (window.effectiveBackdropMode !== "none"
+                                    ? window.screenshotWidth * window.editScale
+                                    : parent.width)
+                            height: window.hasActiveCropSelection
+                                ? window.bgImageItem.sourceSize.height * window.editScale
+                                : (window.effectiveBackdropMode !== "none"
+                                    ? window.screenshotHeight * window.editScale
+                                    : parent.height)
                         }
                     }
 
@@ -2211,7 +2223,7 @@ DankModal {
                             if (isBackdropActive) {
                                 window.drawBackdropBackground(ctx, window.canvasWidth, window.canvasHeight);
                                 window.drawScreenshotShadow(ctx);
-                                window.drawScreenshotImage(ctx, bgImage);
+                                // Screenshot drawn by hardware Image layer (bgImageLayer) — skip to keep sharp
                             } else if (window.currentTool === "colorpicker") {
                                 if (bgImage.status === Image.Ready) {
                                     if (window.hasSelection) {
