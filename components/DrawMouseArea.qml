@@ -628,7 +628,7 @@ MouseArea {
 
         if (window.currentTool === "stamp") {
              window.currentStroke = {
-                 id: Date.now() + Math.random(),
+                 id: window.stampIdCounter++,
                  tool: "stamp",
                  color: window.currentColor.toString(),
                  width: window.strokeWidth,

@@ -321,6 +321,7 @@ DankModal {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
     property int stampCounter: 1
+    property int stampIdCounter: 1
     property string stampCounterFormat: "numeric" // numeric, alpha, roman
     onStampCounterFormatChanged: {
         window.reindexStamps();
@@ -1313,7 +1314,7 @@ DankModal {
             let stroke = window.strokes[i];
             if (stroke && stroke.tool === "stamp") {
                 if (stroke.id === undefined) {
-                    stroke.id = Date.now() + (i / 1000000);
+                    stroke.id = window.stampIdCounter++;
                 }
                 stamps.push(stroke);
             }
@@ -1747,6 +1748,7 @@ DankModal {
         window.selectedStroke = null;
         window.copiedStroke = null;
         window.stampCounter = 1;
+        window.stampIdCounter = 1;
         window.bgImageSource = "";
         if (window.restoreSource) {
             window.bgImageSource = window.restoreSource;
