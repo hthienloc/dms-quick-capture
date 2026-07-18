@@ -2995,6 +2995,7 @@ DankModal {
 
                 HoverSliderPopover {
                     id: backdropPaddingPopover
+                    isVertical: toolbarCard.isVertical
                     minimum: 10
                     maximum: 150
                     value: window.backdropPadding
@@ -3006,6 +3007,7 @@ DankModal {
 
                 HoverSliderPopover {
                     id: backdropRadiusPopover
+                    isVertical: toolbarCard.isVertical
                     minimum: 0
                     maximum: 60
                     stepSize: 2
@@ -3018,6 +3020,7 @@ DankModal {
 
                 HoverSliderPopover {
                     id: backdropShadowPopover
+                    isVertical: toolbarCard.isVertical
                     minimum: 0
                     maximum: 100
                     value: window.backdropShadowStrength
@@ -3029,6 +3032,7 @@ DankModal {
 
                 HoverSliderPopover {
                     id: backdropAnglePopover
+                    isVertical: toolbarCard.isVertical
                     minimum: 0
                     maximum: 360
                     stepSize: 15
