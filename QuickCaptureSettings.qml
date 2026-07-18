@@ -681,7 +681,6 @@ PluginSettings {
             defaultValue: 500
             minimum: 200
             maximum: 2000
-            stepSize: 50
             unit: "ms"
             leftLabel: "200"
             rightLabel: "2000"
