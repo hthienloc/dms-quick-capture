@@ -21,7 +21,7 @@ QtObject {
 
     function screenshotFilename() {
         const hasParent = root.parentWidget && root.parentWidget.pluginData;
-        const pattern = hasParent ? (root.parentWidget.pluginData.saveFilenamePattern || "Screenshot_%Y-%m-%d_%H-%M-%S") : "Screenshot_%Y-%m-%d_%H-%M-%S";
+        const pattern = hasParent ? (root.parentWidget.pluginData.saveFilenamePattern || "Screenshot-%Y-%m-%d_%H-%M-%S") : "Screenshot-%Y-%m-%d_%H-%M-%S";
         const format = hasParent ? (root.parentWidget.pluginData.outputFormat || "png") : "png";
 
         const now = new Date();
@@ -57,7 +57,7 @@ QtObject {
             .replace(/\{zzz\}/gi, zzz);
 
         if (!filename) {
-            filename = "Screenshot_" + yyyy + "-" + MM + "-" + dd + "_" + HH + "-" + mm + "-" + ss;
+            filename = "Screenshot-" + yyyy + "-" + MM + "-" + dd + "_" + HH + "-" + mm + "-" + ss;
         }
 
         return filename + "." + format;
