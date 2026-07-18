@@ -417,6 +417,7 @@ Rectangle {
                 iconName: "arrow_back"
                 buttonSize: tc.btnSize
                 iconSize: tc.iconSize
+                anchors.verticalCenter: parent.verticalCenter
                 tooltipText: qsTr("Back to Annotation (B)")
                 onClicked: root.toolSelected("back")
             }
