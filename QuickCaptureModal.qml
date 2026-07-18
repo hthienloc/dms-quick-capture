@@ -962,16 +962,17 @@ DankModal {
     // Chrome = boardContainer margins plus the edge the toolbar occupies (56px rail + its margin)
     readonly property real _chromeW: Theme.spacingM * 2 + (window.toolbarVisible && !_toolbarHorizontal ? 56 + Theme.spacingM : 0)
     readonly property real _chromeH: Theme.spacingM * 2 + (window.toolbarVisible && _toolbarHorizontal ? 56 + Theme.spacingM : 0)
-    readonly property real _minModalW: _toolbarHorizontal && window.toolbarItem?.width ? window.toolbarItem.width + Theme.spacingM * 2 : 400
-    readonly property real _minModalH: !_toolbarHorizontal && window.toolbarItem?.height ? window.toolbarItem.height + Theme.spacingM * 2 : 300
-    readonly property bool _bgSizeKnown: window.bgImageItem?.status === Image.Ready
-                                         && (window.bgImageItem?.sourceSize.width ?? 0) > 0
-                                         && (window.bgImageItem?.sourceSize.height ?? 0) > 0
+    readonly property real _minModalW: _toolbarHorizontal && window.toolbarItem && window.toolbarItem.width ? window.toolbarItem.width + Theme.spacingM * 2 : 400
+    readonly property real _minModalH: !_toolbarHorizontal && window.toolbarItem && window.toolbarItem.height ? window.toolbarItem.height + Theme.spacingM * 2 : 300
+    readonly property bool _bgSizeKnown: window.bgImageItem !== null
+                                         && window.bgImageItem.status === Image.Ready
+                                         && window.bgImageItem.sourceSize.width > 0
+                                         && window.bgImageItem.sourceSize.height > 0
     // Compositor scale (not Screen.devicePixelRatio, which reports the integer buffer scale)
     readonly property real _outputScale: (window.targetScreen && CompositorService.getScreenScale(window.targetScreen)) || 1
-    readonly property bool _shouldScale: window.parentWidget?.pluginData?.modalScaleToContent ?? false
-    modalWidth: _shouldScale && _bgSizeKnown ? Math.round(Math.min(_maxModalW, Math.max(_minModalW, (window.bgImageItem?.sourceSize.width ?? 0) / _outputScale + _chromeW))) : _maxModalW
-    modalHeight: _shouldScale && _bgSizeKnown ? Math.round(Math.min(_maxModalH, Math.max(_minModalH, (window.bgImageItem?.sourceSize.height ?? 0) / _outputScale + _chromeH))) : _maxModalH
+    readonly property bool _shouldScale: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.modalScaleToContent ? window.parentWidget.pluginData.modalScaleToContent : false
+    modalWidth: _shouldScale && _bgSizeKnown ? Math.round(Math.min(_maxModalW, Math.max(_minModalW, window.bgImageItem.sourceSize.width / _outputScale + _chromeW))) : _maxModalW
+    modalHeight: _shouldScale && _bgSizeKnown ? Math.round(Math.min(_maxModalH, Math.max(_minModalH, window.bgImageItem.sourceSize.height / _outputScale + _chromeH))) : _maxModalH
     enableShadow: true
     positioning: "center"
 
@@ -1289,6 +1290,8 @@ DankModal {
         if (window.isTyping) {
             window.commitTypingText();
         }
+        // Clear any stale callback from a previous session that never completed
+        window.exportCallback = null;
         window.exportCallback = callback;
         if (!window.exportCanvasItem) {
             console.warn("exportCanvasItem is not initialized yet");
@@ -1751,7 +1754,8 @@ DankModal {
             window.bgImageSource = window.restoreSource;
         } else if (window.currentCapturePath) {
             window.bgImageSource = "file://" + window.currentCapturePath;
-            window.currentCapturePath = "";
+            // currentCapturePath is cleared in onDialogClosed to prevent losing it
+            // if this signal fires more than once during layout/screen changes
         }
         window.isScreenshotDark = false;
         window.hasSampledContrast = false;
@@ -1864,6 +1868,12 @@ DankModal {
                         if (window.activeCanvas) {
                             window.activeCanvas.unloadImage(source);
                             window.activeCanvas.loadImage(source);
+                        }
+                        // bakedCanvas must also call loadImage so its onImageLoaded fires
+                        // and triggers requestPaint — without this the background is never drawn
+                        if (window.bakedCanvas) {
+                            window.bakedCanvas.unloadImage(source);
+                            window.bakedCanvas.loadImage(source);
                         }
                         contrastSampler.requestPaint();
                         offscreenSampler.requestPaint();
@@ -3173,5 +3183,15 @@ DankModal {
         window.selectedStroke = null;
         window.copiedStroke = null;
         window.close();
+    }
+
+    onDialogClosed: {
+        // Reset path state only after modal is fully closed, not in onOpened.
+        // This prevents blank canvas if the opened signal fires multiple times
+        // (e.g. during screen/layout changes) which would re-clear the source.
+        window.currentCapturePath = "";
+        window.restoreSource = "";
+        window.bgImageSource = "";
+        window.exportCallback = null;
     }
 }
