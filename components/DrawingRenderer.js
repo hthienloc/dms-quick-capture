@@ -604,8 +604,11 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
  * @param {object} ctx - The Canvas 2D context.
  * @param {object} stroke - The selected stroke data object.
  * @param {object} Theme - The Theme object.
+ * @param {function} estimateTextWidthFn - Text width estimation function.
+ * @param {object} Qt - The Qt object for color utilities.
+ * @param {object} Helpers - The Helpers module for utility functions.
  */
-function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn) {
+function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn, Qt, Helpers) {
     if (!stroke || !stroke.points || stroke.points.length === 0) return;
 
     const hs = Constants.selectionHandleSize;
@@ -706,6 +709,22 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn) {
         ctx.lineWidth = 1;
         ctx.setLineDash([4, 4]);
         ctx.strokeRect(tx - sp, ty - sp, tw + sp * 2, th + sp * 2);
+        ctx.restore();
+        return;
+    }
+
+    if (stroke.tool === "pen") {
+        if (stroke.points.length < 2) return;
+        ctx.save();
+        ctx.strokeStyle = Helpers.getContrastingColor(stroke.color, Qt);
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+        for (let i = 1; i < stroke.points.length; i++) {
+            ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+        }
+        ctx.stroke();
         ctx.restore();
         return;
     }

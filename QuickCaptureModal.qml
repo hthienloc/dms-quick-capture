@@ -2526,7 +2526,7 @@ DankModal {
 
                                 // Draw selection resize handles in select mode
                                 if (selectedStroke && window.currentTool === "select") {
-                                    DrawingRenderer.drawSelectionHandles(ctx, selectedStroke, Theme, window.estimateTextWidth);
+                                    DrawingRenderer.drawSelectionHandles(ctx, selectedStroke, Theme, window.estimateTextWidth, Qt, Helpers);
                                 }
 
                                 // Draw temporary live typing text
