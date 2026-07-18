@@ -125,14 +125,6 @@ Rectangle {
                 }
             }
 
-            // Separator when custom is active
-            Rectangle {
-                visible: popoverRoot.customActive
-                width: parent.width
-                height: tc.separatorThickness
-                color: Theme.withAlpha(Theme.outline, 0.2)
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
 
             // Slider section (Visible only when custom is active)
             Row {

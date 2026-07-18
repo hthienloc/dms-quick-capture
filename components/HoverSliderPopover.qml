@@ -140,6 +140,8 @@ Rectangle {
                 anchors.fill: parent
                 preventStealing: true
                 acceptedButtons: Qt.LeftButton
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
                 
                 function updateValue(mouseY) {
                     let ratio = 1 - Math.max(0, Math.min(1, mouseY / verticalSliderContainer.height));
