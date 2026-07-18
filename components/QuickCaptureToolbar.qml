@@ -110,6 +110,8 @@ Rectangle {
         property int gridSpacingValue: tc.gridSpacing
         signal colorSelected(color col, int index)
         columns: cols
+        rows: cols === 2 ? 4 : 2
+        flow: cols === 2 ? Grid.TopToBottom : Grid.LeftToRight
         spacing: gridSpacingValue
         Repeater {
             model: paletteGrid.paletteModel
@@ -401,27 +403,6 @@ Rectangle {
                     }
                 }
             }
-
-            Rectangle { width: tc.separatorLength; height: tc.separatorThickness; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
-
-            // Thickness Text Only
-            Text {
-                text: {
-                    if (root.activeToolType === "spotlight" || root.activeToolType === "callout") {
-                        return root.strokeWidth + "%";
-                    }
-                    return root.strokeWidth + "px";
-                }
-                color: Theme.surfaceText; font.pixelSize: 10; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter
-            }
-
-            Rectangle { width: tc.separatorLength; height: tc.separatorThickness; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
-
-            Column {
-                spacing: Theme.spacingXS; anchors.horizontalCenter: parent.horizontalCenter
-                DankActionButton { iconName: "undo"; buttonSize: tc.btnSize; iconSize: tc.iconSize; enabled: root.canUndo; opacity: enabled ? 1.0 : 0.4; onClicked: root.undoRequested() }
-                DankActionButton { iconName: "done_all"; buttonSize: tc.btnSize; iconSize: tc.iconSize; tooltipText: "Copy & Save (Enter)"; iconColor: Theme.primary; onClicked: root.copyAndSaveRequested() }
-            }
         }
     }
 
@@ -706,24 +687,25 @@ Rectangle {
                 Item {
                     id: padControlVert
                     width: tc.btnSize
-                    height: tc.btnSizeCompact
+                    height: 40
                     anchors.horizontalCenter: parent.horizontalCenter
                     
-                    Row {
+                    Column {
                         spacing: tc.spacingCompact
                         anchors.centerIn: parent
                         DankIcon {
                             name: "padding"
-                            size: tc.iconSizeCompact
+                            size: tc.iconSize
                             color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
                         }
                         StyledText {
                             text: root.backdropPadding
-                            width: tc.btnSize; horizontalAlignment: Text.AlignRight
-                            font.pixelSize: tc.fontSizeCompact
+                            width: parent.width
+                            horizontalAlignment: Text.AlignHCenter
+                            font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
                         }
                     }
                     MouseArea {
@@ -741,24 +723,25 @@ Rectangle {
                 Item {
                     id: radControlVert
                     width: tc.btnSize
-                    height: tc.btnSizeCompact
+                    height: 40
                     anchors.horizontalCenter: parent.horizontalCenter
                     
-                    Row {
+                    Column {
                         spacing: tc.spacingCompact
                         anchors.centerIn: parent
                         DankIcon {
                             name: "rounded_corner"
-                            size: tc.iconSizeCompact
+                            size: tc.iconSize
                             color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
                         }
                         StyledText {
                             text: root.backdropCornerRadius
-                            width: tc.btnSize; horizontalAlignment: Text.AlignRight
-                            font.pixelSize: tc.fontSizeCompact
+                            width: parent.width
+                            horizontalAlignment: Text.AlignHCenter
+                            font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
                         }
                     }
                     MouseArea {
@@ -776,24 +759,25 @@ Rectangle {
                 Item {
                     id: shadowControlVert
                     width: tc.btnSize
-                    height: tc.btnSizeCompact
+                    height: 40
                     anchors.horizontalCenter: parent.horizontalCenter
                     
-                    Row {
+                    Column {
                         spacing: tc.spacingCompact
                         anchors.centerIn: parent
                         DankIcon {
                             name: "blur_on"
-                            size: tc.iconSizeCompact
+                            size: tc.iconSize
                             color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
                         }
                         StyledText {
                             text: root.backdropShadowStrength
-                            width: tc.btnSize; horizontalAlignment: Text.AlignRight
-                            font.pixelSize: tc.fontSizeCompact
+                            width: parent.width
+                            horizontalAlignment: Text.AlignHCenter
+                            font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
                         }
                     }
                     MouseArea {
@@ -812,24 +796,25 @@ Rectangle {
                     id: angleControlVert
                     visible: root.backdropMode === "gradient" || root.backdropMode === "conic"
                     width: tc.btnSize
-                    height: visible ? tc.btnSizeCompact : 0
+                    height: visible ? 40 : 0
                     anchors.horizontalCenter: parent.horizontalCenter
                     
-                    Row {
+                    Column {
                         spacing: tc.spacingCompact
                         anchors.centerIn: parent
                         DankIcon {
                             name: "rotate_right"
-                            size: tc.iconSizeCompact
+                            size: tc.iconSize
                             color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
                         }
                         StyledText {
                             text: root.backdropGradientAngle
-                            width: tc.btnSize; horizontalAlignment: Text.AlignRight
-                            font.pixelSize: tc.fontSizeCompact
+                            width: parent.width
+                            horizontalAlignment: Text.AlignHCenter
+                            font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
                         }
                     }
                     MouseArea {
@@ -879,6 +864,7 @@ Rectangle {
                 spacing: Theme.spacingS
                 anchors.horizontalCenter: parent.horizontalCenter
                                  BackdropColorSelectors {
+                    isVertical: true
                     backdropMode: root.backdropMode
                     backdropSolidColor: root.backdropSolidColor
                     backdropGradientStart: root.backdropGradientStart

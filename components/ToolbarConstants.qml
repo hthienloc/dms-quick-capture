@@ -32,4 +32,9 @@ QtObject {
     readonly property int subToolbarHeight: 48
     readonly property int subToolbarBtnSize: 36
     readonly property int subToolbarIconSize: 20
+
+    // Vertical layout dimensions constants
+    readonly property int compactControlHeight: 40
+    readonly property int customRatioPopoverHeight: 120
+    readonly property int verticalSelectorItemWidth: 32
 }

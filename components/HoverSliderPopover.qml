@@ -7,8 +7,8 @@ Rectangle {
 
     ToolbarConstants { id: tc }
 
-    width: 120
-    height: tc.btnSize
+    width: isVertical ? tc.btnSize : tc.customRatioPopoverHeight
+    height: isVertical ? tc.customRatioPopoverHeight : tc.btnSize
     color: Theme.surfaceContainer
     border.color: Theme.withAlpha(Theme.outline, 0.15)
     border.width: 1
@@ -20,9 +20,16 @@ Rectangle {
     property int value: 0
     property int stepSize: 5
     property bool opened: false
+    property bool isVertical: false
     onValueChanged: slider.value = value
 
     signal userValueChanged(int val)
+
+    function valueFromRatio(ratio) {
+        let rawVal = minimum + ratio * (maximum - minimum);
+        let newVal = stepSize > 1 ? Math.round(rawVal / stepSize) * stepSize : Math.round(rawVal);
+        return Math.max(minimum, Math.min(maximum, newVal));
+    }
 
     visible: opacity > 0
     opacity: 0
@@ -80,13 +87,81 @@ Rectangle {
 
         DankSlider {
             id: slider
+            visible: !popoverRoot.isVertical
             minimum: popoverRoot.minimum
             maximum: popoverRoot.maximum
             anchors.fill: parent
             anchors.margins: Theme.spacingS
             value: popoverRoot.value
             showValue: false
-            onSliderValueChanged: val => popoverRoot.userValueChanged(val)
+            onSliderValueChanged: val => {
+                if (!popoverRoot.isVertical) popoverRoot.userValueChanged(val)
+            }
+        }
+
+        Item {
+            id: verticalSliderContainer
+            visible: popoverRoot.isVertical
+            anchors.fill: parent
+            anchors.margins: Theme.spacingS
+
+            StyledRect {
+                id: verticalTrack
+                width: 8
+                height: parent.height
+                anchors.centerIn: parent
+                radius: Theme.cornerRadius
+                color: Theme.withAlpha(Theme.outline, Theme.popupTransparency)
+                
+                StyledRect {
+                    id: verticalFill
+                    width: parent.width
+                    radius: Theme.cornerRadius
+                    anchors.bottom: parent.bottom
+                    height: {
+                        const range = popoverRoot.maximum - popoverRoot.minimum;
+                        const ratio = range === 0 ? 0 : (popoverRoot.value - popoverRoot.minimum) / range;
+                        return Math.max(0, Math.min(verticalTrack.height, verticalTrack.height * ratio));
+                    }
+                    color: Theme.primary
+                }
+                
+                StyledRect {
+                    id: verticalHandle
+                    width: 20
+                    height: 8
+                    radius: Theme.cornerRadius
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    y: {
+                        const range = popoverRoot.maximum - popoverRoot.minimum;
+                        const ratio = range === 0 ? 0 : (popoverRoot.value - popoverRoot.minimum) / range;
+                        const travel = verticalTrack.height - height;
+                        return Math.max(0, Math.min(travel, travel * (1 - ratio)));
+                    }
+                    color: Theme.primary
+                }
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                preventStealing: true
+                acceptedButtons: Qt.LeftButton
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                
+                function updateValue(mouseY) {
+                    if (verticalSliderContainer.height <= 0) return;
+                    let ratio = 1 - Math.max(0, Math.min(1, mouseY / verticalSliderContainer.height));
+                    let newVal = popoverRoot.valueFromRatio(ratio);
+                    if (newVal !== popoverRoot.value) {
+                        popoverRoot.userValueChanged(newVal);
+                    }
+                }
+                
+                onPressed: mouse => updateValue(mouse.y)
+                onPositionChanged: mouse => { if (pressed) updateValue(mouse.y) }
+                onClicked: mouse => updateValue(mouse.y)
+            }
         }
     }
 }

@@ -2022,11 +2022,13 @@ DankModal {
                         } else {
                             window.currentTool = tool;
                         }
+                        if (window.modalFocusScope) window.modalFocusScope.forceActiveFocus();
                     }
                     onColorSelected: (color, index) => {
                         moreToolsMenu.close();
                         window.activeColorSlotIndex = index;
                         window.currentColor = color;
+                        if (window.modalFocusScope) window.modalFocusScope.forceActiveFocus();
                     }
                     onCustomColorPickerRequested: (buttonItem) => {
                         moreToolsMenu.close();
@@ -2995,6 +2997,7 @@ DankModal {
 
                 HoverSliderPopover {
                     id: backdropPaddingPopover
+                    isVertical: toolbarCard.isVertical
                     minimum: 10
                     maximum: 150
                     value: window.backdropPadding
@@ -3006,6 +3009,7 @@ DankModal {
 
                 HoverSliderPopover {
                     id: backdropRadiusPopover
+                    isVertical: toolbarCard.isVertical
                     minimum: 0
                     maximum: 60
                     stepSize: 2
@@ -3018,6 +3022,7 @@ DankModal {
 
                 HoverSliderPopover {
                     id: backdropShadowPopover
+                    isVertical: toolbarCard.isVertical
                     minimum: 0
                     maximum: 100
                     value: window.backdropShadowStrength
@@ -3029,6 +3034,7 @@ DankModal {
 
                 HoverSliderPopover {
                     id: backdropAnglePopover
+                    isVertical: toolbarCard.isVertical
                     minimum: 0
                     maximum: 360
                     stepSize: 15

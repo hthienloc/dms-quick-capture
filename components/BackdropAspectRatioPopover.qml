@@ -21,8 +21,8 @@ Rectangle {
     readonly property int _sliderMin: Math.round(customRatioMin * 100)
     readonly property int _sliderMax: Math.round(customRatioMax * 100)
 
-    width: customActive ? 340 : 220
-    height: tc.popoverHeight
+    width: 220
+    height: customActive ? tc.customRatioPopoverHeight : tc.popoverHeight
     color: Theme.surfaceContainer
     border.color: Theme.withAlpha(Theme.outline, 0.15)
     border.width: 1
@@ -86,17 +86,16 @@ Rectangle {
             }
         }
 
-        Row {
+        Column {
             anchors.centerIn: parent
-            spacing: Theme.spacingM
-            leftPadding: Theme.spacingS
-            rightPadding: Theme.spacingS
+            spacing: Theme.spacingS
+            width: parent.width - Theme.spacingS * 2
 
             Grid {
                 columns: 4
                 rows: 2
                 spacing: tc.gridSpacing
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
 
                 Repeater {
                     model: popoverRoot.presets
@@ -126,54 +125,50 @@ Rectangle {
                 }
             }
 
-            // Separator when custom is active
-            Rectangle {
-                visible: popoverRoot.customActive
-                width: tc.separatorThickness
-                height: tc.btnSize
-                color: Theme.withAlpha(Theme.outline, 0.2)
-                anchors.verticalCenter: parent.verticalCenter
-            }
 
             // Slider section (Visible only when custom is active)
-            Row {
+            Item {
                 id: sliderSection
                 visible: popoverRoot.customActive
-                spacing: Theme.spacingS
-                anchors.verticalCenter: parent.verticalCenter
+                width: parent.width
+                height: Math.max(ratioText.implicitHeight, slider.implicitHeight, valueText.implicitHeight)
 
-                Column {
-                    spacing: tc.spacingCompact
+                StyledText {
+                    id: ratioText
+                    text: I18n.tr("Ratio")
+                    font.pixelSize: tc.fontSizeCompact
+                    color: Theme.surfaceVariantText
+                    anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
-
-                    StyledText {
-                        text: I18n.tr("Ratio")
-                        font.pixelSize: tc.fontSizeCompact
-                        color: Theme.surfaceVariantText
-                    }
-
-                    DankSlider {
-                        id: slider
-                        minimum: popoverRoot._sliderMin
-                        maximum: popoverRoot._sliderMax
-                        width: tc.sliderWidth
-                        showValue: false
-                        onSliderValueChanged: val => popoverRoot.changeCustomAspectRatio(val / 100.0)
-
-                        Binding {
-                            target: slider
-                            property: "value"
-                            value: Math.round(popoverRoot.customAspectRatio * 100)
-                        }
-                    }
                 }
 
                 StyledText {
+                    id: valueText
                     text: popoverRoot.customAspectRatio.toFixed(2)
                     font.pixelSize: tc.fontSizeCompact
                     font.weight: Font.Medium
                     color: Theme.surfaceText
+                    anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
+                }
+
+                DankSlider {
+                    id: slider
+                    minimum: popoverRoot._sliderMin
+                    maximum: popoverRoot._sliderMax
+                    anchors.left: ratioText.right
+                    anchors.right: valueText.left
+                    anchors.leftMargin: Theme.spacingS
+                    anchors.rightMargin: Theme.spacingS
+                    showValue: false
+                    onSliderValueChanged: val => popoverRoot.changeCustomAspectRatio(val / 100.0)
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    Binding {
+                        target: slider
+                        property: "value"
+                        value: Math.round(popoverRoot.customAspectRatio * 100)
+                    }
                 }
             }
         }
