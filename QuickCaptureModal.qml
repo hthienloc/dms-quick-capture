@@ -952,11 +952,26 @@ DankModal {
 
     shouldBeVisible: false
     
-    // Spacious modal dimensions occupying 90% width and 90% height of the screen
+    // Modal sized to the screenshot (logical px), clamped between the toolbar's
+    // footprint and 90% of the screen; falls back to 90% until the image loads
     readonly property real _screenW: window.targetScreen ? window.targetScreen.width : (Quickshell.screens[0] ? Quickshell.screens[0].width : 1920)
     readonly property real _screenH: window.targetScreen ? window.targetScreen.height : (Quickshell.screens[0] ? Quickshell.screens[0].height : 1080)
-    modalWidth: Math.round((config.modalAspectRatio === "portrait" ? Math.min(_screenW, _screenH) : Math.max(_screenW, _screenH)) * 0.9)
-    modalHeight: Math.round((config.modalAspectRatio === "portrait" ? Math.max(_screenW, _screenH) : Math.min(_screenW, _screenH)) * 0.9)
+    readonly property real _maxModalW: Math.round((config.modalAspectRatio === "portrait" ? Math.min(_screenW, _screenH) : Math.max(_screenW, _screenH)) * 0.9)
+    readonly property real _maxModalH: Math.round((config.modalAspectRatio === "portrait" ? Math.max(_screenW, _screenH) : Math.min(_screenW, _screenH)) * 0.9)
+    readonly property bool _toolbarHorizontal: window.toolbarPosition === "top" || window.toolbarPosition === "bottom"
+    // Chrome = boardContainer margins plus the edge the toolbar occupies (56px rail + its margin)
+    readonly property real _chromeW: Theme.spacingM * 2 + (window.toolbarVisible && !_toolbarHorizontal ? 56 + Theme.spacingM : 0)
+    readonly property real _chromeH: Theme.spacingM * 2 + (window.toolbarVisible && _toolbarHorizontal ? 56 + Theme.spacingM : 0)
+    readonly property real _minModalW: _toolbarHorizontal && window.toolbarItem?.width ? window.toolbarItem.width + Theme.spacingM * 2 : 400
+    readonly property real _minModalH: !_toolbarHorizontal && window.toolbarItem?.height ? window.toolbarItem.height + Theme.spacingM * 2 : 300
+    readonly property bool _bgSizeKnown: window.bgImageItem?.status === Image.Ready
+                                         && (window.bgImageItem?.sourceSize.width ?? 0) > 0
+                                         && (window.bgImageItem?.sourceSize.height ?? 0) > 0
+    // Compositor scale (not Screen.devicePixelRatio, which reports the integer buffer scale)
+    readonly property real _outputScale: (window.targetScreen && CompositorService.getScreenScale(window.targetScreen)) || 1
+    readonly property bool _shouldScale: window.parentWidget?.pluginData?.modalScaleToContent ?? false
+    modalWidth: _shouldScale && _bgSizeKnown ? Math.round(Math.min(_maxModalW, Math.max(_minModalW, (window.bgImageItem?.sourceSize.width ?? 0) / _outputScale + _chromeW))) : _maxModalW
+    modalHeight: _shouldScale && _bgSizeKnown ? Math.round(Math.min(_maxModalH, Math.max(_minModalH, (window.bgImageItem?.sourceSize.height ?? 0) / _outputScale + _chromeH))) : _maxModalH
     enableShadow: true
     positioning: "center"
 

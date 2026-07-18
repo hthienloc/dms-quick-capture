@@ -1125,13 +1125,14 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Editor")
             icon: "aspect_ratio"
-            showReset: overlayOpacity.isDirty || showCanvasBorder.isDirty || editQuality.isDirty || modalDisplayTarget.isDirty || modalAspectRatio.isDirty
+            showReset: overlayOpacity.isDirty || showCanvasBorder.isDirty || editQuality.isDirty || modalDisplayTarget.isDirty || modalAspectRatio.isDirty || scaleToContent.isDirty
             onResetClicked: {
                 overlayOpacity.resetToDefault();
                 showCanvasBorder.resetToDefault();
                 editQuality.resetToDefault();
                 modalDisplayTarget.resetToDefault();
                 modalAspectRatio.resetToDefault();
+                scaleToContent.resetToDefault();
             }
         }
 
@@ -1215,6 +1216,16 @@ PluginSettings {
         InfoText {
             text: I18n.tr("Lower the resolution limit if you experience lag while editing.")
             opacity: 0.8
+        }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            id: scaleToContent
+            settingKey: "modalScaleToContent"
+            label: I18n.tr("Scale Editor to Screenshot Size")
+            description: I18n.tr("When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.")
+            defaultValue: false
         }
     }
 
@@ -3295,7 +3306,8 @@ PluginSettings {
             "toolbar_color_3": c3.value,
             "toolbar_color_4": c4.value,
             "toolbar_color_5": c5.value,
-            "toolbar_color_6": c6.value
+            "toolbar_color_6": c6.value,
+            "modalScaleToContent": scaleToContent.value
         }
     }
 
