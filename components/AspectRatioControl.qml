@@ -46,6 +46,7 @@ Item {
     Column {
         id: col
         visible: control.compact
+        width: parent.width
         spacing: tc.spacingCompact
         anchors.centerIn: parent
 

@@ -862,6 +862,7 @@ Rectangle {
                 spacing: Theme.spacingS
                 anchors.horizontalCenter: parent.horizontalCenter
                                  BackdropColorSelectors {
+                    isVertical: true
                     backdropMode: root.backdropMode
                     backdropSolidColor: root.backdropSolidColor
                     backdropGradientStart: root.backdropGradientStart

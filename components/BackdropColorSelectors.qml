@@ -2,7 +2,7 @@ import QtQuick
 import qs.Common
 import qs.Widgets
 
-Row {
+Grid {
     id: controlRoot
 
     property string backdropMode: "none"
@@ -12,14 +12,17 @@ Row {
     property string gradientActiveSlot: "start"
     property int itemSize: 24
     property int iconSize: 18
+    property bool isVertical: false
 
     signal setGradientActiveSlot(string slot)
     signal autoColorBalanceRequested()
     signal colorPickerRequested(color currentColor)
     signal eyedropperRequested(string slot)
 
+    columns: isVertical ? 1 : 4
     spacing: Theme.spacingXS
-    anchors.verticalCenter: parent.verticalCenter
+    anchors.verticalCenter: isVertical ? undefined : parent.verticalCenter
+    anchors.horizontalCenter: isVertical ? parent.horizontalCenter : undefined
 
     Rectangle {
         visible: controlRoot.backdropMode === "solid"
@@ -44,10 +47,12 @@ Row {
 
     readonly property bool isGradient: backdropMode === "gradient" || backdropMode === "radial" || backdropMode === "conic"
 
-    Row {
+    Grid {
         visible: controlRoot.isGradient
+        columns: controlRoot.isVertical ? 1 : 2
         spacing: Theme.spacingXS
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenter: controlRoot.isVertical ? undefined : parent.verticalCenter
+        anchors.horizontalCenter: controlRoot.isVertical ? parent.horizontalCenter : undefined
 
         Rectangle {
             width: controlRoot.itemSize; height: controlRoot.itemSize; radius: controlRoot.itemSize / 2
