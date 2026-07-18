@@ -219,6 +219,31 @@ Item {
                                     Behavior on scale { NumberAnimation { duration: Theme.shorterDuration } }
                                     Behavior on opacity { NumberAnimation { duration: Theme.shorterDuration } }
                                 }
+
+                                DankActionButton {
+                                    anchors.top: parent.top
+                                    anchors.left: parent.left
+                                    anchors.margins: 6
+                                    z: 1
+                                    iconName: "delete"
+                                    iconSize: 16
+                                    buttonSize: 28
+                                    radius: height / 2
+                                    opacity: cardHover.hovered ? 1 : 0
+                                    enabled: cardHover.hovered
+                                    tooltipText: I18n.tr("Delete")
+                                    backgroundColor: Qt.rgba(1, 0, 0, 0.25)
+                                    iconColor: "#ff6b6b"
+                                    onClicked: {
+                                        if (root.previewIndex === modelData._glIdx)
+                                            root.previewIndex = -1
+                                        Proc.runCommand("delete-card", ["rm", "-f", modelData.savedPath], function() {
+                                            root.refresh()
+                                        })
+                                    }
+
+                                    Behavior on opacity { NumberAnimation { duration: Theme.shorterDuration } }
+                                }
                             }
                         }
                     }
