@@ -24,22 +24,28 @@ Grid {
     anchors.verticalCenter: isVertical ? undefined : parent.verticalCenter
     anchors.horizontalCenter: isVertical ? parent.horizontalCenter : undefined
 
-    Rectangle {
+    Item {
         visible: controlRoot.backdropMode === "solid"
-        width: controlRoot.itemSize; height: controlRoot.itemSize; radius: controlRoot.itemSize / 2
-        color: controlRoot.backdropSolidColor
-        border.color: Theme.withAlpha(Theme.outline, 0.3)
-        border.width: 1
+        width: controlRoot.itemSize + 8
+        height: controlRoot.itemSize
 
-        MouseArea {
-            anchors.fill: parent
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-            cursorShape: Qt.PointingHandCursor
-            onClicked: (mouse) => {
-                if (mouse.button === Qt.RightButton) {
-                    controlRoot.eyedropperRequested("solid")
-                } else {
-                    controlRoot.colorPickerRequested(controlRoot.backdropSolidColor)
+        Rectangle {
+            width: controlRoot.itemSize; height: controlRoot.itemSize; radius: controlRoot.itemSize / 2
+            color: controlRoot.backdropSolidColor
+            border.color: Theme.withAlpha(Theme.outline, 0.3)
+            border.width: 1
+            anchors.centerIn: parent
+
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                cursorShape: Qt.PointingHandCursor
+                onClicked: (mouse) => {
+                    if (mouse.button === Qt.RightButton) {
+                        controlRoot.eyedropperRequested("solid")
+                    } else {
+                        controlRoot.colorPickerRequested(controlRoot.backdropSolidColor)
+                    }
                 }
             }
         }
@@ -47,43 +53,47 @@ Grid {
 
     readonly property bool isGradient: backdropMode === "gradient" || backdropMode === "radial" || backdropMode === "conic"
 
-    Grid {
+    Item {
         visible: controlRoot.isGradient
-        columns: controlRoot.isVertical ? 1 : 2
-        spacing: Theme.spacingXS
-        anchors.verticalCenter: controlRoot.isVertical ? undefined : parent.verticalCenter
-        anchors.horizontalCenter: controlRoot.isVertical ? parent.horizontalCenter : undefined
+        width: controlRoot.isVertical ? (controlRoot.itemSize + 8) : (controlRoot.itemSize * 2 + Theme.spacingXS)
+        height: controlRoot.isVertical ? (controlRoot.itemSize * 2 + Theme.spacingXS) : controlRoot.itemSize
 
-        Rectangle {
-            width: controlRoot.itemSize; height: controlRoot.itemSize; radius: controlRoot.itemSize / 2
-            color: controlRoot.backdropGradientStart
-            border.color: controlRoot.gradientActiveSlot === "start" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
-            border.width: controlRoot.gradientActiveSlot === "start" ? (controlRoot.itemSize >= 24 ? 2 : 1.5) : 1
-            MouseArea {
-                anchors.fill: parent
-                acceptedButtons: Qt.LeftButton | Qt.RightButton
-                cursorShape: Qt.PointingHandCursor
-                onClicked: (mouse) => {
-                    controlRoot.setGradientActiveSlot("start")
-                    if (mouse.button === Qt.RightButton) {
-                        controlRoot.eyedropperRequested("start")
+        Grid {
+            columns: controlRoot.isVertical ? 1 : 2
+            spacing: Theme.spacingXS
+            anchors.centerIn: parent
+
+            Rectangle {
+                width: controlRoot.itemSize; height: controlRoot.itemSize; radius: controlRoot.itemSize / 2
+                color: controlRoot.backdropGradientStart
+                border.color: controlRoot.gradientActiveSlot === "start" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
+                border.width: controlRoot.gradientActiveSlot === "start" ? (controlRoot.itemSize >= 24 ? 2 : 1.5) : 1
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: (mouse) => {
+                        controlRoot.setGradientActiveSlot("start")
+                        if (mouse.button === Qt.RightButton) {
+                            controlRoot.eyedropperRequested("start")
+                        }
                     }
                 }
             }
-        }
-        Rectangle {
-            width: controlRoot.itemSize; height: controlRoot.itemSize; radius: controlRoot.itemSize / 2
-            color: controlRoot.backdropGradientEnd
-            border.color: controlRoot.gradientActiveSlot === "end" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
-            border.width: controlRoot.gradientActiveSlot === "end" ? (controlRoot.itemSize >= 24 ? 2 : 1.5) : 1
-            MouseArea {
-                anchors.fill: parent
-                acceptedButtons: Qt.LeftButton | Qt.RightButton
-                cursorShape: Qt.PointingHandCursor
-                onClicked: (mouse) => {
-                    controlRoot.setGradientActiveSlot("end")
-                    if (mouse.button === Qt.RightButton) {
-                        controlRoot.eyedropperRequested("end")
+            Rectangle {
+                width: controlRoot.itemSize; height: controlRoot.itemSize; radius: controlRoot.itemSize / 2
+                color: controlRoot.backdropGradientEnd
+                border.color: controlRoot.gradientActiveSlot === "end" ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
+                border.width: controlRoot.gradientActiveSlot === "end" ? (controlRoot.itemSize >= 24 ? 2 : 1.5) : 1
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: (mouse) => {
+                        controlRoot.setGradientActiveSlot("end")
+                        if (mouse.button === Qt.RightButton) {
+                            controlRoot.eyedropperRequested("end")
+                        }
                     }
                 }
             }
@@ -93,8 +103,6 @@ Grid {
     Item {
         width: controlRoot.itemSize + 8
         height: controlRoot.itemSize
-        anchors.verticalCenter: controlRoot.isVertical ? undefined : parent.verticalCenter
-        anchors.horizontalCenter: controlRoot.isVertical ? parent.horizontalCenter : undefined
 
         DankActionButton {
             anchors.fill: parent
@@ -122,14 +130,19 @@ Grid {
         }
     }
 
-    DankActionButton {
-        buttonSize: controlRoot.itemSize
-        iconName: "auto_awesome"
-        iconSize: controlRoot.iconSize
-        backgroundColor: "transparent"
-        iconColor: Theme.surfaceText
-        tooltipText: I18n.tr("Auto Balance")
-        anchors.horizontalCenter: controlRoot.isVertical ? parent.horizontalCenter : undefined
-        onClicked: controlRoot.autoColorBalanceRequested()
+    Item {
+        width: controlRoot.itemSize + 8
+        height: controlRoot.itemSize
+
+        DankActionButton {
+            buttonSize: controlRoot.itemSize
+            iconName: "auto_awesome"
+            iconSize: controlRoot.iconSize
+            backgroundColor: "transparent"
+            iconColor: Theme.surfaceText
+            tooltipText: I18n.tr("Auto Balance")
+            anchors.centerIn: parent
+            onClicked: controlRoot.autoColorBalanceRequested()
+        }
     }
 }

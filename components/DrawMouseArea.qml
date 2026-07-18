@@ -373,6 +373,10 @@ MouseArea {
     }
 
     onPressed: (mouse) => {
+        if (window.modalFocusScope) {
+            window.modalFocusScope.forceActiveFocus();
+        }
+
         if (moreToolsMenu.opened) {
             moreToolsMenu.close();
             return;

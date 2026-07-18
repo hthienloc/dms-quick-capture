@@ -2022,11 +2022,13 @@ DankModal {
                         } else {
                             window.currentTool = tool;
                         }
+                        if (modalFocusScope) modalFocusScope.forceActiveFocus();
                     }
                     onColorSelected: (color, index) => {
                         moreToolsMenu.close();
                         window.activeColorSlotIndex = index;
                         window.currentColor = color;
+                        if (modalFocusScope) modalFocusScope.forceActiveFocus();
                     }
                     onCustomColorPickerRequested: (buttonItem) => {
                         moreToolsMenu.close();
