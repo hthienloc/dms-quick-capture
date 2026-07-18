@@ -29,11 +29,10 @@ Item {
     function refresh() {
         if (!root.daemon || !root.daemon.pluginData) return
         var dir = root.daemon.pluginData.saveDirectory || "~/Pictures/Screenshots"
-        dir = String(dir).replace(/^~/, Quickshell.env("HOME"))
+        dir = String(dir).replace(/^~/, Quickshell.env("HOME") || "")
         var exts = ["png", "jpg", "jpeg", "webp"]
-        var globs = exts.map(function(e) { return "\"" + dir + "\"/*." + e }).join(" ")
-        var cmd = "for f in " + globs + "; do [ -f \"$f\" ] && echo \"$(stat -c '%Y' \"$f\" 2>/dev/null)|$f\"; done | sort -rn | head -50"
-        Proc.runCommand("scan-history", ["sh", "-c", cmd], function(stdout) {
+        var cmd = "d=\"$1\"; shift; for e in \"$@\"; do for f in \"$d\"/*.\"$e\"; do [ -f \"$f\" ] && echo \"$(stat -c '%Y' \"$f\" 2>/dev/null)|$f\"; done; done | sort -rn | head -50"
+        Proc.runCommand("scan-history", ["sh", "-c", cmd, "sh", dir].concat(exts), function(stdout) {
             var list = []
             var lines = stdout.trim().split("\n")
             for (var i = 0; i < lines.length; i++) {
@@ -50,6 +49,12 @@ Item {
     }
 
     onDaemonChanged: { if (root.daemon && root.daemon.pluginData) refresh() }
+
+    function removeEntry(path) {
+        root.entries = root.entries.filter(function(e) { return e.savedPath !== path })
+        if (root.previewIndex >= root.entries.length)
+            root.previewIndex = root.entries.length - 1
+    }
 
     Column {
         anchors.fill: parent
@@ -144,7 +149,7 @@ Item {
                                         anchors.fill: parent
                                         anchors.margins: 4
                                         source: "file://" + modelData.savedPath
-                                        sourceSize.width: parent.width
+                                        sourceSize.width: 400
                                         fillMode: Image.PreserveAspectFit
                                         asynchronous: true
                                     }
@@ -218,6 +223,33 @@ Item {
                                     onExited: _ovHovered = false
                                     Behavior on backgroundColor { ColorAnimation { duration: Theme.shorterDuration } }
                                     Behavior on scale { NumberAnimation { duration: Theme.shorterDuration } }
+                                    Behavior on opacity { NumberAnimation { duration: Theme.shorterDuration } }
+                                }
+
+                                DankActionButton {
+                                    anchors.top: parent.top
+                                    anchors.left: parent.left
+                                    anchors.margins: 6
+                                    z: 1
+                                    iconName: "delete"
+                                    iconSize: 16
+                                    buttonSize: 28
+                                    radius: height / 2
+                                    opacity: cardHover.hovered ? 1 : 0
+                                    enabled: cardHover.hovered
+                                    tooltipText: I18n.tr("Delete")
+                                    backgroundColor: Qt.rgba(1, 0, 0, 0.25)
+                                    iconColor: "#ff6b6b"
+                                    onClicked: {
+                                        if (root.previewIndex === modelData._glIdx)
+                                            root.previewIndex = -1
+                                        var delPath = modelData.savedPath
+                                        root.removeEntry(delPath)
+                                        Proc.runCommand("delete-card", ["rm", "-f", "--", delPath], function() {
+                                            root.refresh()
+                                        })
+                                    }
+
                                     Behavior on opacity { NumberAnimation { duration: Theme.shorterDuration } }
                                 }
                             }
@@ -356,7 +388,8 @@ Item {
                     if (root.previewEntry) {
                         var delPath = root.previewEntry.savedPath
                         root.previewIndex = -1
-                        Proc.runCommand("delete-preview", ["rm", "-f", delPath], function() {
+                        root.removeEntry(delPath)
+                        Proc.runCommand("delete-preview", ["rm", "-f", "--", delPath], function() {
                             root.refresh()
                         })
                     }

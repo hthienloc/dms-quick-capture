@@ -356,6 +356,8 @@ DankModal {
     }
     readonly property real editScale: {
         if (!window.bgImageItem) return 1.0;
+        // When backdrop is active, render at screen resolution for sharp preview
+        if (window.effectiveBackdropMode !== "none") return Math.max(1e-3, window.fitScale);
         const w = window.bgImageItem.sourceSize.width;
         const h = window.bgImageItem.sourceSize.height;
         const max = Math.max(w, h);
@@ -2168,11 +2170,11 @@ DankModal {
                             cache: false
                             smooth: true
                             mipmap: true
-                            
+
                             // Handle crop positioning
                             x: window.hasActiveCropSelection ? -window.cropRect.x * window.editScale : 0
                             y: window.hasActiveCropSelection ? -window.cropRect.y * window.editScale : 0
-                            
+
                             // Scale to original size if cropped, otherwise fit to canvas
                             width: window.hasActiveCropSelection ? window.bgImageItem.sourceSize.width * window.editScale : parent.width
                             height: window.hasActiveCropSelection ? window.bgImageItem.sourceSize.height * window.editScale : parent.height

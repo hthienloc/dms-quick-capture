@@ -260,6 +260,11 @@ PluginComponent {
             return "SUCCESS";
         }
 
+        function showHistory() : string {
+            root.showHistoryCarousel();
+            return "SUCCESS";
+        }
+
         target: "quickCapture"
         enabled: true
     }
