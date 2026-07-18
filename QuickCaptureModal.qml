@@ -964,13 +964,13 @@ DankModal {
     readonly property real _chromeH: Theme.spacingM * 2 + (window.toolbarVisible && _toolbarHorizontal ? 56 + Theme.spacingM : 0)
     readonly property real _minModalW: _toolbarHorizontal && window.toolbarItem && window.toolbarItem.width ? window.toolbarItem.width + Theme.spacingM * 2 : 400
     readonly property real _minModalH: !_toolbarHorizontal && window.toolbarItem && window.toolbarItem.height ? window.toolbarItem.height + Theme.spacingM * 2 : 300
-    readonly property bool _bgSizeKnown: window.bgImageItem !== null
+    readonly property bool _bgSizeKnown: window.bgImageItem
                                          && window.bgImageItem.status === Image.Ready
                                          && window.bgImageItem.sourceSize.width > 0
                                          && window.bgImageItem.sourceSize.height > 0
     // Compositor scale (not Screen.devicePixelRatio, which reports the integer buffer scale)
     readonly property real _outputScale: (window.targetScreen && CompositorService.getScreenScale(window.targetScreen)) || 1
-    readonly property bool _shouldScale: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.modalScaleToContent ? window.parentWidget.pluginData.modalScaleToContent : false
+    readonly property bool _shouldScale: !!(window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.modalScaleToContent)
     modalWidth: _shouldScale && _bgSizeKnown ? Math.round(Math.min(_maxModalW, Math.max(_minModalW, window.bgImageItem.sourceSize.width / _outputScale + _chromeW))) : _maxModalW
     modalHeight: _shouldScale && _bgSizeKnown ? Math.round(Math.min(_maxModalH, Math.max(_minModalH, window.bgImageItem.sourceSize.height / _outputScale + _chromeH))) : _maxModalH
     enableShadow: true
@@ -1291,7 +1291,6 @@ DankModal {
             window.commitTypingText();
         }
         // Clear any stale callback from a previous session that never completed
-        window.exportCallback = null;
         window.exportCallback = callback;
         if (!window.exportCanvasItem) {
             console.warn("exportCanvasItem is not initialized yet");
