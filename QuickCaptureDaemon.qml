@@ -17,7 +17,7 @@ PluginComponent {
     // ── State ────────────────────────────────────────────────────────────────
     property bool isCapturing: false
     readonly property string captureMode: (pluginData.captureMode || "region")
-    readonly property var allowedModes: ["region", "window", "full", "output", "all", "last", ""]
+    readonly property var allowedModes: ["region", "window", "full", "output", "all", "last", "scroll", ""]
     property string activeIpcMode: ""
     property bool isDownloading: false
     property string currentCapturePath: ""
@@ -41,6 +41,11 @@ PluginComponent {
 
         if (mode === "region" && pluginData.skipConfirm !== false) {
             args.push("--no-confirm");
+        }
+
+        if (mode === "scroll") {
+            const interval = parseInt(pluginData.scrollInterval || "500", 10);
+            args.push("--interval", String(interval));
         }
 
         if (mode === "output") {
@@ -111,7 +116,7 @@ PluginComponent {
                     ToastService.showError(errorMsg);
                 }
             }
-        }, 0, 60000);
+        }, 0, root.screenshotMode() === "scroll" ? 120000 : 60000);
     }
 
     function selectImageAndAnnotateWithAction(action) {
