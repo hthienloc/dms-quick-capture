@@ -967,8 +967,9 @@ DankModal {
                                          && (window.bgImageItem?.sourceSize.height ?? 0) > 0
     // Compositor scale (not Screen.devicePixelRatio, which reports the integer buffer scale)
     readonly property real _outputScale: (window.targetScreen && CompositorService.getScreenScale(window.targetScreen)) || 1
-    modalWidth: _bgSizeKnown ? Math.round(Math.min(_maxModalW, Math.max(_minModalW, (window.bgImageItem?.sourceSize.width ?? 0) / _outputScale + _chromeW))) : _maxModalW
-    modalHeight: _bgSizeKnown ? Math.round(Math.min(_maxModalH, Math.max(_minModalH, (window.bgImageItem?.sourceSize.height ?? 0) / _outputScale + _chromeH))) : _maxModalH
+    readonly property bool _shouldScale: window.parentWidget?.pluginData?.modalScaleToContent ?? false
+    modalWidth: _shouldScale && _bgSizeKnown ? Math.round(Math.min(_maxModalW, Math.max(_minModalW, (window.bgImageItem?.sourceSize.width ?? 0) / _outputScale + _chromeW))) : _maxModalW
+    modalHeight: _shouldScale && _bgSizeKnown ? Math.round(Math.min(_maxModalH, Math.max(_minModalH, (window.bgImageItem?.sourceSize.height ?? 0) / _outputScale + _chromeH))) : _maxModalH
     enableShadow: true
     positioning: "center"
 
