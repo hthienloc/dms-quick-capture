@@ -103,6 +103,28 @@ MouseArea {
                             case "rc": x2 = Math.max(x2 + dx, x1 + minSize); break;
                         }
 
+                        if (mouse.modifiers & Qt.ShiftModifier) {
+                            if (window.activeHandle === "tl" || window.activeHandle === "tr" ||
+                                window.activeHandle === "bl" || window.activeHandle === "br") {
+                                let w = x2 - x1;
+                                let h = y2 - y1;
+                                let side = Math.max(w, h);
+                                if (window.activeHandle === "br") {
+                                    x2 = x1 + side;
+                                    y2 = y1 + side;
+                                } else if (window.activeHandle === "tl") {
+                                    x1 = x2 - side;
+                                    y1 = y2 - side;
+                                } else if (window.activeHandle === "tr") {
+                                    x2 = x1 + side;
+                                    y1 = y2 - side;
+                                } else if (window.activeHandle === "bl") {
+                                    x1 = x2 - side;
+                                    y2 = y1 + side;
+                                }
+                            }
+                        }
+
                         const wasFlippedX = p0.x > p1.x;
                         const wasFlippedY = p0.y > p1.y;
                         const newP0 = Qt.point(wasFlippedX ? x2 : x1, wasFlippedY ? y2 : y1);
@@ -165,6 +187,27 @@ MouseArea {
                             case "rc": x2 = Math.max(x2 + dx, x1 + minSize); break;
                         }
 
+                        if (mouse.modifiers & Qt.ShiftModifier) {
+                            if (h === "tl" || h === "tr" || h === "bl" || h === "br") {
+                                let w = x2 - x1;
+                                let h_dim = y2 - y1;
+                                let side = Math.max(w, h_dim);
+                                if (h === "br") {
+                                    x2 = x1 + side;
+                                    y2 = y1 + side;
+                                } else if (h === "tl") {
+                                    x1 = x2 - side;
+                                    y1 = y2 - side;
+                                } else if (h === "tr") {
+                                    x2 = x1 + side;
+                                    y1 = y2 - side;
+                                } else if (h === "bl") {
+                                    x1 = x2 - side;
+                                    y2 = y1 + side;
+                                }
+                            }
+                        }
+
                         const wasFlippedX = p0.x > p1.x;
                         const wasFlippedY = p0.y > p1.y;
                         const newP0 = Qt.point(wasFlippedX ? x2 : x1, wasFlippedY ? y2 : y1);
@@ -183,10 +226,36 @@ MouseArea {
                         const newPoints = [...window.selectedStroke.points];
                         const hasLeader = window.selectedStroke.hasLeaderLine && window.selectedStroke.points.length >= 2;
                         if (window.activeHandle === "anchor" && hasLeader) {
-                            newPoints[0] = Qt.point(orig[0].x + dx, orig[0].y + dy);
+                            let newPt = Qt.point(orig[0].x + dx, orig[0].y + dy);
+                            if (mouse.modifiers & Qt.ShiftModifier) {
+                                const fixed = orig[1];
+                                const sdx = newPt.x - fixed.x;
+                                const sdy = newPt.y - fixed.y;
+                                const L = Math.sqrt(sdx * sdx + sdy * sdy);
+                                if (L > 0) {
+                                    const angle = Math.atan2(sdy, sdx);
+                                    const SNAP_STEP = Math.PI / 12;
+                                    const snapped = Math.round(angle / SNAP_STEP) * SNAP_STEP;
+                                    newPt = Qt.point(fixed.x + L * Math.cos(snapped), fixed.y + L * Math.sin(snapped));
+                                }
+                            }
+                            newPoints[0] = newPt;
                         } else if (window.activeHandle === "stamp") {
                             const idx = hasLeader ? 1 : 0;
-                            newPoints[idx] = Qt.point(orig[idx].x + dx, orig[idx].y + dy);
+                            let newPt = Qt.point(orig[idx].x + dx, orig[idx].y + dy);
+                            if (idx === 1 && (mouse.modifiers & Qt.ShiftModifier)) {
+                                const fixed = orig[0];
+                                const sdx = newPt.x - fixed.x;
+                                const sdy = newPt.y - fixed.y;
+                                const L = Math.sqrt(sdx * sdx + sdy * sdy);
+                                if (L > 0) {
+                                    const angle = Math.atan2(sdy, sdx);
+                                    const SNAP_STEP = Math.PI / 12;
+                                    const snapped = Math.round(angle / SNAP_STEP) * SNAP_STEP;
+                                    newPt = Qt.point(fixed.x + L * Math.cos(snapped), fixed.y + L * Math.sin(snapped));
+                                }
+                            }
+                            newPoints[idx] = newPt;
                         }
                         window.selectedStroke.points = newPoints;
                     }
