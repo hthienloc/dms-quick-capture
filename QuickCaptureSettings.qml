@@ -657,6 +657,7 @@ PluginSettings {
                 anchors.verticalCenter: parent.verticalCenter
 
                 DankIcon {
+                    id: scrollCaptureInfoIcon
                     name: "info"
                     size: 16
                     color: Theme.primary
@@ -664,7 +665,7 @@ PluginSettings {
                 }
 
                 StyledText {
-                    width: parent.width - 24
+                    width: parent.width - scrollCaptureInfoIcon.width - warningScrollRow.spacing
                     text: I18n.tr("Scroll capture: select a region, scroll content, then press Enter to finish.")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceText

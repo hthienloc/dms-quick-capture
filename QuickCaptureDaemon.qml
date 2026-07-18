@@ -22,6 +22,8 @@ PluginComponent {
     property bool isDownloading: false
     property string currentCapturePath: ""
     property string captureOutputName: ""
+    readonly property int captureTimeoutMs: 60000
+    readonly property int scrollCaptureTimeoutMs: 120000
     // Exposed so the widget surface can read annotation state without accessing internal modal id
     readonly property bool isAnnotating: modal.shouldBeVisible
 
@@ -44,7 +46,7 @@ PluginComponent {
         }
 
         if (mode === "scroll") {
-            const interval = parseInt(pluginData.scrollInterval || "500", 10);
+            const interval = parseInt(pluginData.scrollInterval, 10) || 500;
             args.push("--interval", String(interval));
         }
 
@@ -116,7 +118,7 @@ PluginComponent {
                     ToastService.showError(errorMsg);
                 }
             }
-        }, 0, root.screenshotMode() === "scroll" ? 120000 : 60000);
+        }, 0, root.screenshotMode() === "scroll" ? root.scrollCaptureTimeoutMs : root.captureTimeoutMs);
     }
 
     function selectImageAndAnnotateWithAction(action) {
