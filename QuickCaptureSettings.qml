@@ -702,8 +702,8 @@ PluginSettings {
             id: saveFilenamePattern
             settingKey: "saveFilenamePattern"
             label: I18n.tr("Save Filename Pattern")
-            placeholder: "Screenshot_%Y-%m-%d_%H-%M-%S"
-            defaultValue: "Screenshot_%Y-%m-%d_%H-%M-%S"
+            placeholder: "Screenshot-%Y-%m-%d_%H-%M-%S"
+            defaultValue: "Screenshot-%Y-%m-%d_%H-%M-%S"
         }
 
         InfoText {
