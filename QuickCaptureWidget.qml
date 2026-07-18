@@ -156,7 +156,7 @@ PluginComponent {
                 Repeater {
                     model: [
                         { icon: "restart_alt", text: I18n.tr("Last Region"), modeKey: "last" },
-                        { icon: "vertical_align_top", text: I18n.tr("Scrolling"), modeKey: "scroll" },
+                        { icon: "unfold_more", text: I18n.tr("Scrolling"), modeKey: "scroll" },
                         { icon: "grid_view", text: I18n.tr("All Outputs"), modeKey: "all" },
                     ]
                     delegate: menuItemComp
