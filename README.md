@@ -12,7 +12,7 @@ Screenshot and vector annotation plugin for DankMaterialShell (DMS).
 
 ## Requirements
 
-- DankMaterialShell >= 1.5
+- DankMaterialShell >= 1.5.2 (scroll capture requires DMS >= 1.5.2)
 - **ImageMagick** (provides `magick`/`mogrify`, required for WebP/JPEG exports, rotation/mirroring, and OCR/QR crop)
 - **img2pdf** (required for PDF export)
 - **tesseract** (required for OCR text scanner)
@@ -63,6 +63,7 @@ git checkout main && git pull
 2. **Select area** — drag to choose the screenshot region.
 3. **Annotate** — use the toolbar, keyboard shortcuts, or radial menus.
 4. **Finish** — press <kbd>Enter</kbd> (action depends on settings) or <kbd>Esc</kbd> to discard.
+   - **Scroll mode**: select a region, scroll the content, then press <kbd>Enter</kbd> to finish stitching. Adjust scroll interval in settings.
 
 ## Annotation Tools
 
@@ -155,7 +156,7 @@ dms ipc call quickCapture screenshot region float  # float directly
 
 | Command | Arguments | Description |
 |---------|-----------|-------------|
-| `screenshot` | `mode` (`default`, `region`, `full`, `all`, `output`, `window`, `last`) | Trigger capture |
+| `screenshot` | `mode` (`default`, `region`, `full`, `all`, `output`, `window`, `last`, `scroll`) | Trigger capture |
 | `selectFile` | — | Open file browser to pick an image |
 | `fromClipboard` | — | Annotate image from clipboard |
 | `openImage` | `path` | Open a specific image in the annotator |

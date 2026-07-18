@@ -573,7 +573,8 @@ PluginSettings {
                 { label: I18n.tr("All Combined Outputs"), value: "all" },
                 { label: I18n.tr("Specific Output"), value: "output" },
                 { label: I18n.tr("Focused Window"), value: "window" },
-                { label: I18n.tr("Last Selected Region"), value: "last" }
+                { label: I18n.tr("Last Selected Region"), value: "last" },
+                { label: I18n.tr("Scrolling Capture"), value: "scroll" }
             ]
             defaultValue: "region"
         }
@@ -642,6 +643,50 @@ PluginSettings {
             settingKey: "includeCursor"
             label: I18n.tr("Include Cursor")
             defaultValue: false
+        }
+
+        Item {
+            width: parent.width
+            height: visible ? warningScrollRow.implicitHeight + 4 : 0
+            visible: captureMode.value === "scroll"
+
+            Row {
+                id: warningScrollRow
+                width: parent.width
+                spacing: Theme.spacingS
+                anchors.verticalCenter: parent.verticalCenter
+
+                DankIcon {
+                    id: scrollCaptureInfoIcon
+                    name: "info"
+                    size: 16
+                    color: Theme.primary
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                StyledText {
+                    width: parent.width - scrollCaptureInfoIcon.width - warningScrollRow.spacing
+                    text: I18n.tr("Scroll capture: select a region, scroll content, then press Enter to finish.")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceText
+                    wrapMode: Text.Wrap
+                }
+            }
+        }
+
+        SliderSettingPlus {
+            id: scrollInterval
+            settingKey: "scrollInterval"
+            label: I18n.tr("Scroll Interval")
+            defaultValue: 500
+            minimum: 200
+            maximum: 2000
+            stepSize: 50
+            unit: "ms"
+            leftLabel: "200"
+            rightLabel: "2000"
+            visible: captureMode.value === "scroll"
+            height: visible ? implicitHeight : 0
         }
     }
 
