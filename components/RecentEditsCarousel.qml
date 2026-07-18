@@ -29,11 +29,10 @@ Item {
     function refresh() {
         if (!root.daemon || !root.daemon.pluginData) return
         var dir = root.daemon.pluginData.saveDirectory || "~/Pictures/Screenshots"
-        dir = String(dir).replace(/^~/, Quickshell.env("HOME"))
+        dir = String(dir).replace(/^~/, Quickshell.env("HOME") || "")
         var exts = ["png", "jpg", "jpeg", "webp"]
-        var globs = exts.map(function(e) { return "\"" + dir + "\"/*." + e }).join(" ")
-        var cmd = "for f in " + globs + "; do [ -f \"$f\" ] && echo \"$(stat -c '%Y' \"$f\" 2>/dev/null)|$f\"; done | sort -rn | head -50"
-        Proc.runCommand("scan-history", ["sh", "-c", cmd], function(stdout) {
+        var cmd = "d=\"$1\"; shift; for e in \"$@\"; do for f in \"$d\"/*.\"$e\"; do [ -f \"$f\" ] && echo \"$(stat -c '%Y' \"$f\" 2>/dev/null)|$f\"; done; done | sort -rn | head -50"
+        Proc.runCommand("scan-history", ["sh", "-c", cmd, "sh", dir].concat(exts), function(stdout) {
             var list = []
             var lines = stdout.trim().split("\n")
             for (var i = 0; i < lines.length; i++) {
@@ -144,7 +143,7 @@ Item {
                                         anchors.fill: parent
                                         anchors.margins: 4
                                         source: "file://" + modelData.savedPath
-                                        sourceSize.width: parent.width
+                                        sourceSize.width: 400
                                         fillMode: Image.PreserveAspectFit
                                         asynchronous: true
                                     }
