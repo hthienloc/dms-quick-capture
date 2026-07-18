@@ -60,6 +60,7 @@ MouseArea {
                 if (window.activeHandle === "none" && window.originalPoints.length > 0) {
                     const dx = absPt.x - window.pressCoords.x;
                     const dy = absPt.y - window.pressCoords.y;
+
                     if (window.selectedStroke.tool === "callout" && window.calloutDestDragging && window.originalPoints.length === 4) {
                         const newPoints = [...window.selectedStroke.points];
                         newPoints[2] = Qt.point(window.originalPoints[2].x + dx, window.originalPoints[2].y + dy);
@@ -117,10 +118,30 @@ MouseArea {
                         }
                     } else if (tool === "line" || tool === "arrow" || tool === "highlighter") {
                         const newPoints = [...window.selectedStroke.points];
+                        let targetIdx = -1;
+                        let fixedIdx = -1;
                         if (window.activeHandle === "start") {
-                            newPoints[0] = Qt.point(orig[0].x + dx, orig[0].y + dy);
+                            targetIdx = 0;
+                            fixedIdx = orig.length - 1;
                         } else if (window.activeHandle === "end") {
-                            newPoints[newPoints.length - 1] = Qt.point(orig[orig.length - 1].x + dx, orig[orig.length - 1].y + dy);
+                            targetIdx = orig.length - 1;
+                            fixedIdx = 0;
+                        }
+                        if (targetIdx !== -1) {
+                            let newPt = Qt.point(orig[targetIdx].x + dx, orig[targetIdx].y + dy);
+                            if (mouse.modifiers & Qt.ShiftModifier) {
+                                const fixed = orig[fixedIdx];
+                                const sdx = newPt.x - fixed.x;
+                                const sdy = newPt.y - fixed.y;
+                                const L = Math.sqrt(sdx * sdx + sdy * sdy);
+                                if (L > 0) {
+                                    const angle = Math.atan2(sdy, sdx);
+                                    const SNAP_STEP = Math.PI / 12;
+                                    const snapped = Math.round(angle / SNAP_STEP) * SNAP_STEP;
+                                    newPt = Qt.point(fixed.x + L * Math.cos(snapped), fixed.y + L * Math.sin(snapped));
+                                }
+                            }
+                            newPoints[targetIdx] = newPt;
                         }
                         window.selectedStroke.points = newPoints;
                     } else if (tool === "callout" && window.activeHandle && window.activeHandle.indexOf("src_") === 0 && orig.length === 4) {
