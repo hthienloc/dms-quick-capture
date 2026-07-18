@@ -1290,7 +1290,6 @@ DankModal {
         if (window.isTyping) {
             window.commitTypingText();
         }
-        // Clear any stale callback from a previous session that never completed
         window.exportCallback = callback;
         if (!window.exportCanvasItem) {
             console.warn("exportCanvasItem is not initialized yet");
@@ -1753,8 +1752,7 @@ DankModal {
             window.bgImageSource = window.restoreSource;
         } else if (window.currentCapturePath) {
             window.bgImageSource = "file://" + window.currentCapturePath;
-            // currentCapturePath is cleared in onDialogClosed to prevent losing it
-            // if this signal fires more than once during layout/screen changes
+            // currentCapturePath is consumed in onDialogClosed to survive re-fires during screen changes
         }
         window.isScreenshotDark = false;
         window.hasSampledContrast = false;
@@ -3185,9 +3183,8 @@ DankModal {
     }
 
     onDialogClosed: {
-        // Reset path state only after modal is fully closed, not in onOpened.
-        // This prevents blank canvas if the opened signal fires multiple times
-        // (e.g. during screen/layout changes) which would re-clear the source.
+        // Reset path state here (not in onOpened) so re-fires during layout/screen changes
+        // don't wipe bgImageSource before the image has a chance to render.
         window.currentCapturePath = "";
         window.restoreSource = "";
         window.bgImageSource = "";
