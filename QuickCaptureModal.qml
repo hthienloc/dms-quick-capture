@@ -357,7 +357,7 @@ DankModal {
     readonly property real editScale: {
         if (!window.bgImageItem) return 1.0;
         // When backdrop is active, render at screen resolution for sharp preview
-        if (window.effectiveBackdropMode !== "none") return window.fitScale;
+        if (window.effectiveBackdropMode !== "none") return Math.max(1e-3, window.fitScale);
         const w = window.bgImageItem.sourceSize.width;
         const h = window.bgImageItem.sourceSize.height;
         const max = Math.max(w, h);
