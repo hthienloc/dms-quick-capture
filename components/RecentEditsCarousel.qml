@@ -50,6 +50,13 @@ Item {
 
     onDaemonChanged: { if (root.daemon && root.daemon.pluginData) refresh() }
 
+    function removeEntryAndRefresh(path) {
+        root.entries = root.entries.filter(function(e) { return e.savedPath !== path })
+        if (root.previewIndex >= root.entries.length)
+            root.previewIndex = root.entries.length - 1
+        root.refresh()
+    }
+
     Column {
         anchors.fill: parent
         spacing: 0
@@ -237,8 +244,9 @@ Item {
                                     onClicked: {
                                         if (root.previewIndex === modelData._glIdx)
                                             root.previewIndex = -1
-                                        Proc.runCommand("delete-card", ["rm", "-f", modelData.savedPath], function() {
-                                            root.refresh()
+                                        var delPath = modelData.savedPath
+                                        Proc.runCommand("delete-card", ["rm", "-f", delPath], function() {
+                                            root.removeEntryAndRefresh(delPath)
                                         })
                                     }
 
@@ -381,7 +389,7 @@ Item {
                         var delPath = root.previewEntry.savedPath
                         root.previewIndex = -1
                         Proc.runCommand("delete-preview", ["rm", "-f", delPath], function() {
-                            root.refresh()
+                            root.removeEntryAndRefresh(delPath)
                         })
                     }
                 }
