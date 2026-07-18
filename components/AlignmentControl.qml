@@ -20,26 +20,48 @@ Item {
     })
 
     width: compact ? tc.btnSize : row.implicitWidth
-    height: compact ? tc.btnSizeCompact : tc.btnSize
+    height: compact ? 40 : tc.btnSize
 
     Row {
         id: row
-        spacing: compact ? tc.spacingCompact : Theme.spacingXS
-        anchors.centerIn: compact ? parent : undefined
-        anchors.verticalCenter: compact ? undefined : parent.verticalCenter
+        visible: !control.compact
+        spacing: Theme.spacingXS
+        anchors.verticalCenter: parent.verticalCenter
 
         DankIcon {
             name: "align_justify_center"
-            size: compact ? tc.iconSizeCompact : tc.backdropIconSize
+            size: tc.iconSize
             color: Theme.surfaceText
             anchors.verticalCenter: parent.verticalCenter
         }
         StyledText {
             text: control._labelMap[control.backdropAlignment] ?? "C"
-            width: compact ? 18 : 22; horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: compact ? tc.fontSizeCompact : Theme.fontSizeSmall
+            width: 22; horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceText
             anchors.verticalCenter: parent.verticalCenter
+        }
+    }
+
+    Column {
+        id: col
+        visible: control.compact
+        spacing: tc.spacingCompact
+        anchors.centerIn: parent
+
+        DankIcon {
+            name: "align_justify_center"
+            size: tc.iconSize
+            color: Theme.surfaceText
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+        StyledText {
+            text: control._labelMap[control.backdropAlignment] ?? "C"
+            width: parent.width
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.surfaceText
+            anchors.horizontalCenter: parent.horizontalCenter
         }
     }
 

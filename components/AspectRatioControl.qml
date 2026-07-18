@@ -16,17 +16,17 @@ Item {
     signal wheeled(int delta)
 
     width: compact ? tc.btnSize : row.implicitWidth
-    height: compact ? tc.btnSizeCompact : tc.btnSize
+    height: compact ? 40 : tc.btnSize
 
     Row {
         id: row
-        spacing: compact ? tc.spacingCompact : Theme.spacingXS
-        anchors.centerIn: compact ? parent : undefined
-        anchors.verticalCenter: compact ? undefined : parent.verticalCenter
+        visible: !control.compact
+        spacing: Theme.spacingXS
+        anchors.verticalCenter: parent.verticalCenter
 
         DankIcon {
             name: "aspect_ratio"
-            size: compact ? tc.iconSizeCompact : tc.backdropIconSize
+            size: tc.iconSize
             color: Theme.surfaceText
             anchors.verticalCenter: parent.verticalCenter
         }
@@ -36,10 +36,36 @@ Item {
                 if (control.backdropAspectRatio === "custom") return control.customAspectRatio.toFixed(2);
                 return control.backdropAspectRatio;
             }
-            width: compact ? 36 : 46; horizontalAlignment: Text.AlignLeft
-            font.pixelSize: compact ? tc.fontSizeCompact : Theme.fontSizeSmall
+            width: 46; horizontalAlignment: Text.AlignLeft
+            font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceText
             anchors.verticalCenter: parent.verticalCenter
+        }
+    }
+
+    Column {
+        id: col
+        visible: control.compact
+        spacing: tc.spacingCompact
+        anchors.centerIn: parent
+
+        DankIcon {
+            name: "aspect_ratio"
+            size: tc.iconSize
+            color: Theme.surfaceText
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+        StyledText {
+            text: {
+                if (control.backdropAspectRatio === "auto") return I18n.tr("AUTO");
+                if (control.backdropAspectRatio === "custom") return control.customAspectRatio.toFixed(2);
+                return control.backdropAspectRatio;
+            }
+            width: parent.width
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.surfaceText
+            anchors.horizontalCenter: parent.horizontalCenter
         }
     }
 
