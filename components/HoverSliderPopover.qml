@@ -7,8 +7,8 @@ Rectangle {
 
     ToolbarConstants { id: tc }
 
-    width: 120
-    height: tc.btnSize
+    width: isVertical ? tc.btnSize : 120
+    height: isVertical ? 120 : tc.btnSize
     color: Theme.surfaceContainer
     border.color: Theme.withAlpha(Theme.outline, 0.15)
     border.width: 1
@@ -24,14 +24,6 @@ Rectangle {
     onValueChanged: slider.value = value
 
     signal userValueChanged(int val)
-
-    width: isVertical ? tc.btnSize : 120
-    height: isVertical ? 120 : tc.btnSize
-    color: Theme.surfaceContainer
-    border.color: Theme.withAlpha(Theme.outline, 0.15)
-    border.width: 1
-    radius: Theme.cornerRadius
-    z: 10001
 
     visible: opacity > 0
     opacity: 0
