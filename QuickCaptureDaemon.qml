@@ -103,17 +103,28 @@ PluginComponent {
         const cursorVal = pluginData.includeCursor ? "on" : "off";
 
         if (action === "copy") {
-            const baseArgs = ["dms", "screenshot", mode, "--stdout", "--format", "png",
-                              "--cursor", cursorVal, "--no-notify"].concat(root.modeFlags());
-            const cmdStr = baseArgs.map(root.escShell).join(" ") + " | dms cl copy 2>&1";
+            const baseArgs = ["dms", "screenshot", mode, "--no-file", "--format", "png",
+                              "--cursor", cursorVal, "--no-notify", "--json"].concat(root.modeFlags());
+            const cmdStr = baseArgs.map(root.escShell).join(" ") + " 2>&1";
             Proc.runCommand("screenshot-copy", ["sh", "-c", cmdStr], (stdout, exitCode) => {
                 root.isCapturing = false;
                 root.activeIpcMode = "";
                 root.captureOutputName = "";
-                if (exitCode === 0 && typeof ToastService !== "undefined" && ToastService)
-                    ToastService.showInfo(I18n.tr("Copied to clipboard"));
-                else if (exitCode !== 0 && typeof ToastService !== "undefined" && ToastService)
-                    ToastService.showError(stdout.trim() || I18n.tr("Failed to capture"));
+                try {
+                    const trimmed = stdout.trim();
+                    const startIdx = trimmed.indexOf("{");
+                    const endIdx = trimmed.lastIndexOf("}");
+                    const meta = startIdx !== -1 && endIdx > startIdx
+                        ? JSON.parse(trimmed.substring(startIdx, endIdx + 1))
+                        : JSON.parse(trimmed);
+                    if (meta.status === "success" && typeof ToastService !== "undefined" && ToastService)
+                        ToastService.showInfo(I18n.tr("Copied to clipboard"));
+                    else if (meta.status !== "aborted" && typeof ToastService !== "undefined" && ToastService)
+                        ToastService.showError(meta.message || meta.error || I18n.tr("Screenshot failed (mode: %1).").arg(mode));
+                } catch (e) {
+                    if (typeof ToastService !== "undefined" && ToastService)
+                        ToastService.showError(I18n.tr("Screenshot failed (mode: %1).").arg(mode));
+                }
             }, 0, timeout);
             return;
         }
