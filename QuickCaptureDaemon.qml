@@ -105,7 +105,7 @@ PluginComponent {
         if (action === "copy") {
             const baseArgs = ["dms", "screenshot", mode, "--stdout", "--format", "png",
                               "--cursor", cursorVal, "--no-notify"].concat(root.modeFlags());
-            const cmdStr = baseArgs.map(root.escShell).join(" ") + " | wl-copy 2>&1";
+            const cmdStr = baseArgs.map(root.escShell).join(" ") + " | dms cl copy 2>&1";
             Proc.runCommand("screenshot-copy", ["sh", "-c", cmdStr], (stdout, exitCode) => {
                 root.isCapturing = false;
                 root.activeIpcMode = "";
