@@ -16,7 +16,7 @@ PluginComponent {
 
     // ── State ────────────────────────────────────────────────────────────────
     property bool isCapturing: false
-    readonly property string captureMode: (pluginData.captureMode || "region")
+    readonly property string middleClickAction: (pluginData.middleClickAction || "region")
     readonly property var allowedModes: ["region", "window", "full", "output", "all", "last", "scroll", ""]
     property string activeIpcMode: ""
     property bool isDownloading: false
@@ -33,11 +33,11 @@ PluginComponent {
     }
 
     function screenshotMode() {
-        return root.activeIpcMode !== "" ? root.activeIpcMode : root.captureMode;
+        return root.activeIpcMode !== "" ? root.activeIpcMode : root.middleClickAction;
     }
 
     function screenshotArgs(filename) {
-        const mode = root.activeIpcMode !== "" ? root.activeIpcMode : root.captureMode;
+        const mode = root.activeIpcMode !== "" ? root.activeIpcMode : root.middleClickAction;
         const cursorVal = pluginData.includeCursor ? "on" : "off";
         const args = ["dms", "screenshot", mode, "--no-clipboard", "--dir", "/tmp", "--filename", filename, "--format", "png", "--cursor", cursorVal, "--no-notify", "--json"];
 
@@ -177,6 +177,40 @@ PluginComponent {
     function openAction(path, action) {
         if (action === "float") {
             floatServiceItem.spawnWindow("file://" + path, pluginData, null, [path]);
+        } else if (action === "copy") {
+            DMSService.sendRequest("clipboard.copyFile", { "filePath": path });
+            if (typeof ToastService !== "undefined" && ToastService)
+                ToastService.showInfo(I18n.tr("Copied to clipboard"));
+            if (path.startsWith("/tmp/dms_capture_"))
+                Proc.runCommand("cleanup-temp-copy", ["rm", "-f", path]);
+        } else if (action === "save") {
+            const dir = pluginData.saveDirectory || "~/Pictures/Screenshots";
+            const escaped = "'" + path.replace(/'/g, "'\\''") + "'";
+            const cmd = "mkdir -p " + dir + " && cp " + escaped + " " + dir + "/Screenshot-$(date '+%Y-%m-%d_%H-%M-%S').png";
+            Proc.runCommand("capture-save", ["sh", "-c", cmd], (stdout, exitCode) => {
+                if (exitCode === 0) {
+                    if (typeof ToastService !== "undefined" && ToastService)
+                        ToastService.showInfo(I18n.tr("Screenshot saved"));
+                } else {
+                    if (typeof ToastService !== "undefined" && ToastService)
+                        ToastService.showError(I18n.tr("Failed to save screenshot"));
+                }
+                if (path.startsWith("/tmp/dms_capture_"))
+                    Proc.runCommand("cleanup-temp-save", ["rm", "-f", path]);
+            });
+        } else if (action === "copyAndSave") {
+            const dir = pluginData.saveDirectory || "~/Pictures/Screenshots";
+            const escaped = "'" + path.replace(/'/g, "'\\''") + "'";
+            const cmd = "mkdir -p " + dir + " && cp " + escaped + " " + dir + "/Screenshot-$(date '+%Y-%m-%d_%H-%M-%S').png";
+            DMSService.sendRequest("clipboard.copyFile", { "filePath": path });
+            if (typeof ToastService !== "undefined" && ToastService)
+                ToastService.showInfo(I18n.tr("Copied & saved"));
+            Proc.runCommand("capture-copy-save", ["sh", "-c", cmd], (stdout, exitCode) => {
+                if (exitCode !== 0 && typeof ToastService !== "undefined" && ToastService)
+                    ToastService.showError(I18n.tr("Failed to save screenshot"));
+                if (path.startsWith("/tmp/dms_capture_"))
+                    Proc.runCommand("cleanup-temp-copy-save", ["rm", "-f", path]);
+            });
         } else {
             modal.currentCapturePath = path;
             modal.shouldBeVisible = true;

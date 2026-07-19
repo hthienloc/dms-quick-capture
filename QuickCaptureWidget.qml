@@ -22,6 +22,17 @@ PluginComponent {
 
     property bool outputExpanded: false
     property var outputList: []
+
+    function execAction(action) {
+        if (!root.daemon) return;
+        if (action === "clipboard")
+            root.daemon.fromClipboardWithAction("edit");
+        else if (action === "selectFile")
+            root.daemon.selectImageAndAnnotateWithAction("edit");
+        else
+            root.daemon.triggerCaptureWithAction(action, "edit");
+    }
+
     function refreshOutputList() {
         Proc.runCommand("list-outputs", ["dms", "screenshot", "list"], (stdout) => {
             const list = [];
@@ -424,10 +435,18 @@ PluginComponent {
                 id: itemMouse
                 anchors.fill: parent
                 anchors.rightMargin: 28
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onPressed: mouse => itemRipple.trigger(mouse.x, mouse.y)
-                onClicked: execMode("edit")
+                onClicked: (mouse) => {
+                    if (mouse.button === Qt.RightButton) {
+                        const action = root.daemon ? (root.daemon.pluginData.menuRightClickAction || "copy") : "copy";
+                        execMode(action);
+                    } else {
+                        execMode("edit");
+                    }
+                }
             }
 
             MouseArea {
@@ -483,7 +502,8 @@ PluginComponent {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: (mouse) => {
                     if (mouse.button === Qt.MiddleButton) {
-                        if (root.daemon) root.daemon.triggerCaptureWithAction("default", "edit");
+                        const action = root.daemon ? (root.daemon.pluginData.middleClickAction || "region") : "region";
+                        root.execAction(action);
                     }
                 }
             }
@@ -529,7 +549,8 @@ PluginComponent {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: (mouse) => {
                     if (mouse.button === Qt.MiddleButton) {
-                        if (root.daemon) root.daemon.triggerCaptureWithAction("default", "edit");
+                        const action = root.daemon ? (root.daemon.pluginData.middleClickAction || "region") : "region";
+                        root.execAction(action);
                     }
                 }
             }
@@ -539,7 +560,9 @@ PluginComponent {
     // ── Bar Pill interactions ─────────────────────────────────────────────────
     // popout auto-opens on left click when pillClickAction is not set and popoutContent is defined
     pillRightClickAction: function() {
-        if (root.daemon) root.daemon.fromClipboardWithAction("edit");
+        if (!root.daemon) return;
+        const action = root.daemon.pluginData.rightClickAction || "clipboard";
+        root.execAction(action);
     }
 
     // ── Control Center integration ────────────────────────────────────────────
@@ -548,7 +571,8 @@ PluginComponent {
     ccWidgetSecondaryText: root.isActive ? (daemon.isCapturing ? "Capturing..." : "Annotating") : "Ready"
     ccWidgetIsActive: root.isActive
     onCcWidgetToggled: {
-        if (root.daemon) root.daemon.triggerCaptureWithAction("default", "edit");
+        const action = root.daemon ? (root.daemon.pluginData.middleClickAction || "region") : "region";
+        root.execAction(action);
     }
     ccDetailHeight: 240
 
