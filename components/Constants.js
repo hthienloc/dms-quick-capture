@@ -34,3 +34,10 @@ const defaultRadialTools = ["pen", "arrow", "rect", "highlighter", "ellipse", "s
 
 // Selection resize handles
 const selectionHandleSize = 10;
+
+// Text speech bubble configuration
+const textBubblePaddingMultiplierX = 0.5;
+const textBubblePaddingMultiplierY = 0.3;
+const textBubbleDefaultRadius = 8;
+const textBubbleMinRadius = 8;
+const textBubbleDragThreshold = 10;

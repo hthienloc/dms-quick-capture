@@ -446,7 +446,7 @@ function getStrokeBBox(stroke, estimateTextWidthFn) {
     if (len === 0) return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
 
     if (stroke.tool === "text") {
-        const p0 = pts[0];
+        const txtPt = (stroke.isSpeechBubble && len >= 2) ? pts[1] : pts[0];
         const fontSize = stroke.width;
         const txt = stroke.text || "";
         const lines = String(txt).split("\n");
@@ -458,12 +458,12 @@ function getStrokeBBox(stroke, estimateTextWidthFn) {
             textW = Math.max(Constants.minTextWidth, estimateTextWidthFn(txt, fontSize, stroke.isBold === true, stroke.isMonospace === true));
         }
         let textH = fontSize + (numLines - 1) * lineHeight;
-        let textX = p0.x;
-        let textY = p0.y;
+        let textX = txtPt.x;
+        let textY = txtPt.y;
 
-        if (stroke.hasBackground) {
-            const padX = fontSize * Constants.textPaddingMultiplierX;
-            const padY = fontSize * Constants.textPaddingMultiplierY;
+        if (stroke.hasBackground || stroke.isSpeechBubble) {
+            const padX = fontSize * (stroke.isSpeechBubble ? Constants.textBubblePaddingMultiplierX : Constants.textPaddingMultiplierX);
+            const padY = fontSize * (stroke.isSpeechBubble ? Constants.textBubblePaddingMultiplierY : Constants.textPaddingMultiplierY);
             textX -= padX;
             textY -= padY;
             textW += padX * 2;
@@ -473,6 +473,14 @@ function getStrokeBBox(stroke, estimateTextWidthFn) {
         maxX = textX + textW;
         minY = textY;
         maxY = textY + textH;
+
+        if (stroke.isSpeechBubble && len >= 2) {
+            const pTarget = pts[0];
+            minX = Math.min(minX, pTarget.x);
+            maxX = Math.max(maxX, pTarget.x);
+            minY = Math.min(minY, pTarget.y);
+            maxY = Math.max(maxY, pTarget.y);
+        }
     } else if (stroke.tool === "stamp") {
         const radius = stroke.width * Constants.stampRadiusMultiplier + Constants.stampSelectThresholdOffset;
         if (stroke.hasLeaderLine && len >= 2) {
@@ -639,7 +647,7 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
                 if (dist <= radius) return i;
             }
         } else if (stroke.tool === "text") {
-            const p0 = stroke.points[0];
+            const txtPt = (stroke.isSpeechBubble && stroke.points.length >= 2) ? stroke.points[1] : stroke.points[0];
             const fontSize = stroke.width;
             const txt = stroke.text || "";
             const lines = String(txt).split("\n");
@@ -648,20 +656,51 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
 
             let textW = Math.max(Constants.minTextWidth, estimateTextWidthFn(txt, fontSize, stroke.isBold === true, stroke.isMonospace === true));
             let textH = fontSize + (numLines - 1) * lineHeight;
-            let textY = p0.y;
-            let textX = p0.x;
+            let textY = txtPt.y;
+            let textX = txtPt.x;
 
-            if (stroke.hasBackground) {
-                const padX = fontSize * Constants.textPaddingMultiplierX;
-                const padY = fontSize * Constants.textPaddingMultiplierY;
+            if (stroke.isSpeechBubble) {
+                const padX = fontSize * Constants.textBubblePaddingMultiplierX;
+                const padY = fontSize * Constants.textBubblePaddingMultiplierY;
                 textX -= padX;
                 textY -= padY;
                 textW += padX * 2;
                 textH += padY * 2;
-            }
 
-            if (mx >= textX - Constants.ocrSelectionPadding && mx <= textX + textW + Constants.ocrSelectionPadding && my >= textY - Constants.ocrSelectionPadding && my <= textY + textH + Constants.ocrSelectionPadding) {
-                return i;
+                if (mx >= textX - Constants.ocrSelectionPadding && mx <= textX + textW + Constants.ocrSelectionPadding && my >= textY - Constants.ocrSelectionPadding && my <= textY + textH + Constants.ocrSelectionPadding) {
+                    return i;
+                }
+
+                if (stroke.points.length >= 2) {
+                    const pTarget = stroke.points[0];
+                    const dx = pTarget.x - txtPt.x;
+                    const dy = pTarget.y - txtPt.y;
+                    const lenSq = dx * dx + dy * dy;
+                    let dist = Infinity;
+                    if (lenSq === 0) {
+                        dist = Math.sqrt((mx - txtPt.x) * (mx - txtPt.x) + (my - txtPt.y) * (my - txtPt.y));
+                    } else {
+                        let t = ((mx - txtPt.x) * dx + (my - txtPt.y) * dy) / lenSq;
+                        t = Math.max(0, Math.min(1, t));
+                        const px = txtPt.x + t * dx;
+                        const py = txtPt.y + t * dy;
+                        dist = Math.sqrt((mx - px) * (mx - px) + (my - py) * (my - py));
+                    }
+                    if (dist < threshold) return i;
+                }
+            } else {
+                if (stroke.hasBackground) {
+                    const padX = fontSize * Constants.textPaddingMultiplierX;
+                    const padY = fontSize * Constants.textPaddingMultiplierY;
+                    textX -= padX;
+                    textY -= padY;
+                    textW += padX * 2;
+                    textH += padY * 2;
+                }
+
+                if (mx >= textX - Constants.ocrSelectionPadding && mx <= textX + textW + Constants.ocrSelectionPadding && my >= textY - Constants.ocrSelectionPadding && my <= textY + textH + Constants.ocrSelectionPadding) {
+                    return i;
+                }
             }
         } else if (stroke.tool === "callout" && stroke.points.length === 4) {
             const srcP0 = stroke.points[0];
@@ -751,6 +790,14 @@ function getStrokeHandleAt(mx, my, stroke, estimateTextWidthFn) {
         if (Math.abs(mx - cx) <= threshold && Math.abs(my - y2) <= threshold) return "src_bc";
         if (Math.abs(mx - x1) <= threshold && Math.abs(my - cy) <= threshold) return "src_lc";
         if (Math.abs(mx - x2) <= threshold && Math.abs(my - cy) <= threshold) return "src_rc";
+        return "none";
+    }
+
+    if (stroke.tool === "text" && stroke.isSpeechBubble && stroke.points.length >= 2) {
+        const p0 = stroke.points[0];
+        const p1 = stroke.points[1];
+        if (Math.abs(mx - p0.x) <= threshold && Math.abs(my - p0.y) <= threshold) return "start";
+        if (Math.abs(mx - p1.x) <= threshold && Math.abs(my - p1.y) <= threshold) return "end";
         return "none";
     }
 

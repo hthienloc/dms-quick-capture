@@ -3,6 +3,7 @@ import Quickshell
 import qs.Common
 import qs.Services
 import "Helpers.js" as Helpers
+import "Constants.js" as Constants
 
 MouseArea {
     id: drawMouseArea
@@ -138,7 +139,7 @@ MouseArea {
                         if (tool === "redact") {
                             window.selectedStroke.cachedCleanColor = undefined;
                         }
-                    } else if (tool === "line" || tool === "arrow" || tool === "highlighter") {
+                    } else if (tool === "line" || tool === "arrow" || tool === "highlighter" || (tool === "text" && window.selectedStroke.isSpeechBubble)) {
                         const newPoints = [...window.selectedStroke.points];
                         let targetIdx = -1;
                         let fixedIdx = -1;
@@ -362,7 +363,7 @@ MouseArea {
                       window.currentStroke.points.push(finalPt);
                   }
               } else if (window.currentTool === "rect" || window.currentTool === "ellipse" || window.currentTool === "arrow" || window.currentTool === "line"
-                       || window.currentTool === "pixelate" || window.currentTool === "highlighter" || window.currentTool === "spotlight" || window.currentTool === "callout") {
+                       || window.currentTool === "pixelate" || window.currentTool === "highlighter" || window.currentTool === "spotlight" || window.currentTool === "callout" || window.currentTool === "text") {
                   
                  let finalPt = absPt;
                  if ((mouse.modifiers & Qt.ShiftModifier) && (window.currentTool === "line" || window.currentTool === "arrow" || window.currentTool === "highlighter")) {
@@ -390,6 +391,18 @@ MouseArea {
                   } else {
                       window.currentStroke.points.push(finalPt);
                   }
+
+                 if (window.currentTool === "text") {
+                     const p0 = window.currentStroke.points[0];
+                     const dx = finalPt.x - p0.x;
+                     const dy = finalPt.y - p0.y;
+                     const dist = Math.sqrt(dx * dx + dy * dy);
+                     if (dist > Constants.textBubbleDragThreshold / window.editScale) {
+                         window.currentStroke.isSpeechBubble = true;
+                     } else {
+                         window.currentStroke.isSpeechBubble = false;
+                     }
+                 }
               } else if (window.currentTool === "stamp") {
                    const p0 = window.currentStroke.points[0];
                    if (p0) {
@@ -397,7 +410,7 @@ MouseArea {
                        const dx = absPt.x - p0.x;
                        const dy = absPt.y - p0.y;
                        const dist = Math.sqrt(dx * dx + dy * dy);
-                       if (dist > 10 / window.editScale) {
+                       if (dist > Constants.textBubbleDragThreshold / window.editScale) {
                            window.currentStroke.hasLeaderLine = true;
                            
                            if (mouse.modifiers & Qt.ShiftModifier) {
@@ -689,12 +702,22 @@ MouseArea {
 
         // Annotation Mode: perform drawing!
         if (window.currentTool === "text") {
-            window.typingCoords = getAbsolutePoint(mouse.x, mouse.y);
-            window.currentTypingText = "";
-            window.isTyping = true;
-            if (window.textInputMode === "popup") {
-                textInputDialog.open();
-            }
+            const absPt = getAbsolutePoint(mouse.x, mouse.y);
+            window.pressCoords = absPt;
+            window.currentStroke = {
+                tool: "text",
+                color: window.currentColor.toString(),
+                width: window.textFontSize,
+                points: [absPt],
+                isSpeechBubble: false,
+                text: "",
+                isBold: window.textBold,
+                isItalic: window.textItalic,
+                isUnderline: window.textUnderline,
+                hasBackground: window.textBackground,
+                cornerRadius: window.textCornerRadius,
+                fontFamily: window.textFontFamily
+            };
             if (window.activeCanvas) window.activeCanvas.requestPaint();
             return;
         }
@@ -767,7 +790,13 @@ MouseArea {
 
         window.editingStroke = stroke;
         window.selectedStroke = null;
-        window.typingCoords = Qt.point(stroke.points[0].x, stroke.points[0].y);
+        window.typingIsSpeechBubble = stroke.isSpeechBubble || false;
+        window.typingCoords = (stroke.isSpeechBubble && stroke.points.length >= 2)
+            ? Qt.point(stroke.points[1].x, stroke.points[1].y)
+            : Qt.point(stroke.points[0].x, stroke.points[0].y);
+        if (stroke.isSpeechBubble && stroke.points.length >= 2) {
+            window.typingTargetCoords = Qt.point(stroke.points[0].x, stroke.points[0].y);
+        }
         window.currentTypingText = stroke.text;
         window.isTyping = true;
         window.currentColor = stroke.color;
@@ -834,6 +863,22 @@ MouseArea {
 
         if (!window.currentStroke) return;
         let stroke = window.currentStroke;
+        if (stroke.tool === "text") {
+            const hasDrag = stroke.isSpeechBubble && stroke.points.length >= 2;
+            window.typingIsSpeechBubble = hasDrag;
+            window.typingCoords = hasDrag ? stroke.points[1] : stroke.points[0];
+            if (hasDrag) {
+                window.typingTargetCoords = stroke.points[0];
+            }
+            window.currentTypingText = "";
+            window.isTyping = true;
+            window.currentStroke = null;
+            if (window.textInputMode === "popup") {
+                textInputDialog.open();
+            }
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+            return;
+        }
         if (stroke.tool === "callout" && stroke.points.length >= 2) {
             const p0 = stroke.points[0];
             const p1 = stroke.points[stroke.points.length - 1];
