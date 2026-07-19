@@ -462,8 +462,8 @@ function getStrokeBBox(stroke, estimateTextWidthFn) {
         let textY = txtPt.y;
 
         if (stroke.hasBackground || stroke.isSpeechBubble) {
-            const padX = fontSize * (stroke.isSpeechBubble ? 0.5 : Constants.textPaddingMultiplierX);
-            const padY = fontSize * (stroke.isSpeechBubble ? 0.3 : Constants.textPaddingMultiplierY);
+            const padX = fontSize * (stroke.isSpeechBubble ? Constants.textBubblePaddingMultiplierX : Constants.textPaddingMultiplierX);
+            const padY = fontSize * (stroke.isSpeechBubble ? Constants.textBubblePaddingMultiplierY : Constants.textPaddingMultiplierY);
             textX -= padX;
             textY -= padY;
             textW += padX * 2;
@@ -660,8 +660,8 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
             let textX = txtPt.x;
 
             if (stroke.isSpeechBubble) {
-                const padX = fontSize * 0.5;
-                const padY = fontSize * 0.3;
+                const padX = fontSize * Constants.textBubblePaddingMultiplierX;
+                const padY = fontSize * Constants.textBubblePaddingMultiplierY;
                 textX -= padX;
                 textY -= padY;
                 textW += padX * 2;

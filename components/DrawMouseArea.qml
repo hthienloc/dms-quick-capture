@@ -3,6 +3,7 @@ import Quickshell
 import qs.Common
 import qs.Services
 import "Helpers.js" as Helpers
+import "Constants.js" as Constants
 
 MouseArea {
     id: drawMouseArea
@@ -396,7 +397,7 @@ MouseArea {
                      const dx = finalPt.x - p0.x;
                      const dy = finalPt.y - p0.y;
                      const dist = Math.sqrt(dx * dx + dy * dy);
-                     if (dist > 10 / window.editScale) {
+                     if (dist > Constants.textBubbleDragThreshold / window.editScale) {
                          window.currentStroke.isSpeechBubble = true;
                      } else {
                          window.currentStroke.isSpeechBubble = false;
@@ -409,7 +410,7 @@ MouseArea {
                        const dx = absPt.x - p0.x;
                        const dy = absPt.y - p0.y;
                        const dist = Math.sqrt(dx * dx + dy * dy);
-                       if (dist > 10 / window.editScale) {
+                       if (dist > Constants.textBubbleDragThreshold / window.editScale) {
                            window.currentStroke.hasLeaderLine = true;
                            
                            if (mouse.modifiers & Qt.ShiftModifier) {

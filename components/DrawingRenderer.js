@@ -551,14 +551,14 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
                 if (m.width > maxWidth) maxWidth = m.width;
             }
             const h = stroke.width;
-            const padX = h * 0.5;
-            const padY = h * 0.3;
+            const padX = h * (isBubble ? Constants.textBubblePaddingMultiplierX : Constants.textPaddingMultiplierX);
+            const padY = h * (isBubble ? Constants.textBubblePaddingMultiplierY : Constants.textPaddingMultiplierY);
             const totalH = lines.length * lineHeight - (lineHeight - h);
             const rx = pt.x - padX;
             const ry = pt.y - padY;
             const rw = maxWidth + padX * 2;
             const rh = totalH + padY * 2;
-            const radius = Math.max(8, stroke.cornerRadius || 8);
+            const radius = isBubble ? Math.max(Constants.textBubbleMinRadius, stroke.cornerRadius || Constants.textBubbleDefaultRadius) : (stroke.cornerRadius || 0);
 
             ctx.save();
 
@@ -600,28 +600,52 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
 
                 if (activeEdge === "top") {
                     let closestX = Math.max(rx, Math.min(tx, rx + rw));
-                    closestX = Math.max(rx + radius + tailBaseSize, Math.min(closestX, rx + rw - radius - tailBaseSize));
+                    const minAllowedX = rx + radius + tailBaseSize;
+                    const maxAllowedX = rx + rw - radius - tailBaseSize;
+                    if (maxAllowedX >= minAllowedX) {
+                        closestX = Math.max(minAllowedX, Math.min(closestX, maxAllowedX));
+                    } else {
+                        closestX = rx + rw / 2;
+                    }
                     base1X = closestX - tailBaseSize;
                     base1Y = ry;
                     base2X = closestX + tailBaseSize;
                     base2Y = ry;
                 } else if (activeEdge === "bottom") {
                     let closestX = Math.max(rx, Math.min(tx, rx + rw));
-                    closestX = Math.max(rx + radius + tailBaseSize, Math.min(closestX, rx + rw - radius - tailBaseSize));
+                    const minAllowedX = rx + radius + tailBaseSize;
+                    const maxAllowedX = rx + rw - radius - tailBaseSize;
+                    if (maxAllowedX >= minAllowedX) {
+                        closestX = Math.max(minAllowedX, Math.min(closestX, maxAllowedX));
+                    } else {
+                        closestX = rx + rw / 2;
+                    }
                     base1X = closestX - tailBaseSize;
                     base1Y = ry + rh;
                     base2X = closestX + tailBaseSize;
                     base2Y = ry + rh;
                 } else if (activeEdge === "left") {
                     let closestY = Math.max(ry, Math.min(ty, ry + rh));
-                    closestY = Math.max(ry + radius + tailBaseSize, Math.min(closestY, ry + rh - radius - tailBaseSize));
+                    const minAllowedY = ry + radius + tailBaseSize;
+                    const maxAllowedY = ry + rh - radius - tailBaseSize;
+                    if (maxAllowedY >= minAllowedY) {
+                        closestY = Math.max(minAllowedY, Math.min(closestY, maxAllowedY));
+                    } else {
+                        closestY = ry + rh / 2;
+                    }
                     base1X = rx;
                     base1Y = closestY - tailBaseSize;
                     base2X = rx;
                     base2Y = closestY + tailBaseSize;
                 } else if (activeEdge === "right") {
                     let closestY = Math.max(ry, Math.min(ty, ry + rh));
-                    closestY = Math.max(ry + radius + tailBaseSize, Math.min(closestY, ry + rh - radius - tailBaseSize));
+                    const minAllowedY = ry + radius + tailBaseSize;
+                    const maxAllowedY = ry + rh - radius - tailBaseSize;
+                    if (maxAllowedY >= minAllowedY) {
+                        closestY = Math.max(minAllowedY, Math.min(closestY, maxAllowedY));
+                    } else {
+                        closestY = ry + rh / 2;
+                    }
                     base1X = rx + rw;
                     base1Y = closestY - tailBaseSize;
                     base2X = rx + rw;
