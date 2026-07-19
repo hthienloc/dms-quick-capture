@@ -210,8 +210,6 @@ PluginComponent {
                     else
                         ToastService.showError(I18n.tr("Failed to save screenshot"));
                 }
-                if (path.startsWith("/tmp/dms_capture_"))
-                    Proc.runCommand("cleanup-temp-copy-save", ["rm", "-f", path]);
             });
         } else {
             modal.currentCapturePath = path;
