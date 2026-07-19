@@ -314,18 +314,22 @@ PluginComponent {
 
     // ── IPC handlers ─────────────────────────────────────────────────────────
     IpcHandler {
+        function sanitizeAction(action: string) : string {
+            return action === "float" ? "float" : "edit";
+        }
+
         function screenshot(mode: string, action: string) : string {
-            root.triggerCaptureWithAction(mode, action);
+            root.triggerCaptureWithAction(mode, root.sanitizeAction(action));
             return "SUCCESS";
         }
 
         function selectFile(action: string) : string {
-            root.selectImageAndAnnotateWithAction(action);
+            root.selectImageAndAnnotateWithAction(root.sanitizeAction(action));
             return "SUCCESS";
         }
 
         function fromClipboard(action: string) : string {
-            root.fromClipboardWithAction(action);
+            root.fromClipboardWithAction(root.sanitizeAction(action));
             return "SUCCESS";
         }
 
@@ -333,7 +337,7 @@ PluginComponent {
             if (path.startsWith("file://")) {
                 path = path.substring(7);
             }
-            root.loadImageFromUriWithAction(path, action);
+            root.loadImageFromUriWithAction(path, root.sanitizeAction(action));
             return "SUCCESS";
         }
 
