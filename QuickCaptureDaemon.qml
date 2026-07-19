@@ -98,41 +98,7 @@ PluginComponent {
     function startActualCapture() {
         const action = captureDelayTimer.captureAction || "edit";
         const mode = root.screenshotMode();
-        const isScroll = mode === "scroll";
-        const timeout = isScroll ? root.scrollCaptureTimeoutMs : root.captureTimeoutMs;
-        const cursorVal = pluginData.includeCursor ? "on" : "off";
-
-        if (action === "copy") {
-            const baseArgs = ["dms", "screenshot", mode, "--no-file", "--format", "png",
-                              "--cursor", cursorVal, "--no-notify", "--json"].concat(root.modeFlags());
-            const cmdStr = baseArgs.map(root.escShell).join(" ") + " 2>&1";
-            Proc.runCommand("screenshot-copy", ["sh", "-c", cmdStr], (stdout, exitCode) => {
-                root.isCapturing = false;
-                root.activeIpcMode = "";
-                root.captureOutputName = "";
-                const trimmed = (stdout || "").trim();
-                if (exitCode !== 0) {
-                    if (typeof ToastService !== "undefined" && ToastService)
-                        ToastService.showError(trimmed || I18n.tr("Screenshot failed (mode: %1).").arg(mode));
-                    return;
-                }
-                try {
-                    const startIdx = trimmed.indexOf("{");
-                    const endIdx = trimmed.lastIndexOf("}");
-                    const meta = startIdx !== -1 && endIdx > startIdx
-                        ? JSON.parse(trimmed.substring(startIdx, endIdx + 1))
-                        : JSON.parse(trimmed);
-                    if (meta.status === "success" && typeof ToastService !== "undefined" && ToastService)
-                        ToastService.showInfo(I18n.tr("Copied to clipboard"));
-                    else if (meta.status !== "aborted" && typeof ToastService !== "undefined" && ToastService)
-                        ToastService.showError(meta.message || meta.error || I18n.tr("Screenshot failed (mode: %1).").arg(mode));
-                } catch (e) {
-                    if (typeof ToastService !== "undefined" && ToastService)
-                        ToastService.showError(trimmed || I18n.tr("Screenshot failed (mode: %1).").arg(mode));
-                }
-            }, 0, timeout);
-            return;
-        }
+        const timeout = mode === "scroll" ? root.scrollCaptureTimeoutMs : root.captureTimeoutMs;
 
         root.currentCapturePath = root.capturePath();
         const filename = root.currentCapturePath.split("/").pop();
