@@ -185,8 +185,10 @@ PluginComponent {
                 Proc.runCommand("cleanup-temp-copy", ["rm", "-f", path]);
         } else if (action === "save") {
             const dir = pluginData.saveDirectory || "~/Pictures/Screenshots";
-            const escaped = "'" + path.replace(/'/g, "'\\''") + "'";
-            const cmd = "mkdir -p " + dir + " && cp " + escaped + " " + dir + "/Screenshot-$(date '+%Y-%m-%d_%H-%M-%S').png";
+            const esc = s => "'" + s.replace(/'/g, "'\\''") + "'";
+            const escapedDir = dir.startsWith("~/") ? "$HOME/" + esc(dir.slice(2)) : esc(dir);
+            const escapedPath = esc(path);
+            const cmd = "mkdir -p -- " + escapedDir + " && cp -- " + escapedPath + " " + escapedDir + "/Screenshot-$(date '+%Y-%m-%d_%H-%M-%S').png";
             Proc.runCommand("capture-save", ["sh", "-c", cmd], (stdout, exitCode) => {
                 if (exitCode === 0) {
                     if (typeof ToastService !== "undefined" && ToastService)
@@ -200,14 +202,18 @@ PluginComponent {
             });
         } else if (action === "copyAndSave") {
             const dir = pluginData.saveDirectory || "~/Pictures/Screenshots";
-            const escaped = "'" + path.replace(/'/g, "'\\''") + "'";
-            const cmd = "mkdir -p " + dir + " && cp " + escaped + " " + dir + "/Screenshot-$(date '+%Y-%m-%d_%H-%M-%S').png";
+            const esc = s => "'" + s.replace(/'/g, "'\\''") + "'";
+            const escapedDir = dir.startsWith("~/") ? "$HOME/" + esc(dir.slice(2)) : esc(dir);
+            const escapedPath = esc(path);
+            const cmd = "mkdir -p -- " + escapedDir + " && cp -- " + escapedPath + " " + escapedDir + "/Screenshot-$(date '+%Y-%m-%d_%H-%M-%S').png";
             DMSService.sendRequest("clipboard.copyFile", { "filePath": path });
-            if (typeof ToastService !== "undefined" && ToastService)
-                ToastService.showInfo(I18n.tr("Copied & saved"));
             Proc.runCommand("capture-copy-save", ["sh", "-c", cmd], (stdout, exitCode) => {
-                if (exitCode !== 0 && typeof ToastService !== "undefined" && ToastService)
-                    ToastService.showError(I18n.tr("Failed to save screenshot"));
+                if (typeof ToastService !== "undefined" && ToastService) {
+                    if (exitCode === 0)
+                        ToastService.showInfo(I18n.tr("Copied & saved"));
+                    else
+                        ToastService.showError(I18n.tr("Failed to save screenshot"));
+                }
                 if (path.startsWith("/tmp/dms_capture_"))
                     Proc.runCommand("cleanup-temp-copy-save", ["rm", "-f", path]);
             });
