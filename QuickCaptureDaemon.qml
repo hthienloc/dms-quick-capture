@@ -179,8 +179,6 @@ PluginComponent {
             DMSService.sendRequest("clipboard.copyFile", { "filePath": path });
             if (typeof ToastService !== "undefined" && ToastService)
                 ToastService.showInfo(I18n.tr("Copied to clipboard"));
-            if (path.startsWith("/tmp/dms_capture_"))
-                Proc.runCommand("cleanup-temp-copy", ["rm", "-f", path]);
         } else if (action === "save") {
             const dir = pluginData.saveDirectory || "~/Pictures/Screenshots";
             const esc = s => "'" + s.replace(/'/g, "'\\''") + "'";
