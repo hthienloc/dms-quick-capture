@@ -17,7 +17,7 @@ PluginComponent {
     // ── State ────────────────────────────────────────────────────────────────
     property bool isCapturing: false
     readonly property string middleClickAction: (pluginData.middleClickAction || "region")
-    readonly property var allowedModes: ["region", "window", "full", "output", "all", "last", "scroll", ""]
+    readonly property var allowedModes: ["region", "window", "full", "output", "all", "last", "scroll"]
     property string activeIpcMode: ""
     property bool isDownloading: false
     property string currentCapturePath: ""
@@ -59,14 +59,12 @@ PluginComponent {
     }
 
     function triggerCaptureWithAction(mode, action) {
-        const normalizedMode = mode === "default" ? "" : (mode || "");
-        const allowedModes = root.allowedModes;
-        if (normalizedMode && !allowedModes.includes(normalizedMode)) {
+        if (mode && !root.allowedModes.includes(mode)) {
             console.warn("Invalid screenshot mode rejected: " + mode);
             return;
         }
 
-        root.activeIpcMode = normalizedMode;
+        root.activeIpcMode = mode || "";
         captureDelayTimer.captureAction = action || "edit";
         root.startCaptureAfterDelay();
     }

@@ -23,7 +23,7 @@ Commands that capture or open images accept an `action` parameter:
 
 | Command | Arguments | Description |
 | :--- | :--- | :--- |
-| `screenshot` | `mode` (`default`, `region`, `full`, `all`, `output`, `window`, `last`) | Triggers a screenshot. |
+| `screenshot` | `mode` (`region`, `full`, `all`, `output`, `window`, `last`) | Triggers a screenshot. |
 | `selectFile` | `action` | Opens file picker. |
 | `fromClipboard` | `action` | Imports image from clipboard. |
 | `openImage` | `path`, `action` | Opens a local image file. |
