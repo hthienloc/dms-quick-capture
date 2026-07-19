@@ -550,24 +550,43 @@ PluginSettings {
             width: parent.width
             spacing: Theme.spacingM
     SettingsCard {
-        id: captureModeCard
+        id: captureActionsCard
         SectionTitle {
-            text: I18n.tr("Capture Mode")
-            icon: "camera"
-            showReset: captureMode.isDirty || outputTargetName.isDirty || skipConfirm.isDirty || includeCursor.isDirty
+            text: I18n.tr("Capture Actions")
+            icon: "mouse"
+            showReset: middleClickAction.isDirty || rightClickAction.isDirty || menuRightClickAction.isDirty
             onResetClicked: {
-                captureMode.resetToDefault();
-                outputTargetName.resetToDefault();
-                skipConfirm.resetToDefault();
-                includeCursor.resetToDefault();
+                middleClickAction.resetToDefault();
+                rightClickAction.resetToDefault();
+                menuRightClickAction.resetToDefault();
             }
         }
 
         SelectionSettingPlus {
-            id: captureMode
-            settingKey: "captureMode"
-            label: I18n.tr("Capture Mode")
+            id: middleClickAction
+            settingKey: "middleClickAction"
+            label: I18n.tr("Middle Click Action")
             options: [
+                { label: I18n.tr("Interactive Region"), value: "region" },
+                { label: I18n.tr("Full Screen"), value: "full" },
+                { label: I18n.tr("All Combined Outputs"), value: "all" },
+                { label: I18n.tr("Specific Output"), value: "output" },
+                { label: I18n.tr("Focused Window"), value: "window" },
+                { label: I18n.tr("Last Selected Region"), value: "last" },
+                { label: I18n.tr("Scrolling Capture"), value: "scroll" },
+                { label: I18n.tr("From Clipboard"), value: "clipboard" },
+                { label: I18n.tr("From File"), value: "selectFile" }
+            ]
+            defaultValue: "region"
+        }
+
+        SelectionSettingPlus {
+            id: rightClickAction
+            settingKey: "rightClickAction"
+            label: I18n.tr("Right Click Action")
+            options: [
+                { label: I18n.tr("From Clipboard"), value: "clipboard" },
+                { label: I18n.tr("From File"), value: "selectFile" },
                 { label: I18n.tr("Interactive Region"), value: "region" },
                 { label: I18n.tr("Full Screen"), value: "full" },
                 { label: I18n.tr("All Combined Outputs"), value: "all" },
@@ -576,12 +595,34 @@ PluginSettings {
                 { label: I18n.tr("Last Selected Region"), value: "last" },
                 { label: I18n.tr("Scrolling Capture"), value: "scroll" }
             ]
-            defaultValue: "region"
+            defaultValue: "clipboard"
         }
 
-        Separator {
-            visible: captureMode.value === "output"
-            height: visible ? 1 : 0
+        SelectionSettingPlus {
+            id: menuRightClickAction
+            settingKey: "menuRightClickAction"
+            label: I18n.tr("Menu Item Right Click")
+            options: [
+                { label: I18n.tr("Copy"), value: "copy" },
+                { label: I18n.tr("Save"), value: "save" },
+                { label: I18n.tr("Copy & Save"), value: "copyAndSave" },
+                { label: I18n.tr("Float"), value: "float" }
+            ]
+            defaultValue: "copy"
+        }
+    }
+
+    SettingsCard {
+        id: captureOptionsCard
+        SectionTitle {
+            text: I18n.tr("Capture Options")
+            icon: "settings"
+            showReset: outputTargetName.isDirty || skipConfirm.isDirty || includeCursor.isDirty
+            onResetClicked: {
+                outputTargetName.resetToDefault();
+                skipConfirm.resetToDefault();
+                includeCursor.resetToDefault();
+            }
         }
 
         StringSettingPlus {
@@ -590,50 +631,15 @@ PluginSettings {
             label: I18n.tr("Target Output Name")
             placeholder: "e.g. DP-1"
             defaultValue: "DP-1"
-            visible: captureMode.value === "output"
-            height: visible ? implicitHeight : 0
         }
 
-        Item {
-            width: parent.width
-            height: visible ? warningRow.implicitHeight + 4 : 0
-            visible: captureMode.value === "window"
-
-            Row {
-                id: warningRow
-                width: parent.width
-                spacing: Theme.spacingS
-                anchors.verticalCenter: parent.verticalCenter
-
-                DankIcon {
-                    name: "warning"
-                    size: 16
-                    color: Theme.warning
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                StyledText {
-                    width: parent.width - 24
-                    text: I18n.tr("Note: Window capture mode requires Hyprland or DWL compositors.")
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.warning
-                    wrapMode: Text.Wrap
-                }
-            }
-        }
-
-        Separator {
-            visible: captureMode.value === "region"
-            height: visible ? 1 : 0
-        }
+        Separator {}
 
         ToggleSettingPlus {
             id: skipConfirm
             settingKey: "skipConfirm"
             label: I18n.tr("Skip Confirmation")
             defaultValue: true
-            visible: captureMode.value === "region"
-            height: visible ? 36 : 0
         }
 
         Separator {}
@@ -645,10 +651,11 @@ PluginSettings {
             defaultValue: false
         }
 
+        Separator {}
+
         Item {
             width: parent.width
-            height: visible ? warningScrollRow.implicitHeight + 4 : 0
-            visible: captureMode.value === "scroll"
+            height: warningScrollRow.implicitHeight + 4
 
             Row {
                 id: warningScrollRow
@@ -684,8 +691,6 @@ PluginSettings {
             unit: "ms"
             leftLabel: "200"
             rightLabel: "2000"
-            visible: captureMode.value === "scroll"
-            height: visible ? implicitHeight : 0
         }
     }
 

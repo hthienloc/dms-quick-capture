@@ -14,14 +14,19 @@ dms ipc call quickCapture <command> [arg] edit|float
 
 ### Supported Commands
 
-Commands that capture or open images accept an `action` parameter (`edit` / `float`) — use `float` to spawn an always-on-top window instead of the editor.
+Commands that capture or open images accept an `action` parameter:
+- `edit` — open the editor
+- `float` — spawn an always-on-top window
+- `copy` — copy to clipboard (with toast notification)
+- `save` — save to configured directory (with toast)
+- `copyAndSave` — both (with toast)
 
 | Command | Arguments | Description |
 | :--- | :--- | :--- |
-| `screenshot` | `mode` (`default`, `region`, `full`, `all`, `output`, `window`, `last`) | Triggers a screenshot. |
-| `selectFile` | `action` (`edit` / `float`) | Opens file picker. |
-| `fromClipboard` | `action` (`edit` / `float`) | Imports image from clipboard. |
-| `openImage` | `path`, `action` (`edit` / `float`) | Opens a local image file. |
+| `screenshot` | `mode` (`region`, `full`, `all`, `output`, `window`, `last`) | Triggers a screenshot. |
+| `selectFile` | `action` | Opens file picker. |
+| `fromClipboard` | `action` | Imports image from clipboard. |
+| `openImage` | `path`, `action` | Opens a local image file. |
 | `close` | *(none)* | Closes the annotator. |
 | `showHistory` | *(none)* | Opens the Recent Edits history carousel. |
 
