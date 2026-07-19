@@ -14,12 +14,7 @@ dms ipc call quickCapture <command> [arg] edit|float
 
 ### Supported Commands
 
-Commands that capture or open images accept an `action` parameter:
-- `edit` — open the editor
-- `float` — spawn an always-on-top window
-- `copy` — copy to clipboard (with toast notification)
-- `save` — save to configured directory (with toast)
-- `copyAndSave` — both (with toast)
+Commands that capture or open images accept an `action` parameter (`edit` / `float`):
 
 | Command | Arguments | Description |
 | :--- | :--- | :--- |

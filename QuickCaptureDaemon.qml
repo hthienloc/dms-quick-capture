@@ -36,26 +36,34 @@ PluginComponent {
         return root.activeIpcMode !== "" ? root.activeIpcMode : root.middleClickAction;
     }
 
-    function screenshotArgs(filename) {
-        const mode = root.activeIpcMode !== "" ? root.activeIpcMode : root.middleClickAction;
-        const cursorVal = pluginData.includeCursor ? "on" : "off";
-        const args = ["dms", "screenshot", mode, "--no-clipboard", "--dir", "/tmp", "--filename", filename, "--format", "png", "--cursor", cursorVal, "--no-notify", "--json"];
+    function modeFlags() {
+        const mode = root.screenshotMode();
+        const flags = [];
 
-        if (mode === "region" && pluginData.skipConfirm !== false) {
-            args.push("--no-confirm");
-        }
+        if (mode === "region" && pluginData.skipConfirm !== false)
+            flags.push("--no-confirm");
 
         if (mode === "scroll") {
             const interval = parseInt(pluginData.scrollInterval, 10) || 500;
-            args.push("--interval", String(interval));
+            flags.push("--interval", String(interval));
         }
 
         if (mode === "output") {
             const outName = root.captureOutputName || pluginData.outputTargetName || "DP-1";
-            args.push("--output", outName);
+            flags.push("--output", outName);
         }
 
-        return args;
+        if (pluginData.resetLastRegion)
+            flags.push("--reset");
+
+        return flags;
+    }
+
+    function screenshotArgs(filename) {
+        const cursorVal = pluginData.includeCursor ? "on" : "off";
+        return ["dms", "screenshot", root.screenshotMode(), "--no-clipboard", "--dir", "/tmp",
+                "--filename", filename, "--format", "png", "--cursor", cursorVal,
+                "--no-notify", "--json"].concat(root.modeFlags());
     }
 
     function triggerCaptureWithAction(mode, action) {
@@ -83,11 +91,18 @@ PluginComponent {
         captureDelayTimer.start();
     }
 
+    function escShell(s) {
+        return "'" + s.replace(/'/g, "'\\''") + "'";
+    }
+
     function startActualCapture() {
         const action = captureDelayTimer.captureAction || "edit";
+        const mode = root.screenshotMode();
+        const timeout = mode === "scroll" ? root.scrollCaptureTimeoutMs : root.captureTimeoutMs;
+
         root.currentCapturePath = root.capturePath();
         const filename = root.currentCapturePath.split("/").pop();
-        const cmdStr = root.screenshotArgs(filename).map(arg => "'" + arg.replace(/'/g, "'\\''") + "'").join(" ") + " 2>&1";
+        const cmdStr = root.screenshotArgs(filename).map(root.escShell).join(" ") + " 2>&1";
         Proc.runCommand("screenshot-trigger", ["sh", "-c", cmdStr], (stdout, exitCode) => {
             root.isCapturing = false;
             root.activeIpcMode = "";
@@ -103,20 +118,18 @@ PluginComponent {
                     root.currentCapturePath = meta.path;
                     root.validateAndOpenCapturedImage(meta.path, action, meta.width, meta.height);
                 } else if (meta.status !== "aborted") {
-                    const failMode = root.screenshotMode();
                     if (typeof ToastService !== "undefined" && ToastService) {
-                        const errorMsg = meta.message || meta.error || I18n.tr("Screenshot failed (mode: %1).").arg(failMode);
+                        const errorMsg = meta.message || meta.error || I18n.tr("Screenshot failed (mode: %1).").arg(mode);
                         ToastService.showError(errorMsg);
                     }
                 }
             } catch (e) {
-                const failMode = root.screenshotMode();
                 if (typeof ToastService !== "undefined" && ToastService) {
-                    const errorMsg = (stdout && stdout.trim()) ? stdout.trim() : I18n.tr("Screenshot failed (mode: %1).").arg(failMode);
+                    const errorMsg = (stdout && stdout.trim()) ? stdout.trim() : I18n.tr("Screenshot failed (mode: %1).").arg(mode);
                     ToastService.showError(errorMsg);
                 }
             }
-        }, 0, root.screenshotMode() === "scroll" ? root.scrollCaptureTimeoutMs : root.captureTimeoutMs);
+        }, 0, timeout);
     }
 
     function selectImageAndAnnotateWithAction(action) {

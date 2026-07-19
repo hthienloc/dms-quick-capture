@@ -617,11 +617,12 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Capture Options")
             icon: "settings"
-            showReset: outputTargetName.isDirty || skipConfirm.isDirty || includeCursor.isDirty
+            showReset: outputTargetName.isDirty || skipConfirm.isDirty || includeCursor.isDirty || resetLastRegion.isDirty
             onResetClicked: {
                 outputTargetName.resetToDefault();
                 skipConfirm.resetToDefault();
                 includeCursor.resetToDefault();
+                resetLastRegion.resetToDefault();
             }
         }
 
@@ -648,6 +649,16 @@ PluginSettings {
             id: includeCursor
             settingKey: "includeCursor"
             label: I18n.tr("Include Cursor")
+            defaultValue: false
+        }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            id: resetLastRegion
+            settingKey: "resetLastRegion"
+            label: I18n.tr("Reset Last Region")
+            description: I18n.tr("Clear saved region selection before each capture")
             defaultValue: false
         }
 
