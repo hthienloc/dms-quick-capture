@@ -550,4 +550,163 @@ PluginComponent {
     onCcWidgetToggled: {
         if (root.daemon) root.daemon.triggerCaptureWithAction("default", "edit");
     }
+    ccDetailHeight: 240
+
+    ccDetailContent: Component {
+        Rectangle {
+            id: detailRoot
+            radius: Theme.cornerRadius
+            color: Theme.nestedSurface
+            border.color: Theme.outlineMedium
+            border.width: Theme.layerOutlineWidth
+            implicitHeight: childrenRect.height
+
+            Item {
+                id: headerRow
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                height: Math.max(headerLabel.implicitHeight, headerControls.implicitHeight) + Theme.spacingS * 2
+
+                StyledText {
+                    id: headerLabel
+                    text: I18n.tr("Quick Capture")
+                    font.pixelSize: Theme.fontSizeLarge
+                    font.weight: Font.Medium
+                    color: Theme.surfaceText
+                    anchors.left: parent.left
+                    anchors.leftMargin: Theme.spacingM
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                Row {
+                    id: headerControls
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.spacingM
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.spacingS
+
+                    DankActionButton {
+                        iconName: "settings"
+                        buttonSize: 28
+                        iconSize: 16
+                        iconColor: Theme.surfaceVariantText
+                        tooltipText: I18n.tr("Settings")
+                        tooltipSide: "bottom"
+                        onClicked: PopoutService.openSettingsWithTab("plugins")
+                    }
+
+                    DankActionButton {
+                        iconName: "open_in_new"
+                        buttonSize: 28
+                        iconSize: 16
+                        iconColor: Theme.surfaceVariantText
+                        tooltipText: I18n.tr("Screenshot Folder")
+                        tooltipSide: "bottom"
+                        onClicked: {
+                            const dir = root.pluginData.saveDirectory || "~/Pictures/Screenshots";
+                            Proc.runCommand("open-screenshot-dir", ["sh", "-c", "xdg-open " + dir], null);
+                        }
+                    }
+
+                    DankActionButton {
+                        iconName: "history"
+                        buttonSize: 28
+                        iconSize: 16
+                        iconColor: Theme.surfaceVariantText
+                        tooltipText: I18n.tr("History")
+                        tooltipSide: "bottom"
+                        onClicked: {
+                            if (root.daemon) root.daemon.showHistoryCarousel();
+                        }
+                    }
+                }
+            }
+
+            Grid {
+                id: grid
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: headerRow.bottom
+                anchors.margins: Theme.spacingM
+                anchors.topMargin: Theme.spacingS
+                columns: 4
+                spacing: Theme.spacingS
+
+                Repeater {
+                    model: [
+                        { icon: "screenshot_region", text: I18n.tr("Region"), modeKey: "region" },
+                        { icon: "fullscreen", text: I18n.tr("Full Screen"), modeKey: "full" },
+                        { icon: "crop_square", text: I18n.tr("Window"), modeKey: "window" },
+                        { icon: "restart_alt", text: I18n.tr("Last Reg"), modeKey: "last" },
+                        { icon: "unfold_more", text: I18n.tr("Scroll"), modeKey: "scroll" },
+                        { icon: "grid_view", text: I18n.tr("Outputs"), modeKey: "all" },
+                        { icon: "content_paste", text: I18n.tr("Clipboard"), modeKey: "clipboard" },
+                        { icon: "folder_open", text: I18n.tr("From File"), modeKey: "selectFile" }
+                    ]
+
+                    delegate: Rectangle {
+                        id: modeBtn
+                        width: (grid.width - grid.spacing * 3) / 4
+                        height: 68
+                        radius: Theme.cornerRadius
+                        color: mouseArea.containsMouse
+                            ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
+                            : Theme.surfaceContainerLow
+                        border.color: mouseArea.containsMouse ? Theme.primary : Theme.withAlpha(Theme.outline, 0.12)
+                        border.width: 1
+
+                        Behavior on color { ColorAnimation { duration: Theme.shorterDuration } }
+                        Behavior on border.color { ColorAnimation { duration: Theme.shorterDuration } }
+
+                        Column {
+                            anchors.centerIn: parent
+                            width: parent.width
+                            spacing: Theme.spacingXS
+
+                            DankIcon {
+                                name: modelData.icon
+                                size: 20
+                                color: mouseArea.containsMouse ? Theme.primary : Theme.surfaceText
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+
+                            StyledText {
+                                text: modelData.text
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: mouseArea.containsMouse ? Theme.primary : Theme.surfaceText
+                                width: parent.width - Theme.spacingXS * 2
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                horizontalAlignment: Text.AlignHCenter
+                                elide: Text.ElideRight
+                            }
+                        }
+
+                        DankRipple {
+                            id: ripple
+                            anchors.fill: parent
+                            rippleColor: Theme.primary
+                            cornerRadius: modeBtn.radius
+                            clip: true
+                        }
+
+                        MouseArea {
+                            id: mouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onPressed: mouse => ripple.trigger(mouse.x, mouse.y)
+                            onClicked: {
+                                if (!root.daemon) return;
+                                const mk = modelData.modeKey;
+                                if (mk === "clipboard") root.daemon.fromClipboardWithAction("edit");
+                                else if (mk === "selectFile") root.daemon.selectImageAndAnnotateWithAction("edit");
+                                else root.daemon.triggerCaptureWithAction(mk, "edit");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
