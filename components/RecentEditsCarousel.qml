@@ -56,6 +56,32 @@ Item {
             root.previewIndex = root.entries.length - 1
     }
 
+    function formatTimeElapsed(timestamp) {
+        if (!timestamp) return ""
+        var now = Date.now()
+        var diff = now - timestamp
+        if (diff < 0) diff = 0
+        
+        var secs = Math.floor(diff / 1000)
+        var mins = Math.floor(secs / 60)
+        var hours = Math.floor(mins / 60)
+        var days = Math.floor(hours / 24)
+        
+        if (days > 0) {
+            var remHours = hours % 24
+            return remHours > 0 ? (days + "d" + remHours + "h") : (days + "d")
+        }
+        if (hours > 0) {
+            var remMins = mins % 60
+            return remMins > 0 ? (hours + "h" + remMins + "m") : (hours + "h")
+        }
+        if (mins > 0) {
+            var remSecs = secs % 60
+            return remSecs > 0 ? (mins + "m" + remSecs + "s") : (mins + "m")
+        }
+        return secs + "s"
+    }
+
     Column {
         anchors.fill: parent
         spacing: 0
@@ -135,7 +161,12 @@ Item {
                                 height: parent.height
 
                                 Rectangle {
-                                    anchors.fill: parent
+                                    id: cardBackground
+                                    anchors.top: parent.top
+                                    anchors.left: parent.left
+                                    anchors.right: parent.right
+                                    anchors.bottom: timeLabel.top
+                                    anchors.bottomMargin: 4
                                     radius: Theme.cornerRadius
                                     color: Theme.surfaceContainerLow
                                     border.color: cardHover.hovered ? Theme.primary : "transparent"
@@ -146,13 +177,31 @@ Item {
                                     Behavior on border.width { NumberAnimation { duration: Theme.shorterDuration } }
 
                                     Image {
+                                        id: previewImage
                                         anchors.fill: parent
                                         anchors.margins: 4
                                         source: "file://" + modelData.savedPath
                                         sourceSize.width: 400
                                         fillMode: Image.PreserveAspectFit
                                         asynchronous: true
+
+                                        // Hover zoom animation
+                                        scale: cardHover.hovered ? 1.0 : 0.94
+                                        Behavior on scale {
+                                            NumberAnimation { duration: 150; easing.type: Easing.OutCubic }
+                                        }
                                     }
+                                }
+
+                                StyledText {
+                                    id: timeLabel
+                                    anchors.bottom: parent.bottom
+                                    anchors.bottomMargin: 2
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    text: root.formatTimeElapsed(modelData.timestamp)
+                                    font.pixelSize: Theme.fontSizeSmall - 1
+                                    color: cardHover.hovered ? Theme.primary : Theme.surfaceVariantText
+                                    Behavior on color { ColorAnimation { duration: Theme.shorterDuration } }
                                 }
 
                                 HoverHandler { id: cardHover }
@@ -173,8 +222,8 @@ Item {
                                 }
 
                                 DankActionButton {
-                                    anchors.top: parent.top
-                                    anchors.right: parent.right
+                                    anchors.top: cardBackground.top
+                                    anchors.right: cardBackground.right
                                     anchors.margins: 6
                                     z: 1
                                     iconName: "open_in_new"
@@ -198,8 +247,8 @@ Item {
                                 }
 
                                 DankActionButton {
-                                    anchors.bottom: parent.bottom
-                                    anchors.right: parent.right
+                                    anchors.bottom: cardBackground.bottom
+                                    anchors.right: cardBackground.right
                                     anchors.margins: 6
                                     z: 1
                                     iconName: parent._copied ? "check" : "content_copy"
@@ -227,8 +276,8 @@ Item {
                                 }
 
                                 DankActionButton {
-                                    anchors.top: parent.top
-                                    anchors.left: parent.left
+                                    anchors.top: cardBackground.top
+                                    anchors.left: cardBackground.left
                                     anchors.margins: 6
                                     z: 1
                                     iconName: "delete"
@@ -284,11 +333,12 @@ Item {
 
         // Preview
         Item {
+            id: previewArea
             width: parent.width
             height: parent.height - 44
             visible: root.previewEntry
 
-            onVisibleChanged: { if (!visible) _previewCopied = false }
+            onVisibleChanged: { if (!visible) previewArea._previewCopied = false }
 
             Image {
                 anchors.fill: parent
@@ -331,8 +381,8 @@ Item {
             Timer {
                 interval: 1500
                 repeat: false
-                running: parent._previewCopied
-                onTriggered: parent._previewCopied = false
+                running: previewArea._previewCopied
+                onTriggered: previewArea._previewCopied = false
             }
 
             Row {
@@ -355,17 +405,17 @@ Item {
                 }
 
                 DankButton {
-                    iconName: parent._previewCopied ? "check" : "content_copy"
-                    text: parent._previewCopied ? I18n.tr("Copied") : I18n.tr("Copy")
+                    iconName: previewArea._previewCopied ? "check" : "content_copy"
+                    text: previewArea._previewCopied ? I18n.tr("Copied") : I18n.tr("Copy")
                     buttonHeight: 36
                     horizontalPadding: 16
-                    backgroundColor: parent._previewCopied
+                    backgroundColor: previewArea._previewCopied
                         ? Qt.rgba(0.3, 0.7, 0.3, 0.9)
                         : Theme.withAlpha(Theme.primary, 0.9)
-                    textColor: parent._previewCopied ? "white" : Theme.onPrimary
+                    textColor: previewArea._previewCopied ? "white" : Theme.onPrimary
                     onClicked: {
                         if (root.previewEntry) {
-                            parent._previewCopied = true
+                            previewArea._previewCopied = true
                             DMSService.sendRequest("clipboard.copyFile", { "filePath": root.previewEntry.savedPath })
                             ToastService.showInfo(I18n.tr("Image copied to clipboard"))
                         }
