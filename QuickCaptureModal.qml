@@ -669,6 +669,8 @@ DankModal {
     property point typingCoords: Qt.point(0,0)
     property string currentTypingText: ""
     property var editingStroke: null
+    property bool typingIsSpeechBubble: false
+    property point typingTargetCoords: Qt.point(0,0)
 
     backgroundOpacity: {
         const data = window.parentWidget && window.parentWidget.pluginData;
@@ -3149,7 +3151,11 @@ DankModal {
                 s.isUnderline = window.textUnderline;
                 s.hasBackground = window.textBackground;
                 s.cornerRadius = window.textCornerRadius;
-                s.points = [window.typingCoords];
+                if (s.isSpeechBubble) {
+                    s.points = [window.typingTargetCoords, window.typingCoords];
+                } else {
+                    s.points = [window.typingCoords];
+                }
                 const idx = window.strokes.indexOf(s);
                 if (idx !== -1) {
                     const list = [...window.strokes];
@@ -3178,7 +3184,10 @@ DankModal {
                 isUnderline: window.textUnderline,
                 hasBackground: window.textBackground,
                 cornerRadius: window.textCornerRadius,
-                points: [Qt.point(window.typingCoords.x, window.typingCoords.y)],
+                isSpeechBubble: window.typingIsSpeechBubble,
+                points: window.typingIsSpeechBubble
+                    ? [Qt.point(window.typingTargetCoords.x, window.typingTargetCoords.y), Qt.point(window.typingCoords.x, window.typingCoords.y)]
+                    : [Qt.point(window.typingCoords.x, window.typingCoords.y)],
                 text: textStr
             });
         }

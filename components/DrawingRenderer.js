@@ -527,7 +527,7 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         }
 
     } else if (stroke.tool === "text") {
-        const pt = stroke.points[0];
+        const pt = (stroke.isSpeechBubble && stroke.points.length >= 2) ? stroke.points[1] : stroke.points[0];
         ctx.fillStyle = stroke.color;
         
         let styleStr = "";
@@ -542,41 +542,159 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         const lines = (stroke.text || "").split("\n");
         const lineHeight = stroke.width * 1.35;
 
-        if (stroke.hasBackground) {
+        const isBubble = stroke.isSpeechBubble && stroke.points.length >= 2;
+
+        if (isBubble || stroke.hasBackground) {
             let maxWidth = 0;
             for (let li = 0; li < lines.length; li++) {
                 const m = ctx.measureText(lines[li]);
                 if (m.width > maxWidth) maxWidth = m.width;
             }
             const h = stroke.width;
-            const padX = h * 0.3;
-            const padY = h * 0.15;
+            const padX = h * 0.5;
+            const padY = h * 0.3;
             const totalH = lines.length * lineHeight - (lineHeight - h);
             const rx = pt.x - padX;
             const ry = pt.y - padY;
             const rw = maxWidth + padX * 2;
             const rh = totalH + padY * 2;
-            const radius = stroke.cornerRadius || 0;
+            const radius = Math.max(8, stroke.cornerRadius || 8);
 
-            ctx.fillStyle = Helpers.getContrastingColor(stroke.color, Qt);
+            ctx.save();
 
-            if (radius > 0) {
+            if (isBubble) {
+                const contrastColor = Helpers.getContrastingColor(stroke.color, Qt);
+                ctx.fillStyle = (contrastColor === "#ffffff") ? "rgba(255, 255, 255, 0.95)" : "rgba(30, 30, 30, 0.95)";
+            } else {
+                ctx.fillStyle = Helpers.getContrastingColor(stroke.color, Qt);
+            }
+
+            if (isBubble) {
+                const p1 = stroke.points[0];
+                const tx = p1.x;
+                const ty = p1.y;
+                const cx = rx + rw / 2;
+                const cy = ry + rh / 2;
+                const inBubble = tx >= rx && tx <= rx + rw && ty >= ry && ty <= ry + rh;
+
+                let activeEdge = "";
+                if (!inBubble) {
+                    const dx = tx - cx;
+                    const dy = ty - cy;
+                    const angle = Math.atan2(dy, dx);
+                    const diagAngle = Math.atan2(rh, rw);
+
+                    if (angle >= -diagAngle && angle < diagAngle) {
+                        activeEdge = "right";
+                    } else if (angle >= diagAngle && angle < Math.PI - diagAngle) {
+                        activeEdge = "bottom";
+                    } else if (angle >= Math.PI - diagAngle || angle < -Math.PI + diagAngle) {
+                        activeEdge = "left";
+                    } else {
+                        activeEdge = "top";
+                    }
+                }
+
+                let base1X = 0, base1Y = 0, base2X = 0, base2Y = 0;
+                const tailBaseSize = Math.max(8, stroke.width * 0.3);
+
+                if (activeEdge === "top") {
+                    let closestX = Math.max(rx, Math.min(tx, rx + rw));
+                    closestX = Math.max(rx + radius + tailBaseSize, Math.min(closestX, rx + rw - radius - tailBaseSize));
+                    base1X = closestX - tailBaseSize;
+                    base1Y = ry;
+                    base2X = closestX + tailBaseSize;
+                    base2Y = ry;
+                } else if (activeEdge === "bottom") {
+                    let closestX = Math.max(rx, Math.min(tx, rx + rw));
+                    closestX = Math.max(rx + radius + tailBaseSize, Math.min(closestX, rx + rw - radius - tailBaseSize));
+                    base1X = closestX - tailBaseSize;
+                    base1Y = ry + rh;
+                    base2X = closestX + tailBaseSize;
+                    base2Y = ry + rh;
+                } else if (activeEdge === "left") {
+                    let closestY = Math.max(ry, Math.min(ty, ry + rh));
+                    closestY = Math.max(ry + radius + tailBaseSize, Math.min(closestY, ry + rh - radius - tailBaseSize));
+                    base1X = rx;
+                    base1Y = closestY - tailBaseSize;
+                    base2X = rx;
+                    base2Y = closestY + tailBaseSize;
+                } else if (activeEdge === "right") {
+                    let closestY = Math.max(ry, Math.min(ty, ry + rh));
+                    closestY = Math.max(ry + radius + tailBaseSize, Math.min(closestY, ry + rh - radius - tailBaseSize));
+                    base1X = rx + rw;
+                    base1Y = closestY - tailBaseSize;
+                    base2X = rx + rw;
+                    base2Y = closestY + tailBaseSize;
+                }
+
                 ctx.beginPath();
                 ctx.moveTo(rx + radius, ry);
+
+                // Top edge
+                if (activeEdge === "top") {
+                    ctx.lineTo(base1X, ry);
+                    ctx.lineTo(tx, ty);
+                    ctx.lineTo(base2X, ry);
+                }
                 ctx.lineTo(rx + rw - radius, ry);
                 ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + radius);
+
+                // Right edge
+                if (activeEdge === "right") {
+                    ctx.lineTo(rx + rw, base1Y);
+                    ctx.lineTo(tx, ty);
+                    ctx.lineTo(rx + rw, base2Y);
+                }
                 ctx.lineTo(rx + rw, ry + rh - radius);
                 ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - radius, ry + rh);
+
+                // Bottom edge
+                if (activeEdge === "bottom") {
+                    ctx.lineTo(base2X, ry + rh);
+                    ctx.lineTo(tx, ty);
+                    ctx.lineTo(base1X, ry + rh);
+                }
                 ctx.lineTo(rx + radius, ry + rh);
                 ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - radius);
+
+                // Left edge
+                if (activeEdge === "left") {
+                    ctx.lineTo(rx, base2Y);
+                    ctx.lineTo(tx, ty);
+                    ctx.lineTo(rx, base1Y);
+                }
                 ctx.lineTo(rx, ry + radius);
                 ctx.quadraticCurveTo(rx, ry, rx + radius, ry);
                 ctx.closePath();
+
                 ctx.fill();
+
+                // Draw border for bubble
+                ctx.shadowColor = "transparent";
+                ctx.strokeStyle = stroke.color;
+                ctx.lineWidth = Math.max(1.5, Math.round(stroke.width * 0.05));
+                ctx.stroke();
             } else {
-                ctx.fillRect(rx, ry, rw, rh);
+                if (radius > 0) {
+                    ctx.beginPath();
+                    ctx.moveTo(rx + radius, ry);
+                    ctx.lineTo(rx + rw - radius, ry);
+                    ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + radius);
+                    ctx.lineTo(rx + rw, ry + rh - radius);
+                    ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - radius, ry + rh);
+                    ctx.lineTo(rx + radius, ry + rh);
+                    ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - radius);
+                    ctx.lineTo(rx, ry + radius);
+                    ctx.quadraticCurveTo(rx, ry, rx + radius, ry);
+                    ctx.closePath();
+                    ctx.fill();
+                } else {
+                    ctx.fillRect(rx, ry, rw, rh);
+                }
             }
-            
+            ctx.restore();
+
             ctx.fillStyle = stroke.color;
         }
 
@@ -695,6 +813,30 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn, Qt, Helpe
     }
 
     if (stroke.tool === "text") {
+        if (stroke.isSpeechBubble && stroke.points.length >= 2) {
+            const p0 = stroke.points[0];
+            const p1 = stroke.points[1];
+
+            ctx.save();
+            ctx.strokeStyle = Theme.primary;
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(p0.x, p0.y);
+            ctx.lineTo(p1.x, p1.y);
+            ctx.stroke();
+            ctx.restore();
+
+            ctx.fillStyle = "#ffffff";
+            ctx.strokeStyle = Theme.primary;
+            ctx.lineWidth = 1.5;
+            ctx.fillRect(p0.x - hh, p0.y - hh, hs, hs);
+            ctx.strokeRect(p0.x - hh, p0.y - hh, hs, hs);
+            ctx.fillRect(p1.x - hh, p1.y - hh, hs, hs);
+            ctx.strokeRect(p1.x - hh, p1.y - hh, hs, hs);
+            return;
+        }
+
         const p = stroke.points[0];
         const fontSize = stroke.width;
         const txt = stroke.text || "";

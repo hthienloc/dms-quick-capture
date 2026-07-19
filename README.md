@@ -63,7 +63,8 @@ git checkout main && git pull
 2. **Select area** — drag to choose the screenshot region.
 3. **Annotate** — use the toolbar, keyboard shortcuts, or radial menus.
 4. **Finish** — press <kbd>Enter</kbd> (action depends on settings) or <kbd>Esc</kbd> to discard.
-   - **Scroll mode**: select a region, scroll the content, then press <kbd>Enter</kbd> to finish stitching. Adjust scroll interval in settings.
+
+**Scrolling Capture (Stitching):** Select a region, scroll the content, then press <kbd>Enter</kbd> to finish stitching. Adjust the scroll interval in settings.
 
 ## Annotation Tools
 
@@ -96,6 +97,8 @@ git checkout main && git pull
 - **Quick Erase:** **Middle-click** on any element to delete it.
 - **Copy / Duplicate:** Select a vector with the **Select** tool (<kbd>V</kbd>), then press **<kbd>C</kbd>** to duplicate. Pressing **<kbd>C</kbd>** without a selection pastes the last copied vector at the cursor.
 - **Undo:** <kbd>Ctrl</kbd> + <kbd>Z</kbd>.
+- **Speech Bubble (Text Tool):** Click and drag to draw a speech bubble. The click location defines the tail target point, and the release location is the text bubble. A single click without dragging writes normal text.
+- **Leader Line (Stamp Tool):** Click and drag to create a stamp with a leader line. The click location points to the target, and the release location places the stamp body. A single click without dragging drops a normal stamp.
 - **Shift Constraint:** Hold **<kbd>Shift</kbd>** while drawing to constrain shapes:
 
   | Tool | Shift Behavior |
