@@ -33,4 +33,4 @@ const textPaddingMultiplierY = 0.15;
 const defaultRadialTools = ["pen", "arrow", "rect", "highlighter", "ellipse", "stamp", "redact", "pixelate"];
 
 // Selection resize handles
-const selectionHandleSize = 8;
+const selectionHandleSize = 10;

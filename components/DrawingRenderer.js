@@ -652,6 +652,19 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn, Qt, Helpe
         const p0 = stroke.points[0];
         const p1 = stroke.points[stroke.points.length - 1];
 
+        // Draw dashed selection line along the stroke path (except highlighter to keep highlighted text readable)
+        if (stroke.tool !== "highlighter") {
+            ctx.save();
+            ctx.strokeStyle = Helpers.getContrastingColor(stroke.color, Qt);
+            ctx.lineWidth = Math.max(1.5, Math.min(2.5, stroke.width / 2));
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(p0.x, p0.y);
+            ctx.lineTo(p1.x, p1.y);
+            ctx.stroke();
+            ctx.restore();
+        }
+
         ctx.fillStyle = "#ffffff";
         ctx.strokeStyle = Theme.primary;
         ctx.lineWidth = 1.5;
