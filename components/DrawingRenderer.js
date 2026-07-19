@@ -614,7 +614,47 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn, Qt, Helpe
     const hs = Constants.selectionHandleSize;
     const hh = hs / 2;
 
-    if (stroke.tool === "rect" || stroke.tool === "ellipse" || stroke.tool === "redact" ||
+    if (stroke.tool === "ellipse") {
+        if (stroke.points.length < 2) return;
+        const p0 = stroke.points[0];
+        const p1 = stroke.points[stroke.points.length - 1];
+        const x1 = Math.min(p0.x, p1.x);
+        const y1 = Math.min(p0.y, p1.y);
+        const rw = Math.abs(p1.x - p0.x);
+        const rh = Math.abs(p1.y - p0.y);
+        const x2 = x1 + rw;
+        const y2 = y1 + rh;
+        const cx = (x1 + x2) / 2;
+        const cy = (y1 + y2) / 2;
+
+        if (rw > 0 && rh > 0) {
+            ctx.strokeStyle = Helpers.getContrastingColor(stroke.color, Qt);
+            ctx.lineWidth = Math.max(1.5, Math.min(2.5, stroke.width / 2));
+            ctx.setLineDash([4, 4]);
+            ctx.save();
+            ctx.beginPath();
+            ctx.translate(x1 + rw / 2, y1 + rh / 2);
+            ctx.scale(rw / 2, rh / 2);
+            ctx.arc(0, 0, 1, 0, 2 * Math.PI);
+            ctx.restore();
+            ctx.stroke();
+        }
+
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = Theme.primary;
+        ctx.lineWidth = 1.5;
+        const handlePoints = [
+            {x: x1, y: y1}, {x: x2, y: y1}, {x: x1, y: y2}, {x: x2, y: y2},
+            {x: cx, y: y1}, {x: cx, y: y2}, {x: x1, y: cy}, {x: x2, y: cy}
+        ];
+        for (let p of handlePoints) {
+            ctx.fillRect(p.x - hh, p.y - hh, hs, hs);
+            ctx.strokeRect(p.x - hh, p.y - hh, hs, hs);
+        }
+        return;
+    }
+
+    if (stroke.tool === "rect" || stroke.tool === "redact" ||
         stroke.tool === "pixelate" || stroke.tool === "spotlight") {
         if (stroke.points.length < 2) return;
         const p0 = stroke.points[0];
@@ -627,8 +667,8 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn, Qt, Helpe
         const cy = (y1 + y2) / 2;
 
         ctx.save();
-        ctx.strokeStyle = Theme.primary;
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = Helpers.getContrastingColor(stroke.color, Qt);
+        ctx.lineWidth = Math.max(1.5, Math.min(2.5, stroke.width / 2));
         ctx.setLineDash([4, 4]);
         ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
         ctx.restore();
@@ -718,8 +758,8 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn, Qt, Helpe
         }
         const sp = 6;
         ctx.save();
-        ctx.strokeStyle = Theme.primary;
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = Helpers.getContrastingColor(stroke.color, Qt);
+        ctx.lineWidth = Math.max(1.5, Math.min(2.5, stroke.width / 2));
         ctx.setLineDash([4, 4]);
         ctx.strokeRect(tx - sp, ty - sp, tw + sp * 2, th + sp * 2);
         ctx.restore();
@@ -756,8 +796,8 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn, Qt, Helpe
         if (sw <= 0 || sh <= 0) return;
 
         ctx.save();
-        ctx.strokeStyle = Theme.primary;
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = Helpers.getContrastingColor(stroke.color, Qt);
+        ctx.lineWidth = Math.max(1.5, Math.min(2.5, stroke.width / 2));
         ctx.setLineDash([4, 4]);
         ctx.strokeRect(x1, y1, sw, sh);
         ctx.restore();
