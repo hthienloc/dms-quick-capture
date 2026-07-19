@@ -653,6 +653,16 @@ PluginSettings {
 
         Separator {}
 
+        ToggleSettingPlus {
+            id: resetLastRegion
+            settingKey: "resetLastRegion"
+            label: I18n.tr("Reset Last Region")
+            description: I18n.tr("Clear saved region selection before each capture")
+            defaultValue: false
+        }
+
+        Separator {}
+
         Item {
             width: parent.width
             height: warningScrollRow.implicitHeight + 4
