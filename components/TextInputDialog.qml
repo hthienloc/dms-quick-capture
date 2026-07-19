@@ -9,7 +9,7 @@ import "../dms-common"
 Popup {
     id: textInputDialog
     width: 420
-    height: Math.min(Math.max(inputBackground.height + 120, 200), 400)
+    height: Math.min(contentColumn.implicitHeight + Theme.spacingM * 2, 400)
     padding: 0
     modal: false
     focus: true
@@ -25,20 +25,23 @@ Popup {
 
     onOpened: {
         Qt.callLater(() => {
-            textInputField.text = window.currentTypingText;
+            if (window) {
+                textInputField.text = window.currentTypingText;
+            }
             textInputField.forceActiveFocus();
+            textInputField.cursorPosition = textInputField.length;
         });
     }
 
     onClosed: {
-        if (window.isTyping) {
+        if (window && window.isTyping) {
             window.isTyping = false;
             window.currentTypingText = "";
             window.editingStroke = null;
             if (window.activeCanvas) window.activeCanvas.requestPaint();
-            if (modalFocusScope) {
-                modalFocusScope.forceActiveFocus();
-            }
+        }
+        if (modalFocusScope) {
+            modalFocusScope.forceActiveFocus();
         }
     }
 
@@ -49,8 +52,11 @@ Popup {
         border.width: 1
 
         Column {
-            anchors.fill: parent
-            anchors.margins: Theme.spacingM
+            id: contentColumn
+            width: parent.width - Theme.spacingM * 2
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
+            anchors.topMargin: Theme.spacingM
             spacing: Theme.spacingM
 
             StyledText {
@@ -63,11 +69,12 @@ Popup {
             Rectangle {
                 id: inputBackground
                 width: parent.width
-                height: Math.max(textInputField.implicitHeight, 72)
-                radius: Theme.cornerRadiusSmall
+                height: Math.min(Math.max(textInputField.implicitHeight, 72), 240)
+                radius: Theme.cornerRadius / 2
                 color: textInputField.activeFocus ? Theme.surfaceContainerHighest : Theme.surfaceContainerHigh
                 border.color: textInputField.activeFocus ? Theme.primary : Theme.outlineMedium
                 border.width: textInputField.activeFocus ? 2 : 1
+                clip: true
 
                 TextArea {
                     id: textInputField
@@ -89,8 +96,10 @@ Popup {
 
                     Keys.onPressed: (event) => {
                         if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && !(event.modifiers & Qt.ShiftModifier)) {
-                            window.currentTypingText = textInputField.text;
-                            window.commitTypingText();
+                            if (window) {
+                                window.currentTypingText = textInputField.text;
+                                window.commitTypingText();
+                            }
                             textInputDialog.close();
                             event.accepted = true;
                         }
@@ -98,28 +107,84 @@ Popup {
                 }
             }
 
-            Row {
+            Item {
                 width: parent.width
-                spacing: Theme.spacingS
-                layoutDirection: Qt.RightToLeft
+                height: 32
 
-                DankButton {
-                    text: I18n.tr("Add")
-                    backgroundColor: Theme.primary
-                    textColor: Theme.primaryText
-                    onClicked: {
-                        window.currentTypingText = textInputField.text;
-                        window.commitTypingText();
-                        textInputDialog.close();
+                // Left: Formatting Toggles (Bold, Italic, Underline, Background)
+                Row {
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.spacingXS
+
+                    Repeater {
+                        model: [
+                            { icon: "format_bold", active: window && window.textBold, tag: "bold" },
+                            { icon: "format_italic", active: window && window.textItalic, tag: "italic" },
+                            { icon: "format_underlined", active: window && window.textUnderline, tag: "underline" },
+                            { icon: "layers", active: window && window.textBackground, tag: "bg" }
+                        ]
+
+                        delegate: Rectangle {
+                            width: 28
+                            height: 28
+                            radius: Theme.cornerRadius / 2
+                            color: modelData.active 
+                                ? Theme.withAlpha(Theme.primary, 0.15) 
+                                : (toggleMouse.containsMouse ? Theme.withAlpha(Theme.surfaceText, 0.08) : "transparent")
+                            border.color: modelData.active ? Theme.primary : "transparent"
+                            border.width: 1
+
+                            DankIcon {
+                                anchors.centerIn: parent
+                                name: modelData.icon
+                                size: 18
+                                color: modelData.active ? Theme.primary : Theme.surfaceText
+                            }
+
+                            MouseArea {
+                                id: toggleMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    if (!window) return;
+                                    if (modelData.tag === "bold") window.textBold = !window.textBold;
+                                    else if (modelData.tag === "italic") window.textItalic = !window.textItalic;
+                                    else if (modelData.tag === "underline") window.textUnderline = !window.textUnderline;
+                                    else if (modelData.tag === "bg") window.textBackground = !window.textBackground;
+                                }
+                            }
+                        }
                     }
                 }
 
-                DankButton {
-                    text: I18n.tr("Cancel")
-                    backgroundColor: Theme.surfaceContainerHigh
-                    textColor: Theme.surfaceText
-                    onClicked: {
-                        textInputDialog.close();
+                // Right: Add / Cancel Buttons
+                Row {
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.spacingS
+
+                    DankButton {
+                        text: I18n.tr("Cancel")
+                        backgroundColor: Theme.surfaceContainerHigh
+                        textColor: Theme.surfaceText
+                        onClicked: {
+                            textInputDialog.close();
+                        }
+                    }
+
+                    DankButton {
+                        text: I18n.tr("Add")
+                        backgroundColor: Theme.primary
+                        textColor: Theme.primaryText
+                        onClicked: {
+                            if (window) {
+                                window.currentTypingText = textInputField.text;
+                                window.commitTypingText();
+                            }
+                            textInputDialog.close();
+                        }
                     }
                 }
             }
