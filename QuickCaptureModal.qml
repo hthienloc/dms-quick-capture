@@ -80,7 +80,7 @@ DankModal {
         }
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
-    property string activeRedactShape: "rect" // rect, roundRect, ellipse
+    property string activeRedactShape: window.roundRect ? "roundRect" : "rect" // rect, roundRect, ellipse
     onActiveRedactShapeChanged: {
         if (window.selectedStroke && window.selectedStroke.tool === "redact") {
             window.selectedStroke.redactShape = window.activeRedactShape;
