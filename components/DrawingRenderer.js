@@ -9,6 +9,37 @@
  */
 
 /**
+ * Sets up the canvas context for drawing a dashed selection border with auto-contrast color.
+ * @param {object} ctx - The Canvas 2D context.
+ * @param {object} stroke - The stroke data object (provides color and width).
+ * @param {object} Helpers - Reference to the Helpers.js library.
+ * @param {object} Qt - The Qt object for color utilities.
+ */
+function setDashedSelectionStyle(ctx, stroke, Helpers, Qt) {
+    ctx.strokeStyle = Helpers.getContrastingColor(stroke.color, Qt);
+    ctx.lineWidth = Math.max(1.5, Math.min(2.5, stroke.width / 2));
+    ctx.setLineDash([4, 4]);
+}
+
+/**
+ * Draws white-filled selection handle squares with Theme.primary stroke at each point.
+ * @param {object} ctx - The Canvas 2D context.
+ * @param {Array} points - Array of {x, y} handle positions.
+ * @param {number} hh - Half the handle size (for centering).
+ * @param {number} hs - Handle size in pixels.
+ * @param {object} Theme - The Theme object.
+ */
+function drawHandlePoints(ctx, points, hh, hs, Theme) {
+    ctx.fillStyle = "#ffffff";
+    ctx.strokeStyle = Theme.primary;
+    ctx.lineWidth = 1.5;
+    for (let p of points) {
+        ctx.fillRect(p.x - hh, p.y - hh, hs, hs);
+        ctx.strokeRect(p.x - hh, p.y - hh, hs, hs);
+    }
+}
+
+/**
  * Draws a single stroke (annotation) onto the provided context.
  * @param {object} ctx - The Canvas 2D context.
  * @param {object} stroke - The stroke data object.
@@ -629,9 +660,7 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn, Qt, Helpe
 
         if (rw > 0 && rh > 0) {
             ctx.save();
-            ctx.strokeStyle = Helpers.getContrastingColor(stroke.color, Qt);
-            ctx.lineWidth = Math.max(1.5, Math.min(2.5, stroke.width / 2));
-            ctx.setLineDash([4, 4]);
+            setDashedSelectionStyle(ctx, stroke, Helpers, Qt);
             ctx.save();
             ctx.beginPath();
             ctx.translate(x1 + rw / 2, y1 + rh / 2);
@@ -642,17 +671,10 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn, Qt, Helpe
             ctx.restore();
         }
 
-        ctx.fillStyle = "#ffffff";
-        ctx.strokeStyle = Theme.primary;
-        ctx.lineWidth = 1.5;
-        const handlePoints = [
+        drawHandlePoints(ctx, [
             {x: x1, y: y1}, {x: x2, y: y1}, {x: x1, y: y2}, {x: x2, y: y2},
             {x: cx, y: y1}, {x: cx, y: y2}, {x: x1, y: cy}, {x: x2, y: cy}
-        ];
-        for (let p of handlePoints) {
-            ctx.fillRect(p.x - hh, p.y - hh, hs, hs);
-            ctx.strokeRect(p.x - hh, p.y - hh, hs, hs);
-        }
+        ], hh, hs, Theme);
         return;
     }
 
@@ -669,23 +691,14 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn, Qt, Helpe
         const cy = (y1 + y2) / 2;
 
         ctx.save();
-        ctx.strokeStyle = Helpers.getContrastingColor(stroke.color, Qt);
-        ctx.lineWidth = Math.max(1.5, Math.min(2.5, stroke.width / 2));
-        ctx.setLineDash([4, 4]);
+        setDashedSelectionStyle(ctx, stroke, Helpers, Qt);
         ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
         ctx.restore();
 
-        ctx.fillStyle = "#ffffff";
-        ctx.strokeStyle = Theme.primary;
-        ctx.lineWidth = 1.5;
-        const handlePoints = [
+        drawHandlePoints(ctx, [
             {x: x1, y: y1}, {x: x2, y: y1}, {x: x1, y: y2}, {x: x2, y: y2},
             {x: cx, y: y1}, {x: cx, y: y2}, {x: x1, y: cy}, {x: x2, y: cy}
-        ];
-        for (let p of handlePoints) {
-            ctx.fillRect(p.x - hh, p.y - hh, hs, hs);
-            ctx.strokeRect(p.x - hh, p.y - hh, hs, hs);
-        }
+        ], hh, hs, Theme);
         return;
     }
 
@@ -697,9 +710,7 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn, Qt, Helpe
         // Draw dashed selection line along the stroke path (except highlighter to keep highlighted text readable)
         if (stroke.tool !== "highlighter") {
             ctx.save();
-            ctx.strokeStyle = Helpers.getContrastingColor(stroke.color, Qt);
-            ctx.lineWidth = Math.max(1.5, Math.min(2.5, stroke.width / 2));
-            ctx.setLineDash([4, 4]);
+            setDashedSelectionStyle(ctx, stroke, Helpers, Qt);
             ctx.beginPath();
             ctx.moveTo(p0.x, p0.y);
             ctx.lineTo(p1.x, p1.y);
@@ -760,9 +771,7 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn, Qt, Helpe
         }
         const sp = 6;
         ctx.save();
-        ctx.strokeStyle = Helpers.getContrastingColor(stroke.color, Qt);
-        ctx.lineWidth = Math.max(1.5, Math.min(2.5, stroke.width / 2));
-        ctx.setLineDash([4, 4]);
+        setDashedSelectionStyle(ctx, stroke, Helpers, Qt);
         ctx.strokeRect(tx - sp, ty - sp, tw + sp * 2, th + sp * 2);
         ctx.restore();
         return;
@@ -798,25 +807,16 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn, Qt, Helpe
         if (sw <= 0 || sh <= 0) return;
 
         ctx.save();
-        ctx.strokeStyle = Helpers.getContrastingColor(stroke.color, Qt);
-        ctx.lineWidth = Math.max(1.5, Math.min(2.5, stroke.width / 2));
-        ctx.setLineDash([4, 4]);
+        setDashedSelectionStyle(ctx, stroke, Helpers, Qt);
         ctx.strokeRect(x1, y1, sw, sh);
         ctx.restore();
 
-        ctx.fillStyle = "#ffffff";
-        ctx.strokeStyle = Theme.primary;
-        ctx.lineWidth = 1.5;
-        const handlePoints = [
+        drawHandlePoints(ctx, [
             {x: x1, y: y1}, {x: x2, y: y1},
             {x: x1, y: y2}, {x: x2, y: y2},
             {x: cx, y: y1}, {x: cx, y: y2},
             {x: x1, y: cy}, {x: x2, y: cy}
-        ];
-        for (let p of handlePoints) {
-            ctx.fillRect(p.x - hh, p.y - hh, hs, hs);
-            ctx.strokeRect(p.x - hh, p.y - hh, hs, hs);
-        }
+        ], hh, hs, Theme);
         return;
     }
 }
