@@ -24,7 +24,6 @@ PluginComponent {
     property string captureOutputName: ""
     readonly property int captureTimeoutMs: 60000
     readonly property int scrollCaptureTimeoutMs: 120000
-    // Exposed so the widget surface can read annotation state without accessing internal modal id
     readonly property bool isAnnotating: modal.shouldBeVisible
 
     // ── Capture helpers ───────────────────────────────────────────────────────
@@ -74,25 +73,39 @@ PluginComponent {
 
         root.activeIpcMode = mode || "";
         captureDelayTimer.captureAction = action || "edit";
-        root.startCaptureAfterDelay();
-    }
 
-    function closeControlCenter() {
-        if (typeof PopoutService !== "undefined" && PopoutService)
-            PopoutService.closeControlCenter();
-    }
-
-    function startCaptureAfterDelay() {
         if (root.isCapturing || modal.shouldBeVisible)
             return;
-
         root.isCapturing = true;
-        root.closeControlCenter();
+        if (typeof PopoutService !== "undefined" && PopoutService)
+            PopoutService.closeControlCenter();
         captureDelayTimer.start();
     }
 
     function escShell(s) {
         return "'" + s.replace(/'/g, "'\\''") + "'";
+    }
+
+    function toastInfo(m) {
+        if (typeof ToastService !== "undefined" && ToastService)
+            ToastService.showInfo(m);
+    }
+    function toastError(m) {
+        if (typeof ToastService !== "undefined" && ToastService)
+            ToastService.showError(m);
+    }
+    function toastWarning(m) {
+        if (typeof ToastService !== "undefined" && ToastService)
+            ToastService.showWarning(m);
+    }
+
+    function parseJsonMeta(stdout) {
+        const trimmed = (stdout || "").trim();
+        const startIdx = trimmed.indexOf("{");
+        const endIdx = trimmed.lastIndexOf("}");
+        return startIdx !== -1 && endIdx > startIdx
+            ? JSON.parse(trimmed.substring(startIdx, endIdx + 1))
+            : JSON.parse(trimmed);
     }
 
     function startActualCapture() {
@@ -108,38 +121,29 @@ PluginComponent {
             root.activeIpcMode = "";
             root.captureOutputName = "";
             try {
-                const trimmed = stdout.trim();
-                const startIdx = trimmed.indexOf("{");
-                const endIdx = trimmed.lastIndexOf("}");
-                const meta = startIdx !== -1 && endIdx > startIdx
-                    ? JSON.parse(trimmed.substring(startIdx, endIdx + 1))
-                    : JSON.parse(trimmed);
+                const meta = root.parseJsonMeta(stdout);
                 if (meta.status === "success") {
                     root.currentCapturePath = meta.path;
                     root.validateAndOpenCapturedImage(meta.path, action, meta.width, meta.height);
                 } else if (meta.status !== "aborted") {
-                    if (typeof ToastService !== "undefined" && ToastService) {
-                        const errorMsg = meta.message || meta.error || I18n.tr("Screenshot failed (mode: %1).").arg(mode);
-                        ToastService.showError(errorMsg);
-                    }
+                    root.toastError(meta.message || meta.error || I18n.tr("Screenshot failed (mode: %1).").arg(mode));
                 }
             } catch (e) {
-                if (typeof ToastService !== "undefined" && ToastService) {
-                    const errorMsg = (stdout && stdout.trim()) ? stdout.trim() : I18n.tr("Screenshot failed (mode: %1).").arg(mode);
-                    ToastService.showError(errorMsg);
-                }
+                root.toastError((stdout && stdout.trim()) || I18n.tr("Screenshot failed (mode: %1).").arg(mode));
             }
         }, 0, timeout);
     }
 
     function selectImageAndAnnotateWithAction(action) {
-        root.closeControlCenter();
+        if (typeof PopoutService !== "undefined" && PopoutService)
+            PopoutService.closeControlCenter();
         fileBrowserModal.captureAction = action || "edit";
         fileBrowserModal.open();
     }
 
     function fromClipboardWithAction(action) {
-        root.closeControlCenter();
+        if (typeof PopoutService !== "undefined" && PopoutService)
+            PopoutService.closeControlCenter();
         root.currentCapturePath = root.capturePath();
         const checkCmd = "if dms cl paste > " + root.currentCapturePath + " 2>/dev/null && file -b " + root.currentCapturePath + " | grep -qi \"image\"; then echo \"IMAGE\"; else TEXT=$(dms cl paste 2>/dev/null); if [ -n \"$TEXT\" ]; then echo \"TEXT:$TEXT\"; else echo \"EMPTY\"; fi; fi";
         Proc.runCommand("smart-paste", ["sh", "-c", checkCmd], (stdout, exitCode) => {
@@ -148,15 +152,12 @@ PluginComponent {
                 root.validateAndOpenCapturedImage(root.currentCapturePath, action);
             } else if (output.startsWith("TEXT:")) {
                 let text = output.substring(5).trim();
-                if (text === "") {
-                    if (typeof ToastService !== "undefined" && ToastService)
-                        ToastService.showError("Clipboard text is not a valid URL or path.");
-                } else {
+                if (text === "")
+                    root.toastError("Clipboard text is not a valid URL or path.");
+                else
                     root.loadImageFromUriWithAction(text, action);
-                }
             } else {
-                if (typeof ToastService !== "undefined" && ToastService)
-                    ToastService.showError("No valid image, URL, or path in clipboard.");
+                root.toastError("No valid image, URL, or path in clipboard.");
             }
         });
     }
@@ -165,9 +166,7 @@ PluginComponent {
         if (width !== undefined && height !== undefined) {
             const minSize = pluginData.minImageSize ?? 16;
             if (width < minSize || height < minSize) {
-                if (typeof ToastService !== "undefined" && ToastService) {
-                    ToastService.showError("Image is too small (" + width + "x" + height + "). Minimum: " + minSize + "px");
-                }
+                root.toastError("Image is too small (" + width + "x" + height + "). Minimum: " + minSize + "px");
                 return;
             }
             root.openAction(path, action);
@@ -175,9 +174,7 @@ PluginComponent {
             Proc.runCommand("validate-image", ["file", "-b", path], function(stdout, exitCode) {
                 const output = stdout.toLowerCase();
                 if (exitCode !== 0 || output.includes("empty") || !output.includes("image")) {
-                    if (typeof ToastService !== "undefined" && ToastService) {
-                        ToastService.showError("Invalid or corrupted image file.");
-                    }
+                    root.toastError("Invalid or corrupted image file.");
                     return;
                 }
                 root.openAction(path, action);
@@ -190,39 +187,31 @@ PluginComponent {
             floatServiceItem.spawnWindow("file://" + path, pluginData, null, [path]);
         } else if (action === "copy") {
             DMSService.sendRequest("clipboard.copyFile", { "filePath": path });
-            if (typeof ToastService !== "undefined" && ToastService)
-                ToastService.showInfo(I18n.tr("Copied to clipboard"));
+            root.toastInfo(I18n.tr("Copied to clipboard"));
         } else if (action === "save") {
             const dir = pluginData.saveDirectory || "~/Pictures/Screenshots";
-            const esc = s => "'" + s.replace(/'/g, "'\\''") + "'";
-            const escapedDir = dir.startsWith("~/") ? "$HOME/" + esc(dir.slice(2)) : esc(dir);
-            const escapedPath = esc(path);
+            const escapedDir = dir.startsWith("~/") ? "$HOME/" + root.escShell(dir.slice(2)) : root.escShell(dir);
+            const escapedPath = root.escShell(path);
             const cmd = "mkdir -p -- " + escapedDir + " && cp -- " + escapedPath + " " + escapedDir + "/Screenshot-$(date '+%Y-%m-%d_%H-%M-%S').png";
             Proc.runCommand("capture-save", ["sh", "-c", cmd], (stdout, exitCode) => {
-                if (exitCode === 0) {
-                    if (typeof ToastService !== "undefined" && ToastService)
-                        ToastService.showInfo(I18n.tr("Screenshot saved"));
-                } else {
-                    if (typeof ToastService !== "undefined" && ToastService)
-                        ToastService.showError(I18n.tr("Failed to save screenshot"));
-                }
+                if (exitCode === 0)
+                    root.toastInfo(I18n.tr("Screenshot saved"));
+                else
+                    root.toastError(I18n.tr("Failed to save screenshot"));
                 if (path.startsWith("/tmp/dms_capture_"))
                     Proc.runCommand("cleanup-temp-save", ["rm", "-f", path]);
             });
         } else if (action === "copyAndSave") {
             const dir = pluginData.saveDirectory || "~/Pictures/Screenshots";
-            const esc = s => "'" + s.replace(/'/g, "'\\''") + "'";
-            const escapedDir = dir.startsWith("~/") ? "$HOME/" + esc(dir.slice(2)) : esc(dir);
-            const escapedPath = esc(path);
+            const escapedDir = dir.startsWith("~/") ? "$HOME/" + root.escShell(dir.slice(2)) : root.escShell(dir);
+            const escapedPath = root.escShell(path);
             const cmd = "mkdir -p -- " + escapedDir + " && cp -- " + escapedPath + " " + escapedDir + "/Screenshot-$(date '+%Y-%m-%d_%H-%M-%S').png";
             DMSService.sendRequest("clipboard.copyFile", { "filePath": path });
             Proc.runCommand("capture-copy-save", ["sh", "-c", cmd], (stdout, exitCode) => {
-                if (typeof ToastService !== "undefined" && ToastService) {
-                    if (exitCode === 0)
-                        ToastService.showInfo(I18n.tr("Copied & saved"));
-                    else
-                        ToastService.showError(I18n.tr("Failed to save screenshot"));
-                }
+                if (exitCode === 0)
+                    root.toastInfo(I18n.tr("Copied & saved"));
+                else
+                    root.toastError(I18n.tr("Failed to save screenshot"));
             });
         } else {
             modal.currentCapturePath = path;
@@ -240,20 +229,18 @@ PluginComponent {
             root.currentCapturePath = root.capturePath();
             Proc.runCommand("download-image", ["curl", "-s", "-L", "-o", root.currentCapturePath, uri], (stdout, exitCode) => {
                 root.isDownloading = false;
-                if (exitCode === 0) {
+                if (exitCode === 0)
                     root.validateAndOpenCapturedImage(root.currentCapturePath, action);
-                } else if (typeof ToastService !== "undefined" && ToastService) {
-                    ToastService.showError("Failed to download image.");
-                }
+                else
+                    root.toastError("Failed to download image.");
             });
         } else {
             root.currentCapturePath = root.capturePath();
             Proc.runCommand("copy-image", ["cp", "-f", uri, root.currentCapturePath], (stdout, exitCode) => {
-                if (exitCode === 0) {
+                if (exitCode === 0)
                     root.validateAndOpenCapturedImage(root.currentCapturePath, action);
-                } else if (typeof ToastService !== "undefined" && ToastService) {
-                    ToastService.showError("Failed to copy image.");
-                }
+                else
+                    root.toastError("Failed to copy image.");
             });
         }
     }
@@ -270,9 +257,7 @@ PluginComponent {
         }
 
         if (urlStr === "") {
-            if (typeof ToastService !== "undefined" && ToastService) {
-                ToastService.showWarning("No valid image file or URL found in drop.");
-            }
+            root.toastWarning("No valid image file or URL found in drop.");
             return;
         }
 
@@ -360,7 +345,7 @@ PluginComponent {
                 if (exitCode === 0) {
                     root.validateAndOpenCapturedImage(root.currentCapturePath, action);
                 } else {
-                    ToastService.showError("Failed to load image.");
+                    root.toastError("Failed to load image.");
                 }
             });
             close();
