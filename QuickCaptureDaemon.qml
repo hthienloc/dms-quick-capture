@@ -77,9 +77,13 @@ PluginComponent {
         if (root.isCapturing || modal.shouldBeVisible)
             return;
         root.isCapturing = true;
+        root.closeControlCenter();
+        captureDelayTimer.start();
+    }
+
+    function closeControlCenter() {
         if (typeof PopoutService !== "undefined" && PopoutService)
             PopoutService.closeControlCenter();
-        captureDelayTimer.start();
     }
 
     function escShell(s) {
@@ -135,15 +139,13 @@ PluginComponent {
     }
 
     function selectImageAndAnnotateWithAction(action) {
-        if (typeof PopoutService !== "undefined" && PopoutService)
-            PopoutService.closeControlCenter();
+        root.closeControlCenter();
         fileBrowserModal.captureAction = action || "edit";
         fileBrowserModal.open();
     }
 
     function fromClipboardWithAction(action) {
-        if (typeof PopoutService !== "undefined" && PopoutService)
-            PopoutService.closeControlCenter();
+        root.closeControlCenter();
         root.currentCapturePath = root.capturePath();
         const checkCmd = "if dms cl paste > " + root.currentCapturePath + " 2>/dev/null && file -b " + root.currentCapturePath + " | grep -qi \"image\"; then echo \"IMAGE\"; else TEXT=$(dms cl paste 2>/dev/null); if [ -n \"$TEXT\" ]; then echo \"TEXT:$TEXT\"; else echo \"EMPTY\"; fi; fi";
         Proc.runCommand("smart-paste", ["sh", "-c", checkCmd], (stdout, exitCode) => {
