@@ -628,6 +628,7 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn, Qt, Helpe
         const cy = (y1 + y2) / 2;
 
         if (rw > 0 && rh > 0) {
+            ctx.save();
             ctx.strokeStyle = Helpers.getContrastingColor(stroke.color, Qt);
             ctx.lineWidth = Math.max(1.5, Math.min(2.5, stroke.width / 2));
             ctx.setLineDash([4, 4]);
@@ -638,6 +639,7 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn, Qt, Helpe
             ctx.arc(0, 0, 1, 0, 2 * Math.PI);
             ctx.restore();
             ctx.stroke();
+            ctx.restore();
         }
 
         ctx.fillStyle = "#ffffff";
