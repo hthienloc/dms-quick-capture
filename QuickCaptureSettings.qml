@@ -617,11 +617,12 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Capture Options")
             icon: "settings"
-            showReset: outputTargetName.isDirty || skipConfirm.isDirty || includeCursor.isDirty
+            showReset: outputTargetName.isDirty || skipConfirm.isDirty || includeCursor.isDirty || resetLastRegion.isDirty
             onResetClicked: {
                 outputTargetName.resetToDefault();
                 skipConfirm.resetToDefault();
                 includeCursor.resetToDefault();
+                resetLastRegion.resetToDefault();
             }
         }
 

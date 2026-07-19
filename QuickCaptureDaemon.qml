@@ -110,8 +110,13 @@ PluginComponent {
                 root.isCapturing = false;
                 root.activeIpcMode = "";
                 root.captureOutputName = "";
+                const trimmed = (stdout || "").trim();
+                if (exitCode !== 0) {
+                    if (typeof ToastService !== "undefined" && ToastService)
+                        ToastService.showError(trimmed || I18n.tr("Screenshot failed (mode: %1).").arg(mode));
+                    return;
+                }
                 try {
-                    const trimmed = stdout.trim();
                     const startIdx = trimmed.indexOf("{");
                     const endIdx = trimmed.lastIndexOf("}");
                     const meta = startIdx !== -1 && endIdx > startIdx
@@ -123,7 +128,7 @@ PluginComponent {
                         ToastService.showError(meta.message || meta.error || I18n.tr("Screenshot failed (mode: %1).").arg(mode));
                 } catch (e) {
                     if (typeof ToastService !== "undefined" && ToastService)
-                        ToastService.showError(I18n.tr("Screenshot failed (mode: %1).").arg(mode));
+                        ToastService.showError(trimmed || I18n.tr("Screenshot failed (mode: %1).").arg(mode));
                 }
             }, 0, timeout);
             return;
