@@ -52,8 +52,8 @@ git checkout main && git pull
 | Action | Result |
 |--------|--------|
 | **Left Click** (bar icon) | Open widget popout |
-| **Middle Click** (bar icon) | Default action (configured in settings) |
-| **Right Click** (bar icon) | Paste image or image URL from clipboard |
+| **Middle Click** (bar icon) | Middle click action (configured in settings) |
+| **Right Click** (bar icon) | Right click action (configured in settings) |
 | **Drop Image** (bar icon) | Drag any image onto the icon to annotate |
 | **<kbd>Print</kbd>** (keyboard) | Capture using default mode (requires keybind setup) |
 
@@ -148,21 +148,27 @@ git checkout main && git pull
 
 ## IPC Commands
 
-Commands that capture or open images accept an `action` parameter — use `edit` to open the editor or `float` to spawn an always-on-top window.
+Commands that capture or open images accept an `action` parameter:
+- `edit` — open the editor
+- `float` — spawn an always-on-top window
+- `copy` — copy to clipboard
+- `save` — save to configured directory
+- `copyAndSave` — both
 
 ```bash
-dms ipc call quickCapture <command> [arg] edit|float
+dms ipc call quickCapture <command> [arg] action
 
 dms ipc call quickCapture screenshot region edit   # open editor
 dms ipc call quickCapture screenshot region float  # float directly
+dms ipc call quickCapture openImage /tmp/foo.png copy  # copy to clipboard
 ```
 
 | Command | Arguments | Description |
 |---------|-----------|-------------|
-| `screenshot` | `mode` (`default`, `region`, `full`, `all`, `output`, `window`, `last`, `scroll`) | Trigger capture |
-| `selectFile` | — | Open file browser to pick an image |
-| `fromClipboard` | — | Annotate image from clipboard |
-| `openImage` | `path` | Open a specific image in the annotator |
+| `screenshot` | `mode` (`region`, `full`, `all`, `output`, `window`, `last`, `scroll`) | Trigger capture |
+| `selectFile` | `action` | Open file browser to pick an image |
+| `fromClipboard` | `action` | Annotate image from clipboard |
+| `openImage` | `path`, `action` | Open a specific image in the annotator |
 | `close` | — | Close the annotator window |
 | `showHistory` | — | Open Recent Edits history carousel |
 
