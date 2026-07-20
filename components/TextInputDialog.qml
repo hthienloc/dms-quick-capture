@@ -111,10 +111,8 @@ Popup {
                 width: parent.width
                 height: 32
 
-                // Left: Formatting Toggles (Bold, Italic, Underline, Background)
                 Row {
-                    anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.centerIn: parent
                     spacing: Theme.spacingXS
 
                     Repeater {
@@ -159,32 +157,18 @@ Popup {
                     }
                 }
 
-                // Right: Add / Cancel Buttons
-                Row {
+                DankButton {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
-                    spacing: Theme.spacingS
-
-                    DankButton {
-                        text: I18n.tr("Cancel")
-                        backgroundColor: Theme.surfaceContainerHigh
-                        textColor: Theme.surfaceText
-                        onClicked: {
-                            textInputDialog.close();
+                    text: window && window.editingStroke ? I18n.tr("Save") : I18n.tr("Add")
+                    backgroundColor: Theme.primary
+                    textColor: Theme.primaryText
+                    onClicked: {
+                        if (window) {
+                            window.currentTypingText = textInputField.text;
+                            window.commitTypingText();
                         }
-                    }
-
-                    DankButton {
-                        text: window && window.editingStroke ? I18n.tr("Save") : I18n.tr("Add")
-                        backgroundColor: Theme.primary
-                        textColor: Theme.primaryText
-                        onClicked: {
-                            if (window) {
-                                window.currentTypingText = textInputField.text;
-                                window.commitTypingText();
-                            }
-                            textInputDialog.close();
-                        }
+                        textInputDialog.close();
                     }
                 }
             }

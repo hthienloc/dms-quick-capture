@@ -1688,7 +1688,7 @@ DankModal {
         if (window.isTyping) {
             if (window.textInputMode === "inline") {
                 window.handleTypingKey(event);
-            } else {
+            } else if (event.key !== Qt.Key_Escape) {
                 event.accepted = true;
             }
             return;
