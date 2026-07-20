@@ -525,9 +525,17 @@ DankModal {
             }
             ctx.restore();
         } else if (window.backdropMode === "image") {
-            if (backdropImageSource.status === Image.Ready && backdropImageSource.sourceWidth > 0) {
+            if (backdropImageSource.status === Image.Ready && backdropImageSource.sourceWidth > 0 && backdropImageSource.sourceHeight > 0) {
+                const imgW = backdropImageSource.sourceWidth;
+                const imgH = backdropImageSource.sourceHeight;
+                const scale = Math.max(w / imgW, h / imgH);
+                const drawW = imgW * scale;
+                const drawH = imgH * scale;
+                const drawX = (w - drawW) / 2;
+                const drawY = (h - drawH) / 2;
+
                 ctx.save();
-                ctx.drawImage(backdropImageSource, 0, 0, w, h);
+                ctx.drawImage(backdropImageSource, drawX, drawY, drawW, drawH);
                 if (window.backdropImageDim > 0) {
                     ctx.fillStyle = "rgba(0, 0, 0, " + Math.min(0.8, window.backdropImageDim) + ")";
                     ctx.fillRect(0, 0, w, h);
@@ -2705,9 +2713,11 @@ DankModal {
 
                     Item {
                         id: backdropEffectContainer
-                        width: Math.max(1, window.canvasWidth)
-                        height: Math.max(1, window.canvasHeight)
-                        visible: false
+                        width: 100
+                        height: 100
+                        x: -9999
+                        y: -9999
+                        opacity: 0.01
 
                         Image {
                             id: backdropImageSource
