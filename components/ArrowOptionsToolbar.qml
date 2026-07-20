@@ -1,13 +1,12 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
+import "Constants.js" as Constants
 
 Item {
     id: root
     z: 2000
     anchors.fill: parent
-
-    ToolbarConstants { id: tc }
 
     property bool visibleState: false
     visible: opacity > 0
@@ -91,7 +90,7 @@ Item {
                     ]
 
                     delegate: Rectangle {
-                        width: tc.subToolbarBtnSize; height: tc.subToolbarBtnSize
+                        width: Constants.subToolbarBtnSize; height: Constants.subToolbarBtnSize
                         radius: Theme.cornerRadius - 2
                         color: root.currentHeadStyle === modelData.style 
                             ? Theme.withAlpha(Theme.primary, 0.15) 
@@ -102,7 +101,7 @@ Item {
                         DankIcon {
                             anchors.centerIn: parent
                             name: modelData.icon
-                            size: tc.subToolbarIconSize
+                            size: Constants.subToolbarIconSize
                             color: root.currentHeadStyle === modelData.style ? Theme.primary : Theme.surfaceText
                         }
 
@@ -136,7 +135,7 @@ Item {
                     ]
 
                     delegate: Rectangle {
-                        width: tc.subToolbarBtnSize; height: tc.subToolbarBtnSize
+                        width: Constants.subToolbarBtnSize; height: Constants.subToolbarBtnSize
                         radius: Theme.cornerRadius - 2
                         color: root.currentLineStyle === modelData.style 
                             ? Theme.withAlpha(Theme.primary, 0.15) 
@@ -147,7 +146,7 @@ Item {
                         DankIcon {
                             anchors.centerIn: parent
                             name: modelData.icon
-                            size: tc.subToolbarIconSize
+                            size: Constants.subToolbarIconSize
                             color: root.currentLineStyle === modelData.style ? Theme.primary : Theme.surfaceText
                         }
 

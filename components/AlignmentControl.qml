@@ -1,11 +1,10 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
+import "Constants.js" as Constants
 
 Item {
     id: control
-
-    ToolbarConstants { id: tc }
 
     property string backdropAlignment: "center"
     property bool compact: false
@@ -19,8 +18,8 @@ Item {
         "bottom-left": "BL", "bottom-center": "BC", "bottom-right": "BR"
     })
 
-    width: compact ? (tc.btnSize + 8) : row.implicitWidth
-    height: compact ? tc.compactControlHeight : tc.btnSize
+    width: compact ? (Constants.btnSize + 8) : row.implicitWidth
+    height: compact ? Constants.compactControlHeight : Constants.btnSize
 
     Row {
         id: row
@@ -30,7 +29,7 @@ Item {
 
         DankIcon {
             name: "align_justify_center"
-            size: tc.iconSize
+            size: Constants.iconSize
             color: Theme.surfaceText
             anchors.verticalCenter: parent.verticalCenter
         }
@@ -47,12 +46,12 @@ Item {
         id: col
         visible: control.compact
         width: parent.width
-        spacing: tc.spacingCompact
+        spacing: Constants.spacingCompact
         anchors.centerIn: parent
 
         DankIcon {
             name: "align_justify_center"
-            size: tc.iconSize
+            size: Constants.iconSize
             color: Theme.surfaceText
             anchors.horizontalCenter: parent.horizontalCenter
         }

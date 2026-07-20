@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
+import "Constants.js" as Constants
 
 Grid {
     id: controlRoot
@@ -9,8 +10,6 @@ Grid {
     property bool isVertical: false
 
     signal changeBackdropMode(string mode)
-
-    ToolbarConstants { id: tc }
 
     rows: isVertical ? 5 : 1
     columns: isVertical ? 1 : 5
@@ -28,8 +27,8 @@ Grid {
         model: controlRoot.modes
         delegate: DankActionButton {
             iconName: modelData.icon
-            buttonSize: tc.btnSize
-            iconSize: tc.iconSize
+            buttonSize: Constants.btnSize
+            iconSize: Constants.iconSize
             tooltipText: modelData.tooltip
             backgroundColor: controlRoot.backdropMode === modelData.mode ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
             iconColor: controlRoot.backdropMode === modelData.mode ? Theme.primary : Theme.surfaceText

@@ -1,11 +1,10 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
+import "Constants.js" as Constants
 
 Rectangle {
     id: popoverRoot
-
-    ToolbarConstants { id: tc }
 
     property string backdropAspectRatio: "auto"
     property real customAspectRatio: 1.50
@@ -22,7 +21,7 @@ Rectangle {
     readonly property int _sliderMax: Math.round(customRatioMax * 100)
 
     width: 220
-    height: customActive ? tc.customRatioPopoverHeight : tc.popoverHeight
+    height: customActive ? Constants.customRatioPopoverHeight : Constants.popoverHeight
     color: Theme.surfaceContainer
     border.color: Theme.withAlpha(Theme.outline, 0.15)
     border.width: 1
@@ -94,15 +93,15 @@ Rectangle {
             Grid {
                 columns: 4
                 rows: 2
-                spacing: tc.gridSpacing
+                spacing: Constants.gridSpacing
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 Repeater {
                     model: popoverRoot.presets
                     delegate: Rectangle {
                         required property var modelData
-                        width: tc.presetBtnWidth
-                        height: tc.presetBtnHeight
+                        width: Constants.presetBtnWidth
+                        height: Constants.presetBtnHeight
                         radius: Theme.cornerRadius / 2
                         color: popoverRoot.backdropAspectRatio === modelData.value ? Theme.primary : Theme.withAlpha(Theme.surfaceVariant, 0.4)
                         border.color: popoverRoot.backdropAspectRatio === modelData.value ? "transparent" : Theme.withAlpha(Theme.outline, 0.15)
@@ -110,7 +109,7 @@ Rectangle {
 
                         StyledText {
                             text: modelData.label
-                            font.pixelSize: tc.presetFontSize
+                            font.pixelSize: Constants.presetFontSize
                             font.weight: popoverRoot.backdropAspectRatio === modelData.value ? Font.DemiBold : Font.Normal
                             color: popoverRoot.backdropAspectRatio === modelData.value ? Theme.onPrimary : Theme.surfaceVariantText
                             anchors.centerIn: parent
@@ -136,7 +135,7 @@ Rectangle {
                 StyledText {
                     id: ratioText
                     text: I18n.tr("Ratio")
-                    font.pixelSize: tc.fontSizeCompact
+                    font.pixelSize: Constants.fontSizeCompact
                     color: Theme.surfaceVariantText
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
@@ -145,7 +144,7 @@ Rectangle {
                 StyledText {
                     id: valueText
                     text: popoverRoot.customAspectRatio.toFixed(2)
-                    font.pixelSize: tc.fontSizeCompact
+                    font.pixelSize: Constants.fontSizeCompact
                     font.weight: Font.Medium
                     color: Theme.surfaceText
                     anchors.right: parent.right

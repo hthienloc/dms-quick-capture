@@ -1,11 +1,10 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
+import "Constants.js" as Constants
 
 Rectangle {
     id: menuRoot
-
-    ToolbarConstants { id: tc }
 
     width: 140
     height: menuColumn.implicitHeight + Theme.spacingS * 2
@@ -53,17 +52,17 @@ Rectangle {
         id: menuColumn
         anchors.fill: parent
         anchors.margins: Theme.spacingS
-        spacing: tc.spacingCompact
+        spacing: Constants.spacingCompact
 
         // ── Quick action row: Rotate | Mirror ─────────────────────────────
         Row {
             width: parent.width
             height: 52
-            spacing: tc.spacingCompact
+            spacing: Constants.spacingCompact
 
             // Rotate button
             Rectangle {
-                width: (parent.width - tc.spacingCompact) / 2
+                width: (parent.width - Constants.spacingCompact) / 2
                 height: parent.height
                 radius: Theme.cornerRadius - 2
                 color: rotateMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
@@ -102,7 +101,7 @@ Rectangle {
 
             // Mirror button
             Rectangle {
-                width: (parent.width - tc.spacingCompact) / 2
+                width: (parent.width - Constants.spacingCompact) / 2
                 height: parent.height
                 radius: Theme.cornerRadius - 2
                 color: mirrorMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"

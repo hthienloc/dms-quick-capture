@@ -1,13 +1,12 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
+import "Constants.js" as Constants
 
 Item {
     id: root
     z: 2000
     anchors.fill: parent
-
-    ToolbarConstants { id: tc }
 
     property bool visibleState: false
     visible: opacity > 0
@@ -60,7 +59,7 @@ Item {
     Rectangle {
         id: menuContent
         width: contentRow.implicitWidth + Theme.spacingM * 2
-        height: tc.subToolbarHeight
+        height: Constants.subToolbarHeight
         x: Math.max(10, Math.min(root.width - width - 10, root.menuX - width / 2))
         y: root.toolbarPosition === "bottom"
             ? Math.max(10, Math.min(root.height - height - 10, root.menuY - height - 20))
@@ -78,7 +77,7 @@ Item {
             spacing: Theme.spacingS
 
             Rectangle {
-                width: tc.subToolbarBtnSize; height: tc.subToolbarBtnSize
+                width: Constants.subToolbarBtnSize; height: Constants.subToolbarBtnSize
                 radius: Theme.cornerRadius - 2
                 color: root.randomizeActive
                     ? Theme.withAlpha(Theme.primary, 0.15)
@@ -89,7 +88,7 @@ Item {
                 DankIcon {
                     anchors.centerIn: parent
                     name: "visibility_lock"
-                    size: tc.subToolbarIconSize
+                    size: Constants.subToolbarIconSize
                     color: root.randomizeActive ? Theme.primary : Theme.surfaceText
                 }
 

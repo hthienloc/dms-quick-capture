@@ -5,8 +5,6 @@ import qs.Widgets
 Rectangle {
     id: popoverRoot
 
-    ToolbarConstants { id: tc }
-
     property string backdropAlignment: "center"
     property bool opened: false
 
