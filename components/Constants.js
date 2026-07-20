@@ -82,3 +82,21 @@ const compactControlHeight = 40;
 const customRatioPopoverHeight = 120;
 const verticalSelectorItemWidth = 32;
 
+// Default Backdrop Presets
+const defaultBackdropPresets = [
+    {
+        id: "studio_dark",
+        name: "Studio Dark",
+        mode: "solid",
+        solidColor: "#1e1e2e",
+        gradientStart: "#1e1e2e",
+        gradientEnd: "#181825",
+        gradientAngle: 45,
+        padding: 40,
+        cornerRadius: 16,
+        shadowStrength: 50,
+        aspectRatio: "auto",
+        customAspectRatio: 1.50
+    }
+];
+

@@ -428,6 +428,33 @@ Rectangle {
             
             Rectangle { width: Constants.separatorThickness; height: Constants.separatorLength; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
             
+            // Presets Control (Bookmarks)
+            Item {
+                id: presetsControl
+                width: Constants.btnSize
+                height: Constants.btnSize
+                anchors.verticalCenter: parent.verticalCenter
+
+                DankActionButton {
+                    iconName: "bookmarks"
+                    buttonSize: Constants.btnSize
+                    iconSize: Constants.iconSize
+                    tooltipText: qsTr("Backdrop Presets")
+                    anchors.centerIn: parent
+                    onClicked: root.backdropControlHovered("presets", presetsControl)
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onEntered: root.backdropControlHovered("presets", presetsControl)
+                    onExited: root.backdropControlExited("presets")
+                }
+            }
+
+            Rectangle { width: Constants.separatorThickness; height: Constants.separatorLength; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
+
             BackdropModeSelectors {
                 backdropMode: root.backdropMode
                 isVertical: false
@@ -674,6 +701,33 @@ Rectangle {
             
             Rectangle { width: Constants.separatorLength; height: Constants.separatorThickness; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
             
+            // Presets Control (Bookmarks)
+            Item {
+                id: presetsControlVert
+                width: Constants.btnSize
+                height: Constants.btnSize
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                DankActionButton {
+                    iconName: "bookmarks"
+                    buttonSize: Constants.btnSize
+                    iconSize: Constants.iconSize
+                    tooltipText: qsTr("Backdrop Presets")
+                    anchors.centerIn: parent
+                    onClicked: root.backdropControlHovered("presets", presetsControlVert)
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onEntered: root.backdropControlHovered("presets", presetsControlVert)
+                    onExited: root.backdropControlExited("presets")
+                }
+            }
+
+            Rectangle { width: Constants.separatorLength; height: Constants.separatorThickness; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter }
+
             BackdropModeSelectors {
                 backdropMode: root.backdropMode
                 isVertical: true
