@@ -245,6 +245,40 @@ DankModal {
     property color autoBackdropGradientStart: Theme.primary
     property color autoBackdropGradientEnd: Theme.secondary
     property color autoBackdropSolidColor: Theme.primary
+    property var customBackdropPresets: []
+    property var hiddenPresetIds: []
+    readonly property var backdropPresets: {
+        var customMap = {};
+        if (customBackdropPresets) {
+            for (var i = 0; i < customBackdropPresets.length; i++) {
+                var cp = customBackdropPresets[i];
+                customMap[cp.id] = cp;
+            }
+        }
+
+        var list = [];
+        if (Constants && Constants.defaultBackdropPresets) {
+            for (var j = 0; j < Constants.defaultBackdropPresets.length; j++) {
+                var dp = Constants.defaultBackdropPresets[j];
+                if (!hiddenPresetIds || hiddenPresetIds.indexOf(dp.id) === -1) {
+                    if (customMap[dp.id]) {
+                        list.push(customMap[dp.id]);
+                    } else {
+                        list.push(dp);
+                    }
+                }
+            }
+        }
+        if (customBackdropPresets) {
+            for (var k = 0; k < customBackdropPresets.length; k++) {
+                var up = customBackdropPresets[k];
+                if (up.isCustomUserCreated && (!hiddenPresetIds || hiddenPresetIds.indexOf(up.id) === -1)) {
+                    list.push(up);
+                }
+            }
+        }
+        return list;
+    }
 
     // Intensity Management
     property real penSmoothingAlpha: 0.4
@@ -1822,6 +1856,22 @@ DankModal {
                 window.autoBackdropGradientEnd = data.autoBackdropGradientEnd;
                 window.autoBackdropSolidColor = data.autoBackdropSolidColor;
             }
+            if (data.user_backdrop_presets) {
+                try {
+                    const parsed = JSON.parse(data.user_backdrop_presets);
+                    if (Array.isArray(parsed)) window.customBackdropPresets = parsed;
+                } catch (e) {
+                    console.error("Failed to parse user_backdrop_presets:", e);
+                }
+            }
+            if (data.hidden_backdrop_presets) {
+                try {
+                    const parsed = JSON.parse(data.hidden_backdrop_presets);
+                    if (Array.isArray(parsed)) window.hiddenPresetIds = parsed;
+                } catch (e) {
+                    console.error("Failed to parse hidden_backdrop_presets:", e);
+                }
+            }
             if (window.activeCanvas) window.activeCanvas.requestPaint();
             window.restoreState = null;
             window.restoreSource = "";
@@ -1830,6 +1880,113 @@ DankModal {
         Qt.callLater(() => {
             if (modalFocusScope) modalFocusScope.forceActiveFocus();
         });
+    }
+
+    function applyBackdropPreset(preset) {
+        if (!preset) return;
+        if (preset.mode !== undefined) window.backdropMode = preset.mode;
+        if (preset.solidColor !== undefined) window.backdropSolidColor = preset.solidColor;
+        if (preset.gradientStart !== undefined) window.backdropGradientStart = preset.gradientStart;
+        if (preset.gradientEnd !== undefined) window.backdropGradientEnd = preset.gradientEnd;
+        if (preset.gradientAngle !== undefined) window.backdropGradientAngle = preset.gradientAngle;
+        if (preset.padding !== undefined) window.backdropPadding = preset.padding;
+        if (preset.cornerRadius !== undefined) window.backdropCornerRadius = preset.cornerRadius;
+        if (preset.shadowStrength !== undefined) window.backdropShadowStrength = preset.shadowStrength;
+        if (preset.aspectRatio !== undefined) window.backdropAspectRatio = preset.aspectRatio;
+        if (preset.customAspectRatio !== undefined) window.customAspectRatio = preset.customAspectRatio;
+        window.hasUserCustomizedBackdrop = true;
+        window.requestPaintAll();
+    }
+
+    function saveCurrentBackdropAsPreset() {
+        const idx = window.customBackdropPresets.length + 1;
+        const newPreset = {
+            id: "custom_" + Date.now(),
+            name: "Custom " + idx,
+            mode: window.backdropMode,
+            solidColor: window.backdropSolidColor.toString(),
+            gradientStart: window.backdropGradientStart.toString(),
+            gradientEnd: window.backdropGradientEnd.toString(),
+            gradientAngle: window.backdropGradientAngle,
+            padding: window.backdropPadding,
+            cornerRadius: window.backdropCornerRadius,
+            shadowStrength: window.backdropShadowStrength,
+            aspectRatio: window.backdropAspectRatio,
+            customAspectRatio: window.customAspectRatio,
+            isCustomUserCreated: true
+        };
+        const newList = [...window.customBackdropPresets, newPreset];
+        window.customBackdropPresets = newList;
+        if (window.parentWidget && window.parentWidget.pluginService) {
+            window.parentWidget.pluginService.savePluginData("quickCapture", "user_backdrop_presets", JSON.stringify(newList));
+        }
+    }
+
+    function deletePreset(presetId) {
+        if (!presetId) return;
+        const newCustom = window.customBackdropPresets.filter(p => p.id !== presetId);
+        const newHidden = window.hiddenPresetIds.indexOf(presetId) === -1 ? [...window.hiddenPresetIds, presetId] : window.hiddenPresetIds;
+        window.customBackdropPresets = newCustom;
+        window.hiddenPresetIds = newHidden;
+        if (window.parentWidget && window.parentWidget.pluginService) {
+            window.parentWidget.pluginService.savePluginData("quickCapture", "user_backdrop_presets", JSON.stringify(newCustom));
+            window.parentWidget.pluginService.savePluginData("quickCapture", "hidden_backdrop_presets", JSON.stringify(newHidden));
+        }
+    }
+
+    function updatePresetWithCurrent(presetId) {
+        if (!presetId) return;
+        const currentData = {
+            mode: window.backdropMode,
+            solidColor: window.backdropSolidColor.toString(),
+            gradientStart: window.backdropGradientStart.toString(),
+            gradientEnd: window.backdropGradientEnd.toString(),
+            gradientAngle: window.backdropGradientAngle,
+            padding: window.backdropPadding,
+            cornerRadius: window.backdropCornerRadius,
+            shadowStrength: window.backdropShadowStrength,
+            aspectRatio: window.backdropAspectRatio,
+            customAspectRatio: window.customAspectRatio
+        };
+
+        const existingIdx = window.customBackdropPresets.findIndex(p => p.id === presetId);
+        let newList;
+        if (existingIdx !== -1) {
+            newList = window.customBackdropPresets.map(p => p.id === presetId ? Object.assign({}, p, currentData) : p);
+        } else {
+            const original = Constants.defaultBackdropPresets ? Constants.defaultBackdropPresets.find(p => p.id === presetId) : undefined;
+            if (original) {
+                const updated = Object.assign({}, original, currentData);
+                newList = [...window.customBackdropPresets, updated];
+            } else {
+                newList = window.customBackdropPresets;
+            }
+        }
+        window.customBackdropPresets = newList;
+        if (window.parentWidget && window.parentWidget.pluginService) {
+            window.parentWidget.pluginService.savePluginData("quickCapture", "user_backdrop_presets", JSON.stringify(newList));
+        }
+    }
+
+    function renamePreset(presetId, newName) {
+        if (!presetId || !newName) return;
+        const existingIdx = window.customBackdropPresets.findIndex(p => p.id === presetId);
+        let newList;
+        if (existingIdx !== -1) {
+            newList = window.customBackdropPresets.map(p => p.id === presetId ? Object.assign({}, p, { name: newName }) : p);
+        } else {
+            const original = Constants.defaultBackdropPresets ? Constants.defaultBackdropPresets.find(p => p.id === presetId) : undefined;
+            if (original) {
+                const updated = Object.assign({}, original, { name: newName });
+                newList = [...window.customBackdropPresets, updated];
+            } else {
+                newList = window.customBackdropPresets;
+            }
+        }
+        window.customBackdropPresets = newList;
+        if (window.parentWidget && window.parentWidget.pluginService) {
+            window.parentWidget.pluginService.savePluginData("quickCapture", "user_backdrop_presets", JSON.stringify(newList));
+        }
     }
 
     content: Component {
@@ -2096,6 +2253,7 @@ DankModal {
                         else if (type === "angle") popover = backdropAnglePopover;
                         else if (type === "aspectRatio") popover = backdropAspectRatioPopover;
                         else if (type === "alignment") popover = backdropAlignmentPopover;
+                        else if (type === "presets") popover = backdropPresetsPopover;
 
                         if (popover) {
                             if (toolbarCard.isVertical) {
@@ -2136,6 +2294,7 @@ DankModal {
                         else if (type === "angle") popover = backdropAnglePopover;
                         else if (type === "aspectRatio") popover = backdropAspectRatioPopover;
                         else if (type === "alignment") popover = backdropAlignmentPopover;
+                        else if (type === "presets") popover = backdropPresetsPopover;
 
                         if (popover) {
                             popover.startCloseTimer();
@@ -3082,6 +3241,16 @@ DankModal {
                         window.backdropAlignment = alignment;
                         window.requestPaintAll();
                     }
+                }
+
+                BackdropPresetsPopover {
+                    id: backdropPresetsPopover
+                    presetsList: window.backdropPresets
+                    onPresetSelected: (preset) => window.applyBackdropPreset(preset)
+                    onSaveCurrentAsPreset: window.saveCurrentBackdropAsPreset()
+                    onDeletePreset: (presetId) => window.deletePreset(presetId)
+                    onUpdatePresetWithCurrent: (presetId) => window.updatePresetWithCurrent(presetId)
+                    onRenamePreset: (presetId, newName) => window.renamePreset(presetId, newName)
                 }
 
                 Canvas {
