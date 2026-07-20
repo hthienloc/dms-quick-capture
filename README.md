@@ -89,7 +89,7 @@ git checkout main && git pull
 | <kbd>B</kbd> | Backdrop Options |
 | <kbd>V</kbd> | Select |
 | <kbd>X</kbd> | Toggle Hide/Show Annotations |
-| <kbd>Tab</kbd> | Toggle between 2 latest radial presets |
+| <kbd>Tab</kbd> | Toggle between Select tool and last active tool (quickly move newly drawn strokes), or between 2 latest radial presets |
 
 ### Drawing & Editing
 
