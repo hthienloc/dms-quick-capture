@@ -609,14 +609,24 @@ Rectangle {
                 enabled: root.backdropMode !== "none"
                 width: Constants.separatorThickness; height: Constants.separatorLength; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter 
             }
-            
+                        // Image Selectors
+            BackdropImageSelectors {
+                visible: root.backdropMode === "image"
+                modal: root.modal
+                backdropImagePath: root.modal ? root.modal.backdropImagePath : ""
+                backdropImageBlur: root.modal ? root.modal.backdropImageBlur : 0
+                backdropImageDim: root.modal ? root.modal.backdropImageDim : 0.2
+            }
+
             // Colors (Solid or Gradient)
             Row {
-                opacity: root.backdropMode !== "none" ? 1 : 0
-                enabled: root.backdropMode !== "none"
+                visible: root.backdropMode !== "none" && root.backdropMode !== "image"
+                opacity: visible ? 1 : 0
+                enabled: visible
                 spacing: Theme.spacingS
                 anchors.verticalCenter: parent.verticalCenter
-                                 BackdropColorSelectors {
+                
+                BackdropColorSelectors {
                     backdropMode: root.backdropMode
                     backdropSolidColor: root.backdropSolidColor
                     backdropGradientStart: root.backdropGradientStart
@@ -649,7 +659,7 @@ Rectangle {
                         }
                     }
                 }
-            }
+            }}
         }
     }
 
@@ -857,14 +867,25 @@ Rectangle {
                 enabled: root.backdropMode !== "none"
                 width: Constants.separatorLength; height: Constants.separatorThickness; color: Theme.withAlpha(Theme.outline, 0.2); anchors.horizontalCenter: parent.horizontalCenter 
             }
-            
+                        // Image Selectors
+            BackdropImageSelectors {
+                visible: root.backdropMode === "image"
+                isVertical: true
+                modal: root.modal
+                backdropImagePath: root.modal ? root.modal.backdropImagePath : ""
+                backdropImageBlur: root.modal ? root.modal.backdropImageBlur : 0
+                backdropImageDim: root.modal ? root.modal.backdropImageDim : 0.2
+            }
+
             // Colors (Solid or Gradient)
             Column {
-                opacity: root.backdropMode !== "none" ? 1 : 0
-                enabled: root.backdropMode !== "none"
+                visible: root.backdropMode !== "none" && root.backdropMode !== "image"
+                opacity: visible ? 1 : 0
+                enabled: visible
                 spacing: Theme.spacingS
                 anchors.horizontalCenter: parent.horizontalCenter
-                                 BackdropColorSelectors {
+                
+                BackdropColorSelectors {
                     isVertical: true
                     backdropMode: root.backdropMode
                     backdropSolidColor: root.backdropSolidColor
@@ -898,7 +919,7 @@ Rectangle {
                         }
                     }
                 }
-            }
+            }}
         }
     }
 }

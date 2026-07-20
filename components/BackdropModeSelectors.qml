@@ -11,8 +11,8 @@ Grid {
 
     signal changeBackdropMode(string mode)
 
-    rows: isVertical ? 5 : 1
-    columns: isVertical ? 1 : 5
+    rows: isVertical ? 6 : 1
+    columns: isVertical ? 1 : 6
     spacing: Theme.spacingXS
 
     readonly property var modes: [
@@ -20,7 +20,8 @@ Grid {
         { mode: "solid", icon: "format_color_fill", tooltip: qsTr("Solid Color") },
         { mode: "radial", icon: "filter_tilt_shift", tooltip: qsTr("Radial Gradient") },
         { mode: "gradient", icon: "gradient", tooltip: qsTr("Linear Gradient") },
-        { mode: "conic", icon: "timelapse", tooltip: qsTr("Conic Gradient") }
+        { mode: "conic", icon: "timelapse", tooltip: qsTr("Conic Gradient") },
+        { mode: "image", icon: "wallpaper", tooltip: qsTr("Custom Image") }
     ]
 
     Repeater {

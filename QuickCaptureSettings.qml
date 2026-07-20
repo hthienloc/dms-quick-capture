@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Modules.Plugins
+import qs.Modals.FileBrowser
 import qs.Services
 import qs.Widgets
 
@@ -1647,7 +1648,8 @@ PluginSettings {
                 { label: I18n.tr("Solid Color"), value: "solid" },
                 { label: I18n.tr("Linear Gradient"), value: "gradient" },
                 { label: I18n.tr("Radial Gradient"), value: "radial" },
-                { label: I18n.tr("Conic Gradient"), value: "conic" }
+                { label: I18n.tr("Conic Gradient"), value: "conic" },
+                { label: I18n.tr("Custom Image"), value: "image" }
             ]
             defaultValue: "solid"
         }

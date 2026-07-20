@@ -6,6 +6,7 @@ import Quickshell
 import qs.Common
 import qs.Widgets
 import qs.Modals.Common
+import qs.Modals.FileBrowser
 import qs.Services
 import "./dms-common"
 import "components"
@@ -217,11 +218,15 @@ DankModal {
     }
 
     // Backdrop State Variables
-    property string backdropMode: "none" // none, solid, gradient
+    property string backdropMode: "none" // none, solid, gradient, radial, conic, image
     property color backdropSolidColor: Theme.primary
     property color backdropGradientStart: Theme.primary
     property color backdropGradientEnd: Theme.secondary
     property int backdropGradientAngle: Constants.defaultBackdropGradientAngle
+    property string backdropImagePath: ""
+    property real backdropImageBlur: 0
+    property real backdropImageDim: 0.2
+    readonly property alias backdropImageBrowserModal: backdropImageBrowserModal
     property int backdropPadding: Constants.defaultBackdropPadding
     property int backdropCornerRadius: Constants.defaultBackdropCornerRadius
     property int backdropShadowStrength: Constants.defaultBackdropShadowStrength
@@ -521,6 +526,19 @@ DankModal {
                 ctx.fill();
             }
             ctx.restore();
+        } else if (window.backdropMode === "image") {
+            if (backdropImageSource.status === Image.Ready && backdropImageSource.sourceWidth > 0) {
+                ctx.save();
+                ctx.drawImage(backdropEffectContainer, 0, 0, w, h);
+                if (window.backdropImageDim > 0) {
+                    ctx.fillStyle = "rgba(0, 0, 0, " + Math.min(0.8, window.backdropImageDim) + ")";
+                    ctx.fillRect(0, 0, w, h);
+                }
+                ctx.restore();
+            } else {
+                ctx.fillStyle = "#1e1e1e";
+                ctx.fillRect(0, 0, w, h);
+            }
         }
     }
 
@@ -1827,6 +1845,9 @@ DankModal {
                 window.backdropShadowStrength = data.backdropShadowStrength;
                 window.backdropAspectRatio = data.backdropAspectRatio;
                 window.customAspectRatio = data.customAspectRatio;
+                if (data.backdropImagePath !== undefined) window.backdropImagePath = data.backdropImagePath;
+                if (data.backdropImageBlur !== undefined) window.backdropImageBlur = data.backdropImageBlur;
+                if (data.backdropImageDim !== undefined) window.backdropImageDim = data.backdropImageDim;
                 if (data.backdropAlignment) window.backdropAlignment = data.backdropAlignment;
                 window.hasUserCustomizedBackdrop = data.hasUserCustomizedBackdrop;
                 window.autoBackdropGradientStart = data.autoBackdropGradientStart;
@@ -2681,6 +2702,48 @@ DankModal {
                         id: textInputDialog
                         window: rootWindow
                         modalFocusScope: modalFocusScope
+                    }
+
+                    FileBrowserModal {
+                        id: backdropImageBrowserModal
+                        browserTitle: qsTr("Select background image")
+                        browserIcon: "wallpaper"
+                        browserType: "wallpaper"
+                        showHiddenFiles: true
+                        fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif"]
+                        onFileSelected: path => {
+                            window.backdropImagePath = path;
+                            if (window.activeCanvas) window.activeCanvas.requestPaint();
+                            close();
+                        }
+                    }
+
+                    Item {
+                        id: backdropEffectContainer
+                        width: Math.max(1, window.canvasWidth)
+                        height: Math.max(1, window.canvasHeight)
+                        visible: false
+
+                        Image {
+                            id: backdropImageSource
+                            anchors.fill: parent
+                            fillMode: Image.PreserveAspectCrop
+                            source: window.backdropImagePath ? (window.backdropImagePath.indexOf("://") !== -1 ? window.backdropImagePath : "file://" + window.backdropImagePath) : Qt.resolvedUrl("./backdrops/preset1.jpg")
+                            onStatusChanged: {
+                                if (status === Image.Ready && window.activeCanvas) {
+                                    window.activeCanvas.requestPaint();
+                                }
+                            }
+                        }
+
+                        MultiEffect {
+                            anchors.fill: parent
+                            source: backdropImageSource
+                            blurEnabled: window.backdropImageBlur > 0
+                            blurMax: 64
+                            blur: Math.min(1.0, window.backdropImageBlur / 30.0)
+                            visible: window.backdropImageBlur > 0
+                        }
                     }
 
                     Timer {

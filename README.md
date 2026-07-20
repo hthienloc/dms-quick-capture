@@ -183,7 +183,7 @@ binds {
 - [x] QR Code Scanner
 - [x] Canvas Color Picker (Eyedropper tool)
 - [ ] Image Filters (Grayscale, negative, brightness/contrast)
-- [ ] Image Backdrop Mode: Support setting a custom image file as the screenshot background
+- [x] Image Backdrop Mode: Support setting a custom image file as the screenshot background
 - [x] Expanded tool option popovers:
   - **Arrow tool**: Double-headed arrows, line styles (dashed, dotted)
   - **Line tool**: Line styles (dashed, dotted)
