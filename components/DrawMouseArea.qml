@@ -812,6 +812,7 @@ MouseArea {
             window.typingTargetCoords = Qt.point(stroke.points[0].x, stroke.points[0].y);
         }
         window.currentTypingText = stroke.text;
+        window.typingCursorIndex = stroke.text ? stroke.text.length : 0;
         window.isTyping = true;
         window.currentColor = stroke.color;
         window.textFontSize = stroke.width;
@@ -885,6 +886,7 @@ MouseArea {
                 window.typingTargetCoords = stroke.points[0];
             }
             window.currentTypingText = "";
+            window.typingCursorIndex = 0;
             window.isTyping = true;
             window.currentStroke = null;
             if (window.textInputMode === "popup") {

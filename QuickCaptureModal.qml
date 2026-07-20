@@ -700,11 +700,29 @@ DankModal {
 
     // Text Input Management
     property bool isTyping: false
+    onIsTypingChanged: {
+        if (isTyping) {
+            typingCursorVisible = true;
+        }
+    }
     property point typingCoords: Qt.point(0,0)
     property string currentTypingText: ""
+    property int typingCursorIndex: 0
+    property bool typingCursorVisible: true
     property var editingStroke: null
     property bool typingIsSpeechBubble: false
     property point typingTargetCoords: Qt.point(0,0)
+
+    Timer {
+        id: typingCursorTimer
+        interval: 500
+        repeat: true
+        running: window.isTyping
+        onTriggered: {
+            window.typingCursorVisible = !window.typingCursorVisible;
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+        }
+    }
 
     backgroundOpacity: {
         const data = window.parentWidget && window.parentWidget.pluginData;
@@ -1495,17 +1513,24 @@ DankModal {
     }
 
     function handleTypingKey(event) {
+        window.typingCursorVisible = true;
+        typingCursorTimer.restart();
+
         if (event.key === Qt.Key_Escape) {
             window.editingStroke = null;
             window.isTyping = false;
             window.currentTypingText = "";
+            window.typingCursorIndex = 0;
             if (window.activeCanvas) window.activeCanvas.requestPaint();
             event.accepted = true;
             return;
         }
         if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
             if (event.modifiers & Qt.ShiftModifier) {
-                window.currentTypingText += "\n";
+                const txt = window.currentTypingText;
+                const idx = Math.max(0, Math.min(txt.length, window.typingCursorIndex));
+                window.currentTypingText = txt.slice(0, idx) + "\n" + txt.slice(idx);
+                window.typingCursorIndex = idx + 1;
                 if (window.activeCanvas) window.activeCanvas.requestPaint();
                 event.accepted = true;
                 return;
@@ -1514,14 +1539,60 @@ DankModal {
             event.accepted = true;
             return;
         }
-        if (event.key === Qt.Key_Backspace) {
-            window.currentTypingText = window.currentTypingText.slice(0, -1);
+        if (event.key === Qt.Key_Left) {
+            const len = window.currentTypingText.length;
+            window.typingCursorIndex = Math.max(0, Math.min(len, window.typingCursorIndex) - 1);
             if (window.activeCanvas) window.activeCanvas.requestPaint();
             event.accepted = true;
             return;
         }
+        if (event.key === Qt.Key_Right) {
+            const len = window.currentTypingText.length;
+            window.typingCursorIndex = Math.min(len, Math.max(0, window.typingCursorIndex) + 1);
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+            event.accepted = true;
+            return;
+        }
+        if (event.key === Qt.Key_Home) {
+            window.typingCursorIndex = 0;
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+            event.accepted = true;
+            return;
+        }
+        if (event.key === Qt.Key_End) {
+            window.typingCursorIndex = window.currentTypingText.length;
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+            event.accepted = true;
+            return;
+        }
+        if (event.key === Qt.Key_Backspace) {
+            const txt = window.currentTypingText;
+            const idx = Math.max(0, Math.min(txt.length, window.typingCursorIndex));
+            if (idx > 0) {
+                window.currentTypingText = txt.slice(0, idx - 1) + txt.slice(idx);
+                window.typingCursorIndex = idx - 1;
+                if (window.activeCanvas) window.activeCanvas.requestPaint();
+            }
+            event.accepted = true;
+            return;
+        }
+        if (event.key === Qt.Key_Delete) {
+            const txt = window.currentTypingText;
+            const idx = Math.max(0, Math.min(txt.length, window.typingCursorIndex));
+            if (idx < txt.length) {
+                window.currentTypingText = txt.slice(0, idx) + txt.slice(idx + 1);
+                window.typingCursorIndex = idx;
+                if (window.activeCanvas) window.activeCanvas.requestPaint();
+            }
+            event.accepted = true;
+            return;
+        }
         if (event.text && event.text.length > 0 && !(event.modifiers & Qt.ControlModifier) && !(event.modifiers & Qt.AltModifier)) {
-            window.currentTypingText += event.text;
+            const txt = window.currentTypingText;
+            const idx = Math.max(0, Math.min(txt.length, window.typingCursorIndex));
+            const insertStr = event.text;
+            window.currentTypingText = txt.slice(0, idx) + insertStr + txt.slice(idx);
+            window.typingCursorIndex = idx + insertStr.length;
             if (window.activeCanvas) window.activeCanvas.requestPaint();
             event.accepted = true;
         }
@@ -2708,7 +2779,8 @@ DankModal {
                                     ctx.textAlign = "left";
                                     ctx.textBaseline = "middle";
 
-                                    const previewLines = String(window.currentTypingText + "|").split("\n");
+                                    const rawText = window.currentTypingText || "";
+                                    const previewLines = rawText.split("\n");
                                     const lineH = window.textFontSize * 1.35;
 
                                     if (window.textBackground) {
@@ -2717,6 +2789,7 @@ DankModal {
                                             const m = ctx.measureText(previewLines[li]);
                                             if (m.width > maxW) maxW = m.width;
                                         }
+                                        if (maxW === 0) maxW = Math.max(10, window.textFontSize * 0.4);
                                         const h = window.textFontSize;
                                         const padX = h * 0.3;
                                         const padY = h * 0.15;
@@ -2763,6 +2836,36 @@ DankModal {
                                             ctx.lineTo(window.typingCoords.x + textWidth, window.typingCoords.y + li * lineH + window.textFontSize * 1.05);
                                             ctx.stroke();
                                         }
+                                    }
+
+                                    // Draw Overlaid Blinking Cursor Line
+                                    if (window.typingCursorVisible) {
+                                        let cursorLine = 0;
+                                        let charAcc = 0;
+                                        let cursorCol = 0;
+                                        const targetIdx = Math.max(0, Math.min(rawText.length, window.typingCursorIndex));
+
+                                        for (let i = 0; i < previewLines.length; i++) {
+                                            const lineLen = previewLines[i].length;
+                                            if (targetIdx <= charAcc + lineLen) {
+                                                cursorLine = i;
+                                                cursorCol = targetIdx - charAcc;
+                                                break;
+                                            }
+                                            charAcc += lineLen + 1;
+                                        }
+
+                                        const subText = (previewLines[cursorLine] || "").substring(0, cursorCol);
+                                        const subW = ctx.measureText(subText).width;
+                                        const curX = window.typingCoords.x + subW;
+                                        const curY = window.typingCoords.y + cursorLine * lineH;
+
+                                        ctx.strokeStyle = window.currentColor;
+                                        ctx.lineWidth = Math.max(2, Math.round(window.textFontSize * 0.07));
+                                        ctx.beginPath();
+                                        ctx.moveTo(curX, curY);
+                                        ctx.lineTo(curX, curY + window.textFontSize);
+                                        ctx.stroke();
                                     }
                                 }
                             }
