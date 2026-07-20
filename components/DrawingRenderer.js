@@ -22,6 +22,32 @@ function setDashedSelectionStyle(ctx, stroke, Helpers, Qt) {
 }
 
 /**
+ * Draws a high-contrast dual-tone (alternating black and white dashes) selection rectangle.
+ * @param {object} ctx - The Canvas 2D context.
+ * @param {number} x - X coordinate.
+ * @param {number} y - Y coordinate.
+ * @param {number} w - Width.
+ * @param {number} h - Height.
+ */
+function drawHighContrastDashedRect(ctx, x, y, w, h) {
+    ctx.save();
+    ctx.lineWidth = 1.5;
+
+    // Layer 1: Solid white line underneath
+    ctx.setLineDash([]);
+    ctx.strokeStyle = "#ffffff";
+    ctx.strokeRect(x, y, w, h);
+
+    // Layer 2: Black dashed line on top (gap reveals white underneath)
+    ctx.setLineDash([4, 4]);
+    ctx.lineDashOffset = 0;
+    ctx.strokeStyle = "#000000";
+    ctx.strokeRect(x, y, w, h);
+
+    ctx.restore();
+}
+
+/**
  * Draws white-filled selection handle squares with Theme.primary stroke at each point.
  * @param {object} ctx - The Canvas 2D context.
  * @param {Array} points - Array of {x, y} handle positions.
@@ -936,10 +962,7 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn, Qt, Helpe
             th += py * 2;
         }
         const sp = 6;
-        ctx.save();
-        setDashedSelectionStyle(ctx, stroke, Helpers, Qt);
-        ctx.strokeRect(tx - sp, ty - sp, tw + sp * 2, th + sp * 2);
-        ctx.restore();
+        drawHighContrastDashedRect(ctx, tx - sp, ty - sp, tw + sp * 2, th + sp * 2);
         return;
     }
 
