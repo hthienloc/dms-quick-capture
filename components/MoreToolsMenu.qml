@@ -6,7 +6,7 @@ import "Constants.js" as Constants
 Rectangle {
     id: menuRoot
 
-    width: 140
+    width: 160
     height: menuColumn.implicitHeight + Theme.spacingS * 2
     color: Theme.surfaceContainer
     border.color: Theme.withAlpha(Theme.outline, 0.15)
@@ -19,6 +19,10 @@ Rectangle {
     opacity: 0
     scale: 0.9
 
+    signal rotateLeftRequested()
+    signal rotateRightRequested()
+    signal flipHorizontalRequested()
+    signal flipVerticalRequested()
     signal rotateRequested()
     signal mirrorRequested()
     signal ocrRequested()
@@ -54,86 +58,170 @@ Rectangle {
         anchors.margins: Theme.spacingS
         spacing: Constants.spacingCompact
 
-        // ── Quick action row: Rotate | Mirror ─────────────────────────────
-        Row {
+        // ── Quick action grid: Rotate (L/R) | Flip (H/V) ───────────────────
+        Column {
             width: parent.width
-            height: 52
             spacing: Constants.spacingCompact
 
-            // Rotate button
-            Rectangle {
-                width: (parent.width - Constants.spacingCompact) / 2
-                height: parent.height
-                radius: Theme.cornerRadius - 2
-                color: rotateMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                border.width: 0
+            // Row 1: Rotate Left | Rotate Right
+            Row {
+                width: parent.width
+                height: 44
+                spacing: Constants.spacingCompact
 
-                Column {
-                    anchors.centerIn: parent
-                    spacing: 3
+                // Rotate Left button
+                Rectangle {
+                    width: (parent.width - Constants.spacingCompact) / 2
+                    height: parent.height
+                    radius: Theme.cornerRadius - 2
+                    color: rotateLeftMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
 
-                    DankIcon {
-                        name: "rotate_right"
-                        size: 18
-                        color: Theme.surfaceText
-                        anchors.horizontalCenter: parent.horizontalCenter
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: 2
+
+                        DankIcon {
+                            name: "rotate_left"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+
+                        StyledText {
+                            text: qsTr("Rotate L")
+                            font.pixelSize: Theme.fontSizeSmall - 2
+                            color: Theme.surfaceText
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
                     }
 
-                    StyledText {
-                        text: qsTr("Rotate")
-                        font.pixelSize: Theme.fontSizeSmall - 1
-                        color: Theme.surfaceText
-                        anchors.horizontalCenter: parent.horizontalCenter
+                    MouseArea {
+                        id: rotateLeftMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            menuRoot.rotateLeftRequested();
+                        }
                     }
                 }
 
-                MouseArea {
-                    id: rotateMouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        // Keep menu open — rotate is a repeatable action
-                        menuRoot.rotateRequested();
+                // Rotate Right button
+                Rectangle {
+                    width: (parent.width - Constants.spacingCompact) / 2
+                    height: parent.height
+                    radius: Theme.cornerRadius - 2
+                    color: rotateRightMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: 2
+
+                        DankIcon {
+                            name: "rotate_right"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+
+                        StyledText {
+                            text: qsTr("Rotate R")
+                            font.pixelSize: Theme.fontSizeSmall - 2
+                            color: Theme.surfaceText
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                    }
+
+                    MouseArea {
+                        id: rotateRightMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            menuRoot.rotateRightRequested();
+                        }
                     }
                 }
             }
 
-            // Mirror button
-            Rectangle {
-                width: (parent.width - Constants.spacingCompact) / 2
-                height: parent.height
-                radius: Theme.cornerRadius - 2
-                color: mirrorMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
-                border.width: 0
+            // Row 2: Flip Horiz | Flip Vert
+            Row {
+                width: parent.width
+                height: 44
+                spacing: Constants.spacingCompact
 
-                Column {
-                    anchors.centerIn: parent
-                    spacing: 3
+                // Flip Horizontal button
+                Rectangle {
+                    width: (parent.width - Constants.spacingCompact) / 2
+                    height: parent.height
+                    radius: Theme.cornerRadius - 2
+                    color: flipHMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
 
-                    DankIcon {
-                        name: "flip"
-                        size: 18
-                        color: Theme.surfaceText
-                        anchors.horizontalCenter: parent.horizontalCenter
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: 2
+
+                        DankIcon {
+                            name: "flip"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+
+                        StyledText {
+                            text: qsTr("Flip Horiz")
+                            font.pixelSize: Theme.fontSizeSmall - 2
+                            color: Theme.surfaceText
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
                     }
 
-                    StyledText {
-                        text: qsTr("Mirror")
-                        font.pixelSize: Theme.fontSizeSmall - 1
-                        color: Theme.surfaceText
-                        anchors.horizontalCenter: parent.horizontalCenter
+                    MouseArea {
+                        id: flipHMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            menuRoot.flipHorizontalRequested();
+                            menuRoot.mirrorRequested();
+                        }
                     }
                 }
 
-                MouseArea {
-                    id: mirrorMouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        // Keep menu open — mirror is a repeatable action
-                        menuRoot.mirrorRequested();
+                // Flip Vertical button
+                Rectangle {
+                    width: (parent.width - Constants.spacingCompact) / 2
+                    height: parent.height
+                    radius: Theme.cornerRadius - 2
+                    color: flipVMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
+
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: 2
+
+                        DankIcon {
+                            name: "swap_vert"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+
+                        StyledText {
+                            text: qsTr("Flip Vert")
+                            font.pixelSize: Theme.fontSizeSmall - 2
+                            color: Theme.surfaceText
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                    }
+
+                    MouseArea {
+                        id: flipVMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            menuRoot.flipVerticalRequested();
+                        }
                     }
                 }
             }

@@ -719,7 +719,8 @@ DankModal {
         window.toolbarVisible = window.configShowToolbar;
     }
 
-    function rotateScreenshot() {
+    function rotateScreenshot(direction) {
+        const isLeft = (direction === "left");
         const originalW = window.bgImageItem ? window.bgImageItem.sourceSize.width : 1;
         const originalH = window.bgImageItem ? window.bgImageItem.sourceSize.height : 1;
 
@@ -738,22 +739,27 @@ DankModal {
         }
 
         if (!bgPath) return;
-        Proc.runCommand("rotate-image", ["mogrify", "-rotate", "90", bgPath], (stdout, exitCode) => {
+        const degrees = isLeft ? "270" : "90";
+        Proc.runCommand("rotate-image", ["mogrify", "-rotate", degrees, bgPath], (stdout, exitCode) => {
             if (exitCode === 0) {
                 if (window.hasSelection) {
                     const cx = window.cropRect.x;
                     const cy = window.cropRect.y;
                     const cw = window.cropRect.width;
                     const ch = window.cropRect.height;
-                    window.cropRect = Qt.rect(originalH - (cy + ch), cx, ch, cw);
+                    if (isLeft) {
+                        window.cropRect = Qt.rect(cy, originalW - (cx + cw), ch, cw);
+                    } else {
+                        window.cropRect = Qt.rect(originalH - (cy + ch), cx, ch, cw);
+                    }
                 }
 
                 const list = [...window.strokes];
                 for (let s of list) {
                     if (s.points) {
                         s.points = s.points.map(p => ({
-                            x: originalH - p.y,
-                            y: p.x
+                            x: isLeft ? p.y : originalH - p.y,
+                            y: isLeft ? originalW - p.x : p.x
                         }));
                     }
                 }
@@ -765,8 +771,10 @@ DankModal {
         });
     }
 
-    function mirrorScreenshot() {
+    function mirrorScreenshot(direction) {
+        const isVertical = (direction === "vertical" || direction === "v");
         const originalW = window.bgImageItem ? window.bgImageItem.sourceSize.width : 1;
+        const originalH = window.bgImageItem ? window.bgImageItem.sourceSize.height : 1;
 
         let bgPath = "";
         if (window.bgImageSource) {
@@ -783,22 +791,27 @@ DankModal {
         }
 
         if (!bgPath) return;
-        Proc.runCommand("mirror-image", ["mogrify", "-flop", bgPath], (stdout, exitCode) => {
+        const flag = isVertical ? "-flip" : "-flop";
+        Proc.runCommand("mirror-image", ["mogrify", flag, bgPath], (stdout, exitCode) => {
             if (exitCode === 0) {
                 if (window.hasSelection) {
                     const cx = window.cropRect.x;
                     const cy = window.cropRect.y;
                     const cw = window.cropRect.width;
                     const ch = window.cropRect.height;
-                    window.cropRect = Qt.rect(originalW - (cx + cw), cy, cw, ch);
+                    if (isVertical) {
+                        window.cropRect = Qt.rect(cx, originalH - (cy + ch), cw, ch);
+                    } else {
+                        window.cropRect = Qt.rect(originalW - (cx + cw), cy, cw, ch);
+                    }
                 }
 
                 const list = [...window.strokes];
                 for (let s of list) {
                     if (s.points) {
                         s.points = s.points.map(p => ({
-                            x: originalW - p.x,
-                            y: p.y
+                            x: isVertical ? p.x : originalW - p.x,
+                            y: isVertical ? originalH - p.y : p.y
                         }));
                     }
                 }
@@ -2948,8 +2961,12 @@ DankModal {
 
                 MoreToolsMenu {
                     id: moreToolsMenu
-                    onRotateRequested: window.rotateScreenshot()
-                    onMirrorRequested: window.mirrorScreenshot()
+                    onRotateLeftRequested: window.rotateScreenshot("left")
+                    onRotateRightRequested: window.rotateScreenshot("right")
+                    onFlipHorizontalRequested: window.mirrorScreenshot("horizontal")
+                    onFlipVerticalRequested: window.mirrorScreenshot("vertical")
+                    onRotateRequested: window.rotateScreenshot("right")
+                    onMirrorRequested: window.mirrorScreenshot("horizontal")
                     onOcrRequested: window.runOcr()
                     onQrScanRequested: window.runQrScan()
                     onEraserRequested: window.currentTool = "eraser"
