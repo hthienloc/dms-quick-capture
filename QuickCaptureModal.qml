@@ -247,6 +247,7 @@ DankModal {
     property color autoBackdropSolidColor: Theme.primary
 
     // Intensity Management
+    property real penSmoothingAlpha: 0.4
     property int strokeWidth: 8
     property int pixelateIntensity: 8
     property bool pixelateRandomize: true
