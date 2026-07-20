@@ -1,13 +1,12 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
+import "Constants.js" as Constants
 
 Item {
     id: root
     z: 2000
     anchors.fill: parent
-
-    ToolbarConstants { id: tc }
 
     property bool visibleState: false
     visible: opacity > 0
@@ -62,7 +61,7 @@ Item {
     Rectangle {
         id: menuContent
         width: Math.max(modeRow.implicitWidth, shapeRow.implicitWidth) + Theme.spacingM * 2
-        height: tc.subToolbarHeight * 2 + Theme.spacingS
+        height: Constants.subToolbarHeight * 2 + Theme.spacingS
         x: Math.max(10, Math.min(root.width - width - 10, root.menuX - width / 2))
         y: root.toolbarPosition === "bottom"
             ? Math.max(10, Math.min(root.height - height - 10, root.menuY - height - 20))
@@ -89,7 +88,7 @@ Item {
                     ]
 
                     delegate: Rectangle {
-                        width: tc.subToolbarBtnSize; height: tc.subToolbarBtnSize
+                        width: Constants.subToolbarBtnSize; height: Constants.subToolbarBtnSize
                         radius: Theme.cornerRadius - 2
                         color: root.currentMode === modelData.mode
                             ? Theme.withAlpha(Theme.primary, 0.15)
@@ -100,7 +99,7 @@ Item {
                         DankIcon {
                             anchors.centerIn: parent
                             name: modelData.icon
-                            size: tc.subToolbarIconSize
+                            size: Constants.subToolbarIconSize
                             color: root.currentMode === modelData.mode ? Theme.primary : Theme.surfaceText
                         }
 
@@ -128,7 +127,7 @@ Item {
                     ]
 
                     delegate: Rectangle {
-                        width: tc.subToolbarBtnSize; height: tc.subToolbarBtnSize
+                        width: Constants.subToolbarBtnSize; height: Constants.subToolbarBtnSize
                         radius: Theme.cornerRadius - 2
                         color: root.currentShape === modelData.shape
                             ? Theme.withAlpha(Theme.primary, 0.15)
@@ -139,7 +138,7 @@ Item {
                         DankIcon {
                             anchors.centerIn: parent
                             name: modelData.icon
-                            size: tc.subToolbarIconSize
+                            size: Constants.subToolbarIconSize
                             color: root.currentShape === modelData.shape ? Theme.primary : Theme.surfaceText
                         }
 

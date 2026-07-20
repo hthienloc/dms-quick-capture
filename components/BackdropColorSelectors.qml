@@ -1,11 +1,10 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
+import "Constants.js" as Constants
 
 Grid {
     id: controlRoot
-
-    ToolbarConstants { id: tc }
 
     property string backdropMode: "none"
     property color backdropSolidColor: Theme.primary
@@ -28,7 +27,7 @@ Grid {
 
     Item {
         visible: controlRoot.backdropMode === "solid"
-        width: tc.verticalSelectorItemWidth
+        width: Constants.verticalSelectorItemWidth
         height: controlRoot.itemSize
 
         Rectangle {
@@ -57,7 +56,7 @@ Grid {
 
     Item {
         visible: controlRoot.isGradient
-        width: controlRoot.isVertical ? tc.verticalSelectorItemWidth : (controlRoot.itemSize * 2 + Theme.spacingXS)
+        width: controlRoot.isVertical ? Constants.verticalSelectorItemWidth : (controlRoot.itemSize * 2 + Theme.spacingXS)
         height: controlRoot.isVertical ? (controlRoot.itemSize * 2 + Theme.spacingXS) : controlRoot.itemSize
 
         Grid {
@@ -103,7 +102,7 @@ Grid {
     }
 
     Item {
-        width: tc.verticalSelectorItemWidth
+        width: Constants.verticalSelectorItemWidth
         height: controlRoot.itemSize
 
         DankActionButton {
@@ -133,7 +132,7 @@ Grid {
     }
 
     Item {
-        width: tc.verticalSelectorItemWidth
+        width: Constants.verticalSelectorItemWidth
         height: controlRoot.itemSize
 
         DankActionButton {

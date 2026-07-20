@@ -1,14 +1,13 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
+import "Constants.js" as Constants
 
 Rectangle {
     id: popoverRoot
 
-    ToolbarConstants { id: tc }
-
-    width: isVertical ? tc.btnSize : tc.customRatioPopoverHeight
-    height: isVertical ? tc.customRatioPopoverHeight : tc.btnSize
+    width: isVertical ? Constants.btnSize : Constants.customRatioPopoverHeight
+    height: isVertical ? Constants.customRatioPopoverHeight : Constants.btnSize
     color: Theme.surfaceContainer
     border.color: Theme.withAlpha(Theme.outline, 0.15)
     border.width: 1

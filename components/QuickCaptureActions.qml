@@ -2,7 +2,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Services
-import "StrokeProperties.js" as StrokeProps
+import "Helpers.js" as Helpers
 
 QtObject {
     id: root
@@ -311,7 +311,7 @@ QtObject {
                     newStroke.points.push({ x: s.points[pj].x, y: s.points[pj].y });
                 }
             }
-            StrokeProps.copyStrokeProperties(s, newStroke);
+            Helpers.copyStrokeProperties(s, newStroke);
             serializedStrokes.push(newStroke);
         }
 

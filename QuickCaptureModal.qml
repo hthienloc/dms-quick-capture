@@ -11,7 +11,6 @@ import "./dms-common"
 import "components"
 import "components/Helpers.js" as Helpers
 import "components/DrawingRenderer.js" as DrawingRenderer
-import "components/StrokeProperties.js" as StrokeProps
 import "components/Constants.js" as Constants
 
 DankModal {
@@ -1098,7 +1097,7 @@ DankModal {
             width: window.copiedStroke.width,
             points: newPoints
         };
-        StrokeProps.copyStrokeProperties(window.copiedStroke, pasted);
+        Helpers.copyStrokeProperties(window.copiedStroke, pasted);
         window.pushStroke(pasted);
         
         if (window.currentTool === "select") {
@@ -1568,7 +1567,7 @@ DankModal {
                     width: window.selectedStroke.width,
                     points: window.selectedStroke.points.map(p => Qt.point(p.x, p.y))
                 };
-                StrokeProps.copyStrokeProperties(window.selectedStroke, window.copiedStroke);
+                Helpers.copyStrokeProperties(window.selectedStroke, window.copiedStroke);
                 window.performPasteAction();
                 event.accepted = true;
                 return;
@@ -1802,7 +1801,7 @@ DankModal {
                             stroke.points.push(Qt.point(rs.points[rpj].x, rs.points[rpj].y));
                         }
                     }
-                    StrokeProps.copyStrokeProperties(rs, stroke);
+                    Helpers.copyStrokeProperties(rs, stroke);
                     restoredStrokes.push(stroke);
                 }
                 window.strokes = restoredStrokes;
