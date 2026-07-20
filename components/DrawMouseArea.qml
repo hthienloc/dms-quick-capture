@@ -352,7 +352,7 @@ MouseArea {
                         window.currentStroke.points.push(absPt);
                     }
                 } else {
-                    const alpha = window.penSmoothingAlpha;
+                    const alpha = Math.min(1, Math.max(0, window.penSmoothingAlpha));
                     penSmoothX = alpha * absPt.x + (1 - alpha) * penSmoothX;
                     penSmoothY = alpha * absPt.y + (1 - alpha) * penSmoothY;
                     window.currentStroke.points.push(Qt.point(penSmoothX, penSmoothY));
@@ -964,7 +964,9 @@ MouseArea {
          }
          window.pushStroke(window.currentStroke);
          window.currentStroke = null;
-    }
+         penSmoothX = 0;
+         penSmoothY = 0;
+     }
 
      onWheel: (wheel) => {
          const step = wheel.angleDelta.y > 0 ? 1 : -1;
@@ -1029,5 +1031,13 @@ MouseArea {
           window.showSizePreview = true;
           previewTimer.restart();
          wheel.accepted = true;
+     }
+
+     Connections {
+         target: window
+         function onCurrentToolChanged() {
+             penSmoothX = 0;
+             penSmoothY = 0;
+         }
      }
 }

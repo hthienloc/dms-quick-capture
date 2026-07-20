@@ -289,7 +289,7 @@ Rectangle {
             // Actions
             Row {
                 spacing: Theme.spacingXS; anchors.verticalCenter: parent.verticalCenter
-                DankActionButton { iconName: "undo"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; enabled: root.canUndo; opacity: enabled ? 1.0 : 0.4; tooltipText: "Undo (Ctrl+Z)"; onClicked: root.undoRequested() }
+                DankActionButton { iconName: "undo"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; enabled: root.canUndo; opacity: enabled ? 1.0 : 0.4; tooltipText: qsTr("Undo (Ctrl+Z)"); onClicked: root.undoRequested() }
                 DankActionButton { iconName: "push_pin"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; tooltipText: "Float Window (Ctrl+F)"; onClicked: root.floatRequested() }
                 DankActionButton { iconName: "save"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; tooltipText: "Save (Ctrl+S)"; onClicked: root.saveRequested() }
                 DankActionButton { iconName: "content_copy"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; tooltipText: "Copy (Ctrl+C)"; onClicked: root.copyRequested() }
@@ -298,7 +298,7 @@ Rectangle {
 
             Rectangle { width: Constants.separatorThickness; height: Constants.separatorLength; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
-            DankActionButton { iconName: "close"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; iconColor: Theme.error; tooltipText: "Discard & Close (Esc)"; anchors.verticalCenter: parent.verticalCenter; onClicked: root.closeRequested() }
+            DankActionButton { iconName: "close"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; iconColor: Theme.error; tooltipText: qsTr("Discard & Close (Esc)"); anchors.verticalCenter: parent.verticalCenter; onClicked: root.closeRequested() }
         }
     }
 
