@@ -19,7 +19,9 @@ Row {
 
     readonly property var presets: [
         { label: "Preset 1", path: Qt.resolvedUrl("../backdrops/preset1.jpg") },
-        { label: "Preset 2", path: Qt.resolvedUrl("../backdrops/preset2.jpg") }
+        { label: "Preset 2", path: Qt.resolvedUrl("../backdrops/preset2.jpg") },
+        { label: "Preset 3", path: Qt.resolvedUrl("../backdrops/preset3.jpg") },
+        { label: "Preset 4", path: Qt.resolvedUrl("../backdrops/preset4.jpg") }
     ]
 
     // Presets Row
@@ -53,19 +55,6 @@ Row {
                         }
                     }
                 }
-            }
-        }
-    }
-
-    // Browse Button (Opens DMS FileBrowserModal)
-    DankButton {
-        text: qsTr("Browse...")
-        iconName: "folder_open"
-        horizontalPadding: Theme.spacingM
-        anchors.verticalCenter: parent.verticalCenter
-        onClicked: {
-            if (controlRoot.modal && controlRoot.modal.backdropImageBrowserModal) {
-                controlRoot.modal.backdropImageBrowserModal.open();
             }
         }
     }

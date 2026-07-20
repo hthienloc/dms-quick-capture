@@ -4,7 +4,6 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Modules.Plugins
-import qs.Modals.FileBrowser
 import qs.Services
 import qs.Widgets
 
