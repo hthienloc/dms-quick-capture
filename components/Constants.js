@@ -50,7 +50,6 @@ const shadowBaseOpacityFactor = 0.55;
 
 // Magnifier Loupe sizing
 const magnifierSize = 160;
-const magnifierRadius = 80;
 const magnifierCrosshairSize = 16;
 const magnifierBannerHeight = 56;
 const magnifierSwatchSize = 20;

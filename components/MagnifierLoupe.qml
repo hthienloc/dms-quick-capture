@@ -11,7 +11,7 @@ Rectangle {
     id: magnifier
     width: Constants.magnifierSize
     height: Constants.magnifierSize
-    radius: Constants.magnifierRadius
+    radius: width / 2
     border.color: Theme.primary
     border.width: 2
     color: "black"

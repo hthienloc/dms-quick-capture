@@ -530,17 +530,17 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
                 const dx = B.x - A.x;
                 const dy = B.y - A.y;
                 const lenSq = dx * dx + dy * dy;
-                let dist = Infinity;
+                let distSq = Infinity;
                 if (lenSq === 0) {
-                    dist = Math.hypot(mx - A.x, my - A.y);
+                    distSq = (mx - A.x) * (mx - A.x) + (my - A.y) * (my - A.y);
                 } else {
                     let t = ((mx - A.x) * dx + (my - A.y) * dy) / lenSq;
                     t = Math.max(0, Math.min(1, t));
                     const px = A.x + t * dx;
                     const py = A.y + t * dy;
-                    dist = Math.hypot(mx - px, my - py);
+                    distSq = (mx - px) * (mx - px) + (my - py) * (my - py);
                 }
-                if (dist < threshold) return i;
+                if (distSq < threshold * threshold) return i;
             }
         } else if (stroke.tool === "rect") {
             const p0 = stroke.points[0];
@@ -604,17 +604,17 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
             const dx = p1.x - p0.x;
             const dy = p1.y - p0.y;
             const lenSq = dx * dx + dy * dy;
-            let dist = Infinity;
+            let distSq = Infinity;
             if (lenSq === 0) {
-                dist = Math.hypot(mx - p0.x, my - p0.y);
+                distSq = (mx - p0.x) * (mx - p0.x) + (my - p0.y) * (my - p0.y);
             } else {
                 let t = ((mx - p0.x) * dx + (my - p0.y) * dy) / lenSq;
                 t = Math.max(0, Math.min(1, t));
                 const px = p0.x + t * dx;
                 const py = p0.y + t * dy;
-                dist = Math.hypot(mx - px, my - py);
+                distSq = (mx - px) * (mx - px) + (my - py) * (my - py);
             }
-            if (dist < threshold) return i;
+            if (distSq < threshold * threshold) return i;
         } else if (stroke.tool === "stamp") {
             const radius = stroke.width * Constants.stampRadiusMultiplier + Constants.stampSelectThresholdOffset;
             if (stroke.hasLeaderLine && stroke.points.length >= 2) {
@@ -622,28 +622,28 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
                 const p1 = stroke.points[1];
 
                 // Check stamp circle at points[1]
-                const distStamp = Math.hypot(mx - p1.x, my - p1.y);
-                if (distStamp <= radius) return i;
+                const distStampSq = (mx - p1.x) * (mx - p1.x) + (my - p1.y) * (my - p1.y);
+                if (distStampSq <= radius * radius) return i;
 
                 // Check leader line segment points[0] -> points[1]
                 const dx = p1.x - p0.x;
                 const dy = p1.y - p0.y;
                 const lenSq = dx * dx + dy * dy;
-                let distLine = Infinity;
+                let distLineSq = Infinity;
                 if (lenSq === 0) {
-                    distLine = Math.hypot(mx - p0.x, my - p0.y);
+                    distLineSq = (mx - p0.x) * (mx - p0.x) + (my - p0.y) * (my - p0.y);
                 } else {
                     let t = ((mx - p0.x) * dx + (my - p0.y) * dy) / lenSq;
                     t = Math.max(0, Math.min(1, t));
                     const px = p0.x + t * dx;
                     const py = p0.y + t * dy;
-                    distLine = Math.hypot(mx - px, my - py);
+                    distLineSq = (mx - px) * (mx - px) + (my - py) * (my - py);
                 }
-                if (distLine < threshold) return i;
+                if (distLineSq < threshold * threshold) return i;
             } else {
                 const p0 = stroke.points[0];
-                const dist = Math.hypot(mx - p0.x, my - p0.y);
-                if (dist <= radius) return i;
+                const distSq = (mx - p0.x) * (mx - p0.x) + (my - p0.y) * (my - p0.y);
+                if (distSq <= radius * radius) return i;
             }
         } else if (stroke.tool === "text") {
             const txtPt = (stroke.isSpeechBubble && stroke.points.length >= 2) ? stroke.points[1] : stroke.points[0];
