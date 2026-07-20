@@ -1121,42 +1121,20 @@ DankModal {
     }
 
     function getPresetTool(index) {
-        let pData = {};
-        if (window.parentWidget && window.parentWidget.pluginData) {
-            pData = window.parentWidget.pluginData;
-        } else if (typeof config !== "undefined" && config.pluginData) {
-            pData = config.pluginData;
-        }
-        const val = pData["preset_" + index + "_tool"];
-        if (val !== undefined) return val;
-        
-        return Constants.defaultRadialTools[index] || "none";
+        const val = window.pluginData["preset_" + index + "_tool"];
+        return val !== undefined ? val : (Constants.defaultRadialTools[index] || "none");
     }
 
     function getPresetColor(index) {
-        let pData = {};
-        if (window.parentWidget && window.parentWidget.pluginData) {
-            pData = window.parentWidget.pluginData;
-        } else if (typeof config !== "undefined" && config.pluginData) {
-            pData = config.pluginData;
-        }
-        const val = pData["preset_" + index + "_color"];
+        const val = window.pluginData["preset_" + index + "_color"];
         if (val !== undefined) return val;
-        
         const defaultColors = ["primary", "primary", "primary", "primary", "primary", "primary", "#000000", "#ffffff"];
         return defaultColors[index] || "primary";
     }
 
     function getPresetThickness(index) {
-        let pData = {};
-        if (window.parentWidget && window.parentWidget.pluginData) {
-            pData = window.parentWidget.pluginData;
-        } else if (typeof config !== "undefined" && config.pluginData) {
-            pData = config.pluginData;
-        }
-        const val = pData["preset_" + index + "_thickness"];
-        if (val !== undefined) return parseInt(val, 10) || 6;
-        return 6;
+        const val = window.pluginData["preset_" + index + "_thickness"];
+        return val !== undefined ? (parseInt(val, 10) || 6) : 6;
     }
 
     function updateRadialPresets() {
