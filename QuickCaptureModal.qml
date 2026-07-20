@@ -1423,12 +1423,12 @@ DankModal {
     }
 
     function sampleCanvasColor(mouseX, mouseY) {
-        var canvas = window.bakedCanvas || window.activeCanvas;
+        const canvas = window.bakedCanvas || window.activeCanvas;
         if (!canvas) return window.currentColor;
         
         // Clamp and round coordinates to prevent out-of-bounds errors and ensure integer coordinates in device pixels
-        var x = Math.max(0, Math.min(Math.floor(mouseX * window.dpr), Math.floor(canvas.width * window.dpr) - 1));
-        var y = Math.max(0, Math.min(Math.floor(mouseY * window.dpr), Math.floor(canvas.height * window.dpr) - 1));
+        const x = Helpers.clamp(Math.floor(mouseX * window.dpr), 0, Math.floor(canvas.width * window.dpr) - 1);
+        const y = Helpers.clamp(Math.floor(mouseY * window.dpr), 0, Math.floor(canvas.height * window.dpr) - 1);
         
         // Performance optimization: skip sampling if the pixel coordinates haven't changed
         if (window._lastSampledX === x && window._lastSampledY === y) {
@@ -1436,17 +1436,17 @@ DankModal {
         }
         
         try {
-            var ctx = canvas.getContext("2d");
+            const ctx = canvas.getContext("2d");
             if (!ctx) return window.currentColor;
             
-            var imgData = ctx.getImageData(x, y, 1, 1);
+            const imgData = ctx.getImageData(x, y, 1, 1);
             if (imgData && imgData.data && imgData.data.length >= 4) {
-                var r = imgData.data[0];
-                var g = imgData.data[1];
-                var b = imgData.data[2];
-                var a = imgData.data[3];
+                const r = imgData.data[0];
+                const g = imgData.data[1];
+                const b = imgData.data[2];
+                const a = imgData.data[3];
                 
-                var pickedColor;
+                let pickedColor;
                 if (a === 0) {
                     pickedColor = window.currentColor;
                 } else {
@@ -1785,22 +1785,17 @@ DankModal {
 
         // Restore state from FloatService if returning from float window
         if (window.restoreState) {
-            var data = window.restoreState;
+            const data = window.restoreState;
             if (data.strokes) {
-                var restoredStrokes = [];
-                for (var rsi = 0; rsi < data.strokes.length; rsi++) {
-                    var rs = data.strokes[rsi];
-                    var stroke = {
+                const restoredStrokes = [];
+                for (let rsi = 0; rsi < data.strokes.length; rsi++) {
+                    const rs = data.strokes[rsi];
+                    const stroke = {
                         tool: rs.tool,
                         color: rs.color,
                         width: rs.width,
-                        points: []
+                        points: rs.points ? rs.points.map(p => Qt.point(p.x, p.y)) : []
                     };
-                    if (rs.points) {
-                        for (var rpj = 0; rpj < rs.points.length; rpj++) {
-                            stroke.points.push(Qt.point(rs.points[rpj].x, rs.points[rpj].y));
-                        }
-                    }
                     Helpers.copyStrokeProperties(rs, stroke);
                     restoredStrokes.push(stroke);
                 }
@@ -2990,12 +2985,12 @@ DankModal {
                     Component.onCompleted: window.paletteWarningDialogRef = paletteWarningDialog
                     currentPaletteColors: toolbarCard.toolbarPalette
                     customPaletteColors: {
-                        var customList = [];
-                        var primaryRaw = config.pluginData["toolbar_color_primary"] || "primary";
-                        var primaryColor = primaryRaw === "primary" ? Theme.primary : primaryRaw;
+                        const customList = [];
+                        const primaryRaw = config.pluginData["toolbar_color_primary"] || "primary";
+                        const primaryColor = primaryRaw === "primary" ? Theme.primary : primaryRaw;
                         customList.push(typeof primaryColor === "string" ? Qt.color(primaryColor) : primaryColor);
-                        for (var i = 0; i < 7; i++) {
-                            var val = config.pluginData["toolbar_color_" + i] || config.adaptiveColors[i];
+                        for (let i = 0; i < 7; i++) {
+                            const val = config.pluginData["toolbar_color_" + i] || config.adaptiveColors[i];
                             customList.push(typeof val === "string" ? Qt.color(val) : val);
                         }
                         return customList;
