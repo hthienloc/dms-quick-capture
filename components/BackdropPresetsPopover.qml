@@ -201,89 +201,97 @@ Rectangle {
                             anchors.fill: parent
                             anchors.margins: 6
 
-                            Row {
+                            // Dual Swatches (2 Color Circles)
+                            Item {
+                                id: swatchesItem
+                                width: 30
+                                height: 20
                                 anchors.left: parent.left
                                 anchors.verticalCenter: parent.verticalCenter
-                                spacing: Theme.spacingS
 
-                                // Dual Swatches (2 Color Circles)
-                                Item {
-                                    width: 30
-                                    height: 20
+                                // Color Slot 1 (Primary / Start / Solid)
+                                Rectangle {
+                                    width: 18
+                                    height: 18
+                                    radius: 9
+                                    x: 0
                                     anchors.verticalCenter: parent.verticalCenter
+                                    color: modelData.mode === "solid" ? (modelData.solidColor || Theme.primary) : (modelData.gradientStart || Theme.primary)
+                                    border.color: Theme.withAlpha(Theme.outline, 0.3)
+                                    border.width: 1
+                                    z: 1
+                                }
 
-                                    // Color Slot 1 (Primary / Start / Solid)
-                                    Rectangle {
-                                        width: 18
-                                        height: 18
-                                        radius: 9
-                                        x: 0
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        color: modelData.mode === "solid" ? (modelData.solidColor || Theme.primary) : (modelData.gradientStart || Theme.primary)
-                                        border.color: Theme.withAlpha(Theme.outline, 0.3)
-                                        border.width: 1
-                                        z: 1
+                                // Color Slot 2 (Secondary / End / Empty for Solid)
+                                Rectangle {
+                                    width: 18
+                                    height: 18
+                                    radius: 9
+                                    x: 12
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    color: (modelData.mode === "gradient" || modelData.mode === "radial" || modelData.mode === "conic")
+                                           ? (modelData.gradientEnd || Theme.secondary)
+                                           : "transparent"
+                                    border.color: Theme.withAlpha(Theme.outline, 0.3)
+                                    border.width: 1
+                                    z: 0
+
+                                    DankIcon {
+                                        name: "close"
+                                        size: 10
+                                        color: Theme.withAlpha(Theme.surfaceText, 0.25)
+                                        anchors.centerIn: parent
+                                        visible: modelData.mode === "solid"
                                     }
+                                }
+                            }
 
-                                    // Color Slot 2 (Secondary / End / Empty for Solid)
-                                    Rectangle {
-                                        width: 18
-                                        height: 18
-                                        radius: 9
-                                        x: 12
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        color: (modelData.mode === "gradient" || modelData.mode === "radial" || modelData.mode === "conic")
-                                               ? (modelData.gradientEnd || Theme.secondary)
-                                               : "transparent"
-                                        border.color: Theme.withAlpha(Theme.outline, 0.3)
-                                        border.width: 1
-                                        z: 0
+                            // Preset Name & Info
+                            Column {
+                                id: textColumn
+                                anchors.left: swatchesItem.right
+                                anchors.leftMargin: Theme.spacingS
+                                anchors.right: popoverRoot.editMode ? editActionsRow.left : parent.right
+                                anchors.rightMargin: Theme.spacingS
+                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: 1
 
-                                        DankIcon {
-                                            name: "close"
-                                            size: 10
-                                            color: Theme.withAlpha(Theme.surfaceText, 0.25)
-                                            anchors.centerIn: parent
-                                            visible: modelData.mode === "solid"
-                                        }
+                                TextInput {
+                                    visible: popoverRoot.editMode
+                                    width: parent.width
+                                    text: modelData.name || "Preset"
+                                    font.pixelSize: Theme.fontSizeSmall - 1
+                                    font.bold: true
+                                    color: Theme.error
+                                    selectByMouse: true
+                                    clip: true
+                                    onEditingFinished: {
+                                        popoverRoot.renamePreset(modelData.id, text);
                                     }
                                 }
 
-                                // Preset Name & Info
-                                Column {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    spacing: 1
+                                StyledText {
+                                    visible: !popoverRoot.editMode
+                                    width: parent.width
+                                    text: modelData.name || "Preset"
+                                    font.pixelSize: Theme.fontSizeSmall - 1
+                                    font.bold: true
+                                    color: Theme.surfaceText
+                                    elide: Text.ElideRight
+                                }
 
-                                    TextInput {
-                                        visible: popoverRoot.editMode
-                                        text: modelData.name || "Preset"
-                                        font.pixelSize: Theme.fontSizeSmall - 1
-                                        font.bold: true
-                                        color: Theme.error
-                                        selectByMouse: true
-                                        onEditingFinished: {
-                                            popoverRoot.renamePreset(modelData.id, text);
-                                        }
-                                    }
-
-                                    StyledText {
-                                        visible: !popoverRoot.editMode
-                                        text: modelData.name || "Preset"
-                                        font.pixelSize: Theme.fontSizeSmall - 1
-                                        font.bold: true
-                                        color: Theme.surfaceText
-                                    }
-
-                                    StyledText {
-                                        text: (modelData.mode || "solid").toUpperCase() + " • " + (modelData.aspectRatio || "auto").toUpperCase()
-                                        font.pixelSize: Theme.fontSizeSmall - 3
-                                        color: Theme.withAlpha(Theme.surfaceText, 0.6)
-                                    }
+                                StyledText {
+                                    width: parent.width
+                                    text: (modelData.mode || "solid").toUpperCase() + " • " + (modelData.aspectRatio || "auto").toUpperCase()
+                                    font.pixelSize: Theme.fontSizeSmall - 3
+                                    color: Theme.withAlpha(Theme.surfaceText, 0.6)
+                                    elide: Text.ElideRight
                                 }
                             }
 
                             // Edit Actions Row (visible in Edit Mode)
                             Row {
+                                id: editActionsRow
                                 visible: popoverRoot.editMode === true
                                 anchors.right: parent.right
                                 anchors.verticalCenter: parent.verticalCenter

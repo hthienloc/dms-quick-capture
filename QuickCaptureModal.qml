@@ -249,9 +249,9 @@ DankModal {
     property var hiddenPresetIds: []
     readonly property var backdropPresets: {
         var customMap = {};
-        if (window.customBackdropPresets) {
-            for (var i = 0; i < window.customBackdropPresets.length; i++) {
-                var cp = window.customBackdropPresets[i];
+        if (customBackdropPresets) {
+            for (var i = 0; i < customBackdropPresets.length; i++) {
+                var cp = customBackdropPresets[i];
                 customMap[cp.id] = cp;
             }
         }
@@ -260,7 +260,7 @@ DankModal {
         if (Constants && Constants.defaultBackdropPresets) {
             for (var j = 0; j < Constants.defaultBackdropPresets.length; j++) {
                 var dp = Constants.defaultBackdropPresets[j];
-                if (!window.hiddenPresetIds || window.hiddenPresetIds.indexOf(dp.id) === -1) {
+                if (!hiddenPresetIds || hiddenPresetIds.indexOf(dp.id) === -1) {
                     if (customMap[dp.id]) {
                         list.push(customMap[dp.id]);
                     } else {
@@ -269,10 +269,10 @@ DankModal {
                 }
             }
         }
-        if (window.customBackdropPresets) {
-            for (var k = 0; k < window.customBackdropPresets.length; k++) {
-                var up = window.customBackdropPresets[k];
-                if (up.isCustomUserCreated && (!window.hiddenPresetIds || window.hiddenPresetIds.indexOf(up.id) === -1)) {
+        if (customBackdropPresets) {
+            for (var k = 0; k < customBackdropPresets.length; k++) {
+                var up = customBackdropPresets[k];
+                if (up.isCustomUserCreated && (!hiddenPresetIds || hiddenPresetIds.indexOf(up.id) === -1)) {
                     list.push(up);
                 }
             }
@@ -1858,14 +1858,16 @@ DankModal {
             }
             if (data.user_backdrop_presets) {
                 try {
-                    window.customBackdropPresets = JSON.parse(data.user_backdrop_presets);
+                    const parsed = JSON.parse(data.user_backdrop_presets);
+                    if (Array.isArray(parsed)) window.customBackdropPresets = parsed;
                 } catch (e) {
                     console.error("Failed to parse user_backdrop_presets:", e);
                 }
             }
             if (data.hidden_backdrop_presets) {
                 try {
-                    window.hiddenPresetIds = JSON.parse(data.hidden_backdrop_presets);
+                    const parsed = JSON.parse(data.hidden_backdrop_presets);
+                    if (Array.isArray(parsed)) window.hiddenPresetIds = parsed;
                 } catch (e) {
                     console.error("Failed to parse hidden_backdrop_presets:", e);
                 }
@@ -1952,9 +1954,13 @@ DankModal {
         if (existingIdx !== -1) {
             newList = window.customBackdropPresets.map(p => p.id === presetId ? Object.assign({}, p, currentData) : p);
         } else {
-            const original = Constants.defaultBackdropPresets.find(p => p.id === presetId);
-            const updated = Object.assign({}, original, currentData);
-            newList = [...window.customBackdropPresets, updated];
+            const original = Constants.defaultBackdropPresets ? Constants.defaultBackdropPresets.find(p => p.id === presetId) : undefined;
+            if (original) {
+                const updated = Object.assign({}, original, currentData);
+                newList = [...window.customBackdropPresets, updated];
+            } else {
+                newList = window.customBackdropPresets;
+            }
         }
         window.customBackdropPresets = newList;
         if (window.parentWidget && window.parentWidget.pluginService) {
@@ -1969,9 +1975,13 @@ DankModal {
         if (existingIdx !== -1) {
             newList = window.customBackdropPresets.map(p => p.id === presetId ? Object.assign({}, p, { name: newName }) : p);
         } else {
-            const original = Constants.defaultBackdropPresets.find(p => p.id === presetId);
-            const updated = Object.assign({}, original, { name: newName });
-            newList = [...window.customBackdropPresets, updated];
+            const original = Constants.defaultBackdropPresets ? Constants.defaultBackdropPresets.find(p => p.id === presetId) : undefined;
+            if (original) {
+                const updated = Object.assign({}, original, { name: newName });
+                newList = [...window.customBackdropPresets, updated];
+            } else {
+                newList = window.customBackdropPresets;
+            }
         }
         window.customBackdropPresets = newList;
         if (window.parentWidget && window.parentWidget.pluginService) {
