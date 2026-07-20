@@ -227,6 +227,20 @@ DankModal {
     property real backdropImageBlur: 0
     property real backdropImageDim: 0.2
     readonly property alias backdropImageBrowserModal: backdropImageBrowserModal
+
+    FileBrowserModal {
+        id: backdropImageBrowserModal
+        browserTitle: qsTr("Select background image")
+        browserIcon: "wallpaper"
+        browserType: "wallpaper"
+        showHiddenFiles: true
+        fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif"]
+        onFileSelected: path => {
+            window.backdropImagePath = path;
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+            close();
+        }
+    }
     property int backdropPadding: Constants.defaultBackdropPadding
     property int backdropCornerRadius: Constants.defaultBackdropCornerRadius
     property int backdropShadowStrength: Constants.defaultBackdropShadowStrength
@@ -2703,20 +2717,6 @@ DankModal {
                         id: textInputDialog
                         window: rootWindow
                         modalFocusScope: modalFocusScope
-                    }
-
-                    FileBrowserModal {
-                        id: backdropImageBrowserModal
-                        browserTitle: qsTr("Select background image")
-                        browserIcon: "wallpaper"
-                        browserType: "wallpaper"
-                        showHiddenFiles: true
-                        fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.jxl", "*.avif", "*.heif"]
-                        onFileSelected: path => {
-                            window.backdropImagePath = path;
-                            if (window.activeCanvas) window.activeCanvas.requestPaint();
-                            close();
-                        }
                     }
 
                     Item {
