@@ -60,7 +60,7 @@ Popup {
             spacing: Theme.spacingM
 
             StyledText {
-                text: I18n.tr("Add Text Note")
+                text: window && window.editingStroke ? I18n.tr("Edit Text Note") : I18n.tr("Add Text Note")
                 font.bold: true
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceText
@@ -175,7 +175,7 @@ Popup {
                     }
 
                     DankButton {
-                        text: I18n.tr("Add")
+                        text: window && window.editingStroke ? I18n.tr("Save") : I18n.tr("Add")
                         backgroundColor: Theme.primary
                         textColor: Theme.primaryText
                         onClicked: {
