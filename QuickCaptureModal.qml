@@ -545,10 +545,10 @@ DankModal {
         const w = layout.w;
         const h = layout.h;
         
-        const opacity = (window.backdropShadowStrength / 100.0) * 0.55;
-        const STEPS = 12;
-        const maxOffset = 24.0;
-        const maxBlur = 45.0;
+        const opacity = (window.backdropShadowStrength / 100.0) * Constants.shadowBaseOpacityFactor;
+        const STEPS = Constants.defaultShadowSteps;
+        const maxOffset = Constants.maxShadowOffset;
+        const maxBlur = Constants.maxShadowBlur;
         
         // Draw 12 concentric shadow layers with quadratic spacing and falloff for smooth rendering
         for (let i = 1; i <= STEPS; i++) {

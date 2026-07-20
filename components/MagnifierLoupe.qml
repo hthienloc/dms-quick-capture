@@ -5,12 +5,13 @@ import qs.Widgets
 import qs.Modals.Common
 import qs.Services
 import "../dms-common"
+import "Constants.js" as Constants
 
 Rectangle {
     id: magnifier
-    width: 160
-    height: 160
-    radius: 80
+    width: Constants.magnifierSize
+    height: Constants.magnifierSize
+    radius: Constants.magnifierRadius
     border.color: Theme.primary
     border.width: 2
     color: "black"
@@ -124,14 +125,14 @@ Rectangle {
 
     Rectangle {
         anchors.centerIn: parent
-        width: 16
+        width: Constants.magnifierCrosshairSize
         height: 1.5
         color: Theme.primary
     }
     Rectangle {
         anchors.centerIn: parent
         width: 1.5
-        height: 16
+        height: Constants.magnifierCrosshairSize
         color: Theme.primary
     }
 
@@ -142,7 +143,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        height: 56
+        height: Constants.magnifierBannerHeight
         color: Theme.withAlpha(Theme.surfaceContainer, 0.9)
         border.color: Theme.withAlpha(Theme.outline, 0.15)
         border.width: 1
@@ -153,9 +154,9 @@ Rectangle {
 
             // Color preview swatch
             Rectangle {
-                width: 20
-                height: 20
-                radius: 5
+                width: Constants.magnifierSwatchSize
+                height: Constants.magnifierSwatchSize
+                radius: Constants.magnifierSwatchRadius
                 color: window.hoveredColor
                 border.color: Theme.withAlpha(Theme.outline, 0.3)
                 border.width: 1

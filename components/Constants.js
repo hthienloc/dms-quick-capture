@@ -42,6 +42,20 @@ const textBubbleDefaultRadius = 8;
 const textBubbleMinRadius = 8;
 const textBubbleDragThreshold = 10;
 
+// Shadow rendering constants
+const defaultShadowSteps = 12;
+const maxShadowOffset = 24.0;
+const maxShadowBlur = 45.0;
+const shadowBaseOpacityFactor = 0.55;
+
+// Magnifier Loupe sizing
+const magnifierSize = 160;
+const magnifierRadius = 80;
+const magnifierCrosshairSize = 16;
+const magnifierBannerHeight = 56;
+const magnifierSwatchSize = 20;
+const magnifierSwatchRadius = 5;
+
 // Toolbar sizing constants (from ToolbarConstants.qml)
 const btnSize = 36;
 const iconSize = 18;
@@ -68,3 +82,4 @@ const subToolbarIconSize = 20;
 const compactControlHeight = 40;
 const customRatioPopoverHeight = 120;
 const verticalSelectorItemWidth = 32;
+
