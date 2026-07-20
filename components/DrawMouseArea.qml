@@ -29,6 +29,10 @@ MouseArea {
     property string hoveredHandle: "none"
     property int hoveredStrokeIdx: -1
 
+    // Pen real-time smoothing state (exponential moving average)
+    property real penSmoothX: 0
+    property real penSmoothY: 0
+
     function getAbsolutePoint(mx, my) {
         let rx = mx / window.editScale;
         let ry = my / window.editScale;
@@ -348,7 +352,10 @@ MouseArea {
                         window.currentStroke.points.push(absPt);
                     }
                 } else {
-                    window.currentStroke.points.push(absPt);
+                    const alpha = Math.min(1, Math.max(0, window.penSmoothingAlpha));
+                    penSmoothX = alpha * absPt.x + (1 - alpha) * penSmoothX;
+                    penSmoothY = alpha * absPt.y + (1 - alpha) * penSmoothY;
+                    window.currentStroke.points.push(Qt.point(penSmoothX, penSmoothY));
                 }
                } else if (window.currentTool === "redact") {
                  let finalPt = absPt;
@@ -763,6 +770,13 @@ MouseArea {
             return;
         }
 
+        // Initialize pen smoothing state for real-time EMA filtering
+        if (window.currentTool === "pen") {
+            const pt = getAbsolutePoint(mouse.x, mouse.y);
+            penSmoothX = pt.x;
+            penSmoothY = pt.y;
+        }
+
          window.currentStroke = {
               tool: window.currentTool,
               color: window.currentColor.toString(),
@@ -950,7 +964,9 @@ MouseArea {
          }
          window.pushStroke(window.currentStroke);
          window.currentStroke = null;
-    }
+         penSmoothX = 0;
+         penSmoothY = 0;
+     }
 
      onWheel: (wheel) => {
          const step = wheel.angleDelta.y > 0 ? 1 : -1;
@@ -1015,5 +1031,13 @@ MouseArea {
           window.showSizePreview = true;
           previewTimer.restart();
          wheel.accepted = true;
+     }
+
+     Connections {
+         target: window
+         function onCurrentToolChanged() {
+             penSmoothX = 0;
+             penSmoothY = 0;
+         }
      }
 }
