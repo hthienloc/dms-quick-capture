@@ -532,13 +532,13 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
                 const lenSq = dx * dx + dy * dy;
                 let dist = Infinity;
                 if (lenSq === 0) {
-                    dist = Math.sqrt((mx - A.x) * (mx - A.x) + (my - A.y) * (my - A.y));
+                    dist = Math.hypot(mx - A.x, my - A.y);
                 } else {
                     let t = ((mx - A.x) * dx + (my - A.y) * dy) / lenSq;
                     t = Math.max(0, Math.min(1, t));
                     const px = A.x + t * dx;
                     const py = A.y + t * dy;
-                    dist = Math.sqrt((mx - px) * (mx - px) + (my - py) * (my - py));
+                    dist = Math.hypot(mx - px, my - py);
                 }
                 if (dist < threshold) return i;
             }
@@ -606,13 +606,13 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
             const lenSq = dx * dx + dy * dy;
             let dist = Infinity;
             if (lenSq === 0) {
-                dist = Math.sqrt((mx - p0.x) * (mx - p0.x) + (my - p0.y) * (my - p0.y));
+                dist = Math.hypot(mx - p0.x, my - p0.y);
             } else {
                 let t = ((mx - p0.x) * dx + (my - p0.y) * dy) / lenSq;
                 t = Math.max(0, Math.min(1, t));
                 const px = p0.x + t * dx;
                 const py = p0.y + t * dy;
-                dist = Math.sqrt((mx - px) * (mx - px) + (my - py) * (my - py));
+                dist = Math.hypot(mx - px, my - py);
             }
             if (dist < threshold) return i;
         } else if (stroke.tool === "stamp") {
@@ -622,7 +622,7 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
                 const p1 = stroke.points[1];
 
                 // Check stamp circle at points[1]
-                const distStamp = Math.sqrt((mx - p1.x) * (mx - p1.x) + (my - p1.y) * (my - p1.y));
+                const distStamp = Math.hypot(mx - p1.x, my - p1.y);
                 if (distStamp <= radius) return i;
 
                 // Check leader line segment points[0] -> points[1]
@@ -631,18 +631,18 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
                 const lenSq = dx * dx + dy * dy;
                 let distLine = Infinity;
                 if (lenSq === 0) {
-                    distLine = Math.sqrt((mx - p0.x) * (mx - p0.x) + (my - p0.y) * (my - p0.y));
+                    distLine = Math.hypot(mx - p0.x, my - p0.y);
                 } else {
                     let t = ((mx - p0.x) * dx + (my - p0.y) * dy) / lenSq;
                     t = Math.max(0, Math.min(1, t));
                     const px = p0.x + t * dx;
                     const py = p0.y + t * dy;
-                    distLine = Math.sqrt((mx - px) * (mx - px) + (my - py) * (my - py));
+                    distLine = Math.hypot(mx - px, my - py);
                 }
                 if (distLine < threshold) return i;
             } else {
                 const p0 = stroke.points[0];
-                const dist = Math.sqrt((mx - p0.x) * (mx - p0.x) + (my - p0.y) * (my - p0.y));
+                const dist = Math.hypot(mx - p0.x, my - p0.y);
                 if (dist <= radius) return i;
             }
         } else if (stroke.tool === "text") {
