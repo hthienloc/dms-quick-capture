@@ -22,6 +22,7 @@ Rectangle {
     readonly property bool showShortcutHints: root.pluginData["show_shortcut_hints"] ?? false
 
     // Backdrop configuration properties
+    property var modal: null
     property string backdropMode: "none"
     property color backdropSolidColor: Theme.primary
     property color backdropGradientStart: Theme.primary
@@ -659,7 +660,7 @@ Rectangle {
                         }
                     }
                 }
-            }}
+            }
         }
     }
 
@@ -919,7 +920,7 @@ Rectangle {
                         }
                     }
                 }
-            }}
+            }
         }
     }
 }

@@ -529,7 +529,7 @@ DankModal {
         } else if (window.backdropMode === "image") {
             if (backdropImageSource.status === Image.Ready && backdropImageSource.sourceWidth > 0) {
                 ctx.save();
-                ctx.drawImage(backdropEffectContainer, 0, 0, w, h);
+                ctx.drawImage(backdropImageSource, 0, 0, w, h);
                 if (window.backdropImageDim > 0) {
                     ctx.fillStyle = "rgba(0, 0, 0, " + Math.min(0.8, window.backdropImageDim) + ")";
                     ctx.fillRect(0, 0, w, h);
@@ -1909,6 +1909,7 @@ DankModal {
 
                 QuickCaptureToolbar {
                     id: toolbarCard
+                    modal: window
                     Component.onCompleted: window.toolbarItem = toolbarCard
                     z: 100
                     visible: window.toolbarVisible
@@ -2728,7 +2729,7 @@ DankModal {
                             id: backdropImageSource
                             anchors.fill: parent
                             fillMode: Image.PreserveAspectCrop
-                            source: window.backdropImagePath ? (window.backdropImagePath.indexOf("://") !== -1 ? window.backdropImagePath : "file://" + window.backdropImagePath) : Qt.resolvedUrl("./backdrops/preset1.jpg")
+                            source: window.backdropImagePath ? (window.backdropImagePath.indexOf(":/") !== -1 ? window.backdropImagePath : "file://" + window.backdropImagePath) : Qt.resolvedUrl("./backdrops/preset1.jpg")
                             onStatusChanged: {
                                 if (status === Image.Ready && window.activeCanvas) {
                                     window.activeCanvas.requestPaint();
