@@ -680,36 +680,38 @@ DankModal {
     }
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
 
-    readonly property bool textMonospace: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textMonospace !== undefined ? window.parentWidget.pluginData.textMonospace : false
+    readonly property var pluginData: (window.parentWidget && window.parentWidget.pluginData) ? window.parentWidget.pluginData : ({})
+
+    readonly property bool textMonospace: pluginData.textMonospace !== undefined ? pluginData.textMonospace : false
     
     // Rich Text Options
-    property bool textBold: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textBold !== undefined ? window.parentWidget.pluginData.textBold : false
+    property bool textBold: pluginData.textBold !== undefined ? pluginData.textBold : false
     onTextBoldChanged: {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
-    property bool textItalic: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textItalic !== undefined ? window.parentWidget.pluginData.textItalic : false
+    property bool textItalic: pluginData.textItalic !== undefined ? pluginData.textItalic : false
     onTextItalicChanged: {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
-    property bool textUnderline: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textUnderline !== undefined ? window.parentWidget.pluginData.textUnderline : false
+    property bool textUnderline: pluginData.textUnderline !== undefined ? pluginData.textUnderline : false
     onTextUnderlineChanged: {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
-    property bool textBackground: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textBackground !== undefined ? window.parentWidget.pluginData.textBackground : false
+    property bool textBackground: pluginData.textBackground !== undefined ? pluginData.textBackground : false
     onTextBackgroundChanged: {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
-    property int textCornerRadius: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textCornerRadius !== undefined ? window.parentWidget.pluginData.textCornerRadius : 8
+    property int textCornerRadius: pluginData.textCornerRadius !== undefined ? pluginData.textCornerRadius : 8
     onTextCornerRadiusChanged: {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
-    property string textFontFamily: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textFontFamily !== undefined ? window.parentWidget.pluginData.textFontFamily : (textMonospace ? "monospace" : "sans-serif")
+    property string textFontFamily: pluginData.textFontFamily !== undefined ? pluginData.textFontFamily : (textMonospace ? "monospace" : "sans-serif")
     onTextFontFamilyChanged: {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
-    readonly property string textInputMode: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textInputMode !== undefined ? window.parentWidget.pluginData.textInputMode : "inline"
-    readonly property string toolbarPosition: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.toolbarPosition !== undefined ? window.parentWidget.pluginData.toolbarPosition : "bottom"
-    readonly property bool configShowToolbar: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.showToolbar !== undefined ? window.parentWidget.pluginData.showToolbar : true
+    readonly property string textInputMode: pluginData.textInputMode !== undefined ? pluginData.textInputMode : "inline"
+    readonly property string toolbarPosition: pluginData.toolbarPosition !== undefined ? pluginData.toolbarPosition : "bottom"
+    readonly property bool configShowToolbar: pluginData.showToolbar !== undefined ? pluginData.showToolbar : true
     readonly property bool enableMagnifier: true
     property bool toolbarVisible: true
     onConfigShowToolbarChanged: {
