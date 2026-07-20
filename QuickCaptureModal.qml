@@ -2066,16 +2066,18 @@ DankModal {
                         if (moreToolsMenu.opened) {
                             moreToolsMenu.close();
                         } else {
-                            var pt = buttonItem.mapToItem(contentRoot, 0, 0);
+                            const pt = buttonItem.mapToItem(contentRoot, 0, 0);
                             if (toolbarCard.isVertical) {
                                 if (window.toolbarPosition === "right") {
                                     moreToolsMenu.x = pt.x - moreToolsMenu.width - Theme.spacingS;
                                 } else {
                                     moreToolsMenu.x = pt.x + buttonItem.width + Theme.spacingS;
                                 }
-                                moreToolsMenu.y = Math.max(Theme.spacingS, Math.min(pt.y, contentRoot.height - moreToolsMenu.height - Theme.spacingS));
+                                const targetY = pt.y + (buttonItem.height - moreToolsMenu.height) / 2;
+                                moreToolsMenu.y = Math.max(Theme.spacingS, Math.min(targetY, contentRoot.height - moreToolsMenu.height - Theme.spacingS));
                             } else {
-                                moreToolsMenu.x = Math.max(Theme.spacingS, Math.min(pt.x, contentRoot.width - moreToolsMenu.width - Theme.spacingS));
+                                const targetX = pt.x + (buttonItem.width - moreToolsMenu.width) / 2;
+                                moreToolsMenu.x = Math.max(Theme.spacingS, Math.min(targetX, contentRoot.width - moreToolsMenu.width - Theme.spacingS));
                                 if (window.toolbarPosition === "bottom") {
                                     moreToolsMenu.y = pt.y - moreToolsMenu.height - Theme.spacingS;
                                 } else {
