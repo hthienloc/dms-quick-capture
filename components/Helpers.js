@@ -160,7 +160,7 @@ function isInsideCropRect(mx, my, hasSelection, cropRect) {
  */
 function findByKey(items, key) {
     if (!items) return null;
-    for (var i = 0; i < items.length; i++) {
+    for (let i = 0; i < items.length; i++) {
         if (items[i].key === key) return items[i];
     }
     return null;
@@ -168,7 +168,6 @@ function findByKey(items, key) {
 
 /**
  * Formats watermark text patterns.
-
  * @param {string} pattern - The pattern string.
  * @param {object} Quickshell - The Quickshell object.
  * @returns {string} Formatted string.
@@ -177,7 +176,7 @@ function formatWatermarkText(pattern, Quickshell) {
     if (!pattern) return "";
     const username = Quickshell.env("USER") || Quickshell.env("USERNAME") || "User";
     const now = new Date();
-    const pad = function(num, size) {
+    const pad = (num, size) => {
         let s = num + "";
         while (s.length < (size || 2)) s = "0" + s;
         return s;
@@ -219,7 +218,7 @@ function formatWatermarkText(pattern, Quickshell) {
  * @returns {object} { start, end } QML color values.
  */
 function extractDominantColors(imgData, Qt) {
-    var fallback = {
+    const fallback = {
         start: Qt.rgba(0.2, 0.33, 0.47, 1),
         end: Qt.rgba(0.07, 0.13, 0.2, 1)
     };
@@ -227,29 +226,29 @@ function extractDominantColors(imgData, Qt) {
         return fallback;
     }
 
-    var pixels = [];
-    for (var i = 0; i < 16; i++) {
-        var r = imgData.data[i * 4];
-        var g = imgData.data[i * 4 + 1];
-        var b = imgData.data[i * 4 + 2];
+    const pixels = [];
+    for (let i = 0; i < 16; i++) {
+        const r = imgData.data[i * 4];
+        const g = imgData.data[i * 4 + 1];
+        const b = imgData.data[i * 4 + 2];
         
         // Calculate saturation: max(r,g,b) - min(r,g,b)
-        var max = Math.max(r, g, b);
-        var min = Math.min(r, g, b);
-        var sat = max - min;
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        const sat = max - min;
         
         pixels.push({ r: r, g: g, b: b, sat: sat, max: max });
     }
     
     // Sort by saturation descending to prefer vibrant colors
-    pixels.sort(function(a, b) { return b.sat - a.sat; });
+    pixels.sort((a, b) => b.sat - a.sat);
     
-    var colorStart, colorEnd;
+    let colorStart, colorEnd;
     
     // If the image is extremely grey/monochromatic (saturation < 15)
     if (pixels[0].sat < 15) {
-        var avg = 0;
-        for (var i = 0; i < 16; i++) {
+        let avg = 0;
+        for (let i = 0; i < 16; i++) {
             avg += (pixels[i].r + pixels[i].g + pixels[i].b) / 3;
         }
         avg = Math.round(avg / 16);
@@ -258,15 +257,15 @@ function extractDominantColors(imgData, Qt) {
         colorEnd = Qt.rgba(Math.min(255, avg + 20)/255, Math.min(255, avg + 10)/255, Math.max(0, avg - 10)/255, 1);
     } else {
         // Start color: the most vibrant color
-        var pStart = pixels[0];
+        const pStart = pixels[0];
         colorStart = Qt.rgba(pStart.r/255, pStart.g/255, pStart.b/255, 1);
         
         // End color: find a pixel that is sufficiently different from start color in RGB space
-        var pEnd = null;
-        var maxDist = -1;
-        for (var j = 1; j < pixels.length; j++) {
-            var pj = pixels[j];
-            var dist = Math.sqrt(Math.pow(pj.r - pStart.r, 2) + Math.pow(pj.g - pStart.g, 2) + Math.pow(pj.b - pStart.b, 2));
+        let pEnd = null;
+        let maxDist = -1;
+        for (let j = 1; j < pixels.length; j++) {
+            const pj = pixels[j];
+            const dist = Math.sqrt(Math.pow(pj.r - pStart.r, 2) + Math.pow(pj.g - pStart.g, 2) + Math.pow(pj.b - pStart.b, 2));
             if (dist > maxDist) {
                 maxDist = dist;
                 pEnd = pj;
@@ -287,41 +286,41 @@ function extractDominantColors(imgData, Qt) {
     }
     
     // Calculate average image luminance
-    var imgLuminance = 0;
-    for (var i = 0; i < 16; i++) {
-        var pr = imgData.data[i * 4] / 255;
-        var pg = imgData.data[i * 4 + 1] / 255;
-        var pb = imgData.data[i * 4 + 2] / 255;
+    let imgLuminance = 0;
+    for (let i = 0; i < 16; i++) {
+        const pr = imgData.data[i * 4] / 255;
+        const pg = imgData.data[i * 4 + 1] / 255;
+        const pb = imgData.data[i * 4 + 2] / 255;
         imgLuminance += (0.299 * pr + 0.587 * pg + 0.114 * pb);
     }
     imgLuminance /= 16;
 
     // Helper to adjust color to a specific target luminance
-    function adjustToLuminance(c, targetL) {
-        var l = 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
+    const adjustToLuminance = (c, targetL) => {
+        const l = 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
         if (Math.abs(l - targetL) < 0.01) return c;
         
         if (targetL < l) {
             // Make darker
-            var scale = targetL / Math.max(0.01, l);
+            const scale = targetL / Math.max(0.01, l);
             return Qt.rgba(Math.min(1.0, c.r * scale), Math.min(1.0, c.g * scale), Math.min(1.0, c.b * scale), 1);
         } else {
             // Make lighter
             if (l >= 0.99) return Qt.rgba(targetL, targetL, targetL, 1);
-            var t = (targetL - l) / (1.0 - l);
+            const t = (targetL - l) / (1.0 - l);
             return Qt.rgba(c.r + (1.0 - c.r) * t, c.g + (1.0 - c.g) * t, c.b + (1.0 - c.b) * t, 1);
         }
-    }
+    };
 
-    var lStart = 0.299 * colorStart.r + 0.587 * colorStart.g + 0.114 * colorStart.b;
-    var ratioStart = (Math.max(lStart, imgLuminance) + 0.05) / (Math.min(lStart, imgLuminance) + 0.05);
+    const lStart = 0.299 * colorStart.r + 0.587 * colorStart.g + 0.114 * colorStart.b;
+    const ratioStart = (Math.max(lStart, imgLuminance) + 0.05) / (Math.min(lStart, imgLuminance) + 0.05);
     
-    var finalStart = colorStart;
-    var finalEnd = colorEnd;
+    let finalStart = colorStart;
+    let finalEnd = colorEnd;
     
     if (ratioStart < 4.5) {
-        var targetLStart;
-        var targetLEnd;
+        let targetLStart;
+        let targetLEnd;
         if (imgLuminance > 0.5) {
             // Image is light -> Make backdrop darker
             targetLStart = Math.max(0.05, (imgLuminance + 0.05) / 4.5 - 0.05);
@@ -336,11 +335,11 @@ function extractDominantColors(imgData, Qt) {
     } else {
         // Start color already has good contrast. Ensure End color also has contrast,
         // and keep a healthy luminance gap between them to ensure gradient visibility.
-        var lEnd = 0.299 * colorEnd.r + 0.587 * colorEnd.g + 0.114 * colorEnd.b;
-        var ratioEnd = (Math.max(lEnd, imgLuminance) + 0.05) / (Math.min(lEnd, imgLuminance) + 0.05);
+        const lEnd = 0.299 * colorEnd.r + 0.587 * colorEnd.g + 0.114 * colorEnd.b;
+        const ratioEnd = (Math.max(lEnd, imgLuminance) + 0.05) / (Math.min(lEnd, imgLuminance) + 0.05);
         
         if (ratioEnd < 4.5) {
-            var targetLEnd;
+            let targetLEnd;
             if (imgLuminance > 0.5) {
                 targetLEnd = Math.max(0.02, (imgLuminance + 0.05) / 4.5 - 0.05);
                 if (Math.abs(lStart - targetLEnd) < 0.1) {

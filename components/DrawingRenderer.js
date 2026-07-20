@@ -116,7 +116,7 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         ctx.lineJoin = config.roundHighlighter ? "round" : "miter";
         ctx.beginPath();
         ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-        for (var i = 1; i < stroke.points.length; i++) {
+        for (let i = 1; i < stroke.points.length; i++) {
             ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
         }
         ctx.stroke();
