@@ -976,6 +976,7 @@ function colorEquals(c1, c2, Qt) {
 }
 
 function copyStrokeProperties(source, target) {
+    if (!source || !target) return;
     if (source.text !== undefined) target.text = source.text;
     if (source.isMonospace !== undefined) target.isMonospace = source.isMonospace;
     if (source.fontFamily !== undefined) target.fontFamily = source.fontFamily;
