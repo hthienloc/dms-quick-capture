@@ -1427,8 +1427,8 @@ DankModal {
         if (!canvas) return window.currentColor;
         
         // Clamp and round coordinates to prevent out-of-bounds errors and ensure integer coordinates in device pixels
-        const x = Math.max(0, Math.min(Math.floor(mouseX * window.dpr), Math.floor(canvas.width * window.dpr) - 1));
-        const y = Math.max(0, Math.min(Math.floor(mouseY * window.dpr), Math.floor(canvas.height * window.dpr) - 1));
+        const x = Helpers.clamp(Math.floor(mouseX * window.dpr), 0, Math.floor(canvas.width * window.dpr) - 1);
+        const y = Helpers.clamp(Math.floor(mouseY * window.dpr), 0, Math.floor(canvas.height * window.dpr) - 1);
         
         // Performance optimization: skip sampling if the pixel coordinates haven't changed
         if (window._lastSampledX === x && window._lastSampledY === y) {
@@ -1794,13 +1794,8 @@ DankModal {
                         tool: rs.tool,
                         color: rs.color,
                         width: rs.width,
-                        points: []
+                        points: rs.points ? rs.points.map(p => Qt.point(p.x, p.y)) : []
                     };
-                    if (rs.points) {
-                        for (let rpj = 0; rpj < rs.points.length; rpj++) {
-                            stroke.points.push(Qt.point(rs.points[rpj].x, rs.points[rpj].y));
-                        }
-                    }
                     Helpers.copyStrokeProperties(rs, stroke);
                     restoredStrokes.push(stroke);
                 }

@@ -265,7 +265,7 @@ function extractDominantColors(imgData, Qt) {
         let maxDist = -1;
         for (let j = 1; j < pixels.length; j++) {
             const pj = pixels[j];
-            const dist = Math.sqrt(Math.pow(pj.r - pStart.r, 2) + Math.pow(pj.g - pStart.g, 2) + Math.pow(pj.b - pStart.b, 2));
+            const dist = Math.hypot(pj.r - pStart.r, pj.g - pStart.g, pj.b - pStart.b);
             if (dist > maxDist) {
                 maxDist = dist;
                 pEnd = pj;
