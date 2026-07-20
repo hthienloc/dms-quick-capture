@@ -997,3 +997,26 @@ function copyStrokeProperties(source, target) {
     if (source.calloutLinkLines !== undefined) target.calloutLinkLines = source.calloutLinkLines;
     if (source.id !== undefined) target.id = source.id;
 }
+
+/**
+ * Calculates Euclidean distance between two points {x, y}.
+ * @param {object} p1 - First point {x, y}.
+ * @param {object} p2 - Second point {x, y}.
+ * @returns {number} Distance value.
+ */
+function distance(p1, p2) {
+    if (!p1 || !p2) return 0;
+    return Math.hypot(p2.x - p1.x, p2.y - p1.y);
+}
+
+/**
+ * Clamps a numerical value between min and max bounds.
+ * @param {number} val - Input value.
+ * @param {number} min - Lower bound.
+ * @param {number} max - Upper bound.
+ * @returns {number} Clamped value.
+ */
+function clamp(val, min, max) {
+    return Math.max(min, Math.min(max, val));
+}
+
