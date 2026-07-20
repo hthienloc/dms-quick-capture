@@ -700,6 +700,11 @@ DankModal {
 
     // Text Input Management
     property bool isTyping: false
+    onIsTypingChanged: {
+        if (isTyping) {
+            typingCursorVisible = true;
+        }
+    }
     property point typingCoords: Qt.point(0,0)
     property string currentTypingText: ""
     property int typingCursorIndex: 0
@@ -1535,13 +1540,15 @@ DankModal {
             return;
         }
         if (event.key === Qt.Key_Left) {
-            window.typingCursorIndex = Math.max(0, window.typingCursorIndex - 1);
+            const len = window.currentTypingText.length;
+            window.typingCursorIndex = Math.max(0, Math.min(len, window.typingCursorIndex) - 1);
             if (window.activeCanvas) window.activeCanvas.requestPaint();
             event.accepted = true;
             return;
         }
         if (event.key === Qt.Key_Right) {
-            window.typingCursorIndex = Math.min(window.currentTypingText.length, window.typingCursorIndex + 1);
+            const len = window.currentTypingText.length;
+            window.typingCursorIndex = Math.min(len, Math.max(0, window.typingCursorIndex) + 1);
             if (window.activeCanvas) window.activeCanvas.requestPaint();
             event.accepted = true;
             return;
@@ -1559,9 +1566,9 @@ DankModal {
             return;
         }
         if (event.key === Qt.Key_Backspace) {
-            if (window.typingCursorIndex > 0) {
-                const txt = window.currentTypingText;
-                const idx = window.typingCursorIndex;
+            const txt = window.currentTypingText;
+            const idx = Math.max(0, Math.min(txt.length, window.typingCursorIndex));
+            if (idx > 0) {
                 window.currentTypingText = txt.slice(0, idx - 1) + txt.slice(idx);
                 window.typingCursorIndex = idx - 1;
                 if (window.activeCanvas) window.activeCanvas.requestPaint();
@@ -1570,10 +1577,11 @@ DankModal {
             return;
         }
         if (event.key === Qt.Key_Delete) {
-            if (window.typingCursorIndex < window.currentTypingText.length) {
-                const txt = window.currentTypingText;
-                const idx = window.typingCursorIndex;
+            const txt = window.currentTypingText;
+            const idx = Math.max(0, Math.min(txt.length, window.typingCursorIndex));
+            if (idx < txt.length) {
                 window.currentTypingText = txt.slice(0, idx) + txt.slice(idx + 1);
+                window.typingCursorIndex = idx;
                 if (window.activeCanvas) window.activeCanvas.requestPaint();
             }
             event.accepted = true;
