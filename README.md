@@ -96,7 +96,8 @@ git checkout main && git pull
 - **Thickness:** Scroll **Mouse Wheel** to scale brush / font size.
 - **Quick Erase:** **Middle-click** on any element to delete it.
 - **Copy / Duplicate:** Select a vector with the **Select** tool (<kbd>V</kbd>), then press **<kbd>C</kbd>** to duplicate. Pressing **<kbd>C</kbd>** without a selection pastes the last copied vector at the cursor.
-- **Undo:** <kbd>Ctrl</kbd> + <kbd>Z</kbd>.
+- **Undo:** <kbd>Ctrl</kbd> + <kbd>Z</kbd> or **Mouse Back Button**.
+- **Redo:** <kbd>Ctrl</kbd> + <kbd>Y</kbd> / <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd> or **Mouse Forward Button**.
 - **Speech Bubble (Text Tool):** Click and drag to draw a speech bubble. The click location defines the tail target point, and the release location is the text bubble. A single click without dragging writes normal text.
 - **Leader Line (Stamp Tool):** Click and drag to create a stamp with a leader line. The click location points to the target, and the release location places the stamp body. A single click without dragging drops a normal stamp.
 - **Shift Constraint:** Hold **<kbd>Shift</kbd>** while drawing to constrain shapes:
@@ -129,7 +130,8 @@ git checkout main && git pull
 |-----|--------|
 | <kbd>Enter</kbd> | Done (save/copy per settings) |
 | <kbd>Esc</kbd> | Discard & Close |
-| <kbd>Ctrl</kbd> + <kbd>Z</kbd> | Undo last stroke |
+| <kbd>Ctrl</kbd> + <kbd>Z</kbd> | Undo last stroke (or Mouse Back Button) |
+| <kbd>Ctrl</kbd> + <kbd>Y</kbd> / <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd> | Redo last undone stroke (or Mouse Forward Button) |
 | <kbd>Ctrl</kbd> + <kbd>S</kbd> | Save to file |
 | <kbd>Ctrl</kbd> + <kbd>C</kbd> | Copy to clipboard |
 | <kbd>Ctrl</kbd> + <kbd>A</kbd> | Copy & Save |
