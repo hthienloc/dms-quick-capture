@@ -17,6 +17,7 @@ Rectangle {
     property color currentColor: Theme.primary
     property int strokeWidth: 8
     property bool canUndo: false
+    property bool canRedo: false
     property bool isVertical: false
     property bool showAnnotations: true
     readonly property bool showShortcutHints: root.pluginData["show_shortcut_hints"] ?? false
@@ -78,6 +79,7 @@ Rectangle {
     property int activeColorSlotIndex: 0
     signal strokeWidthSelected(int width)
     signal undoRequested()
+    signal redoRequested()
     signal floatRequested()
     signal saveRequested()
     signal copyRequested()
@@ -290,10 +292,18 @@ Rectangle {
 
             Rectangle { width: Constants.separatorThickness; height: Constants.separatorLength; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
-            // Actions
+            // History Actions (Undo & Redo)
             Row {
                 spacing: Theme.spacingXS; anchors.verticalCenter: parent.verticalCenter
                 DankActionButton { iconName: "undo"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; enabled: root.canUndo; opacity: enabled ? 1.0 : 0.4; tooltipText: I18n.tr("Undo (Ctrl+Z)"); onClicked: root.undoRequested() }
+                DankActionButton { iconName: "redo"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; enabled: root.canRedo; opacity: enabled ? 1.0 : 0.4; tooltipText: I18n.tr("Redo (Ctrl+Y / Ctrl+Shift+Z)"); onClicked: root.redoRequested() }
+            }
+
+            Rectangle { width: Constants.separatorThickness; height: Constants.separatorLength; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
+
+            // Export Actions
+            Row {
+                spacing: Theme.spacingXS; anchors.verticalCenter: parent.verticalCenter
                 DankActionButton { iconName: "push_pin"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; tooltipText: "Float Window (Ctrl+F)"; onClicked: root.floatRequested() }
                 DankActionButton { iconName: "save"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; tooltipText: "Save (Ctrl+S)"; onClicked: root.saveRequested() }
                 DankActionButton { iconName: "content_copy"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; tooltipText: "Copy (Ctrl+C)"; onClicked: root.copyRequested() }

@@ -310,6 +310,9 @@ DankModal {
         }
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
+    property var undoneStrokes: []
+    readonly property bool canUndo: strokes.length > 0
+    readonly property bool canRedo: undoneStrokes.length > 0
     property int textFontSize: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textFontSize !== undefined ? window.parentWidget.pluginData.textFontSize : 36
     property int calloutZoom: 150
     property bool calloutDestDragging: false
@@ -1626,6 +1629,11 @@ DankModal {
             event.accepted = true;
             return;
         }
+        if (hasCtrl && (token === "Y" || (event.modifiers & Qt.ShiftModifier && token === "Z"))) {
+            window.performRedo();
+            event.accepted = true;
+            return;
+        }
         if (hasCtrl && token === "Z") {
             window.performUndo();
             event.accepted = true;
@@ -2141,7 +2149,8 @@ DankModal {
                     activeColorSlotIndex: window.activeColorSlotIndex
 
                     strokeWidth: window.activeIntensity
-                    canUndo: window.strokes.length > 0
+                    canUndo: window.canUndo
+                    canRedo: window.canRedo
 
                     backdropMode: window.backdropMode
                     backdropSolidColor: window.backdropSolidColor
@@ -2278,6 +2287,10 @@ DankModal {
                     onUndoRequested: {
                         moreToolsMenu.close();
                         window.performUndo();
+                    }
+                    onRedoRequested: {
+                        moreToolsMenu.close();
+                        window.performRedo();
                     }
                     onAnnotationsToggled: window.showAnnotations = !window.showAnnotations
 
@@ -3473,14 +3486,29 @@ DankModal {
         const list = [...window.strokes];
         list.push(stroke);
         window.strokes = list;
+        window.undoneStrokes = [];
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
 
     function performUndo() {
         if (window.strokes.length > 0) {
             const list = [...window.strokes];
-            list.pop();
+            const popped = list.pop();
             window.strokes = list;
+            window.undoneStrokes = [...window.undoneStrokes, popped];
+            if (window.selectedStroke === popped) {
+                window.selectedStroke = null;
+            }
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+        }
+    }
+
+    function performRedo() {
+        if (window.undoneStrokes.length > 0) {
+            const undoneList = [...window.undoneStrokes];
+            const strokeToRedo = undoneList.pop();
+            window.undoneStrokes = undoneList;
+            window.strokes = [...window.strokes, strokeToRedo];
             if (window.activeCanvas) window.activeCanvas.requestPaint();
         }
     }

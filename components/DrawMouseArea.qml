@@ -481,6 +481,11 @@ MouseArea {
             return;
         }
 
+        if (mouse.button === Qt.ForwardButton || mouse.button === Qt.XButton2) {
+            window.performRedo();
+            return;
+        }
+
         if (mouse.button === Qt.RightButton) {
             const mapped = drawMouseArea.mapToItem(radialMenu.parent, mouse.x, mouse.y);
             if (mouse.modifiers & Qt.ShiftModifier) {
