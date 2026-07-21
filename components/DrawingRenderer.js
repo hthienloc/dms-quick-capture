@@ -509,7 +509,16 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
             if (sw > 0 && sh > 0 && dw > 0 && dh > 0) {
                 const bW = stroke.borderWidth !== undefined ? stroke.borderWidth : 2;
 
-                // 1. Draw connecting lines (dynamic corners) using semi-transparent stroke color
+                // 1. Draw orig rect border (background source box)
+                ctx.strokeStyle = stroke.color;
+                ctx.lineWidth = bW;
+                ctx.strokeRect(sx, sy, sw, sh);
+                
+                ctx.strokeStyle = "rgba(0,0,0,0.4)";
+                ctx.lineWidth = 1;
+                ctx.strokeRect(sx - bW/2 - 0.5, sy - bW/2 - 0.5, sw + bW + 1, sh + bW + 1);
+
+                // 2. Draw connecting lines (dynamic corners) using semi-transparent stroke color
                 const linkLines = stroke.calloutLinkLines !== undefined ? stroke.calloutLinkLines : 2;
                 ctx.strokeStyle = Qt.rgba(rgb.r, rgb.g, rgb.b, 0.6);
                 ctx.lineWidth = bW;
@@ -546,7 +555,7 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
                 }
                 ctx.stroke();
 
-                // 2. Draw destination image (magnified)
+                // 3. Draw destination image (foreground magnified pop-up view)
                 if (config.bgImageItem && config.bgImageItem.status === 1) {
                     const imgW = config.bgImageItem.sourceSize
                         ? config.bgImageItem.sourceSize.width
@@ -570,16 +579,13 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
                     }
                 }
 
-                // 3. Draw borders with high visibility
+                // 4. Draw destination border and shadow (foreground)
                 ctx.strokeStyle = stroke.color;
                 ctx.lineWidth = bW;
-                ctx.strokeRect(sx, sy, sw, sh);
                 ctx.strokeRect(dx, dy, dw, dh);
                 
-                // Contrasting outline shadow
                 ctx.strokeStyle = "rgba(0,0,0,0.4)";
                 ctx.lineWidth = 1;
-                ctx.strokeRect(sx - bW/2 - 0.5, sy - bW/2 - 0.5, sw + bW + 1, sh + bW + 1);
                 ctx.strokeRect(dx - bW/2 - 0.5, dy - bW/2 - 0.5, dw + bW + 1, dh + bW + 1);
             }
         }
