@@ -2580,7 +2580,7 @@ DankModal {
                                 }
 
                                 for (let i = 0; i < strokes.length; i++) {
-                                    if (strokes[i].tool !== "spotlight" && strokes[i].tool !== "pixelate" && strokes[i] !== selectedStroke) {
+                                    if (strokes[i].tool !== "spotlight" && strokes[i].tool !== "pixelate" && strokes[i] !== selectedStroke && (!window.isTyping || strokes[i] !== window.editingStroke)) {
                                         drawStroke(ctx, strokes[i]);
                                     }
                                 }
@@ -2758,7 +2758,7 @@ DankModal {
                                 }
 
                                 // Draw selected stroke
-                                if (selectedStroke && selectedStroke.tool !== "spotlight" && selectedStroke.tool !== "pixelate") {
+                                if (selectedStroke && selectedStroke.tool !== "spotlight" && selectedStroke.tool !== "pixelate" && (!window.isTyping || selectedStroke !== window.editingStroke)) {
                                     drawStroke(ctx, selectedStroke);
                                 }
 
