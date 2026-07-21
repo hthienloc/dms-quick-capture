@@ -866,7 +866,7 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn, Qt, Helpe
         const cx = (x1 + x2) / 2;
         const cy = (y1 + y2) / 2;
 
-        if (stroke.tool === "spotlight") {
+        if (stroke.tool === "spotlight" || stroke.tool === "pixelate") {
             drawHighContrastDashedRect(ctx, x1, y1, x2 - x1, y2 - y1);
         } else {
             ctx.save();

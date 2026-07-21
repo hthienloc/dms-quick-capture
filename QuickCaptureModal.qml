@@ -2777,7 +2777,7 @@ DankModal {
                                     ctx.fillRect(cropX, cropY, sw, sh);
                                     ctx.restore();
 
-                                    if (window.currentStroke && window.currentStroke.tool === "spotlight" && window.currentStroke.points.length >= 2) {
+                                    if (window.currentStroke && (window.currentStroke.tool === "spotlight" || window.currentStroke.tool === "pixelate") && window.currentStroke.points.length >= 2) {
                                         const p0 = window.currentStroke.points[0];
                                         const p1 = window.currentStroke.points[window.currentStroke.points.length - 1];
                                         const rx = Math.min(p0.x, p1.x);
