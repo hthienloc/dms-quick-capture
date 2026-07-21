@@ -860,10 +860,14 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn, Qt, Helpe
         const cx = (x1 + x2) / 2;
         const cy = (y1 + y2) / 2;
 
-        ctx.save();
-        setDashedSelectionStyle(ctx, stroke, Helpers, Qt);
-        ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
-        ctx.restore();
+        if (stroke.tool === "spotlight") {
+            drawHighContrastDashedRect(ctx, x1, y1, x2 - x1, y2 - y1);
+        } else {
+            ctx.save();
+            setDashedSelectionStyle(ctx, stroke, Helpers, Qt);
+            ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+            ctx.restore();
+        }
 
         drawHandlePoints(ctx, [
             {x: x1, y: y1}, {x: x2, y: y1}, {x: x1, y: y2}, {x: x2, y: y2},

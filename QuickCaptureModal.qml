@@ -2754,6 +2754,16 @@ DankModal {
                                     ctx.fillStyle = "rgba(0, 0, 0, " + spotlightOpacity + ")";
                                     ctx.fillRect(cropX, cropY, sw, sh);
                                     ctx.restore();
+
+                                    if (window.currentStroke && window.currentStroke.tool === "spotlight" && window.currentStroke.points.length >= 2) {
+                                        const p0 = window.currentStroke.points[0];
+                                        const p1 = window.currentStroke.points[window.currentStroke.points.length - 1];
+                                        const rx = Math.min(p0.x, p1.x);
+                                        const ry = Math.min(p0.y, p1.y);
+                                        const rw = Math.abs(p1.x - p0.x);
+                                        const rh = Math.abs(p1.y - p0.y);
+                                        DrawingRenderer.drawHighContrastDashedRect(ctx, rx, ry, rw, rh);
+                                    }
                                 }
 
                                 // Draw active/current stroke
