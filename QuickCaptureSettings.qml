@@ -1478,11 +1478,12 @@ PluginSettings {
             settingKey: "textFontFamily"
             label: I18n.tr("Default Font Family")
             options: [
+                { label: I18n.tr("System Default") + (Theme.fontFamily ? " (" + Theme.fontFamily + ")" : ""), value: "system" },
                 { label: I18n.tr("Sans-Serif"), value: "sans-serif" },
                 { label: I18n.tr("Monospace"), value: "monospace" },
                 { label: I18n.tr("Serif"), value: "serif" }
             ]
-            defaultValue: "sans-serif"
+            defaultValue: "system"
         }
 
         Separator {}

@@ -758,7 +758,7 @@ DankModal {
     onTextCornerRadiusChanged: {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }
-    property string textFontFamily: pluginData.textFontFamily !== undefined ? pluginData.textFontFamily : (textMonospace ? "monospace" : "sans-serif")
+    property string textFontFamily: (pluginData.textFontFamily && pluginData.textFontFamily !== "system") ? pluginData.textFontFamily : (textMonospace ? "monospace" : (Theme.fontFamily || "sans-serif"))
     onTextFontFamilyChanged: {
         if (window.activeCanvas) window.activeCanvas.requestPaint();
     }

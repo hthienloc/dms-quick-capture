@@ -443,7 +443,8 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         const fontSize = Math.round(radius * Constants.stampTextFontSizeMultiplier);
         const text = Helpers.formatCounter(stroke.counter, stroke.format || "numeric");
         ctx.fillStyle = textColor;
-        ctx.font = "bold " + fontSize + "px sans-serif";
+        const fontFam = (typeof Theme !== "undefined" && Theme.fontFamily) ? Theme.fontFamily : "sans-serif";
+        ctx.font = "bold " + fontSize + "px " + fontFam;
         ctx.textBaseline = "middle";
         ctx.textAlign = "left";
         const textW = ctx.measureText(text).width;
@@ -590,7 +591,8 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
         let styleStr = "";
         if (stroke.isItalic) styleStr += "italic ";
         if (stroke.isBold) styleStr += "bold ";
-        const fFamily = stroke.fontFamily || (stroke.isMonospace ? "monospace" : "sans-serif");
+        const sysFont = (typeof Theme !== "undefined" && Theme.fontFamily) ? Theme.fontFamily : "sans-serif";
+        const fFamily = (stroke.fontFamily && stroke.fontFamily !== "system") ? stroke.fontFamily : (stroke.isMonospace ? "monospace" : sysFont);
         
         ctx.font = styleStr + Math.round(stroke.width) + "px " + fFamily;
         ctx.textAlign = "left";
@@ -1136,7 +1138,8 @@ function drawWatermark(ctx, options, config) {
         const lines = textStr.split("\n");
         const fontSize = Math.round(Math.max(12, options.canvasHeight * options.textScale));
         
-        ctx.font = "bold " + fontSize + "px sans-serif";
+        const watermarkFont = (typeof Theme !== "undefined" && Theme.fontFamily) ? Theme.fontFamily : "sans-serif";
+        ctx.font = "bold " + fontSize + "px " + watermarkFont;
         ctx.fillStyle = "#ffffff";
         ctx.shadowColor = "#000000";
         ctx.shadowOffsetX = 1;
