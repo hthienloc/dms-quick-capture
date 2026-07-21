@@ -8,7 +8,7 @@ import "Constants.js" as Constants
 MouseArea {
     id: drawMouseArea
     hoverEnabled: true
-    acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+    acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton | Qt.BackButton | Qt.ForwardButton | Qt.XButton1 | Qt.XButton2
 
     required property var window
     required property var drawingCanvas
@@ -473,6 +473,11 @@ MouseArea {
 
         if (window.isTyping) {
             window.commitTypingText();
+            return;
+        }
+
+        if (mouse.button === Qt.BackButton || mouse.button === Qt.XButton1) {
+            window.performUndo();
             return;
         }
 
