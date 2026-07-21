@@ -328,7 +328,7 @@ DankModal {
         if (effectiveTool === "text") textFontSize = val;
         else if (effectiveTool === "pixelate") pixelateIntensity = Math.max(2, Math.min(12, val));
         else if (effectiveTool === "spotlight") {
-            spotlightIntensity = Math.max(10, Math.min(95, val));
+            spotlightIntensity = Math.max(10, Math.min(100, val));
             preGrabSpotlightIntensity = spotlightIntensity;
         }
         else if (effectiveTool === "callout") calloutZoom = Math.max(100, Math.min(500, val));
@@ -3151,7 +3151,7 @@ DankModal {
                         window.currentColor = preset.color;
                         if (preset.tool === "text") window.textFontSize = preset.thickness;
                         else if (preset.tool === "pixelate") window.pixelateIntensity = Math.max(2, Math.min(12, preset.thickness));
-                        else if (preset.tool === "spotlight") window.spotlightIntensity = Math.max(10, Math.min(95, preset.thickness));
+                        else if (preset.tool === "spotlight") window.spotlightIntensity = Math.max(10, Math.min(100, preset.thickness));
                         else if (preset.tool === "callout") window.calloutZoom = Math.max(100, Math.min(500, preset.thickness));
                         else window.strokeWidth = preset.thickness;
                         window.recordPresetUsage(preset);
