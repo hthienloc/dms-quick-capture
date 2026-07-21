@@ -1813,6 +1813,9 @@ DankModal {
     }
 
     onOpened: {
+        Qt.inputMethod.commit();
+        Qt.inputMethod.reset();
+        Qt.inputMethod.hide();
         window.updateRadialPresets();
 
         let startTool = "pen";
@@ -1949,6 +1952,9 @@ DankModal {
         }
 
         Qt.callLater(() => {
+            Qt.inputMethod.commit();
+            Qt.inputMethod.reset();
+            Qt.inputMethod.hide();
             if (modalFocusScope) modalFocusScope.forceActiveFocus();
         });
     }

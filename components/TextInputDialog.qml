@@ -40,6 +40,9 @@ Popup {
             window.editingStroke = null;
             if (window.activeCanvas) window.activeCanvas.requestPaint();
         }
+        Qt.inputMethod.commit();
+        Qt.inputMethod.reset();
+        Qt.inputMethod.hide();
         if (modalFocusScope) {
             modalFocusScope.forceActiveFocus();
         }
