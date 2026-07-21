@@ -301,6 +301,15 @@ DankModal {
         }
     }
     property int spotlightIntensity: 50
+    onSpotlightIntensityChanged: {
+        preGrabSpotlightIntensity = spotlightIntensity;
+        for (let i = 0; i < window.strokes.length; i++) {
+            if (window.strokes[i].tool === "spotlight") {
+                window.strokes[i].width = window.spotlightIntensity;
+            }
+        }
+        if (window.activeCanvas) window.activeCanvas.requestPaint();
+    }
     property int textFontSize: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.textFontSize !== undefined ? window.parentWidget.pluginData.textFontSize : 36
     property int calloutZoom: 150
     property bool calloutDestDragging: false
@@ -318,7 +327,10 @@ DankModal {
     function updateActiveIntensity(val) {
         if (effectiveTool === "text") textFontSize = val;
         else if (effectiveTool === "pixelate") pixelateIntensity = Math.max(2, Math.min(12, val));
-        else if (effectiveTool === "spotlight") spotlightIntensity = Math.max(10, Math.min(95, val));
+        else if (effectiveTool === "spotlight") {
+            spotlightIntensity = Math.max(10, Math.min(95, val));
+            preGrabSpotlightIntensity = spotlightIntensity;
+        }
         else if (effectiveTool === "callout") calloutZoom = Math.max(100, Math.min(500, val));
         else strokeWidth = Math.max(1, Math.min(50, val));
 
@@ -2520,9 +2532,7 @@ DankModal {
                                     const sw = window.screenshotWidth;
                                     const sh = window.screenshotHeight;
 
-                                    const lastSpotlight = spotlightStrokes[spotlightStrokes.length - 1];
-                                    const activeInt = lastSpotlight ? lastSpotlight.width : window.spotlightIntensity;
-                                    const spotlightOpacity = activeInt / 100.0;
+                                    const spotlightOpacity = window.spotlightIntensity / 100.0;
 
                                     const cropX = window.hasActiveCropSelection ? window.cropRect.x : 0;
                                     const cropY = window.hasActiveCropSelection ? window.cropRect.y : 0;
@@ -2689,12 +2699,7 @@ DankModal {
                                     const sw = window.screenshotWidth;
                                     const sh = window.screenshotHeight;
 
-                                    let activeInt = window.spotlightIntensity;
-                                    if (isEditingSpotlight) {
-                                        activeInt = selectedStroke.width;
-                                    }
-
-                                    const spotlightOpacity = activeInt / 100.0;
+                                    const spotlightOpacity = window.spotlightIntensity / 100.0;
 
                                     const cropX = window.hasActiveCropSelection ? window.cropRect.x : 0;
                                     const cropY = window.hasActiveCropSelection ? window.cropRect.y : 0;
@@ -3030,15 +3035,7 @@ DankModal {
                                     const sw = window.screenshotWidth;
                                     const sh = window.screenshotHeight;
                                     
-                                    let activeInt = window.spotlightIntensity;
-                                    if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "spotlight") {
-                                        activeInt = window.selectedStroke.width;
-                                    } else {
-                                        const lastSpotlight = window.strokes.slice().reverse().find(s => s.tool === "spotlight");
-                                        if (lastSpotlight) activeInt = lastSpotlight.width;
-                                    }
-
-                                    const spotlightOpacity = activeInt / 100.0;
+                                    const spotlightOpacity = window.spotlightIntensity / 100.0;
 
                                     const cropX = window.hasActiveCropSelection ? window.cropRect.x : 0;
                                     const cropY = window.hasActiveCropSelection ? window.cropRect.y : 0;
