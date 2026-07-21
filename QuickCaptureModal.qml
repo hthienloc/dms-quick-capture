@@ -3498,6 +3498,15 @@ DankModal {
             window.undoneStrokes = [...window.undoneStrokes, popped];
             if (window.selectedStroke === popped) {
                 window.selectedStroke = null;
+                window.strokeWidth = window.preGrabStrokeWidth;
+                window.textFontSize = window.preGrabTextFontSize;
+                window.pixelateIntensity = window.preGrabPixelateIntensity;
+                window.spotlightIntensity = window.preGrabSpotlightIntensity;
+                window.calloutZoom = window.preGrabCalloutZoom;
+                window.currentColor = window.preGrabColor;
+                window.activeRedactMode = window.preGrabRedactMode;
+                window.activeRedactShape = window.preGrabRedactShape;
+                window.calloutLinkLines = window.preGrabCalloutLinkLines;
             }
             if (window.activeCanvas) window.activeCanvas.requestPaint();
         }
@@ -3509,6 +3518,36 @@ DankModal {
             const strokeToRedo = undoneList.pop();
             window.undoneStrokes = undoneList;
             window.strokes = [...window.strokes, strokeToRedo];
+
+            if (window.currentTool === "select") {
+                window.preGrabStrokeWidth = window.strokeWidth;
+                window.preGrabTextFontSize = window.textFontSize;
+                window.preGrabPixelateIntensity = window.pixelateIntensity;
+                window.preGrabSpotlightIntensity = window.spotlightIntensity;
+                window.preGrabCalloutZoom = window.calloutZoom;
+                window.preGrabColor = window.currentColor;
+                window.preGrabRedactMode = window.activeRedactMode;
+                window.preGrabRedactShape = window.activeRedactShape;
+                window.preGrabCalloutLinkLines = window.calloutLinkLines;
+
+                window.selectedStroke = strokeToRedo;
+                window.currentColor = strokeToRedo.color;
+                if (strokeToRedo.tool === "text") window.textFontSize = strokeToRedo.width;
+                else if (strokeToRedo.tool === "pixelate") window.pixelateIntensity = strokeToRedo.width;
+                else if (strokeToRedo.tool === "spotlight") window.spotlightIntensity = strokeToRedo.width;
+                else if (strokeToRedo.tool === "callout") window.calloutZoom = strokeToRedo.width;
+                else window.strokeWidth = strokeToRedo.width;
+
+                if (strokeToRedo.tool === "line" && strokeToRedo.lineStyle) window.activeLineStyle = strokeToRedo.lineStyle;
+                if (strokeToRedo.tool === "arrow") {
+                    if (strokeToRedo.arrowLineStyle) window.activeArrowLineStyle = strokeToRedo.arrowLineStyle;
+                    if (strokeToRedo.arrowHeadStyle) window.activeArrowHeadStyle = strokeToRedo.arrowHeadStyle;
+                }
+                if (strokeToRedo.tool === "redact" && strokeToRedo.redactMode) window.activeRedactMode = strokeToRedo.redactMode;
+                if (strokeToRedo.tool === "redact" && strokeToRedo.redactShape) window.activeRedactShape = strokeToRedo.redactShape;
+                if (strokeToRedo.tool === "callout") window.calloutLinkLines = strokeToRedo.calloutLinkLines !== undefined ? strokeToRedo.calloutLinkLines : 1;
+            }
+
             if (window.activeCanvas) window.activeCanvas.requestPaint();
         }
     }
