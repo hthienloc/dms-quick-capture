@@ -1473,7 +1473,7 @@ PluginSettings {
 
         Separator {}
 
-        ButtonGroupSettingPlus {
+        SelectionSettingPlus {
             id: textFontFamily
             settingKey: "textFontFamily"
             label: I18n.tr("Default Font Family")
