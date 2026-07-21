@@ -58,7 +58,8 @@ Key events are intercepted at the root Modal level via `modalFocusScope.Keys.onP
 | `Tab` | Presets Toggle | Swaps between 2 latest presets |
 | `Esc` | Discard & Close | Closes modal editor |
 | `Enter` / `Return` | Done | Triggers save/copy pipeline |
-| `Ctrl+Z` | Undo | Reverts last vector stroke |
+| `Ctrl+Z` / Mouse Back | Undo | Reverts last vector stroke |
+| `Ctrl+Y` / `Ctrl+Shift+Z` / Mouse Forward | Redo | Restores last undone vector stroke |
 | `Ctrl+C` | Copy | Copies canvas to clipboard |
 | `Ctrl+S` | Save | Saves canvas as file |
 | `Ctrl+A` | Copy & Save | Copy and save concurrently |

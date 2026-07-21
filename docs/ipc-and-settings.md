@@ -79,7 +79,8 @@ Pressing these keys changes the active tool:
 ### Action Controls
 - `Enter`: Complete and save/copy (depends on preferences).
 - `Esc`: Cancel, discard changes, and close.
-- `Ctrl + Z`: Undo the latest vector stroke.
+- `Ctrl + Z` / **Mouse Back Button**: Undo the latest vector stroke.
+- `Ctrl + Y` / `Ctrl + Shift + Z` / **Mouse Forward Button**: Redo the latest undone vector stroke.
 - `Ctrl + C`: Copy the current canvas to the clipboard.
 - `Ctrl + S`: Save the canvas directly as a file.
 - `Ctrl + A`: Copy to clipboard and save as file simultaneously.
