@@ -1639,6 +1639,11 @@ DankModal {
             event.accepted = true;
             return;
         }
+        if (hasCtrl && (event.modifiers & Qt.ShiftModifier) && token === "C") {
+            captureActions.performAnonymousCopy();
+            event.accepted = true;
+            return;
+        }
         if (hasCtrl && token === "C") {
             captureActions.performCopyOnly();
             event.accepted = true;
@@ -2306,6 +2311,10 @@ DankModal {
                     onCopyRequested: {
                         moreToolsMenu.close();
                         captureActions.performCopyOnly();
+                    }
+                    onAnonymousCopyRequested: {
+                        moreToolsMenu.close();
+                        captureActions.performAnonymousCopy();
                     }
                     onCopyAndSaveRequested: {
                         moreToolsMenu.close();

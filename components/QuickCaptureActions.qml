@@ -79,7 +79,7 @@ QtObject {
     }
 
     function cleanupTemp(path) {
-        if (path && path.startsWith("/tmp/dms_capture_")) {
+        if (path && (path.startsWith("/tmp/dms_capture_") || path.startsWith("/tmp/img_"))) {
             // Delay cleanup by 10s to allow notification daemons to load the image
             Proc.runCommand("cleanup-temp-delayed", ["sh", "-c", "sleep 10 && rm -f -- " + shellPathExpression(path)]);
         }
@@ -237,6 +237,31 @@ QtObject {
                     }
                     cleanupTemp(finalPath);
                     if (originalPng) cleanupTemp(originalPng);
+                });
+            });
+        });
+    }
+
+    function performAnonymousCopy() {
+        withExport((pngPath) => {
+            const randomHex = Math.random().toString(36).substring(2, 10);
+            const anonPath = "/tmp/img_" + randomHex + ".png";
+            
+            const cmd = "magick convert -- " + shellPathExpression(pngPath) + " -strip " + shellPathExpression(anonPath) +
+                        " || cp -- " + shellPathExpression(pngPath) + " " + shellPathExpression(anonPath);
+
+            Proc.runCommand("anon-copy-strip", ["sh", "-c", cmd], (stdout, exitCode) => {
+                const clipSource = (exitCode === 0 && anonPath) ? anonPath : pngPath;
+                copyFileToClipboard(clipSource, (clipOut, clipExit) => {
+                    if (clipExit === 0) {
+                        root.sendNotification(I18n.tr("Copied Anonymously"), I18n.tr("Screenshot copied anonymously with randomized name and stripped metadata."), clipSource);
+                        root.closeRequested();
+                    } else {
+                        notifyError("Failed to copy screenshot to clipboard.");
+                        root.closeRequested();
+                    }
+                    cleanupTemp(pngPath);
+                    cleanupTemp(anonPath);
                 });
             });
         });

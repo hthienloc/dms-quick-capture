@@ -82,6 +82,7 @@ Pressing these keys changes the active tool:
 - `Ctrl + Z` / **Mouse Back Button**: Undo the latest vector stroke.
 - `Ctrl + Y` / `Ctrl + Shift + Z` / **Mouse Forward Button**: Redo the latest undone vector stroke.
 - `Ctrl + C`: Copy the current canvas to the clipboard.
+- `Ctrl + Shift + C` / **Right-click Copy Button**: Copy canvas anonymously to clipboard (randomized filename & stripped metadata).
 - `Ctrl + S`: Save the canvas directly as a file.
 - `Ctrl + A`: Copy to clipboard and save as file simultaneously.
 - `Ctrl + F`: Float image to always-on-top window.
