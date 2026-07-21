@@ -312,21 +312,22 @@ Rectangle {
                     height: Constants.btnSize
                     anchors.verticalCenter: parent.verticalCenter
                     DankActionButton {
+                        id: copyButton
                         anchors.fill: parent
                         iconName: "content_copy"
                         buttonSize: Constants.btnSize
                         iconSize: Constants.iconSize
-                        tooltipText: I18n.tr("Copy (Ctrl+C) | Right-click for Anonymous Copy (Ctrl+Shift+C)")
-                        onClicked: root.copyRequested()
+                        tooltipText: I18n.tr("Copy (Ctrl+C) | Right-Click for Anonymous Copy (Ctrl+Shift+C)")
                     }
                     MouseArea {
                         anchors.fill: parent
-                        hoverEnabled: true
+                        acceptedButtons: Qt.LeftButton | Qt.RightButton
                         cursorShape: Qt.PointingHandCursor
-                        acceptedButtons: Qt.RightButton
-                        onClicked: (mouse) => {
+                        onClicked: mouse => {
                             if (mouse.button === Qt.RightButton) {
                                 root.anonymousCopyRequested();
+                            } else {
+                                root.copyRequested();
                             }
                         }
                     }
