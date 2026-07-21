@@ -88,7 +88,7 @@ Rectangle {
                         }
 
                         StyledText {
-                            text: qsTr("Rotate L")
+                            text: I18n.tr("Rotate L")
                             font.pixelSize: Theme.fontSizeSmall - 2
                             color: Theme.surfaceText
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -125,7 +125,7 @@ Rectangle {
                         }
 
                         StyledText {
-                            text: qsTr("Rotate R")
+                            text: I18n.tr("Rotate R")
                             font.pixelSize: Theme.fontSizeSmall - 2
                             color: Theme.surfaceText
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -169,7 +169,7 @@ Rectangle {
                         }
 
                         StyledText {
-                            text: qsTr("Flip Horiz")
+                            text: I18n.tr("Flip Horiz")
                             font.pixelSize: Theme.fontSizeSmall - 2
                             color: Theme.surfaceText
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -207,7 +207,7 @@ Rectangle {
                         }
 
                         StyledText {
-                            text: qsTr("Flip Vert")
+                            text: I18n.tr("Flip Vert")
                             font.pixelSize: Theme.fontSizeSmall - 2
                             color: Theme.surfaceText
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -256,7 +256,7 @@ Rectangle {
                 }
 
                 StyledText {
-                    text: qsTr("OCR (O)")
+                    text: I18n.tr("OCR (O)")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
@@ -297,7 +297,7 @@ Rectangle {
                 }
 
                 StyledText {
-                    text: qsTr("Scan QR")
+                    text: I18n.tr("Scan QR")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
@@ -338,7 +338,7 @@ Rectangle {
                 }
 
                 StyledText {
-                    text: qsTr("Eraser (T)")
+                    text: I18n.tr("Eraser (T)")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
@@ -379,7 +379,7 @@ Rectangle {
                 }
 
                 StyledText {
-                    text: qsTr("Copy Color")
+                    text: I18n.tr("Copy Color")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter

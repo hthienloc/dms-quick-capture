@@ -92,7 +92,7 @@ Rectangle {
             height: 24
 
             StyledText {
-                text: qsTr("Backdrop Presets")
+                text: I18n.tr("Backdrop Presets")
                 font.pixelSize: Theme.fontSizeSmall
                 font.bold: true
                 color: Theme.surfaceText
@@ -154,7 +154,7 @@ Rectangle {
                         }
 
                         StyledText {
-                            text: qsTr("Save")
+                            text: I18n.tr("Save")
                             font.pixelSize: Theme.fontSizeSmall - 2
                             color: Theme.primary
                             font.bold: true

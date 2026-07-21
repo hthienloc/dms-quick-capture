@@ -209,7 +209,7 @@ Rectangle {
                     iconName: "more_horiz"
                     buttonSize: Constants.btnSize
                     iconSize: Constants.iconSize
-                    tooltipText: qsTr("More Tools")
+                    tooltipText: I18n.tr("More Tools")
                     onClicked: root.moreToolsClicked(moreActionsBtn)
                 }
             }
@@ -237,7 +237,7 @@ Rectangle {
                     iconName: "colorize"
                     buttonSize: Constants.btnSize
                     iconSize: Constants.iconSize
-                    tooltipText: qsTr("Color Picker (F for RGB / Right-Click for Eyedropper)")
+                    tooltipText: I18n.tr("Color Picker (F for RGB / Right-Click for Eyedropper)")
                     backgroundColor: root.currentTool === "colorpicker" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                     iconColor: root.currentTool === "colorpicker" ? Theme.primary : Theme.surfaceText
                 }
@@ -293,7 +293,7 @@ Rectangle {
             // Actions
             Row {
                 spacing: Theme.spacingXS; anchors.verticalCenter: parent.verticalCenter
-                DankActionButton { iconName: "undo"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; enabled: root.canUndo; opacity: enabled ? 1.0 : 0.4; tooltipText: qsTr("Undo (Ctrl+Z)"); onClicked: root.undoRequested() }
+                DankActionButton { iconName: "undo"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; enabled: root.canUndo; opacity: enabled ? 1.0 : 0.4; tooltipText: I18n.tr("Undo (Ctrl+Z)"); onClicked: root.undoRequested() }
                 DankActionButton { iconName: "push_pin"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; tooltipText: "Float Window (Ctrl+F)"; onClicked: root.floatRequested() }
                 DankActionButton { iconName: "save"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; tooltipText: "Save (Ctrl+S)"; onClicked: root.saveRequested() }
                 DankActionButton { iconName: "content_copy"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; tooltipText: "Copy (Ctrl+C)"; onClicked: root.copyRequested() }
@@ -302,7 +302,7 @@ Rectangle {
 
             Rectangle { width: Constants.separatorThickness; height: Constants.separatorLength; color: Theme.withAlpha(Theme.outline, 0.2); anchors.verticalCenter: parent.verticalCenter }
 
-            DankActionButton { iconName: "close"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; iconColor: Theme.error; tooltipText: qsTr("Discard & Close (Esc)"); anchors.verticalCenter: parent.verticalCenter; onClicked: root.closeRequested() }
+            DankActionButton { iconName: "close"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; iconColor: Theme.error; tooltipText: I18n.tr("Discard & Close (Esc)"); anchors.verticalCenter: parent.verticalCenter; onClicked: root.closeRequested() }
         }
     }
 
@@ -362,7 +362,7 @@ Rectangle {
                     iconName: "more_vert"
                     buttonSize: Constants.btnSize
                     iconSize: Constants.iconSize
-                    tooltipText: qsTr("More Tools")
+                    tooltipText: I18n.tr("More Tools")
                     onClicked: root.moreToolsClicked(moreActionsVerticalBtn)
                 }
             }
@@ -390,7 +390,7 @@ Rectangle {
                     iconName: "colorize"
                     buttonSize: Constants.btnSize
                     iconSize: Constants.iconSize
-                    tooltipText: qsTr("Color Picker (F for RGB / Right-Click for Eyedropper)")
+                    tooltipText: I18n.tr("Color Picker (F for RGB / Right-Click for Eyedropper)")
                     backgroundColor: root.currentTool === "colorpicker" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
                     iconColor: root.currentTool === "colorpicker" ? Theme.primary : Theme.surfaceText
                 }
@@ -422,7 +422,7 @@ Rectangle {
                 buttonSize: Constants.btnSize
                 iconSize: Constants.iconSize
                 anchors.verticalCenter: parent.verticalCenter
-                tooltipText: qsTr("Back to Annotation (B)")
+                tooltipText: I18n.tr("Back to Annotation (B)")
                 onClicked: root.toolSelected("back")
             }
             
@@ -439,7 +439,7 @@ Rectangle {
                     iconName: "bookmarks"
                     buttonSize: Constants.btnSize
                     iconSize: Constants.iconSize
-                    tooltipText: qsTr("Backdrop Presets")
+                    tooltipText: I18n.tr("Backdrop Presets")
                     anchors.centerIn: parent
                     onClicked: root.backdropControlHovered("presets", presetsControl)
                 }
@@ -695,7 +695,7 @@ Rectangle {
                 iconName: "arrow_back"
                 buttonSize: Constants.btnSize
                 iconSize: Constants.iconSize
-                tooltipText: qsTr("Back to Annotation (B)")
+                tooltipText: I18n.tr("Back to Annotation (B)")
                 onClicked: root.toolSelected("back")
             }
             
@@ -712,7 +712,7 @@ Rectangle {
                     iconName: "bookmarks"
                     buttonSize: Constants.btnSize
                     iconSize: Constants.iconSize
-                    tooltipText: qsTr("Backdrop Presets")
+                    tooltipText: I18n.tr("Backdrop Presets")
                     anchors.centerIn: parent
                     onClicked: root.backdropControlHovered("presets", presetsControlVert)
                 }

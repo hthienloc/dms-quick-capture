@@ -16,11 +16,11 @@ Grid {
     spacing: Theme.spacingXS
 
     readonly property var modes: [
-        { mode: "none", icon: "blur_off", tooltip: qsTr("No Backdrop") },
-        { mode: "solid", icon: "format_color_fill", tooltip: qsTr("Solid Color") },
-        { mode: "radial", icon: "filter_tilt_shift", tooltip: qsTr("Radial Gradient") },
-        { mode: "gradient", icon: "gradient", tooltip: qsTr("Linear Gradient") },
-        { mode: "conic", icon: "timelapse", tooltip: qsTr("Conic Gradient") }
+        { mode: "none", icon: "blur_off", tooltip: I18n.tr("No Backdrop") },
+        { mode: "solid", icon: "format_color_fill", tooltip: I18n.tr("Solid Color") },
+        { mode: "radial", icon: "filter_tilt_shift", tooltip: I18n.tr("Radial Gradient") },
+        { mode: "gradient", icon: "gradient", tooltip: I18n.tr("Linear Gradient") },
+        { mode: "conic", icon: "timelapse", tooltip: I18n.tr("Conic Gradient") }
     ]
 
     Repeater {

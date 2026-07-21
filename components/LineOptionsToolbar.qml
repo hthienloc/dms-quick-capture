@@ -79,9 +79,9 @@ Item {
             // Group: Line Styles (Solid, Dashed, Dotted)
             Repeater {
                 model: [
-                    { icon: "line_weight", style: "solid", tooltip: qsTr("Solid Line") },
-                    { icon: "border_style", style: "dashed", tooltip: qsTr("Dashed Line") },
-                    { icon: "more_horiz", style: "dotted", tooltip: qsTr("Dotted Line") }
+                    { icon: "line_weight", style: "solid", tooltip: I18n.tr("Solid Line") },
+                    { icon: "border_style", style: "dashed", tooltip: I18n.tr("Dashed Line") },
+                    { icon: "more_horiz", style: "dotted", tooltip: I18n.tr("Dotted Line") }
                 ]
 
                 delegate: Rectangle {
