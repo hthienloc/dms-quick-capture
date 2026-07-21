@@ -83,6 +83,7 @@ Rectangle {
     signal floatRequested()
     signal saveRequested()
     signal copyRequested()
+    signal anonymousCopyRequested()
     signal copyAndSaveRequested()
     signal closeRequested()
     signal annotationsToggled()
@@ -306,7 +307,28 @@ Rectangle {
                 spacing: Theme.spacingXS; anchors.verticalCenter: parent.verticalCenter
                 DankActionButton { iconName: "push_pin"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; tooltipText: "Float Window (Ctrl+F)"; onClicked: root.floatRequested() }
                 DankActionButton { iconName: "save"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; tooltipText: "Save (Ctrl+S)"; onClicked: root.saveRequested() }
-                DankActionButton { iconName: "content_copy"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; tooltipText: "Copy (Ctrl+C)"; onClicked: root.copyRequested() }
+                Item {
+                    width: Constants.btnSize
+                    height: Constants.btnSize
+                    anchors.verticalCenter: parent.verticalCenter
+                    DankActionButton {
+                        anchors.fill: parent
+                        iconName: "content_copy"
+                        buttonSize: Constants.btnSize
+                        iconSize: Constants.iconSize
+                        tooltipText: I18n.tr("Copy (Ctrl+C) | Right-click for Anonymous Copy (Ctrl+Shift+C)")
+                        onClicked: root.copyRequested()
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        acceptedButtons: Qt.RightButton
+                        onClicked: (mouse) => {
+                            if (mouse.button === Qt.RightButton) {
+                                root.anonymousCopyRequested();
+                            }
+                        }
+                    }
+                }
                 DankActionButton { iconName: "done_all"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; tooltipText: "Copy & Save (Enter)"; iconColor: Theme.primary; onClicked: root.copyAndSaveRequested() }
             }
 

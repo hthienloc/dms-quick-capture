@@ -134,6 +134,7 @@ git checkout main && git pull
 | <kbd>Ctrl</kbd> + <kbd>Y</kbd> / <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd> | Redo last undone stroke (or Mouse Forward Button) |
 | <kbd>Ctrl</kbd> + <kbd>S</kbd> | Save to file |
 | <kbd>Ctrl</kbd> + <kbd>C</kbd> | Copy to clipboard |
+| <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd> | Anonymous Copy (randomized filename & stripped metadata / Right-click Copy) |
 | <kbd>Ctrl</kbd> + <kbd>A</kbd> | Copy & Save |
 | <kbd>Ctrl</kbd> + <kbd>F</kbd> | Float image to always-on-top window |
 | <kbd>Ctrl</kbd> + <kbd>X</kbd> | Crop / Resize |

@@ -61,6 +61,7 @@ Key events are intercepted at the root Modal level via `modalFocusScope.Keys.onP
 | `Ctrl+Z` / Mouse Back | Undo | Reverts last vector stroke |
 | `Ctrl+Y` / `Ctrl+Shift+Z` / Mouse Forward | Redo | Restores last undone vector stroke |
 | `Ctrl+C` | Copy | Copies canvas to clipboard |
+| `Ctrl+Shift+C` / Right-click Copy | Anonymous Copy | Copies canvas anonymously with randomized name & stripped metadata |
 | `Ctrl+S` | Save | Saves canvas as file |
 | `Ctrl+A` | Copy & Save | Copy and save concurrently |
 | `Ctrl+F` | Float | Pins capture on desktop |
