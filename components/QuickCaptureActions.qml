@@ -242,27 +242,49 @@ QtObject {
         });
     }
 
+    function generateRandomString(length) {
+        let result = "";
+        const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        for (let i = 0; i < (length || 12); i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
+
     function performAnonymousCopy() {
         withExport((pngPath) => {
-            const randomHex = Math.random().toString(36).substring(2, 10);
-            const anonPath = "/tmp/img_" + randomHex + ".png";
-            
-            const cmd = "magick convert -- " + shellPathExpression(pngPath) + " -strip " + shellPathExpression(anonPath) +
-                        " || cp -- " + shellPathExpression(pngPath) + " " + shellPathExpression(anonPath);
+            const randomStr = generateRandomString(12);
+            const anonPath = "/tmp/img_" + randomStr + ".png";
+            const stripCmd = "magick convert -- " + shellPathExpression(pngPath) + " -strip " + shellPathExpression(anonPath);
 
-            Proc.runCommand("anon-copy-strip", ["sh", "-c", cmd], (stdout, exitCode) => {
-                const clipSource = (exitCode === 0 && anonPath) ? anonPath : pngPath;
-                copyFileToClipboard(clipSource, (clipOut, clipExit) => {
-                    if (clipExit === 0) {
-                        root.sendNotification(I18n.tr("Copied Anonymously"), I18n.tr("Screenshot copied anonymously with randomized name and stripped metadata."), clipSource);
-                        root.closeRequested();
-                    } else {
-                        notifyError("Failed to copy screenshot to clipboard.");
-                        root.closeRequested();
-                    }
-                    cleanupTemp(pngPath);
-                    cleanupTemp(anonPath);
-                });
+            Proc.runCommand("anon-copy-strip", ["sh", "-c", stripCmd], (stdout, exitCode) => {
+                const stripSuccess = (exitCode === 0);
+                const doCopy = (sourceFile, isStripped) => {
+                    copyFileToClipboard(sourceFile, (clipOut, clipExit) => {
+                        if (clipExit === 0) {
+                            const msg = isStripped 
+                                ? I18n.tr("Screenshot copied anonymously with randomized name and stripped metadata.")
+                                : I18n.tr("Screenshot copied with randomized name.");
+                            root.sendNotification(I18n.tr("Copied Anonymously"), msg, sourceFile);
+                            root.closeRequested();
+                        } else {
+                            notifyError("Failed to copy screenshot to clipboard.");
+                            root.closeRequested();
+                        }
+                        cleanupTemp(pngPath);
+                        if (sourceFile !== pngPath) cleanupTemp(sourceFile);
+                    });
+                };
+
+                if (stripSuccess) {
+                    doCopy(anonPath, true);
+                } else {
+                    const fallbackCmd = "cp -- " + shellPathExpression(pngPath) + " " + shellPathExpression(anonPath);
+                    Proc.runCommand("anon-copy-fallback", ["sh", "-c", fallbackCmd], (fbOut, fbExit) => {
+                        const targetFile = (fbExit === 0) ? anonPath : pngPath;
+                        doCopy(targetFile, false);
+                    });
+                }
             });
         });
     }

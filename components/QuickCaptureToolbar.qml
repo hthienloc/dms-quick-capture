@@ -321,6 +321,8 @@ Rectangle {
                     }
                     MouseArea {
                         anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
                         acceptedButtons: Qt.RightButton
                         onClicked: (mouse) => {
                             if (mouse.button === Qt.RightButton) {
