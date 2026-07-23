@@ -3,7 +3,7 @@
     "id": "quickCapture",
     "name": "Quick Capture",
     "description": "Screenshot and vector annotation plugin for DMS",
-    "version": "3.6.3",
+    "version": "3.7.0",
     "author": "Loc Huynh",
     "icon": "screenshot_region",
     "type": "composite",
