@@ -921,9 +921,6 @@ DankModal {
         window.ocrRect = Qt.rect(0, 0, 0, 0);
         window.currentTool = "ocr";
         if (window.activeCanvas) window.activeCanvas.requestPaint();
-        if (typeof ToastService !== "undefined" && ToastService) {
-            ToastService.showInfo(I18n.tr("OCR: Draw a rectangle on the image to scan"));
-        }
     }
 
     function executeOcr() {
@@ -992,9 +989,6 @@ DankModal {
         window.ocrRect = Qt.rect(0, 0, 0, 0);
         window.currentTool = "qr";
         if (window.activeCanvas) window.activeCanvas.requestPaint();
-        if (typeof ToastService !== "undefined" && ToastService) {
-            ToastService.showInfo(I18n.tr("QR Scan: Draw a rectangle on the image to scan"));
-        }
     }
 
     function executeQrScan() {
