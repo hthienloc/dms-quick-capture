@@ -43,7 +43,7 @@ const textBubbleMinRadius = 8;
 const textBubbleDragThreshold = 10;
 
 // Shadow rendering constants
-const defaultShadowSteps = 12;
+const defaultShadowSteps = 24;
 const maxShadowOffset = 24.0;
 const maxShadowBlur = 45.0;
 const shadowBaseOpacityFactor = 0.55;
