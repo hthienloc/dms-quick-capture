@@ -176,13 +176,15 @@ Rectangle {
 
         // Scrollable list of preset cards
         ScrollView {
+            id: presetsScrollView
             width: parent.width
             height: Math.min(240, presetsColumn.implicitHeight)
             clip: true
+            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
 
             Column {
                 id: presetsColumn
-                width: parent.width
+                width: presetsScrollView.availableWidth
                 spacing: Constants.spacingCompact
 
                 Repeater {
