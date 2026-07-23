@@ -617,51 +617,47 @@ DankModal {
         
         const s = (scale !== undefined && scale > 0) ? scale : 1.0;
         const opacity = (window.backdropShadowStrength / 100.0) * Constants.shadowBaseOpacityFactor;
+        const STEPS = Constants.defaultShadowSteps;
         
         // Proportional shadow bounds for small layouts
         const baseBlur = Math.min(Constants.maxShadowBlur, Math.min(w, h) * 0.15);
         const baseOffset = Math.min(Constants.maxShadowOffset, Math.min(w, h) * 0.08);
-
-        const buildCasterPath = () => {
+        
+        const maxOffset = baseOffset / s;
+        const maxBlur = baseBlur / s;
+        
+        // Draw 12 concentric shadow layers with quadratic spacing and falloff for smooth rendering
+        for (let i = 1; i <= STEPS; i++) {
+            const t = i / STEPS;
+            const blur = Math.pow(t, 1.5) * maxBlur;
+            const offset = Math.pow(t, 1.5) * maxOffset;
+            const alpha = opacity * Math.pow(1.0 - t, 1.5) * 0.75;
+            
+            ctx.fillStyle = Qt.rgba(0, 0, 0, alpha);
+            
+            const sx = x - blur/2;
+            const sy = y - blur/2 + offset;
+            const sw = w + blur;
+            const sh = h + blur;
+            const sr = r + blur/2;
+            
             ctx.beginPath();
-            if (r > 0) {
-                ctx.moveTo(x + r, y);
-                ctx.lineTo(x + w - r, y);
-                ctx.arcTo(x + w, y, x + w, y + r, r);
-                ctx.lineTo(x + w, y + h - r);
-                ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
-                ctx.lineTo(x + r, y + h);
-                ctx.arcTo(x, y + h, x, y + h - r, r);
-                ctx.lineTo(x, y + r);
-                ctx.arcTo(x, y, x + r, y, r);
+            if (sr > 0) {
+                ctx.moveTo(sx + sr, sy);
+                ctx.lineTo(sx + sw - sr, sy);
+                ctx.arcTo(sx + sw, sy, sx + sw, sy + sr, sr);
+                ctx.lineTo(sx + sw, sy + sh - sr);
+                ctx.arcTo(sx + sw, sy + sh, sx + sw - sr, sy + sh, sr);
+                ctx.lineTo(sx + sr, sy + sh);
+                ctx.arcTo(sx, sy + sh, sx, sy + sh - sr, sr);
+                ctx.lineTo(sx, sy + sr);
+                ctx.arcTo(sx, sy, sx + sr, sy, sr);
             } else {
-                ctx.rect(x, y, w, h);
+                ctx.rect(sx, sy, sw, sh);
             }
             ctx.closePath();
-        };
-
-        ctx.fillStyle = Qt.rgba(0, 0, 0, 1.0);
-
-        // Layer 1: Ambient Shadow (Tight, slightly darker)
-        ctx.save();
-        ctx.shadowColor = Qt.rgba(0, 0, 0, opacity * 0.35);
-        ctx.shadowBlur = (baseBlur * 0.2) / s;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = (baseOffset * 0.25) / s;
-        buildCasterPath();
-        ctx.fill();
-        ctx.restore();
-
-        // Layer 2: Diffuse Shadow (Large, soft, lighter)
-        ctx.save();
-        ctx.shadowColor = Qt.rgba(0, 0, 0, opacity * 0.25);
-        ctx.shadowBlur = baseBlur / s;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = baseOffset / s;
-        buildCasterPath();
-        ctx.fill();
-        ctx.restore();
-
+            ctx.fill();
+        }
         ctx.restore();
     }
 
