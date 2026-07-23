@@ -18,7 +18,7 @@ Commands that capture or open images accept an `action` parameter (`edit` / `flo
 
 | Command | Arguments | Description |
 | :--- | :--- | :--- |
-| `screenshot` | `mode` (`region`, `full`, `all`, `output`, `window`, `last`) | Triggers a screenshot. |
+| `screenshot` | `mode` (`region`, `full`, `all`, `output`, `window`, `last`, `scroll`) | Triggers a screenshot. |
 | `selectFile` | `action` | Opens file picker. |
 | `fromClipboard` | `action` | Imports image from clipboard. |
 | `openImage` | `path`, `action` | Opens a local image file. |
@@ -73,6 +73,7 @@ Pressing these keys changes the active tool:
 - `Z`: Area Zoom / Callout box
 - `V`: Select / Move tool
 - `B`: Backdrop options
+- `O`: OCR Text Recognition
 - `G` (hold): Magnifier Lens (Cursor zoom)
 - `Tab`: Swap between the two most recently used tool presets.
 

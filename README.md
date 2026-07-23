@@ -87,6 +87,8 @@ git checkout main && git pull
 | <kbd>T</kbd> | Eraser |
 | <kbd>Z</kbd> | Area Zoom (Callout) |
 | <kbd>B</kbd> | Backdrop Options |
+| <kbd>O</kbd> | OCR Text Recognition |
+| <kbd>G</kbd> (Hold) | Magnifier Lens (Cursor Zoom) |
 | <kbd>V</kbd> | Select |
 | <kbd>X</kbd> | Toggle Hide/Show Annotations |
 | <kbd>Tab</kbd> | Toggle between Select tool and last active tool, or between 2 latest radial presets |

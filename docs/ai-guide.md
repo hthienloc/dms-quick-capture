@@ -51,8 +51,11 @@ Key events are intercepted at the root Modal level via `modalFocusScope.Keys.onP
 | :--- | :--- | :--- |
 | `1`–`4` | Pen, Line, Arrow, Rectangle | Selects tool |
 | `Q`, `W`, `E`, `R` | Ellipse, Text, Pixelate, Redact | Selects tool |
-| `A`, `S`, `D`, `F`, `Z` | Stamp, Highlighter, Eraser, Spotlight, Callout | Selects tool |
+| `A`, `S`, `D` | Stamp, Highlighter, Spotlight | Selects tool |
+| `F`, `T` | Color Picker, Eraser | Selects tool |
+| `Z` | Callout | Selects tool |
 | `B` | Backdrop Options Toggle | Selects backdrop panel |
+| `O` | OCR Text Recognition | Toggles OCR tool |
 | `V` | Select / Move Tool | Selects tool |
 | `G` (Hold) | Magnifier Loupe | Enables circular magnifying zoom |
 | `Tab` | Presets Toggle | Swaps between 2 latest presets |

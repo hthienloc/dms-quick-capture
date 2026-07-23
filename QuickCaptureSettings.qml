@@ -3145,10 +3145,10 @@ PluginSettings {
                 spacing: 2
 
                 ShortcutRow { keyText: I18n.tr("Action"); actionText: I18n.tr("Interaction / Result"); isHeader: true }
-                ShortcutRow { keyText: I18n.tr("Left Click"); actionText: I18n.tr("Start interactive screenshot capture") }
-                ShortcutRow { keyText: I18n.tr("Middle Click"); actionText: I18n.tr("Open file browser to select image") }
-                ShortcutRow { keyText: I18n.tr("Right Click"); actionText: I18n.tr("Annotate image from clipboard") }
-                ShortcutRow { keyText: I18n.tr("Drag Image"); actionText: I18n.tr("Drop image onto icon to annotate") }
+                ShortcutRow { keyText: I18n.tr("Left Click"); actionText: I18n.tr("Open Quick Capture menu (Popout)") }
+                ShortcutRow { keyText: I18n.tr("Middle Click"); actionText: I18n.tr("Trigger Middle-Click Action (Default: Interactive Region)") }
+                ShortcutRow { keyText: I18n.tr("Right Click"); actionText: I18n.tr("Trigger Right-Click Action (Default: Clipboard Annotate)") }
+                ShortcutRow { keyText: I18n.tr("Drag Image"); actionText: I18n.tr("Drop image onto bar icon to annotate it") }
             }
 
             Separator { opacity: 0.1 }
@@ -3169,6 +3169,7 @@ PluginSettings {
                 ShortcutRow { keyText: "1 - 4"; actionText: I18n.tr("Pen, Line, Arrow, Rect") }
                 ShortcutRow { keyText: "Q - R"; actionText: I18n.tr("Ellipse, Text, Pixelate, Redact (Q, W, E, R)") }
                 ShortcutRow { keyText: "A - D"; actionText: I18n.tr("Stamp, Highlighter, Spotlight (A, S, D)") }
+                ShortcutRow { keyText: "Z / B"; actionText: I18n.tr("Callout, Backdrop (Z, B)") }
                 ShortcutRow { keyText: "F / T"; actionText: I18n.tr("Color Picker, Eraser (F, T)") }
             }
 
@@ -3191,9 +3192,15 @@ PluginSettings {
                 ShortcutRow { keyText: "Tab"; actionText: I18n.tr("Toggle between 2 latest presets") }
                 ShortcutRow { keyText: "V"; actionText: I18n.tr("Switch to Select Tool") }
                 ShortcutRow { keyText: "C"; actionText: I18n.tr("Copy vector / Paste / Duplicate") }
+                ShortcutRow { keyText: "G (Hold)"; actionText: I18n.tr("Magnifier Loupe") }
+                ShortcutRow { keyText: "O"; actionText: I18n.tr("OCR Text Recognition") }
+                ShortcutRow { keyText: "X"; actionText: I18n.tr("Toggle Hide/Show Annotations") }
                 ShortcutRow { keyText: "Ctrl + Z"; actionText: I18n.tr("Undo last stroke") }
+                ShortcutRow { keyText: "Ctrl + Y"; actionText: I18n.tr("Redo last undone stroke") }
+                ShortcutRow { keyText: "Ctrl + Shift + Z"; actionText: I18n.tr("Redo last undone stroke") }
                 ShortcutRow { keyText: "Ctrl + S"; actionText: I18n.tr("Force Save to File") }
                 ShortcutRow { keyText: "Ctrl + C"; actionText: I18n.tr("Force Copy to Clipboard") }
+                ShortcutRow { keyText: "Ctrl + Shift + C"; actionText: I18n.tr("Anonymous Copy (stripped metadata)") }
                 ShortcutRow { keyText: "Ctrl + A"; actionText: I18n.tr("Force Copy & Save") }
                 ShortcutRow { keyText: "Ctrl + F"; actionText: I18n.tr("Float Image") }
                 ShortcutRow { keyText: "Ctrl + X"; actionText: I18n.tr("Crop / Resize Area") }
@@ -3236,15 +3243,7 @@ PluginSettings {
                 wrapMode: Text.WordWrap
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceVariantText
-            }
-
-            CopyBox {
-                label: I18n.tr("Screenshot (Default) — Edit")
-                text: "dms ipc call quickCapture screenshot default edit"
-            }
-            CopyBox {
-                label: I18n.tr("Screenshot (Default) — Float")
-                text: "dms ipc call quickCapture screenshot default float"
+                textFormat: Text.RichText
             }
 
             CopyBox {
@@ -3299,6 +3298,15 @@ PluginSettings {
             CopyBox {
                 label: I18n.tr("Screenshot (Last Selected Region) — Float")
                 text: "dms ipc call quickCapture screenshot last float"
+            }
+
+            CopyBox {
+                label: I18n.tr("Screenshot (Scrolling Capture) — Edit")
+                text: "dms ipc call quickCapture screenshot scroll edit"
+            }
+            CopyBox {
+                label: I18n.tr("Screenshot (Scrolling Capture) — Float")
+                text: "dms ipc call quickCapture screenshot scroll float"
             }
 
             CopyBox {
