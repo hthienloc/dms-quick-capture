@@ -28,6 +28,7 @@ MouseArea {
     property string activeHandle: "none"
     property string hoveredHandle: "none"
     property int hoveredStrokeIdx: -1
+    property string shiftLockAxis: "none"
 
     // Pen real-time smoothing state (exponential moving average)
     property real penSmoothX: 0
@@ -67,11 +68,23 @@ MouseArea {
                     let dy = absPt.y - window.pressCoords.y;
 
                     if (mouse.modifiers & Qt.ShiftModifier) {
-                        if (Math.abs(dx) > Math.abs(dy)) {
+                        if (shiftLockAxis === "none") {
+                            const threshold = 4;
+                            if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
+                                if (Math.abs(dx) > Math.abs(dy)) {
+                                    shiftLockAxis = "horizontal";
+                                } else {
+                                    shiftLockAxis = "vertical";
+                                }
+                            }
+                        }
+                        if (shiftLockAxis === "horizontal") {
                             dy = 0;
-                        } else {
+                        } else if (shiftLockAxis === "vertical") {
                             dx = 0;
                         }
+                    } else {
+                        shiftLockAxis = "none";
                     }
 
                     if (window.selectedStroke.tool === "callout" && window.calloutDestDragging && window.originalPoints.length === 4) {
@@ -470,6 +483,7 @@ MouseArea {
     }
 
     onPressed: (mouse) => {
+        shiftLockAxis = "none";
         if (window.modalFocusScope) {
             window.modalFocusScope.forceActiveFocus();
         }
@@ -853,6 +867,7 @@ MouseArea {
     }
 
     onReleased: (mouse) => {
+        shiftLockAxis = "none";
         if (window.currentTool === "select") {
              window.activeHandle = "none";
              window.calloutDestDragging = false;
