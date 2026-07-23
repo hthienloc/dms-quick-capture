@@ -1715,6 +1715,9 @@ DankModal {
         }
 
         if (token === "C" && !hasCtrl) {
+            if (window.currentTool !== "select" && window.strokes.length > 0) {
+                window.currentTool = "select";
+            }
             if (window.selectedStroke) {
                 // Duplicate: Copy then Paste
                 window.copiedStroke = {
