@@ -605,7 +605,7 @@ DankModal {
         };
     }
 
-    function drawScreenshotShadow(ctx) {
+    function drawScreenshotShadow(ctx, scale) {
         if (window.backdropShadowStrength <= 0) return;
         ctx.save();
         const layout = window.getScreenshotLayout();
@@ -615,10 +615,16 @@ DankModal {
         const w = layout.w;
         const h = layout.h;
         
+        const s = (scale !== undefined && scale > 0) ? scale : 1.0;
         const opacity = (window.backdropShadowStrength / 100.0) * Constants.shadowBaseOpacityFactor;
         const STEPS = Constants.defaultShadowSteps;
-        const maxOffset = Constants.maxShadowOffset;
-        const maxBlur = Constants.maxShadowBlur;
+        
+        // Proportional shadow bounds for small layouts
+        const baseBlur = Math.min(Constants.maxShadowBlur, Math.min(w, h) * 0.15);
+        const baseOffset = Math.min(Constants.maxShadowOffset, Math.min(w, h) * 0.08);
+        
+        const maxOffset = baseOffset / s;
+        const maxBlur = baseBlur / s;
         
         // Draw 12 concentric shadow layers with quadratic spacing and falloff for smooth rendering
         for (let i = 1; i <= STEPS; i++) {
@@ -2565,7 +2571,7 @@ DankModal {
                             const isBackdropActive = window.effectiveBackdropMode !== "none";
                             if (isBackdropActive) {
                                 window.drawBackdropBackground(ctx, window.canvasWidth, window.canvasHeight);
-                                window.drawScreenshotShadow(ctx);
+                                window.drawScreenshotShadow(ctx, window.editScale);
                                 window.drawScreenshotImage(ctx, bgImage);
                             } else if (window.currentTool === "colorpicker") {
                                 if (bgImage.status === Image.Ready) {
@@ -3078,7 +3084,7 @@ DankModal {
                         const isBackdropActive = window.effectiveBackdropMode !== "none";
                         if (isBackdropActive) {
                             window.drawBackdropBackground(ctx, window.canvasWidth, window.canvasHeight);
-                            window.drawScreenshotShadow(ctx);
+                            window.drawScreenshotShadow(ctx, 1 / window.dpr);
                             window.drawScreenshotImage(ctx, bgImage);
                         } else {
                             if (bgImage.status === Image.Ready) {

@@ -74,7 +74,7 @@ Rectangle {
             // 1. Draw background image
             if (window.effectiveBackdropMode !== "none") {
                 window.drawBackdropBackground(ctx, window.canvasWidth, window.canvasHeight);
-                window.drawScreenshotShadow(ctx);
+                window.drawScreenshotShadow(ctx, magnifier.zoomFactor);
                 
                 // Draw screenshot image directly to bypass nested clip path bug in Qt Canvas
                 if (bgImage.status === Image.Ready) {
