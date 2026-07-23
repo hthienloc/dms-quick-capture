@@ -21,6 +21,7 @@ DankModal {
     CaptureConfig { 
         id: config 
         pluginData: (window.parentWidget && window.parentWidget.pluginData) ? window.parentWidget.pluginData : ({})
+        onPluginDataChanged: window.loadPresetsFromPluginData()
     }
 
     Image {
@@ -2085,6 +2086,42 @@ DankModal {
         }
     }
 
+    function loadPresetsFromPluginData() {
+        if (!config || !config.pluginData) return;
+        
+        const userPresetsRaw = config.pluginData["user_backdrop_presets"];
+        if (userPresetsRaw !== undefined) {
+            if (userPresetsRaw) {
+                try {
+                    const parsed = JSON.parse(userPresetsRaw);
+                    if (Array.isArray(parsed)) {
+                        window.customBackdropPresets = parsed;
+                    }
+                } catch (e) {
+                    console.error("Failed to parse user_backdrop_presets:", e);
+                }
+            } else {
+                window.customBackdropPresets = [];
+            }
+        }
+
+        const hiddenPresetsRaw = config.pluginData["hidden_backdrop_presets"];
+        if (hiddenPresetsRaw !== undefined) {
+            if (hiddenPresetsRaw) {
+                try {
+                    const parsed = JSON.parse(hiddenPresetsRaw);
+                    if (Array.isArray(parsed)) {
+                        window.hiddenPresetIds = parsed;
+                    }
+                } catch (e) {
+                    console.error("Failed to parse hidden_backdrop_presets:", e);
+                }
+            } else {
+                window.hiddenPresetIds = [];
+            }
+        }
+    }
+
     content: Component {
         FocusScope {
             id: contentRoot
@@ -3574,5 +3611,9 @@ DankModal {
         window.restoreSource = "";
         window.bgImageSource = "";
         window.exportCallback = null;
+    }
+
+    Component.onCompleted: {
+        window.loadPresetsFromPluginData();
     }
 }
