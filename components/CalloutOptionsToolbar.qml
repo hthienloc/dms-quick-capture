@@ -16,9 +16,11 @@ Item {
     property real menuY: 0
 
     property int currentLinkLines: 1
+    property string currentShape: "rect"
     property string toolbarPosition: "top"
 
     signal linkLinesSelected(int count)
+    signal shapeSelected(string shape)
 
     states: [
         State {
@@ -58,8 +60,8 @@ Item {
 
     Rectangle {
         id: menuContent
-        width: contentRow.implicitWidth + Theme.spacingM * 2
-        height: Constants.subToolbarHeight
+        width: contentColumn.implicitWidth + Theme.spacingM * 2
+        height: contentColumn.implicitHeight + Theme.spacingM * 2
         x: Math.max(10, Math.min(root.width - width - 10, root.menuX - width / 2))
         y: root.toolbarPosition === "bottom"
             ? Math.max(10, Math.min(root.height - height - 10, root.menuY - height - 20))
@@ -71,14 +73,52 @@ Item {
         border.width: 1
         radius: Theme.cornerRadius
 
-        Row {
-            id: contentRow
+        Column {
+            id: contentColumn
             anchors.centerIn: parent
             spacing: Theme.spacingS
 
-            // Group: Connecting Lines (1 Line, 2 Lines)
+            // Row 1: Shape (Rectangle, Ellipse)
             Row {
-                spacing: Theme.spacingXS
+                id: shapeRow
+                spacing: Theme.spacingS
+                Repeater {
+                    model: [
+                        { icon: "crop_square", shape: "rect", tooltip: I18n.tr("Rectangle") },
+                        { icon: "circle", shape: "ellipse", tooltip: I18n.tr("Ellipse") }
+                    ]
+                    delegate: Rectangle {
+                        width: Constants.subToolbarBtnSize; height: Constants.subToolbarBtnSize
+                        radius: Theme.cornerRadius - 2
+                        color: root.currentShape === modelData.shape
+                            ? Theme.withAlpha(Theme.primary, 0.15)
+                            : (shapeMouse.containsMouse ? Theme.withAlpha(Theme.surfaceText, 0.08) : "transparent")
+                        border.color: root.currentShape === modelData.shape ? Theme.primary : "transparent"
+                        border.width: 1
+
+                        DankIcon {
+                            anchors.centerIn: parent
+                            name: modelData.icon
+                            size: Constants.subToolbarIconSize
+                            color: root.currentShape === modelData.shape ? Theme.primary : Theme.surfaceText
+                        }
+
+                        MouseArea {
+                            id: shapeMouse
+                            anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                root.shapeSelected(modelData.shape);
+                                root.close();
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Row 2: Connecting Lines (1 Line, 2 Lines)
+            Row {
+                id: linesRow
+                spacing: Theme.spacingS
                 Repeater {
                     model: [
                         { icon: "remove", count: 1, tooltip: I18n.tr("1 Connecting Line") },

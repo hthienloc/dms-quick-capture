@@ -1,6 +1,23 @@
 .pragma library
 .import "Constants.js" as Constants
 
+function ellipseEdgePoint(cx, cy, rx, ry, tx, ty) {
+    const dx = tx - cx;
+    const dy = ty - cy;
+    if (dx === 0 && dy === 0) return { x: cx + rx, y: cy };
+    const angle = Math.atan2(dy, dx);
+    return { x: cx + rx * Math.cos(angle), y: cy + ry * Math.sin(angle) };
+}
+
+function drawEllipsePath(ctx, cx, cy, rx, ry) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(rx, ry);
+    ctx.beginPath();
+    ctx.arc(0, 0, 1, 0, 2 * Math.PI);
+    ctx.restore();
+}
+
 /**
  * DrawingRenderer.js
  * Encapsulates all drawing logic for the Quick Capture plugin.
@@ -508,46 +525,77 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
 
             if (sw > 0 && sh > 0 && dw > 0 && dh > 0) {
                 const bW = stroke.borderWidth !== undefined ? stroke.borderWidth : 2;
+                const isEllipse = stroke.calloutShape === "ellipse";
+                const srcCx = sx + sw / 2;
+                const srcCy = sy + sh / 2;
+                const dstCx = dx + dw / 2;
+                const dstCy = dy + dh / 2;
 
-                // 1. Draw orig rect border (background source box)
+                // 1. Draw source border
                 ctx.strokeStyle = stroke.color;
                 ctx.lineWidth = bW;
-                ctx.strokeRect(sx, sy, sw, sh);
-                
+                if (isEllipse) {
+                    drawEllipsePath(ctx, srcCx, srcCy, sw / 2, sh / 2);
+                    ctx.stroke();
+                    drawEllipsePath(ctx, srcCx, srcCy, sw / 2 + 1, sh / 2 + 1);
+                } else {
+                    ctx.strokeRect(sx, sy, sw, sh);
+                }
+
                 ctx.strokeStyle = "rgba(0,0,0,0.4)";
                 ctx.lineWidth = 1;
-                ctx.strokeRect(sx - bW/2 - 0.5, sy - bW/2 - 0.5, sw + bW + 1, sh + bW + 1);
+                if (isEllipse) {
+                    ctx.stroke();
+                } else {
+                    ctx.strokeRect(sx - bW/2 - 0.5, sy - bW/2 - 0.5, sw + bW + 1, sh + bW + 1);
+                }
 
-                // 2. Draw connecting lines (dynamic corners) using semi-transparent stroke color
+                // 2. Draw connecting lines using semi-transparent stroke color
                 const linkLines = stroke.calloutLinkLines !== undefined ? stroke.calloutLinkLines : 2;
                 ctx.strokeStyle = Qt.rgba(rgb.r, rgb.g, rgb.b, 0.6);
                 ctx.lineWidth = bW;
                 ctx.beginPath();
-                
-                if (linkLines === 2) {
-                    // Simple logic: connect closest horizontal corners
-                    if (dx > sx + sw) { // Dest is to the right
+
+                if (isEllipse) {
+                    const srcRx = sw / 2;
+                    const srcRy = sh / 2;
+                    const dstRx = dw / 2;
+                    const dstRy = dh / 2;
+                    if (linkLines === 2) {
+                        const e1 = ellipseEdgePoint(srcCx, srcCy, srcRx, srcRy, dstP0.x, dstP0.y);
+                        const e2 = ellipseEdgePoint(srcCx, srcCy, srcRx, srcRy, dstP1.x, dstP1.y);
+                        const d1 = ellipseEdgePoint(dstCx, dstCy, dstRx, dstRy, srcP0.x, srcP0.y);
+                        const d2 = ellipseEdgePoint(dstCx, dstCy, dstRx, dstRy, srcP1.x, srcP1.y);
+                        ctx.moveTo(e1.x, e1.y); ctx.lineTo(d1.x, d1.y);
+                        ctx.moveTo(e2.x, e2.y); ctx.lineTo(d2.x, d2.y);
+                    } else {
+                        const e1 = ellipseEdgePoint(srcCx, srcCy, srcRx, srcRy, dstCx, dstCy);
+                        const d1 = ellipseEdgePoint(dstCx, dstCy, dstRx, dstRy, srcCx, srcCy);
+                        ctx.moveTo(e1.x, e1.y); ctx.lineTo(d1.x, d1.y);
+                    }
+                } else if (linkLines === 2) {
+                    if (dx > sx + sw) {
                         ctx.moveTo(srcP1.x, srcP0.y); ctx.lineTo(dstP0.x, dstP0.y);
                         ctx.moveTo(srcP1.x, srcP1.y); ctx.lineTo(dstP0.x, dstP1.y);
-                    } else if (dx + dw < sx) { // Dest is to the left
+                    } else if (dx + dw < sx) {
                         ctx.moveTo(srcP0.x, srcP0.y); ctx.lineTo(dstP1.x, dstP0.y);
                         ctx.moveTo(srcP0.x, srcP1.y); ctx.lineTo(dstP1.x, dstP1.y);
-                    } else { // Dest is above/below
+                    } else {
                         ctx.moveTo(srcP0.x, srcP1.y); ctx.lineTo(dstP0.x, dstP0.y);
                         ctx.moveTo(srcP1.x, srcP1.y); ctx.lineTo(dstP1.x, dstP0.y);
                     }
-                } else { // 1 Line
-                    if (dx > sx + sw) { // Dest is to the right
+                } else {
+                    if (dx > sx + sw) {
                         ctx.moveTo(sx + sw, sy + sh / 2);
                         ctx.lineTo(dx, dy + dh / 2);
-                    } else if (dx + dw < sx) { // Dest is to the left
+                    } else if (dx + dw < sx) {
                         ctx.moveTo(sx, sy + sh / 2);
                         ctx.lineTo(dx + dw, dy + dh / 2);
-                    } else { // Dest is above/below
-                        if (dy > sy + sh) { // Dest is below
+                    } else {
+                        if (dy > sy + sh) {
                             ctx.moveTo(sx + sw / 2, sy + sh);
                             ctx.lineTo(dx + dw / 2, dy);
-                        } else { // Dest is above
+                        } else {
                             ctx.moveTo(sx + sw / 2, sy);
                             ctx.lineTo(dx + dw / 2, dy + dh);
                         }
@@ -571,7 +619,11 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
                         if (clampSW > 0 && clampSH > 0) {
                             ctx.save();
                             ctx.beginPath();
-                            ctx.rect(dx, dy, dw, dh);
+                            if (isEllipse) {
+                                drawEllipsePath(ctx, dstCx, dstCy, dw / 2, dh / 2);
+                            } else {
+                                ctx.rect(dx, dy, dw, dh);
+                            }
                             ctx.clip();
                             ctx.drawImage(config.bgImageItem, clampSX, clampSY, clampSW, clampSH, dx, dy, dw, dh);
                             ctx.restore();
@@ -582,11 +634,23 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
                 // 4. Draw destination border and shadow (foreground)
                 ctx.strokeStyle = stroke.color;
                 ctx.lineWidth = bW;
-                ctx.strokeRect(dx, dy, dw, dh);
-                
+                if (isEllipse) {
+                    ctx.beginPath();
+                    drawEllipsePath(ctx, dstCx, dstCy, dw / 2, dh / 2);
+                    ctx.stroke();
+                } else {
+                    ctx.strokeRect(dx, dy, dw, dh);
+                }
+
                 ctx.strokeStyle = "rgba(0,0,0,0.4)";
                 ctx.lineWidth = 1;
-                ctx.strokeRect(dx - bW/2 - 0.5, dy - bW/2 - 0.5, dw + bW + 1, dh + bW + 1);
+                if (isEllipse) {
+                    ctx.beginPath();
+                    drawEllipsePath(ctx, dstCx, dstCy, dw / 2 + 1, dh / 2 + 1);
+                    ctx.stroke();
+                } else {
+                    ctx.strokeRect(dx - bW/2 - 0.5, dy - bW/2 - 0.5, dw + bW + 1, dh + bW + 1);
+                }
             }
         }
 
@@ -1009,7 +1073,13 @@ function drawSelectionHandles(ctx, stroke, Theme, estimateTextWidthFn, Qt, Helpe
 
         ctx.save();
         setDashedSelectionStyle(ctx, stroke, Helpers, Qt);
-        ctx.strokeRect(x1, y1, sw, sh);
+        if (stroke.calloutShape === "ellipse") {
+            ctx.beginPath();
+            drawEllipsePath(ctx, cx, cy, sw / 2, sh / 2);
+        } else {
+            ctx.rect(x1, y1, sw, sh);
+        }
+        ctx.stroke();
         ctx.restore();
 
         drawHandlePoints(ctx, [

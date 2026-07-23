@@ -706,9 +706,25 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
             const srcP1 = stroke.points[1];
             const dstP0 = stroke.points[2];
             const dstP1 = stroke.points[3];
-            if ((mx >= srcP0.x - Constants.calloutSelectionPadding && mx <= srcP1.x + Constants.calloutSelectionPadding && my >= srcP0.y - Constants.calloutSelectionPadding && my <= srcP1.y + Constants.calloutSelectionPadding) ||
-                (mx >= dstP0.x - Constants.calloutSelectionPadding && mx <= dstP1.x + Constants.calloutSelectionPadding && my >= dstP0.y - Constants.calloutSelectionPadding && my <= dstP1.y + Constants.calloutSelectionPadding)) {
-                return i;
+            const pad = Constants.calloutSelectionPadding;
+            if (stroke.calloutShape === "ellipse") {
+                const srcCx = (srcP0.x + srcP1.x) / 2;
+                const srcCy = (srcP0.y + srcP1.y) / 2;
+                const srcRx = (srcP1.x - srcP0.x) / 2 + pad;
+                const srcRy = (srcP1.y - srcP0.y) / 2 + pad;
+                let dx = mx - srcCx;
+                let dy = my - srcCy;
+                if (srcRx > 0 && srcRy > 0 && (dx * dx) / (srcRx * srcRx) + (dy * dy) / (srcRy * srcRy) <= 1) return i;
+                const dstCx = (dstP0.x + dstP1.x) / 2;
+                const dstCy = (dstP0.y + dstP1.y) / 2;
+                const dstRx = (dstP1.x - dstP0.x) / 2 + pad;
+                const dstRy = (dstP1.y - dstP0.y) / 2 + pad;
+                dx = mx - dstCx;
+                dy = my - dstCy;
+                if (dstRx > 0 && dstRy > 0 && (dx * dx) / (dstRx * dstRx) + (dy * dy) / (dstRy * dstRy) <= 1) return i;
+            } else {
+                if (mx >= srcP0.x - pad && mx <= srcP1.x + pad && my >= srcP0.y - pad && my <= srcP1.y + pad) return i;
+                if (mx >= dstP0.x - pad && mx <= dstP1.x + pad && my >= dstP0.y - pad && my <= dstP1.y + pad) return i;
             }
         }
     }
@@ -995,6 +1011,7 @@ function copyStrokeProperties(source, target) {
     if (source.hasLeaderLine !== undefined) target.hasLeaderLine = source.hasLeaderLine;
     if (source.isSpeechBubble !== undefined) target.isSpeechBubble = source.isSpeechBubble;
     if (source.calloutLinkLines !== undefined) target.calloutLinkLines = source.calloutLinkLines;
+    if (source.calloutShape !== undefined) target.calloutShape = source.calloutShape;
     if (source.id !== undefined) target.id = source.id;
 }
 
