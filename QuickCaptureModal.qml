@@ -1654,6 +1654,15 @@ DankModal {
                 event.accepted = true;
                 return;
             }
+            if (window.currentTool === "crop" || window.hasSelection) {
+                window.hasSelection = false;
+                window.cropRect = Qt.rect(0, 0, 0, 0);
+                window.activeHandle = "none";
+                window.currentTool = window.lastActiveTool;
+                window.requestPaintAll();
+                event.accepted = true;
+                return;
+            }
             window.discardAndClose();
             event.accepted = true;
             return;
