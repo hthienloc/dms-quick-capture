@@ -63,8 +63,16 @@ MouseArea {
                 hoveredHandle = window.getSelectedStrokeHandleAt(absPt.x, absPt.y);
 
                 if (window.activeHandle === "none" && window.originalPoints.length > 0) {
-                    const dx = absPt.x - window.pressCoords.x;
-                    const dy = absPt.y - window.pressCoords.y;
+                    let dx = absPt.x - window.pressCoords.x;
+                    let dy = absPt.y - window.pressCoords.y;
+
+                    if (mouse.modifiers & Qt.ShiftModifier) {
+                        if (Math.abs(dx) > Math.abs(dy)) {
+                            dy = 0;
+                        } else {
+                            dx = 0;
+                        }
+                    }
 
                     if (window.selectedStroke.tool === "callout" && window.calloutDestDragging && window.originalPoints.length === 4) {
                         const newPoints = [...window.selectedStroke.points];
