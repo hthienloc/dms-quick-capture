@@ -564,8 +564,10 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
                     if (linkLines === 2) {
                         const e1 = ellipseEdgePoint(srcCx, srcCy, srcRx, srcRy, dstP0.x, dstP0.y);
                         const e2 = ellipseEdgePoint(srcCx, srcCy, srcRx, srcRy, dstP1.x, dstP1.y);
-                        ctx.moveTo(e1.x, e1.y); ctx.lineTo(dstP0.x, dstP0.y);
-                        ctx.moveTo(e2.x, e2.y); ctx.lineTo(dstP1.x, dstP1.y);
+                        const d1 = ellipseEdgePoint(dstCx, dstCy, dstRx, dstRy, srcP0.x, srcP0.y);
+                        const d2 = ellipseEdgePoint(dstCx, dstCy, dstRx, dstRy, srcP1.x, srcP1.y);
+                        ctx.moveTo(e1.x, e1.y); ctx.lineTo(d1.x, d1.y);
+                        ctx.moveTo(e2.x, e2.y); ctx.lineTo(d2.x, d2.y);
                     } else {
                         const e1 = ellipseEdgePoint(srcCx, srcCy, srcRx, srcRy, dstCx, dstCy);
                         const d1 = ellipseEdgePoint(dstCx, dstCy, dstRx, dstRy, srcCx, srcCy);

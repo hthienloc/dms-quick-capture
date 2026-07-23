@@ -712,14 +712,19 @@ function findStrokeAt(mx, my, strokes, estimateTextWidthFn) {
                 const srcCy = (srcP0.y + srcP1.y) / 2;
                 const srcRx = (srcP1.x - srcP0.x) / 2 + pad;
                 const srcRy = (srcP1.y - srcP0.y) / 2 + pad;
-                const dx = mx - srcCx;
-                const dy = my - srcCy;
+                let dx = mx - srcCx;
+                let dy = my - srcCy;
                 if (srcRx > 0 && srcRy > 0 && (dx * dx) / (srcRx * srcRx) + (dy * dy) / (srcRy * srcRy) <= 1) return i;
-            } else if (mx >= srcP0.x - pad && mx <= srcP1.x + pad && my >= srcP0.y - pad && my <= srcP1.y + pad) {
-                return i;
-            }
-            if (mx >= dstP0.x - pad && mx <= dstP1.x + pad && my >= dstP0.y - pad && my <= dstP1.y + pad) {
-                return i;
+                const dstCx = (dstP0.x + dstP1.x) / 2;
+                const dstCy = (dstP0.y + dstP1.y) / 2;
+                const dstRx = (dstP1.x - dstP0.x) / 2 + pad;
+                const dstRy = (dstP1.y - dstP0.y) / 2 + pad;
+                dx = mx - dstCx;
+                dy = my - dstCy;
+                if (dstRx > 0 && dstRy > 0 && (dx * dx) / (dstRx * dstRx) + (dy * dy) / (dstRy * dstRy) <= 1) return i;
+            } else {
+                if (mx >= srcP0.x - pad && mx <= srcP1.x + pad && my >= srcP0.y - pad && my <= srcP1.y + pad) return i;
+                if (mx >= dstP0.x - pad && mx <= dstP1.x + pad && my >= dstP0.y - pad && my <= dstP1.y + pad) return i;
             }
         }
     }
