@@ -3483,10 +3483,14 @@ DankModal {
                 s.isUnderline = window.textUnderline;
                 s.hasBackground = window.textBackground;
                 s.cornerRadius = window.textCornerRadius;
+                // Use per-stroke saved coordinates to prevent cross-contamination
+                // when multiple edit dialogs are open simultaneously
+                const editCoords = s._editCoords || window.typingCoords;
+                const editTargetCoords = s._editTargetCoords || window.typingTargetCoords;
                 if (s.isSpeechBubble) {
-                    s.points = [window.typingTargetCoords, window.typingCoords];
+                    s.points = [editTargetCoords, editCoords];
                 } else {
-                    s.points = [window.typingCoords];
+                    s.points = [editCoords];
                 }
                 const idx = window.strokes.indexOf(s);
                 if (idx !== -1) {
@@ -3497,6 +3501,9 @@ DankModal {
                 if (window.currentTool === "select") {
                     window.selectedStroke = s;
                 }
+                // Clean up per-stroke edit coordinates
+                delete s._editCoords;
+                delete s._editTargetCoords;
             } else {
                 const list = [...window.strokes];
                 const idx = list.indexOf(window.editingStroke);

@@ -815,11 +815,15 @@ MouseArea {
         window.editingStroke = stroke;
         window.selectedStroke = null;
         window.typingIsSpeechBubble = stroke.isSpeechBubble || false;
-        window.typingCoords = (stroke.isSpeechBubble && stroke.points.length >= 2)
+        // Store coordinates directly on the stroke to avoid cross-contamination
+        // between concurrent edit sessions (multiple dialogs)
+        stroke._editCoords = (stroke.isSpeechBubble && stroke.points.length >= 2)
             ? Qt.point(stroke.points[1].x, stroke.points[1].y)
             : Qt.point(stroke.points[0].x, stroke.points[0].y);
+        window.typingCoords = stroke._editCoords;
         if (stroke.isSpeechBubble && stroke.points.length >= 2) {
-            window.typingTargetCoords = Qt.point(stroke.points[0].x, stroke.points[0].y);
+            stroke._editTargetCoords = Qt.point(stroke.points[0].x, stroke.points[0].y);
+            window.typingTargetCoords = stroke._editTargetCoords;
         }
         window.currentTypingText = stroke.text;
         window.typingCursorIndex = stroke.text ? stroke.text.length : 0;

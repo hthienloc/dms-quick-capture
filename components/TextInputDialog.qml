@@ -37,6 +37,10 @@ Popup {
         if (window && window.isTyping) {
             window.isTyping = false;
             window.currentTypingText = "";
+            if (window.editingStroke) {
+                delete window.editingStroke._editCoords;
+                delete window.editingStroke._editTargetCoords;
+            }
             window.editingStroke = null;
             if (window.activeCanvas) window.activeCanvas.requestPaint();
         }
