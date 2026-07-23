@@ -573,6 +573,7 @@ MouseArea {
                     window.activeRedactMode = window.preGrabRedactMode;
                     window.activeRedactShape = window.preGrabRedactShape;
                     window.calloutLinkLines = window.preGrabCalloutLinkLines;
+                    window.calloutShape = window.preGrabCalloutShape;
                 }
                 window.originalPoints = [];
                 window.activeHandle = "none";
@@ -595,6 +596,7 @@ MouseArea {
                     window.preGrabRedactMode = window.activeRedactMode;
                     window.preGrabRedactShape = window.activeRedactShape;
                     window.preGrabCalloutLinkLines = window.calloutLinkLines;
+                    window.preGrabCalloutShape = window.calloutShape;
                 }
                 
                 window.selectedStroke = stroke;
@@ -614,6 +616,7 @@ MouseArea {
                 }
                 if (stroke.tool === "callout") {
                     window.calloutLinkLines = stroke.calloutLinkLines !== undefined ? stroke.calloutLinkLines : 1;
+                    window.calloutShape = stroke.calloutShape !== undefined ? stroke.calloutShape : "rect";
                 }
 
                 // Detection for callout destination dragging
@@ -798,6 +801,7 @@ MouseArea {
               redactMode: window.currentTool === "redact" ? window.activeRedactMode : "solid",
               redactShape: window.currentTool === "redact" ? window.activeRedactShape : "rect",
               calloutLinkLines: window.currentTool === "callout" ? window.calloutLinkLines : 1,
+              calloutShape: window.currentTool === "callout" ? window.calloutShape : "rect",
               randomize: window.currentTool === "pixelate" ? window.pixelateRandomize : false,
               randomSeed: window.currentTool === "pixelate" ? Math.floor(Math.random() * 2147483647) : 0
           };

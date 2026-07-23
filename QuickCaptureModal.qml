@@ -167,6 +167,7 @@ DankModal {
             window.activeRedactMode = window.preGrabRedactMode;
             window.activeRedactShape = window.preGrabRedactShape;
             window.calloutLinkLines = window.preGrabCalloutLinkLines;
+            window.calloutShape = window.preGrabCalloutShape;
             if (window.activeCanvas) window.activeCanvas.requestPaint();
         }
         if (currentTool === "colorpicker") {
@@ -191,6 +192,7 @@ DankModal {
             window.preGrabRedactMode = window.activeRedactMode;
             window.preGrabRedactShape = window.activeRedactShape;
             window.preGrabCalloutLinkLines = window.calloutLinkLines;
+            window.preGrabCalloutShape = window.calloutShape;
             window.selectedStroke = s;
             window.currentColor = s.color;
             if (s.tool === "text") window.textFontSize = s.width;
@@ -205,7 +207,10 @@ DankModal {
             }
             if (s.tool === "redact" && s.redactMode) window.activeRedactMode = s.redactMode;
             if (s.tool === "redact" && s.redactShape) window.activeRedactShape = s.redactShape;
-            if (s.tool === "callout") window.calloutLinkLines = s.calloutLinkLines !== undefined ? s.calloutLinkLines : 1;
+            if (s.tool === "callout") {
+                window.calloutLinkLines = s.calloutLinkLines !== undefined ? s.calloutLinkLines : 1;
+                window.calloutShape = s.calloutShape !== undefined ? s.calloutShape : "rect";
+            }
             const reorder = [...window.strokes];
             const idx = reorder.indexOf(s);
             if (idx !== -1) {
@@ -376,6 +381,20 @@ DankModal {
     onStampCounterFormatChanged: {
         window.reindexStamps();
         window.requestPaintAll();
+    }
+    property string calloutShape: "rect" // rect, ellipse
+    onCalloutShapeChanged: {
+        if (selectedStroke && selectedStroke.tool === "callout") {
+            if (selectedStroke.calloutShape !== calloutShape) {
+                selectedStroke.calloutShape = calloutShape;
+                const idx = window.strokes.indexOf(selectedStroke);
+                if (idx !== -1) {
+                    window.strokes[idx] = selectedStroke;
+                    window.strokes = [...window.strokes];
+                }
+                if (window.activeCanvas) window.activeCanvas.requestPaint();
+            }
+        }
     }
     property int calloutLinkLines: 1 // 1, 2
     onCalloutLinkLinesChanged: {
@@ -711,6 +730,7 @@ DankModal {
     property string preGrabRedactMode: "solid"
     property string preGrabRedactShape: "rect"
     property int preGrabCalloutLinkLines: 1
+    property string preGrabCalloutShape: "rect"
     property point pressCoords: Qt.point(0, 0)
     property var originalPoints: []
 
@@ -1190,10 +1210,12 @@ DankModal {
             window.preGrabRedactMode = window.activeRedactMode;
             window.preGrabRedactShape = window.activeRedactShape;
             window.preGrabCalloutLinkLines = window.calloutLinkLines;
+            window.preGrabCalloutShape = window.calloutShape;
             window.strokeWidth = pasted.width;
             window.currentColor = pasted.color;
             if (pasted.tool === "redact" && pasted.redactMode) window.activeRedactMode = pasted.redactMode;
             if (pasted.tool === "redact" && pasted.redactShape) window.activeRedactShape = pasted.redactShape;
+            if (pasted.tool === "callout") window.calloutShape = pasted.calloutShape !== undefined ? pasted.calloutShape : "rect";
             window.selectedStroke = pasted;
             window.pressCoords = absPt;
             window.originalPoints = newPoints;
@@ -3279,7 +3301,9 @@ DankModal {
                     id: calloutOptionsToolbar
                     toolbarPosition: window.toolbarPosition
                     currentLinkLines: window.calloutLinkLines
+                    currentShape: window.calloutShape
                     onLinkLinesSelected: (count) => window.calloutLinkLines = count
+                    onShapeSelected: (shape) => window.calloutShape = shape
                 }
 
                 PixelateOptionsToolbar {
@@ -3560,6 +3584,7 @@ DankModal {
                 window.activeRedactMode = window.preGrabRedactMode;
                 window.activeRedactShape = window.preGrabRedactShape;
                 window.calloutLinkLines = window.preGrabCalloutLinkLines;
+                window.calloutShape = window.preGrabCalloutShape;
             }
             if (window.activeCanvas) window.activeCanvas.requestPaint();
         }
@@ -3582,6 +3607,7 @@ DankModal {
                 window.preGrabRedactMode = window.activeRedactMode;
                 window.preGrabRedactShape = window.activeRedactShape;
                 window.preGrabCalloutLinkLines = window.calloutLinkLines;
+                window.preGrabCalloutShape = window.calloutShape;
 
                 window.selectedStroke = strokeToRedo;
                 window.currentColor = strokeToRedo.color;
@@ -3598,7 +3624,10 @@ DankModal {
                 }
                 if (strokeToRedo.tool === "redact" && strokeToRedo.redactMode) window.activeRedactMode = strokeToRedo.redactMode;
                 if (strokeToRedo.tool === "redact" && strokeToRedo.redactShape) window.activeRedactShape = strokeToRedo.redactShape;
-                if (strokeToRedo.tool === "callout") window.calloutLinkLines = strokeToRedo.calloutLinkLines !== undefined ? strokeToRedo.calloutLinkLines : 1;
+                if (strokeToRedo.tool === "callout") {
+                    window.calloutLinkLines = strokeToRedo.calloutLinkLines !== undefined ? strokeToRedo.calloutLinkLines : 1;
+                    window.calloutShape = strokeToRedo.calloutShape !== undefined ? strokeToRedo.calloutShape : "rect";
+                }
             }
 
             if (window.activeCanvas) window.activeCanvas.requestPaint();
