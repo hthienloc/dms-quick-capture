@@ -1013,6 +1013,8 @@ function copyStrokeProperties(source, target) {
     if (source.calloutLinkLines !== undefined) target.calloutLinkLines = source.calloutLinkLines;
     if (source.calloutShape !== undefined) target.calloutShape = source.calloutShape;
     if (source.id !== undefined) target.id = source.id;
+    if (source.randomize !== undefined) target.randomize = source.randomize;
+    if (source.randomSeed !== undefined) target.randomSeed = source.randomSeed;
 }
 
 /**
