@@ -1683,6 +1683,24 @@ DankModal {
         const hasCtrl = event.modifiers & Qt.ControlModifier;
 
         if (event.key === Qt.Key_Escape) {
+            // Cancel active drawing stroke
+            if (window.currentStroke) {
+                window.currentStroke = null;
+                if (window.activeCanvas) window.activeCanvas.requestPaint();
+                event.accepted = true;
+                return;
+            }
+            // Cancel active select tool drag/move/resize and restore original position
+            if (window.currentTool === "select" && window.originalPoints && window.originalPoints.length > 0) {
+                if (window.selectedStroke) {
+                    window.selectedStroke.points = window.originalPoints.map(p => Qt.point(p.x, p.y));
+                }
+                window.activeHandle = "none";
+                window.originalPoints = [];
+                if (window.activeCanvas) window.activeCanvas.requestPaint();
+                event.accepted = true;
+                return;
+            }
             if (window.selectedStroke) {
                 window.selectedStroke = null;
                 if (window.activeCanvas) window.activeCanvas.requestPaint();
