@@ -911,7 +911,7 @@ PluginSettings {
                 { label: I18n.tr("Left"), value: "left" },
                 { label: I18n.tr("Right"), value: "right" }
             ]
-            defaultValue: "top"
+            defaultValue: "bottom"
             visible: showToolbar.value
             height: visible ? 72 : 0
         }
