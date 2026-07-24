@@ -51,7 +51,11 @@ Item {
     onDaemonChanged: { if (root.daemon && root.daemon.pluginData) refresh() }
 
     function removeEntry(path) {
-        root.entries = root.entries.filter(function(e) { return e.savedPath !== path })
+        var filtered = root.entries.filter(function(e) { return e.savedPath !== path })
+        for (var i = 0; i < filtered.length; i++) {
+            filtered[i]._glIdx = i
+        }
+        root.entries = filtered
         if (root.previewIndex >= root.entries.length)
             root.previewIndex = root.entries.length - 1
     }
