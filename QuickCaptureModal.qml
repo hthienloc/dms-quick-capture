@@ -1637,6 +1637,48 @@ DankModal {
     }
 
     function handleShortcutKey(event) {
+        // Delete selected stroke shortcut
+        if ((event.key === Qt.Key_Delete || event.key === Qt.Key_Backspace) && window.currentTool === "select" && window.selectedStroke) {
+            const list = [...window.strokes];
+            const idx = list.indexOf(window.selectedStroke);
+            if (idx !== -1) {
+                list.splice(idx, 1);
+                window.undoneStrokes = [...window.undoneStrokes, window.selectedStroke];
+                window.strokes = list;
+            }
+            window.selectedStroke = null;
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+            event.accepted = true;
+            return;
+        }
+
+        // Move selected stroke shortcut using arrow keys
+        if ((event.key === Qt.Key_Left || event.key === Qt.Key_Right || event.key === Qt.Key_Up || event.key === Qt.Key_Down)
+            && window.currentTool === "select" && window.selectedStroke) {
+            
+            let step = (event.modifiers & Qt.ShiftModifier) ? 10 : 1;
+            let dx = 0;
+            let dy = 0;
+            if (event.key === Qt.Key_Left) dx = -step;
+            else if (event.key === Qt.Key_Right) dx = step;
+            else if (event.key === Qt.Key_Up) dy = -step;
+            else if (event.key === Qt.Key_Down) dy = step;
+
+            const newPoints = [];
+            for (let i = 0; i < window.selectedStroke.points.length; i++) {
+                newPoints.push(Qt.point(window.selectedStroke.points[i].x + dx, window.selectedStroke.points[i].y + dy));
+            }
+            window.selectedStroke.points = newPoints;
+
+            if (window.selectedStroke.tool === "redact") {
+                window.selectedStroke.cachedCleanColor = undefined;
+            }
+
+            if (window.activeCanvas) window.activeCanvas.requestPaint();
+            event.accepted = true;
+            return;
+        }
+
         const token = Helpers.shortcutToken(event.key, Qt);
         const hasCtrl = event.modifiers & Qt.ControlModifier;
 
