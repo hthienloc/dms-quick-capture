@@ -1683,6 +1683,12 @@ DankModal {
         const hasCtrl = event.modifiers & Qt.ControlModifier;
 
         if (event.key === Qt.Key_Escape) {
+            if (window.selectedStroke) {
+                window.selectedStroke = null;
+                if (window.activeCanvas) window.activeCanvas.requestPaint();
+                event.accepted = true;
+                return;
+            }
             if (window.currentTool === "ocr" || window.currentTool === "qr") {
                 window.currentTool = window.lastActiveTool;
                 window.ocrRect = Qt.rect(0, 0, 0, 0);
