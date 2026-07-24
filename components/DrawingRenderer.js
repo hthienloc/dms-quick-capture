@@ -404,7 +404,7 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
                                 sx = Math.max(0, Math.min(sx, Math.max(0, imgW - sampleSize)));
                                 sy = Math.max(0, Math.min(sy, Math.max(0, imgH - sampleSize)));
                             }
-                            ctx.drawImage(config.bgImageItem, sx, sy, sampleSize, sampleSize, x, y, bw, bh);
+                            ctx.drawImage(config.bgImageItem, sx, sy, sampleSize, sampleSize, x, y, bw + 1, bh + 1);
                         }
                     }
                 }
