@@ -121,15 +121,20 @@ QtObject {
         }
     }
 
-    function notifyError(message) {
+    function notifyError(message, detail) {
+        let fullMsg = message;
+        if (detail) {
+            fullMsg += "\n" + detail;
+        }
+        console.error("[QuickCapture Error]", message, detail ? ("| Detail: " + detail) : "");
         if (typeof ToastService !== "undefined" && ToastService) {
-            ToastService.showError(message);
+            ToastService.showError(fullMsg);
         }
         
         const hasParent = root.parentWidget && root.parentWidget.pluginData;
         const mode = hasParent ? (root.parentWidget.pluginData.postNotification || "notification") : "notification";
         if (mode === "notification" || mode === "both") {
-            Proc.runCommand("system-notify-error", ["notify-send", "-u", "critical", "-a", "Quick Capture", "-i", "error", I18n.tr("Quick Capture Error"), message]);
+            Proc.runCommand("system-notify-error", ["notify-send", "-u", "critical", "-a", "Quick Capture", "-i", "error", I18n.tr("Quick Capture Error"), fullMsg]);
         }
     }
 
@@ -182,21 +187,32 @@ QtObject {
     }
 
     function copyFileToClipboard(tempOut, callback) {
-        DMSService.sendRequest("clipboard.copyFile", { "filePath": tempOut }, function(response) {
-            if (response.error) {
-                console.error("DMS native copy failed:", response.error);
-                callback(response.error, 1);
-            } else {
-                callback("", 0);
+        const checkCmd = "[ -s " + shellPathExpression(tempOut) + " ] || { echo 'ERROR: Exported screenshot file is empty or missing' >&2; exit 2; }";
+        Proc.runCommand("check-copy-file", ["sh", "-c", checkCmd], (checkOut, checkCode) => {
+            if (checkCode !== 0) {
+                const errDetail = checkOut ? checkOut.trim() : ("Exported file missing or empty (" + tempOut + ")");
+                console.error("[QuickCapture] Copy pre-check failed:", errDetail);
+                callback(errDetail, checkCode);
+                return;
             }
-        });
+            DMSService.sendRequest("clipboard.copyFile", { "filePath": tempOut }, function(response) {
+                if (response && response.error) {
+                    const errStr = String(response.error);
+                    console.error("[QuickCapture] DMS clipboard copy failed:", errStr);
+                    callback(errStr, 1);
+                } else {
+                    callback("", 0);
+                }
+            });
+        }, 0, 2000);
     }
 
     function saveFile(tempOut, callback) {
         const saveDir = saveDirectory();
         const filename = screenshotFilename();
         const targetPath = saveDir.replace(/\/$/, "") + "/" + filename;
-        const saveCmd = "mkdir -p -- " + shellPathExpression(saveDir) +
+        const saveCmd = "[ -s " + shellPathExpression(tempOut) + " ] || { echo 'ERROR: Exported screenshot file is empty or missing' >&2; exit 2; }; " +
+                        "mkdir -p -- " + shellPathExpression(saveDir) +
                         " && cp -- " + shellPathExpression(tempOut) + " " + shellPathExpression(targetPath);
 
         Proc.runCommand("save-capture-file", ["sh", "-c", saveCmd], (stdout, exitCode) => {
@@ -214,7 +230,9 @@ QtObject {
                         root.sendNotification(I18n.tr("Screenshot Saved"), I18n.tr("Screenshot saved to %1/%2").arg(saveDir).arg(filename), iconPath, notifyPath);
                         root.closeRequested();
                     } else {
-                        notifyError("Failed to save screenshot file.");
+                        const errDetail = stdout ? stdout.trim() : ("Save command failed with exit code " + exitCode);
+                        console.error("[QuickCapture] Save failed:", errDetail);
+                        notifyError(I18n.tr("Failed to save screenshot file."), errDetail);
                     }
                     cleanupTemp(finalPath);
                     if (originalPng) cleanupTemp(originalPng);
@@ -232,7 +250,9 @@ QtObject {
                         root.sendNotification(I18n.tr("Screenshot Copied"), I18n.tr("Screenshot copied to clipboard."), clipSource);
                         root.closeRequested();
                     } else {
-                        notifyError("Failed to copy screenshot to clipboard.");
+                        const errDetail = stdout ? stdout.trim() : ("Clipboard exit code " + exitCode);
+                        console.error("[QuickCapture] Copy failed:", errDetail);
+                        notifyError(I18n.tr("Failed to copy screenshot to clipboard."), errDetail);
                         root.closeRequested();
                     }
                     cleanupTemp(finalPath);
@@ -268,7 +288,8 @@ QtObject {
                             root.sendNotification(I18n.tr("Copied Anonymously"), msg, sourceFile);
                             root.closeRequested();
                         } else {
-                            notifyError("Failed to copy screenshot to clipboard.");
+                            const errDetail = clipOut ? clipOut.trim() : ("Clipboard exit code " + clipExit);
+                            notifyError(I18n.tr("Failed to copy screenshot to clipboard."), errDetail);
                             root.closeRequested();
                         }
                         cleanupTemp(pngPath);
@@ -301,14 +322,17 @@ QtObject {
                                 const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && originalPng) ? originalPng : notifyPath;
                                 root.sendNotification(I18n.tr("Screenshot Saved"), I18n.tr("Screenshot copied to clipboard and saved to %1").arg(saveDir), iconPath, notifyPath);
                             } else {
-                                notifyWarning("Screenshot copied to clipboard but failed to save file.");
+                                const errDetail = saveOut ? saveOut.trim() : ("Save exit code " + saveCode);
+                                notifyWarning(I18n.tr("Screenshot copied to clipboard but failed to save file: %1").arg(errDetail));
                             }
                             root.closeRequested();
                             cleanupTemp(finalPath);
                             if (originalPng) cleanupTemp(originalPng);
                         });
                     } else {
-                        notifyError("Failed to copy screenshot to clipboard.");
+                        const errDetail = stdout ? stdout.trim() : ("Clipboard exit code " + exitCode);
+                        console.error("[QuickCapture] Copy&Save failed on copy step:", errDetail);
+                        notifyError(I18n.tr("Failed to copy screenshot to clipboard."), errDetail);
                         root.closeRequested();
                         cleanupTemp(finalPath);
                         if (originalPng) cleanupTemp(originalPng);
