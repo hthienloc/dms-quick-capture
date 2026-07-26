@@ -818,8 +818,11 @@ DankModal {
 
     function rotateScreenshot(direction) {
         const isLeft = (direction === "left");
-        const currentW = window.screenshotWidth;
-        const currentH = window.screenshotHeight;
+        const rawW = window.bgImageItem ? window.bgImageItem.sourceSize.width : 1;
+        const rawH = window.bgImageItem ? window.bgImageItem.sourceSize.height : 1;
+        const isRotated90 = (window.bgRotation === 90 || window.bgRotation === 270);
+        const uncroppedW = isRotated90 ? rawH : rawW;
+        const uncroppedH = isRotated90 ? rawW : rawH;
 
         if (window.hasSelection) {
             const cx = window.cropRect.x;
@@ -827,9 +830,9 @@ DankModal {
             const cw = window.cropRect.width;
             const ch = window.cropRect.height;
             if (isLeft) {
-                window.cropRect = Qt.rect(cy, currentW - (cx + cw), ch, cw);
+                window.cropRect = Qt.rect(cy, uncroppedW - (cx + cw), ch, cw);
             } else {
-                window.cropRect = Qt.rect(currentH - (cy + ch), cx, ch, cw);
+                window.cropRect = Qt.rect(uncroppedH - (cy + ch), cx, ch, cw);
             }
         }
 
@@ -837,8 +840,8 @@ DankModal {
         for (let s of list) {
             if (s.points) {
                 s.points = s.points.map(p => ({
-                    x: isLeft ? p.y : currentH - p.y,
-                    y: isLeft ? currentW - p.x : p.x
+                    x: isLeft ? p.y : uncroppedH - p.y,
+                    y: isLeft ? uncroppedW - p.x : p.x
                 }));
             }
         }
@@ -849,8 +852,11 @@ DankModal {
 
     function mirrorScreenshot(direction) {
         const isVertical = (direction === "vertical" || direction === "v");
-        const currentW = window.screenshotWidth;
-        const currentH = window.screenshotHeight;
+        const rawW = window.bgImageItem ? window.bgImageItem.sourceSize.width : 1;
+        const rawH = window.bgImageItem ? window.bgImageItem.sourceSize.height : 1;
+        const isRotated90 = (window.bgRotation === 90 || window.bgRotation === 270);
+        const uncroppedW = isRotated90 ? rawH : rawW;
+        const uncroppedH = isRotated90 ? rawW : rawH;
 
         if (window.hasSelection) {
             const cx = window.cropRect.x;
@@ -858,9 +864,9 @@ DankModal {
             const cw = window.cropRect.width;
             const ch = window.cropRect.height;
             if (isVertical) {
-                window.cropRect = Qt.rect(cx, currentH - (cy + ch), cw, ch);
+                window.cropRect = Qt.rect(cx, uncroppedH - (cy + ch), cw, ch);
             } else {
-                window.cropRect = Qt.rect(currentW - (cx + cw), cy, cw, ch);
+                window.cropRect = Qt.rect(uncroppedW - (cx + cw), cy, cw, ch);
             }
         }
 
@@ -868,8 +874,8 @@ DankModal {
         for (let s of list) {
             if (s.points) {
                 s.points = s.points.map(p => ({
-                    x: isVertical ? p.x : currentW - p.x,
-                    y: isVertical ? currentH - p.y : p.y
+                    x: isVertical ? p.x : uncroppedW - p.x,
+                    y: isVertical ? uncroppedH - p.y : p.y
                 }));
             }
         }
