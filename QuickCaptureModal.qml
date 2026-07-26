@@ -680,8 +680,6 @@ DankModal {
         ctx.closePath();
         ctx.clip();
         
-        const isRotated90 = (window.bgRotation === 90 || window.bgRotation === 270);
-        ctx.save();
         ctx.translate(x + w / 2, y + h / 2);
         if (window.bgRotation !== 0) {
             ctx.rotate(window.bgRotation * Math.PI / 180);
@@ -699,7 +697,6 @@ DankModal {
         } else {
             ctx.drawImage(imgSource, -drawW / 2, -drawH / 2, drawW, drawH);
         }
-        ctx.restore();
         ctx.restore();
     }
 
@@ -3154,7 +3151,6 @@ DankModal {
                             window.drawScreenshotImage(ctx, bgImage);
                         } else {
                             if (bgImage.status === Image.Ready) {
-                                const isRotated90 = (window.bgRotation === 90 || window.bgRotation === 270);
                                 if (window.bgRotation !== 0 || window.bgFlipH || window.bgFlipV) {
                                     ctx.save();
                                     const sw = window.screenshotWidth;
