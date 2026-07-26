@@ -432,13 +432,15 @@ DankModal {
         if (window.hasActiveCropSelection) {
             return window.cropRect.width;
         }
-        return window.bgImageItem ? window.bgImageItem.sourceSize.width : 1;
+        if (!window.bgImageItem) return 1;
+        return (window.bgRotation % 180 === 0) ? window.bgImageItem.sourceSize.width : window.bgImageItem.sourceSize.height;
     }
     readonly property real screenshotHeight: {
         if (window.hasActiveCropSelection) {
             return window.cropRect.height;
         }
-        return window.bgImageItem ? window.bgImageItem.sourceSize.height : 1;
+        if (!window.bgImageItem) return 1;
+        return (window.bgRotation % 180 === 0) ? window.bgImageItem.sourceSize.height : window.bgImageItem.sourceSize.width;
     }
 
     function getTargetRatio(ratioStr) {
@@ -678,11 +680,26 @@ DankModal {
         ctx.closePath();
         ctx.clip();
         
-        if (window.hasSelection) {
-            ctx.drawImage(imgSource, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, x, y, w, h);
-        } else {
-            ctx.drawImage(imgSource, x, y, w, h);
+        const isRotated90 = (window.bgRotation === 90 || window.bgRotation === 270);
+        ctx.save();
+        ctx.translate(x + w / 2, y + h / 2);
+        if (window.bgRotation !== 0) {
+            ctx.rotate(window.bgRotation * Math.PI / 180);
         }
+        const sx = window.bgFlipH ? -1 : 1;
+        const sy = window.bgFlipV ? -1 : 1;
+        if (sx !== 1 || sy !== 1) {
+            ctx.scale(sx, sy);
+        }
+        const drawW = isRotated90 ? h : w;
+        const drawH = isRotated90 ? w : h;
+
+        if (window.hasSelection) {
+            ctx.drawImage(imgSource, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, -drawW / 2, -drawH / 2, drawW, drawH);
+        } else {
+            ctx.drawImage(imgSource, -drawW / 2, -drawH / 2, drawW, drawH);
+        }
+        ctx.restore();
         ctx.restore();
     }
 
@@ -800,106 +817,72 @@ DankModal {
 
     function rotateScreenshot(direction) {
         const isLeft = (direction === "left");
-        const originalW = window.bgImageItem ? window.bgImageItem.sourceSize.width : 1;
-        const originalH = window.bgImageItem ? window.bgImageItem.sourceSize.height : 1;
+        const currentW = window.screenshotWidth;
+        const currentH = window.screenshotHeight;
 
-        let bgPath = "";
-        if (window.bgImageSource) {
-            let srcStr = window.bgImageSource.toString();
-            const qIdx = srcStr.indexOf("?");
-            if (qIdx !== -1) {
-                srcStr = srcStr.substring(0, qIdx);
-            }
-            if (srcStr.startsWith("file://")) {
-                bgPath = srcStr.substring(7);
-            } else if (srcStr.startsWith("/")) {
-                bgPath = srcStr;
+        if (window.hasSelection) {
+            const cx = window.cropRect.x;
+            const cy = window.cropRect.y;
+            const cw = window.cropRect.width;
+            const ch = window.cropRect.height;
+            if (isLeft) {
+                window.cropRect = Qt.rect(cy, currentW - (cx + cw), ch, cw);
+            } else {
+                window.cropRect = Qt.rect(currentH - (cy + ch), cx, ch, cw);
             }
         }
 
-        if (!bgPath) return;
-        const degrees = isLeft ? "270" : "90";
-        Proc.runCommand("rotate-image", ["mogrify", "-rotate", degrees, bgPath], (stdout, exitCode) => {
-            if (exitCode === 0) {
-                if (window.hasSelection) {
-                    const cx = window.cropRect.x;
-                    const cy = window.cropRect.y;
-                    const cw = window.cropRect.width;
-                    const ch = window.cropRect.height;
-                    if (isLeft) {
-                        window.cropRect = Qt.rect(cy, originalW - (cx + cw), ch, cw);
-                    } else {
-                        window.cropRect = Qt.rect(originalH - (cy + ch), cx, ch, cw);
-                    }
-                }
-
-                const list = [...window.strokes];
-                for (let s of list) {
-                    if (s.points) {
-                        s.points = s.points.map(p => ({
-                            x: isLeft ? p.y : originalH - p.y,
-                            y: isLeft ? originalW - p.x : p.x
-                        }));
-                    }
-                }
-                window.strokes = list;
-
-                window.bgImageSource = "";
-                window.bgImageSource = "file://" + bgPath + "?t=" + Date.now();
+        const list = [...window.strokes];
+        for (let s of list) {
+            if (s.points) {
+                s.points = s.points.map(p => ({
+                    x: isLeft ? p.y : currentH - p.y,
+                    y: isLeft ? currentW - p.x : p.x
+                }));
             }
-        });
+        }
+        window.strokes = list;
+        window.bgRotation = (window.bgRotation + (isLeft ? 270 : 90)) % 360;
+        window.requestPaintAll();
     }
 
     function mirrorScreenshot(direction) {
         const isVertical = (direction === "vertical" || direction === "v");
-        const originalW = window.bgImageItem ? window.bgImageItem.sourceSize.width : 1;
-        const originalH = window.bgImageItem ? window.bgImageItem.sourceSize.height : 1;
+        const currentW = window.screenshotWidth;
+        const currentH = window.screenshotHeight;
 
-        let bgPath = "";
-        if (window.bgImageSource) {
-            let srcStr = window.bgImageSource.toString();
-            const qIdx = srcStr.indexOf("?");
-            if (qIdx !== -1) {
-                srcStr = srcStr.substring(0, qIdx);
-            }
-            if (srcStr.startsWith("file://")) {
-                bgPath = srcStr.substring(7);
-            } else if (srcStr.startsWith("/")) {
-                bgPath = srcStr;
+        if (window.hasSelection) {
+            const cx = window.cropRect.x;
+            const cy = window.cropRect.y;
+            const cw = window.cropRect.width;
+            const ch = window.cropRect.height;
+            if (isVertical) {
+                window.cropRect = Qt.rect(cx, currentH - (cy + ch), cw, ch);
+            } else {
+                window.cropRect = Qt.rect(currentW - (cx + cw), cy, cw, ch);
             }
         }
 
-        if (!bgPath) return;
-        const flag = isVertical ? "-flip" : "-flop";
-        Proc.runCommand("mirror-image", ["mogrify", flag, bgPath], (stdout, exitCode) => {
-            if (exitCode === 0) {
-                if (window.hasSelection) {
-                    const cx = window.cropRect.x;
-                    const cy = window.cropRect.y;
-                    const cw = window.cropRect.width;
-                    const ch = window.cropRect.height;
-                    if (isVertical) {
-                        window.cropRect = Qt.rect(cx, originalH - (cy + ch), cw, ch);
-                    } else {
-                        window.cropRect = Qt.rect(originalW - (cx + cw), cy, cw, ch);
-                    }
-                }
-
-                const list = [...window.strokes];
-                for (let s of list) {
-                    if (s.points) {
-                        s.points = s.points.map(p => ({
-                            x: isVertical ? p.x : originalW - p.x,
-                            y: isVertical ? originalH - p.y : p.y
-                        }));
-                    }
-                }
-                window.strokes = list;
-
-                window.bgImageSource = "";
-                window.bgImageSource = "file://" + bgPath + "?t=" + Date.now();
+        const list = [...window.strokes];
+        for (let s of list) {
+            if (s.points) {
+                s.points = s.points.map(p => ({
+                    x: isVertical ? p.x : currentW - p.x,
+                    y: isVertical ? currentH - p.y : p.y
+                }));
             }
-        });
+        }
+        window.strokes = list;
+
+        if (window.bgRotation === 0 || window.bgRotation === 180) {
+            if (isVertical) window.bgFlipV = !window.bgFlipV;
+            else window.bgFlipH = !window.bgFlipH;
+        } else {
+            if (isVertical) window.bgFlipH = !window.bgFlipH;
+            else window.bgFlipV = !window.bgFlipV;
+        }
+
+        window.requestPaintAll();
     }
 
     function runOcr() {
@@ -1090,6 +1073,9 @@ DankModal {
 
     // Component scope bridging properties
     property string bgImageSource: ""
+    property int bgRotation: 0
+    property bool bgFlipH: false
+    property bool bgFlipV: false
     property var activeCanvas: null
     property var bakedCanvas: null
     property var bgImageItem: null
@@ -1963,6 +1949,9 @@ DankModal {
         window.copiedStroke = null;
         window.stampCounter = 1;
         window.stampIdCounter = 1;
+        window.bgRotation = 0;
+        window.bgFlipH = false;
+        window.bgFlipV = false;
         window.bgImageSource = "";
         if (window.restoreSource) {
             window.bgImageSource = window.restoreSource;
@@ -2019,6 +2008,15 @@ DankModal {
             }
             if (data.stampCounter !== undefined) {
                 window.stampCounter = data.stampCounter;
+            }
+            if (data.bgRotation !== undefined) {
+                window.bgRotation = data.bgRotation;
+            }
+            if (data.bgFlipH !== undefined) {
+                window.bgFlipH = data.bgFlipH;
+            }
+            if (data.bgFlipV !== undefined) {
+                window.bgFlipV = data.bgFlipV;
             }
             if (data.cropRect) {
                 window.cropRect = Qt.rect(data.cropRect.x, data.cropRect.y, data.cropRect.width, data.cropRect.height);
@@ -2590,13 +2588,33 @@ DankModal {
                             smooth: true
                             mipmap: true
 
+                            rotation: window.bgRotation
+                            transform: Scale {
+                                origin.x: staticBgImage.width / 2
+                                origin.y: staticBgImage.height / 2
+                                xScale: window.bgFlipH ? -1 : 1
+                                yScale: window.bgFlipV ? -1 : 1
+                            }
+
                             // Handle crop positioning
                             x: window.hasActiveCropSelection ? -window.cropRect.x * window.editScale : 0
                             y: window.hasActiveCropSelection ? -window.cropRect.y * window.editScale : 0
 
                             // Scale to original size if cropped, otherwise fit to canvas
-                            width: window.hasActiveCropSelection ? window.bgImageItem.sourceSize.width * window.editScale : parent.width
-                            height: window.hasActiveCropSelection ? window.bgImageItem.sourceSize.height * window.editScale : parent.height
+                            width: {
+                                const isRotated90 = (window.bgRotation === 90 || window.bgRotation === 270);
+                                if (window.hasActiveCropSelection) {
+                                    return (isRotated90 ? window.bgImageItem.sourceSize.height : window.bgImageItem.sourceSize.width) * window.editScale;
+                                }
+                                return isRotated90 ? parent.height : parent.width;
+                            }
+                            height: {
+                                const isRotated90 = (window.bgRotation === 90 || window.bgRotation === 270);
+                                if (window.hasActiveCropSelection) {
+                                    return (isRotated90 ? window.bgImageItem.sourceSize.width : window.bgImageItem.sourceSize.height) * window.editScale;
+                                }
+                                return isRotated90 ? parent.width : parent.height;
+                            }
                         }
                     }
 
@@ -3147,13 +3165,35 @@ DankModal {
                             window.drawScreenshotImage(ctx, bgImage);
                         } else {
                             if (bgImage.status === Image.Ready) {
-                                 if (window.hasSelection) {
-                                     // Draw the cropped portion of the raw background
-                                     ctx.drawImage(bgImage, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, 0, 0, window.cropRect.width, window.cropRect.height);
-                                 } else {
-                                     // Fullscreen background
-                                     ctx.drawImage(bgImage, 0, 0);
-                                 }
+                                const isRotated90 = (window.bgRotation === 90 || window.bgRotation === 270);
+                                if (window.bgRotation !== 0 || window.bgFlipH || window.bgFlipV) {
+                                    ctx.save();
+                                    const sw = window.screenshotWidth;
+                                    const sh = window.screenshotHeight;
+                                    ctx.translate(sw / 2, sh / 2);
+                                    if (window.bgRotation !== 0) {
+                                        ctx.rotate(window.bgRotation * Math.PI / 180);
+                                    }
+                                    const sx = window.bgFlipH ? -1 : 1;
+                                    const sy = window.bgFlipV ? -1 : 1;
+                                    if (sx !== 1 || sy !== 1) {
+                                        ctx.scale(sx, sy);
+                                    }
+                                    const drawW = isRotated90 ? sh : sw;
+                                    const drawH = isRotated90 ? sw : sh;
+                                    if (window.hasSelection) {
+                                        ctx.drawImage(bgImage, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, -drawW / 2, -drawH / 2, drawW, drawH);
+                                    } else {
+                                        ctx.drawImage(bgImage, -drawW / 2, -drawH / 2, drawW, drawH);
+                                    }
+                                    ctx.restore();
+                                } else {
+                                    if (window.hasSelection) {
+                                        ctx.drawImage(bgImage, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, 0, 0, window.cropRect.width, window.cropRect.height);
+                                    } else {
+                                        ctx.drawImage(bgImage, 0, 0);
+                                    }
+                                }
                             }
                         }
 

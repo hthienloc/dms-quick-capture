@@ -366,6 +366,9 @@ QtObject {
             strokes: serializedStrokes,
             originalBackground: root.modal.bgImageSource,
             stampCounter: root.modal.stampCounter,
+            bgRotation: root.modal.bgRotation,
+            bgFlipH: root.modal.bgFlipH,
+            bgFlipV: root.modal.bgFlipV,
             cropRect: {
                 x: root.modal.cropRect.x,
                 y: root.modal.cropRect.y,

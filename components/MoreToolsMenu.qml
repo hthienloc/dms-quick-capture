@@ -183,7 +183,6 @@ Rectangle {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
                             menuRoot.flipHorizontalRequested();
-                            menuRoot.mirrorRequested();
                         }
                     }
                 }
