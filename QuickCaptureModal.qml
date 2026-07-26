@@ -691,8 +691,8 @@ DankModal {
         if (sx !== 1 || sy !== 1) {
             ctx.scale(sx, sy);
         }
-        const drawW = isRotated90 ? h : w;
-        const drawH = isRotated90 ? w : h;
+        const drawW = w;
+        const drawH = h;
 
         if (window.hasSelection) {
             ctx.drawImage(imgSource, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, -drawW / 2, -drawH / 2, drawW, drawH);
@@ -2588,6 +2588,8 @@ DankModal {
                             smooth: true
                             mipmap: true
 
+                            anchors.centerIn: window.hasActiveCropSelection ? undefined : parent
+
                             rotation: window.bgRotation
                             transform: Scale {
                                 origin.x: staticBgImage.width / 2
@@ -2597,24 +2599,11 @@ DankModal {
                             }
 
                             // Handle crop positioning
-                            x: window.hasActiveCropSelection ? -window.cropRect.x * window.editScale : 0
-                            y: window.hasActiveCropSelection ? -window.cropRect.y * window.editScale : 0
+                            x: window.hasActiveCropSelection ? -window.cropRect.x * window.editScale : staticBgImage.x
+                            y: window.hasActiveCropSelection ? -window.cropRect.y * window.editScale : staticBgImage.y
 
-                            // Scale to original size if cropped, otherwise fit to canvas
-                            width: {
-                                const isRotated90 = (window.bgRotation === 90 || window.bgRotation === 270);
-                                if (window.hasActiveCropSelection) {
-                                    return (isRotated90 ? window.bgImageItem.sourceSize.height : window.bgImageItem.sourceSize.width) * window.editScale;
-                                }
-                                return isRotated90 ? parent.height : parent.width;
-                            }
-                            height: {
-                                const isRotated90 = (window.bgRotation === 90 || window.bgRotation === 270);
-                                if (window.hasActiveCropSelection) {
-                                    return (isRotated90 ? window.bgImageItem.sourceSize.width : window.bgImageItem.sourceSize.height) * window.editScale;
-                                }
-                                return isRotated90 ? parent.width : parent.height;
-                            }
+                            width: window.bgImageItem ? window.bgImageItem.sourceSize.width * window.editScale : parent.width
+                            height: window.bgImageItem ? window.bgImageItem.sourceSize.height * window.editScale : parent.height
                         }
                     }
 
@@ -3179,8 +3168,8 @@ DankModal {
                                     if (sx !== 1 || sy !== 1) {
                                         ctx.scale(sx, sy);
                                     }
-                                    const drawW = isRotated90 ? sh : sw;
-                                    const drawH = isRotated90 ? sw : sh;
+                                    const drawW = sw;
+                                    const drawH = sh;
                                     if (window.hasSelection) {
                                         ctx.drawImage(bgImage, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, -drawW / 2, -drawH / 2, drawW, drawH);
                                     } else {
