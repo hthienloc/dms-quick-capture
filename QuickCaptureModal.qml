@@ -680,7 +680,17 @@ DankModal {
         ctx.closePath();
         ctx.clip();
         
-        ctx.translate(x + w / 2, y + h / 2);
+        const rawW = imgSource.sourceSize.width;
+        const rawH = imgSource.sourceSize.height;
+        const isRotated90 = (window.bgRotation === 90 || window.bgRotation === 270);
+        const uncroppedW = isRotated90 ? rawH : rawW;
+        const uncroppedH = isRotated90 ? rawW : rawH;
+
+        if (window.hasSelection) {
+            ctx.translate(-window.cropRect.x, -window.cropRect.y);
+        }
+
+        ctx.translate(x + uncroppedW / 2, y + uncroppedH / 2);
         if (window.bgRotation !== 0) {
             ctx.rotate(window.bgRotation * Math.PI / 180);
         }
@@ -689,14 +699,8 @@ DankModal {
         if (sx !== 1 || sy !== 1) {
             ctx.scale(sx, sy);
         }
-        const drawW = w;
-        const drawH = h;
 
-        if (window.hasSelection) {
-            ctx.drawImage(imgSource, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, -drawW / 2, -drawH / 2, drawW, drawH);
-        } else {
-            ctx.drawImage(imgSource, -drawW / 2, -drawH / 2, drawW, drawH);
-        }
+        ctx.drawImage(imgSource, -rawW / 2, -rawH / 2, rawW, rawH);
         ctx.restore();
     }
 
@@ -2578,29 +2582,37 @@ DankModal {
                         clip: true
                         visible: window.effectiveBackdropMode === "none"
 
-                        Image {
-                            id: staticBgImage
-                            source: window.bgImageSource
-                            cache: false
-                            smooth: true
-                            mipmap: true
+                        Item {
+                            id: transformedBgContainer
+                            readonly property bool isRotated90: (window.bgRotation === 90 || window.bgRotation === 270)
+                            readonly property real rawW: window.bgImageItem ? window.bgImageItem.sourceSize.width : 1
+                            readonly property real rawH: window.bgImageItem ? window.bgImageItem.sourceSize.height : 1
 
-                            anchors.centerIn: window.hasActiveCropSelection ? undefined : parent
+                            width: (isRotated90 ? rawH : rawW) * window.editScale
+                            height: (isRotated90 ? rawW : rawH) * window.editScale
 
-                            rotation: window.bgRotation
-                            transform: Scale {
-                                origin.x: staticBgImage.width / 2
-                                origin.y: staticBgImage.height / 2
-                                xScale: window.bgFlipH ? -1 : 1
-                                yScale: window.bgFlipV ? -1 : 1
+                            x: window.hasActiveCropSelection ? -window.cropRect.x * window.editScale : 0
+                            y: window.hasActiveCropSelection ? -window.cropRect.y * window.editScale : 0
+
+                            Image {
+                                id: staticBgImage
+                                source: window.bgImageSource
+                                cache: false
+                                smooth: true
+                                mipmap: true
+
+                                anchors.centerIn: parent
+                                width: transformedBgContainer.rawW * window.editScale
+                                height: transformedBgContainer.rawH * window.editScale
+
+                                rotation: window.bgRotation
+                                transform: Scale {
+                                    origin.x: staticBgImage.width / 2
+                                    origin.y: staticBgImage.height / 2
+                                    xScale: window.bgFlipH ? -1 : 1
+                                    yScale: window.bgFlipV ? -1 : 1
+                                }
                             }
-
-                            // Handle crop positioning
-                            x: window.hasActiveCropSelection ? -window.cropRect.x * window.editScale : staticBgImage.x
-                            y: window.hasActiveCropSelection ? -window.cropRect.y * window.editScale : staticBgImage.y
-
-                            width: window.bgImageItem ? window.bgImageItem.sourceSize.width * window.editScale : parent.width
-                            height: window.bgImageItem ? window.bgImageItem.sourceSize.height * window.editScale : parent.height
                         }
                     }
 
@@ -3151,34 +3163,29 @@ DankModal {
                             window.drawScreenshotImage(ctx, bgImage);
                         } else {
                             if (bgImage.status === Image.Ready) {
-                                if (window.bgRotation !== 0 || window.bgFlipH || window.bgFlipV) {
-                                    ctx.save();
-                                    const sw = window.screenshotWidth;
-                                    const sh = window.screenshotHeight;
-                                    ctx.translate(sw / 2, sh / 2);
-                                    if (window.bgRotation !== 0) {
-                                        ctx.rotate(window.bgRotation * Math.PI / 180);
-                                    }
-                                    const sx = window.bgFlipH ? -1 : 1;
-                                    const sy = window.bgFlipV ? -1 : 1;
-                                    if (sx !== 1 || sy !== 1) {
-                                        ctx.scale(sx, sy);
-                                    }
-                                    const drawW = sw;
-                                    const drawH = sh;
-                                    if (window.hasSelection) {
-                                        ctx.drawImage(bgImage, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, -drawW / 2, -drawH / 2, drawW, drawH);
-                                    } else {
-                                        ctx.drawImage(bgImage, -drawW / 2, -drawH / 2, drawW, drawH);
-                                    }
-                                    ctx.restore();
-                                } else {
-                                    if (window.hasSelection) {
-                                        ctx.drawImage(bgImage, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, 0, 0, window.cropRect.width, window.cropRect.height);
-                                    } else {
-                                        ctx.drawImage(bgImage, 0, 0);
-                                    }
+                                ctx.save();
+                                const rawW = bgImage.sourceSize.width;
+                                const rawH = bgImage.sourceSize.height;
+                                const isRotated90 = (window.bgRotation === 90 || window.bgRotation === 270);
+                                const uncroppedW = isRotated90 ? rawH : rawW;
+                                const uncroppedH = isRotated90 ? rawW : rawH;
+
+                                if (window.hasSelection) {
+                                    ctx.translate(-window.cropRect.x, -window.cropRect.y);
                                 }
+
+                                ctx.translate(uncroppedW / 2, uncroppedH / 2);
+                                if (window.bgRotation !== 0) {
+                                    ctx.rotate(window.bgRotation * Math.PI / 180);
+                                }
+                                const sx = window.bgFlipH ? -1 : 1;
+                                const sy = window.bgFlipV ? -1 : 1;
+                                if (sx !== 1 || sy !== 1) {
+                                    ctx.scale(sx, sy);
+                                }
+
+                                ctx.drawImage(bgImage, -rawW / 2, -rawH / 2, rawW, rawH);
+                                ctx.restore();
                             }
                         }
 
