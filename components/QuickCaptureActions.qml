@@ -122,19 +122,20 @@ QtObject {
     }
 
     function notifyError(message, detail) {
-        let fullMsg = message;
         if (detail) {
-            fullMsg += "\n" + detail;
+            console.error("[QuickCapture Error]", message, "| Detail:", detail);
+        } else {
+            console.error("[QuickCapture Error]", message);
         }
-        console.error("[QuickCapture Error]", message, detail ? ("| Detail: " + detail) : "");
+
         if (typeof ToastService !== "undefined" && ToastService) {
-            ToastService.showError(fullMsg);
+            ToastService.showError(message);
         }
         
         const hasParent = root.parentWidget && root.parentWidget.pluginData;
         const mode = hasParent ? (root.parentWidget.pluginData.postNotification || "notification") : "notification";
         if (mode === "notification" || mode === "both") {
-            Proc.runCommand("system-notify-error", ["notify-send", "-u", "critical", "-a", "Quick Capture", "-i", "error", I18n.tr("Quick Capture Error"), fullMsg]);
+            Proc.runCommand("system-notify-error", ["notify-send", "-u", "critical", "-a", "Quick Capture", "-i", "error", I18n.tr("Quick Capture Error"), message]);
         }
     }
 
