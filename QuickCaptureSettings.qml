@@ -1165,7 +1165,6 @@ PluginSettings {
             description: I18n.tr("When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.")
             defaultValue: false
         }
-
     }
 
         }
