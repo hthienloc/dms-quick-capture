@@ -59,7 +59,7 @@ DankModal {
 
     layerNamespace: "dms:plugins:quickCapture"
     keepPopoutsOpen: true
-    useOverlayLayer: config.modalOverlayLayer
+    useOverlayLayer: true
 
     // Parent communication reference
     property var parentWidget: null

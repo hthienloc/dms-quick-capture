@@ -1063,7 +1063,7 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Editor")
             icon: "aspect_ratio"
-            showReset: overlayOpacity.isDirty || showCanvasBorder.isDirty || editQuality.isDirty || modalDisplayTarget.isDirty || modalAspectRatio.isDirty || scaleToContent.isDirty || modalOverlayLayer.isDirty
+            showReset: overlayOpacity.isDirty || showCanvasBorder.isDirty || editQuality.isDirty || modalDisplayTarget.isDirty || modalAspectRatio.isDirty || scaleToContent.isDirty
             onResetClicked: {
                 overlayOpacity.resetToDefault();
                 showCanvasBorder.resetToDefault();
@@ -1071,7 +1071,6 @@ PluginSettings {
                 modalDisplayTarget.resetToDefault();
                 modalAspectRatio.resetToDefault();
                 scaleToContent.resetToDefault();
-                modalOverlayLayer.resetToDefault();
             }
         }
 
@@ -1167,15 +1166,6 @@ PluginSettings {
             defaultValue: false
         }
 
-        Separator {}
-
-        ToggleSettingPlus {
-            id: modalOverlayLayer
-            settingKey: "modalOverlayLayer"
-            label: I18n.tr("Open Above Fullscreen Windows")
-            description: I18n.tr("When enabled, the editor uses the overlay layer so it is visible over fullscreen windows.")
-            defaultValue: true
-        }
     }
 
         }
