@@ -370,6 +370,7 @@ PluginComponent {
         shouldBeVisible: false
         positioning: "center"
         enableShadow: true
+        useOverlayLayer: root.pluginData["modalOverlayLayer"] !== false
         keepContentLoaded: true
         closeOnEscapeKey: true
         closeOnBackgroundClick: true

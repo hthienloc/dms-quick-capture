@@ -247,4 +247,5 @@ QtObject {
     function formatWatermarkText(pattern) { return Helpers.formatWatermarkText(pattern, Quickshell); }
     readonly property string modalDisplayTarget: pluginData["modalDisplayTarget"] || "focused"
     readonly property string modalAspectRatio: pluginData["modalAspectRatio"] || "landscape"
+    readonly property bool modalOverlayLayer: pluginData["modalOverlayLayer"] !== false
 }
