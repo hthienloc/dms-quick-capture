@@ -507,9 +507,10 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Capture Options")
             icon: "settings"
-            showReset: outputTargetName.isDirty || skipConfirm.isDirty || includeCursor.isDirty || resetLastRegion.isDirty
+            showReset: outputTargetName.isDirty || hideControlCenter.isDirty || skipConfirm.isDirty || includeCursor.isDirty || resetLastRegion.isDirty
             onResetClicked: {
                 outputTargetName.resetToDefault();
+                hideControlCenter.resetToDefault();
                 skipConfirm.resetToDefault();
                 includeCursor.resetToDefault();
                 resetLastRegion.resetToDefault();
@@ -540,6 +541,16 @@ PluginSettings {
             settingKey: "includeCursor"
             label: I18n.tr("Include Cursor")
             defaultValue: false
+        }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            id: hideControlCenter
+            settingKey: "hideControlCenter"
+            label: I18n.tr("Hide Control Center")
+            description: I18n.tr("Close Control Center before capture.")
+            defaultValue: true
         }
 
         Separator {}

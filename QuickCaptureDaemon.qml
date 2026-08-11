@@ -77,8 +77,13 @@ PluginComponent {
         root.isCapturing = true;
         root.pendingCaptureAction = finalAction;
         root.pendingCaptureMode = finalMode;
-        root.closeControlCenter();
-        captureDelayTimer.start();
+
+        if (pluginData.hideControlCenter === true) {
+            root.closeControlCenter();
+            captureDelayTimer.start();
+        } else {
+            root.startActualCapture();
+        }
     }
 
     function closeControlCenter() {
