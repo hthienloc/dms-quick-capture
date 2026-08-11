@@ -644,6 +644,20 @@ PluginComponent {
                             if (root.daemon) root.daemon.showHistoryCarousel();
                         }
                     }
+
+                    DankActionButton {
+                        iconName: root.daemon && root.daemon.hideControlCenter ? "visibility_off" : "visibility"
+                        buttonSize: 28
+                        iconSize: 16
+                        iconColor: root.daemon && root.daemon.hideControlCenter ? Theme.surfaceVariantText : Theme.primary
+                        tooltipText: root.daemon && root.daemon.hideControlCenter
+                            ? I18n.tr("Hide Control Center")
+                            : I18n.tr("Show Control Center")
+                        tooltipSide: "bottom"
+                        onClicked: {
+                            if (root.daemon) root.daemon.toggleHideControlCenter();
+                        }
+                    }
                 }
             }
 
