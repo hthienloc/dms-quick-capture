@@ -24,6 +24,8 @@ PluginComponent {
     property bool isDownloading: false
     property string currentCapturePath: ""
     property string captureOutputName: ""
+    property bool hideControlCenter: pluginData.defaultHideControlCenter !== false
+    property bool waitingForControlCenterClose: false
     readonly property int captureTimeoutMs: 60000
     readonly property int scrollCaptureTimeoutMs: 120000
     readonly property bool isAnnotating: modal.shouldBeVisible
@@ -55,11 +57,20 @@ PluginComponent {
         return flags;
     }
 
+    function usesNewScreenshotBackend(mode) {
+        return (pluginData.screenshotBackend || "dms") === "rust" &&
+            ["region", "window", "full", "output", "all", "last", "scroll"].includes(mode);
+    }
+
     function screenshotArgs(mode, filename) {
         const cursorVal = pluginData.includeCursor ? "on" : "off";
-        return ["dms", "screenshot", mode, "--no-clipboard", "--dir", "/tmp",
+        const command = usesNewScreenshotBackend(mode) ? "dms-screenshot-rs" : "dms";
+        const args = usesNewScreenshotBackend(mode)
+            ? [command, mode]
+            : [command, "screenshot", mode];
+        return args.concat(["--no-clipboard", "--dir", "/tmp",
                 "--filename", filename, "--format", "png", "--cursor", cursorVal,
-                "--no-notify", "--json"].concat(root.modeFlags(mode));
+                "--no-notify", "--json"], root.modeFlags(mode));
     }
 
     function triggerCaptureWithAction(mode, action) {
@@ -77,13 +88,35 @@ PluginComponent {
         root.isCapturing = true;
         root.pendingCaptureAction = finalAction;
         root.pendingCaptureMode = finalMode;
-        root.closeControlCenter();
-        captureDelayTimer.start();
+
+        if (root.hideControlCenter) {
+            root.closeControlCenter();
+            root.waitForControlCenterClose();
+        } else {
+            root.startActualCapture();
+        }
+    }
+
+    function toggleHideControlCenter() {
+        root.hideControlCenter = !root.hideControlCenter;
     }
 
     function closeControlCenter() {
         if (typeof PopoutService !== "undefined" && PopoutService)
             PopoutService.closeControlCenter();
+    }
+
+    function waitForControlCenterClose() {
+        root.waitingForControlCenterClose = true;
+        captureDelayTimer.start();
+    }
+
+    function startCaptureAfterControlCenterClose() {
+        if (!root.waitingForControlCenterClose)
+            return;
+        root.waitingForControlCenterClose = false;
+        captureDelayTimer.stop();
+        root.startActualCapture();
     }
 
     function escShell(s) {
@@ -100,9 +133,11 @@ PluginComponent {
     }
 
     function startActualCapture() {
+        root.waitingForControlCenterClose = false;
         const mode = root.pendingCaptureMode;
         const action = root.pendingCaptureAction;
         const timeout = mode === "scroll" ? root.scrollCaptureTimeoutMs : root.captureTimeoutMs;
+        const newBackend = root.usesNewScreenshotBackend(mode);
 
         root.currentCapturePath = root.capturePath();
         const filename = root.currentCapturePath.split("/").pop();
@@ -121,7 +156,11 @@ PluginComponent {
                     root.toastError(meta.message || meta.error || I18n.tr("Screenshot failed (mode: %1).").arg(mode));
                 }
             } catch (e) {
-                root.toastError((stdout && stdout.trim()) || I18n.tr("Screenshot failed (mode: %1).").arg(mode));
+                if (newBackend) {
+                    root.toastError(I18n.tr("dms-screenshot-rs was not found in PATH."));
+                } else {
+                    root.toastError((stdout && stdout.trim()) || I18n.tr("Screenshot failed (mode: %1).").arg(mode));
+                }
             }
         }, 0, timeout);
     }
@@ -221,6 +260,7 @@ PluginComponent {
                     root.toastError(I18n.tr("Failed to save screenshot"));
             });
         } else {
+            root.closeControlCenter();
             modal.currentCapturePath = path;
             modal.shouldBeVisible = true;
             modal.open();
@@ -320,7 +360,22 @@ PluginComponent {
         id: captureDelayTimer
         interval: Math.max(50, Theme.popoutAnimationDuration + 50)
         repeat: false
-        onTriggered: root.startActualCapture()
+        onTriggered: {
+            if (root.waitingForControlCenterClose)
+                root.startCaptureAfterControlCenterClose();
+            else
+                root.startActualCapture();
+        }
+    }
+
+    Connections {
+        target: (typeof PopoutService !== "undefined" && PopoutService)
+            ? PopoutService.controlCenterPopout
+            : null
+
+        function onPopoutClosed() {
+            root.startCaptureAfterControlCenterClose();
+        }
     }
 
     // ── Float service ─────────────────────────────────────────────────────────

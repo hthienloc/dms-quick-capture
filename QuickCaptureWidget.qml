@@ -22,6 +22,24 @@ PluginComponent {
 
     property bool outputExpanded: false
     property var outputList: []
+    property var pendingPopoutAction: null
+
+    Timer {
+        id: popoutCloseTimer
+        interval: Math.max(50, Theme.popoutAnimationDuration + 50)
+        repeat: false
+        onTriggered: {
+            const action = root.pendingPopoutAction;
+            root.pendingPopoutAction = null;
+            if (action) action();
+        }
+    }
+
+    function runAfterPopoutClosed(action) {
+        root.pendingPopoutAction = action;
+        root.closePopout();
+        popoutCloseTimer.restart();
+    }
 
     function execAction(action) {
         if (!root.daemon) return;
@@ -299,11 +317,12 @@ PluginComponent {
                             hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                             onPressed: mouse => subRipple.trigger(mouse.x, mouse.y)
                             onClicked: {
-                                if (root.daemon) {
-                                    root.daemon.captureOutputName = modelData.value;
-                                    root.daemon.triggerCaptureWithAction("output", "edit");
-                                }
-                                root.closePopout();
+                                root.runAfterPopoutClosed(() => {
+                                    if (root.daemon) {
+                                        root.daemon.captureOutputName = modelData.value;
+                                        root.daemon.triggerCaptureWithAction("output", "edit");
+                                    }
+                                });
                                 root.outputExpanded = false;
                             }
                         }
@@ -316,11 +335,12 @@ PluginComponent {
                             hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                             onPressed: mouse => subRipple.trigger(mouse.x + parent.width - 28, mouse.y)
                             onClicked: {
-                                if (root.daemon) {
-                                    root.daemon.captureOutputName = modelData.value;
-                                    root.daemon.triggerCaptureWithAction("output", "float");
-                                }
-                                root.closePopout();
+                                root.runAfterPopoutClosed(() => {
+                                    if (root.daemon) {
+                                        root.daemon.captureOutputName = modelData.value;
+                                        root.daemon.triggerCaptureWithAction("output", "float");
+                                    }
+                                });
                                 root.outputExpanded = false;
                             }
                         }
@@ -381,10 +401,11 @@ PluginComponent {
             function execMode(action) {
                 if (!root.daemon) return;
                 const mk = modelData.modeKey;
-                if (mk === "clipboard") root.daemon.fromClipboardWithAction(action);
-                else if (mk === "selectFile") root.daemon.selectImageAndAnnotateWithAction(action);
-                else root.daemon.triggerCaptureWithAction(mk, action);
-                root.closePopout();
+                root.runAfterPopoutClosed(() => {
+                    if (mk === "clipboard") root.daemon.fromClipboardWithAction(action);
+                    else if (mk === "selectFile") root.daemon.selectImageAndAnnotateWithAction(action);
+                    else root.daemon.triggerCaptureWithAction(mk, action);
+                });
             }
 
             Row {
@@ -642,6 +663,20 @@ PluginComponent {
                         tooltipSide: "bottom"
                         onClicked: {
                             if (root.daemon) root.daemon.showHistoryCarousel();
+                        }
+                    }
+
+                    DankActionButton {
+                        iconName: root.daemon && root.daemon.hideControlCenter ? "visibility_off" : "visibility"
+                        buttonSize: 28
+                        iconSize: 16
+                        iconColor: root.daemon && root.daemon.hideControlCenter ? Theme.surfaceVariantText : Theme.primary
+                        tooltipText: root.daemon && root.daemon.hideControlCenter
+                            ? I18n.tr("Hide Control Center")
+                            : I18n.tr("Show Control Center")
+                        tooltipSide: "bottom"
+                        onClicked: {
+                            if (root.daemon) root.daemon.toggleHideControlCenter();
                         }
                     }
                 }
