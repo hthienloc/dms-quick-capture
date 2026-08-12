@@ -3,7 +3,7 @@
     "id": "quickCapture",
     "name": "Quick Capture",
     "description": "A screenshot annotation tool",
-    "version": "4.2.0",
+    "version": "5.0.0-beta.1",
     "author": "Loc Huynh",
     "icon": "screenshot_region",
     "type": "composite",
