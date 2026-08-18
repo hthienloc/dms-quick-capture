@@ -711,6 +711,9 @@ fn setup_layer_surfaces(
         layer_surface.set_exclusive_zone(-1);
         surface.commit();
 
+        // A freshly created surface has never committed a buffer, so its first
+        // frame must be drawn synchronously (see request_render).
+        output.initial_render_done = false;
         output.surface = Some(surface);
         output.layer_surface = Some(layer_surface);
     }
@@ -2276,23 +2279,21 @@ fn request_render_pending(state: &mut SelectorState, qh: &QueueHandle<SelectorSt
 }
 
 fn request_render(state: &mut SelectorState, qh: &QueueHandle<SelectorState>, output_idx: usize) {
-    let Some(output) = state.outputs.get(output_idx) else {
-        return;
+    // Decide whether this output still needs a synchronous first render. The
+    // borrow ends here so render_output can take &mut state below.
+    let needs_direct_render = {
+        let Some(output) = state.outputs.get_mut(output_idx) else {
+            return;
+        };
+        if !output.configured || output.closed {
+            return;
+        }
+        output.dirty = true;
+        if output.frame_callback.is_some() || output.surface.is_none() {
+            return;
+        }
+        !output.initial_render_done
     };
-    if !output.configured || output.closed {
-        return;
-    }
-    let has_frame_callback = output.frame_callback.is_some();
-    let needs_direct_render = !output.initial_render_done;
-    let has_surface = output.surface.is_some();
-
-    let Some(output) = state.outputs.get_mut(output_idx) else {
-        return;
-    };
-    output.dirty = true;
-    if has_frame_callback || !has_surface {
-        return;
-    }
 
     if needs_direct_render {
         // Some compositors (e.g. Hyprland >= 0.56) never fire wl_surface.frame
