@@ -182,6 +182,7 @@ struct OutputEntry {
     cursor_buffer: Option<CursorBuffer>,
     frame_callback: Option<WlCallback>,
     dirty: bool,
+    initial_render_done: bool,
 }
 
 struct ShmBuffer {
@@ -2232,6 +2233,7 @@ fn render_output(state: &mut SelectorState, qh: &QueueHandle<SelectorState>, out
     surface.set_buffer_scale(scale);
     surface.commit();
     output.dirty = false;
+    output.initial_render_done = true;
 }
 
 fn pointer_is_over_scroll_preview(state: &SelectorState, seat_idx: usize) -> bool {
@@ -2274,16 +2276,36 @@ fn request_render_pending(state: &mut SelectorState, qh: &QueueHandle<SelectorSt
 }
 
 fn request_render(state: &mut SelectorState, qh: &QueueHandle<SelectorState>, output_idx: usize) {
-    let Some(output) = state.outputs.get_mut(output_idx) else {
+    let Some(output) = state.outputs.get(output_idx) else {
         return;
     };
     if !output.configured || output.closed {
         return;
     }
+    let has_frame_callback = output.frame_callback.is_some();
+    let needs_direct_render = !output.initial_render_done;
+    let has_surface = output.surface.is_some();
+
+    let Some(output) = state.outputs.get_mut(output_idx) else {
+        return;
+    };
     output.dirty = true;
-    if output.frame_callback.is_some() {
+    if has_frame_callback || !has_surface {
         return;
     }
+
+    if needs_direct_render {
+        // Some compositors (e.g. Hyprland >= 0.56) never fire wl_surface.frame
+        // callbacks for a layer surface that has not committed a buffer yet,
+        // which deadlocks the selector before its first frame. Draw the first
+        // frame synchronously instead of waiting for a callback.
+        render_output(state, qh, output_idx);
+        return;
+    }
+
+    let Some(output) = state.outputs.get_mut(output_idx) else {
+        return;
+    };
     let Some(surface) = output.surface.as_ref().cloned() else {
         return;
     };
