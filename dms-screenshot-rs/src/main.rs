@@ -145,30 +145,29 @@ fn capture_interactive_region(
         height: selection.rect.height as u32,
     };
     let _ = state::save_region(rect);
-    let frozen_output = frozen_outputs
-        .into_iter()
-        .find(|output| output.name == output_name)
-        .ok_or_else(|| format!("missing frozen capture for output {output_name}"))?;
-    let output = wayland::list_outputs()?
-        .into_iter()
+    let outputs = wayland::list_outputs()?;
+    let output = outputs
+        .iter()
         .find(|output| output.name == output_name)
         .ok_or_else(|| format!("output disappeared during selection: {output_name}"))?;
+    // Consistent with the selector's own fallback when the compositor
+    // reports no position: the selection rect was built assuming the origin.
+    let (output_x, output_y) = output.position.unwrap_or((0, 0));
     let local = Rect {
-        x: rect.x - output.position.map(|position| position.0).unwrap_or(0),
-        y: rect.y - output.position.map(|position| position.1).unwrap_or(0),
+        x: rect.x - output_x,
+        y: rect.y - output_y,
         width: rect.width,
         height: rect.height,
     };
-    let logical_width = (output.width as f64 / output.scale.max(1.0)).round() as i32;
-    let logical_height = (output.height as f64 / output.scale.max(1.0)).round() as i32;
-    if local.x < 0
-        || local.y < 0
-        || local.x.saturating_add(local.width as i32) > logical_width
-        || local.y.saturating_add(local.height as i32) > logical_height
-    {
-        return Err("region crosses output boundaries".to_string());
+    if wayland::region_fits_output(output, &local) {
+        let frozen_output = frozen_outputs
+            .into_iter()
+            .find(|output| output.name == output_name)
+            .ok_or_else(|| format!("missing frozen capture for output {output_name}"))?;
+        return wayland::crop_captured_local_region(frozen_output.image, local);
     }
-    wayland::crop_captured_local_region(frozen_output.image, local)
+    // The region spans several outputs: composite the frozen captures.
+    wayland::crop_frozen_global_region(&frozen_outputs, &outputs, rect)
 }
 
 fn capture_interactive_scroll(

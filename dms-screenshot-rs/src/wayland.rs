@@ -642,14 +642,40 @@ pub fn capture_output_region_logical(
 /// Captures a region expressed in the compositor's global logical coordinates.
 ///
 /// Interactive selection and the shared last-region state use global positions,
-/// while `zwlr_screencopy` receives coordinates relative to one output.
+/// while `zwlr_screencopy` receives coordinates relative to one output. When
+/// the region spans several outputs, the intersecting outputs are captured
+/// and composited into one image.
 pub fn capture_global_region(requested: Rect, cursor: bool) -> Result<CapturedImage, String> {
-    let (output_name, local) = resolve_global_region(requested)?;
-    capture_output_region_logical(Some(&output_name), local, cursor)
+    let outputs = list_outputs()?;
+    let (output, local) = resolve_global_region_in(&outputs, requested)?;
+    if region_fits_output(output, &local) {
+        return capture_output_region_logical(Some(&output.name), local, cursor);
+    }
+    let mut captured = Vec::new();
+    for output in outputs.iter() {
+        let Some(bounds) = output_logical_bounds(output) else {
+            continue;
+        };
+        if !bounds_intersect(&requested, &bounds) {
+            continue;
+        }
+        let name = output.name.clone();
+        let image = capture_output(Some(&name), cursor)?;
+        captured.push(CapturedOutput { name, image });
+    }
+    crop_frozen_global_region(&captured, &outputs, requested)
 }
 
 pub fn resolve_global_region(requested: Rect) -> Result<(String, Rect), String> {
     let outputs = list_outputs()?;
+    let (output, local) = resolve_global_region_in(&outputs, requested)?;
+    Ok((output.name.clone(), local))
+}
+
+fn resolve_global_region_in(
+    outputs: &[OutputInfo],
+    requested: Rect,
+) -> Result<(&OutputInfo, Rect), String> {
     let center_x = requested.x + requested.width as i32 / 2;
     let center_y = requested.y + requested.height as i32 / 2;
     let output = outputs
@@ -668,7 +694,7 @@ pub fn resolve_global_region(requested: Rect) -> Result<(String, Rect), String> 
         .position
         .ok_or_else(|| format!("output has no position: {}", output.name))?;
     Ok((
-        output.name.clone(),
+        output,
         Rect {
             x: requested.x - output_x,
             y: requested.y - output_y,
@@ -676,6 +702,149 @@ pub fn resolve_global_region(requested: Rect) -> Result<(String, Rect), String> 
             height: requested.height,
         },
     ))
+}
+
+/// Whether an output-local region lies entirely within the output.
+pub fn region_fits_output(output: &OutputInfo, local: &Rect) -> bool {
+    let scale = output.scale.max(1.0);
+    let logical_width = (output.width as f64 / scale).round() as i32;
+    let logical_height = (output.height as f64 / scale).round() as i32;
+    local.x >= 0
+        && local.y >= 0
+        && local.x.saturating_add(local.width as i32) <= logical_width
+        && local.y.saturating_add(local.height as i32) <= logical_height
+}
+
+/// The output's bounds in the compositor's global logical coordinates.
+fn output_logical_bounds(output: &OutputInfo) -> Option<Rect> {
+    let (x, y) = output.position?;
+    let scale = output.scale.max(1.0);
+    Some(Rect {
+        x,
+        y,
+        width: (output.width as f64 / scale).round() as u32,
+        height: (output.height as f64 / scale).round() as u32,
+    })
+}
+
+fn bounds_intersect(a: &Rect, b: &Rect) -> bool {
+    a.x < b.x + b.width as i32
+        && b.x < a.x + a.width as i32
+        && a.y < b.y + b.height as i32
+        && b.y < a.y + a.height as i32
+}
+
+/// Crops a global-logical region from per-output captures, compositing across
+/// outputs when the region spans more than one.
+///
+/// The result is scaled to the output containing the region's center; pieces
+/// from outputs at a different scale are resampled into the canvas.
+pub fn crop_frozen_global_region(
+    captured: &[CapturedOutput],
+    outputs: &[OutputInfo],
+    requested: Rect,
+) -> Result<CapturedImage, String> {
+    #[derive(Clone, Copy)]
+    struct Piece {
+        output: usize,
+        global: Rect,
+    }
+
+    let center_x = requested.x + requested.width as i32 / 2;
+    let center_y = requested.y + requested.height as i32 / 2;
+    let mut pieces: Vec<Piece> = Vec::new();
+    for (idx, capture) in captured.iter().enumerate() {
+        let Some(bounds) = outputs
+            .iter()
+            .find(|output| output.name == capture.name)
+            .and_then(output_logical_bounds)
+        else {
+            continue;
+        };
+        let x0 = requested.x.max(bounds.x);
+        let y0 = requested.y.max(bounds.y);
+        let x1 = (requested.x + requested.width as i32).min(bounds.x + bounds.width as i32);
+        let y1 = (requested.y + requested.height as i32).min(bounds.y + bounds.height as i32);
+        if x1 <= x0 || y1 <= y0 {
+            continue;
+        }
+        pieces.push(Piece {
+            output: idx,
+            global: Rect {
+                x: x0,
+                y: y0,
+                width: (x1 - x0) as u32,
+                height: (y1 - y0) as u32,
+            },
+        });
+    }
+
+    let Some(&Piece {
+        output: primary, ..
+    }) = pieces
+        .iter()
+        .find(|piece| {
+            center_x >= piece.global.x
+                && center_y >= piece.global.y
+                && center_x < piece.global.x + piece.global.width as i32
+                && center_y < piece.global.y + piece.global.height as i32
+        })
+        .or_else(|| pieces.first())
+    else {
+        return Err("region does not intersect a Wayland output".to_string());
+    };
+    let scale = captured[primary].image.scale.max(1.0);
+
+    let width = (requested.width as f64 * scale).round().max(1.0) as u32;
+    let height = (requested.height as f64 * scale).round().max(1.0) as u32;
+    let mut canvas = image::RgbaImage::from_pixel(width, height, image::Rgba([0, 0, 0, 255]));
+
+    for Piece { output, global } in pieces {
+        let capture = &captured[output];
+        let Some(info) = outputs.iter().find(|output| output.name == capture.name) else {
+            continue;
+        };
+        let (output_x, output_y) = info
+            .position
+            .ok_or_else(|| format!("output has no position: {}", info.name))?;
+        let out_scale = capture.image.scale.max(1.0);
+        let x = ((global.x - output_x) as f64 * out_scale).round() as u32;
+        let y = ((global.y - output_y) as f64 * out_scale).round() as u32;
+        let x = x.min(capture.image.width.saturating_sub(1));
+        let y = y.min(capture.image.height.saturating_sub(1));
+        let w = ((global.width as f64 * out_scale).round() as u32)
+            .min(capture.image.width.saturating_sub(x));
+        let h = ((global.height as f64 * out_scale).round() as u32)
+            .min(capture.image.height.saturating_sub(y));
+        if w == 0 || h == 0 {
+            continue;
+        }
+        let cropped = image::imageops::crop_imm(&capture.image.image, x, y, w, h).to_image();
+        let target_w = (global.width as f64 * scale).round().max(1.0) as u32;
+        let target_h = (global.height as f64 * scale).round().max(1.0) as u32;
+        let piece_image = if (cropped.width(), cropped.height()) == (target_w, target_h) {
+            cropped
+        } else {
+            image::imageops::resize(
+                &cropped,
+                target_w,
+                target_h,
+                image::imageops::FilterType::Triangle,
+            )
+        };
+        let dx = ((global.x - requested.x) as f64 * scale).round() as u32;
+        let dy = ((global.y - requested.y) as f64 * scale).round() as u32;
+        image::imageops::overlay(&mut canvas, &piece_image, dx as i64, dy as i64);
+    }
+
+    Ok(CapturedImage {
+        width,
+        height,
+        image: canvas,
+        scale,
+        origin_x: 0,
+        origin_y: 0,
+    })
 }
 
 pub fn crop_captured_local_region(
