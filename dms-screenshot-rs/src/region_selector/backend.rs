@@ -25,6 +25,8 @@ use wayland_protocols::wp::cursor_shape::v1::client::wp_cursor_shape_device_v1::
     Shape as CursorShape, WpCursorShapeDeviceV1,
 };
 use wayland_protocols::wp::cursor_shape::v1::client::wp_cursor_shape_manager_v1::WpCursorShapeManagerV1;
+use wayland_protocols::wp::viewporter::client::wp_viewport::WpViewport;
+use wayland_protocols::wp::viewporter::client::wp_viewporter::WpViewporter;
 use wayland_protocols::xdg::xdg_output::zv1::client::zxdg_output_manager_v1::ZxdgOutputManagerV1;
 use wayland_protocols::xdg::xdg_output::zv1::client::zxdg_output_v1::ZxdgOutputV1;
 use wayland_protocols_wlr::layer_shell::v1::client::zwlr_layer_shell_v1::{
@@ -193,6 +195,7 @@ struct OutputEntry {
     scale: i32,
     name: Option<String>,
     surface: Option<WlSurface>,
+    viewport: Option<WpViewport>,
     layer_surface: Option<ZwlrLayerSurfaceV1>,
     configured: bool,
     closed: bool,
@@ -295,6 +298,7 @@ struct SelectorState {
     layer_shell: Option<ZwlrLayerShellV1>,
     xdg_output_manager: Option<ZxdgOutputManagerV1>,
     cursor_shape_manager: Option<WpCursorShapeManagerV1>,
+    viewporter: Option<WpViewporter>,
     outputs: Vec<OutputEntry>,
     seats: Vec<SeatEntry>,
 
@@ -321,6 +325,8 @@ struct SelectorState {
 }
 
 delegate_noop!(SelectorState: ignore WlRegion);
+delegate_noop!(SelectorState: ignore WpViewport);
+delegate_noop!(SelectorState: ignore WpViewporter);
 
 pub struct RunResult {
     pub result: SelectionBox,
@@ -635,6 +641,9 @@ fn teardown_state(state: &mut SelectorState, conn: &Connection) {
         if let Some(layer) = output.layer_surface.take() {
             layer.destroy();
         }
+        if let Some(viewport) = output.viewport.take() {
+            viewport.destroy();
+        }
         if let Some(xdg) = output.xdg_output.take() {
             xdg.destroy();
         }
@@ -657,6 +666,9 @@ fn teardown_state(state: &mut SelectorState, conn: &Connection) {
     }
 
     if let Some(manager) = state.cursor_shape_manager.take() {
+        manager.destroy();
+    }
+    if let Some(manager) = state.viewporter.take() {
         manager.destroy();
     }
     if let Some(xdg_mgr) = state.xdg_output_manager.take() {
@@ -756,6 +768,7 @@ fn setup_layer_surfaces(
         .as_ref()
         .ok_or_else(|| "compositor doesn't support zwlr_layer_shell_v1".to_string())?
         .clone();
+    let viewporter = state.viewporter.as_ref().cloned();
 
     for (idx, output) in state.outputs.iter_mut().enumerate() {
         let Some(wl_output) = output.wl_output.as_ref() else {
@@ -770,6 +783,9 @@ fn setup_layer_surfaces(
             qh,
             OutputKey(idx),
         );
+        let viewport = viewporter
+            .as_ref()
+            .map(|manager| manager.get_viewport(&surface, qh, ()));
         layer_surface.set_anchor(Anchor::Top | Anchor::Bottom | Anchor::Left | Anchor::Right);
         layer_surface.set_keyboard_interactivity(KeyboardInteractivity::Exclusive);
         layer_surface.set_exclusive_zone(-1);
@@ -779,6 +795,7 @@ fn setup_layer_surfaces(
         // frame must be drawn synchronously (see request_render).
         output.initial_render_done = false;
         output.surface = Some(surface);
+        output.viewport = viewport;
         output.layer_surface = Some(layer_surface);
     }
 
@@ -1353,7 +1370,7 @@ struct RenderParams<'a> {
     logical_geometry: &'a SelectionBox,
     layer_width: u32,
     layer_height: u32,
-    output_scale: i32,
+    output_scale: f64,
     seats: &'a [SeatSnapshot],
     config: &'a Config,
     background: Option<&'a BackgroundImage>,
@@ -1459,7 +1476,7 @@ fn logical_to_surface_rect(
     logical_geometry: &SelectionBox,
     layer_width: u32,
     layer_height: u32,
-    scale: i32,
+    scale: f64,
     rect: &SelectionBox,
 ) -> Option<SelectionBox> {
     let ow = layer_width as i32;
@@ -1476,12 +1493,12 @@ fn logical_to_surface_rect(
         return None;
     }
 
-    let scale = scale.max(1);
+    let scale = scale.max(1.0);
     Some(SelectionBox {
-        x: x0 * scale,
-        y: y0 * scale,
-        width: (x1 - x0) * scale,
-        height: (y1 - y0) * scale,
+        x: (x0 as f64 * scale).round() as i32,
+        y: (y0 as f64 * scale).round() as i32,
+        width: ((x1 - x0) as f64 * scale).round() as i32,
+        height: ((y1 - y0) as f64 * scale).round() as i32,
         label: None,
     })
 }
@@ -1612,7 +1629,7 @@ fn render_overlay_cairo(
     }
     unsafe {
         cairo_identity_matrix(cr);
-        cairo_scale(cr, params.output_scale as f64, params.output_scale as f64);
+        cairo_scale(cr, params.output_scale, params.output_scale);
         cairo_translate(
             cr,
             -(params.logical_geometry.x as f64),
@@ -1757,10 +1774,10 @@ fn cairo_stroke_selection_rect(
     cr: *mut CairoContext,
     sel: &SelectionBox,
     border_weight: i32,
-    output_scale: i32,
+    output_scale: f64,
     outside: bool,
 ) {
-    let lw = border_weight.max(1) as f64 / output_scale.max(1) as f64;
+    let lw = border_weight.max(1) as f64 / output_scale.max(1.0);
     let offset = if outside { -lw / 2.0 } else { 0.0 };
     let width = (sel.width as f64 + if outside { lw } else { 0.0 }).max(1.0);
     let height = (sel.height as f64 + if outside { lw } else { 0.0 }).max(1.0);
@@ -1879,20 +1896,22 @@ fn render_overlay_software(canvas: &mut PixelCanvas<'_>, params: &RenderParams<'
             && params.config.crosshairs
             && SelectionBox::contains(params.logical_geometry, seat.x, seat.y)
         {
-            let lx = (seat.x - params.logical_geometry.x) * params.output_scale;
-            let ly = (seat.y - params.logical_geometry.y) * params.output_scale;
+            let lx =
+                ((seat.x - params.logical_geometry.x) as f64 * params.output_scale).round() as i32;
+            let ly =
+                ((seat.y - params.logical_geometry.y) as f64 * params.output_scale).round() as i32;
             let h = SelectionBox {
                 x: 0,
                 y: ly,
-                width: params.layer_width as i32 * params.output_scale,
-                height: params.output_scale,
+                width: (params.layer_width as f64 * params.output_scale).round() as i32,
+                height: params.output_scale.round().max(1.0) as i32,
                 label: None,
             };
             let v = SelectionBox {
                 x: lx,
                 y: 0,
-                width: params.output_scale,
-                height: params.layer_height as i32 * params.output_scale,
+                width: params.output_scale.round().max(1.0) as i32,
+                height: (params.layer_height as f64 * params.output_scale).round() as i32,
                 label: None,
             };
             draw_rect_px(
@@ -1968,33 +1987,27 @@ fn render_overlay_software(canvas: &mut PixelCanvas<'_>, params: &RenderParams<'
                 draw_resize_handles_px(
                     canvas,
                     params.logical_geometry,
-                    params.output_scale,
+                    params.output_scale.round().max(1.0) as i32,
                     &seat.selection,
                     params.config.colors.border,
                 );
             }
             if params.config.display_dimensions {
                 let text = format!("{}x{}", seat.selection.width, seat.selection.height);
-                let tx = rect.x + rect.width + 10 * params.output_scale;
-                let ty = rect.y + rect.height + 20 * params.output_scale;
+                let scale_px = params.output_scale.round().max(1.0) as i32;
+                let tx = rect.x + rect.width + 10 * scale_px;
+                let ty = rect.y + rect.height + 20 * scale_px;
                 let text_spec = TextRenderSpec {
                     x: tx,
                     y: ty,
-                    font_size: 14 * params.output_scale.max(1),
+                    font_size: 14 * scale_px,
                     text: &text,
                     font_family: &params.config.font_family,
                     color: params.config.colors.border,
                 };
                 let drawn = draw_text_cairo(canvas, &text_spec);
                 if !drawn {
-                    draw_text_5x7(
-                        canvas,
-                        tx,
-                        ty,
-                        params.output_scale.max(1),
-                        &text,
-                        params.config.colors.border,
-                    );
+                    draw_text_5x7(canvas, tx, ty, scale_px, &text, params.config.colors.border);
                 }
             }
         }
@@ -2066,7 +2079,7 @@ fn scroll_preview_panel(
 fn draw_scroll_preview(
     canvas: &mut PixelCanvas<'_>,
     geometry: &SelectionBox,
-    output_scale: i32,
+    output_scale: f64,
     selection: &CaptureRect,
     source_width: u32,
     source_rows: usize,
@@ -2085,8 +2098,7 @@ fn draw_scroll_preview(
     const PADDING: i32 = 6;
     let image_width = panel_logical.width - PADDING * 2;
     let image_height = panel_logical.height - PADDING * 2;
-    let surface_scale = output_scale.max(1);
-    let to_surface = |value: i32| value * surface_scale;
+    let to_surface = |value: i32| (value as f64 * output_scale).round() as i32;
     let panel = SelectionBox {
         x: to_surface(panel_logical.x - geometry.x),
         y: to_surface(panel_logical.y - geometry.y),
@@ -2135,7 +2147,7 @@ fn draw_scroll_preview(
         canvas.width,
         canvas.height,
         &panel,
-        surface_scale,
+        output_scale.round().max(1.0) as i32,
         0xFFFFFFFF,
     );
 }
@@ -2471,8 +2483,23 @@ fn render_output(state: &mut SelectorState, qh: &QueueHandle<SelectorState>, out
     }
 
     let scale = state.outputs[output_idx].scale.max(1);
-    let bw = state.outputs[output_idx].layer_width * scale as u32;
-    let bh = state.outputs[output_idx].layer_height * scale as u32;
+    let viewport_enabled = state.viewporter.is_some()
+        && state.outputs[output_idx].viewport.is_some()
+        && !state.scroll_active;
+    let background_size = state.outputs[output_idx]
+        .name
+        .as_deref()
+        .and_then(|name| state.background.as_ref()?.get(name))
+        .map(|background| (background.width, background.height));
+    let default_size = (
+        state.outputs[output_idx].layer_width * scale as u32,
+        state.outputs[output_idx].layer_height * scale as u32,
+    );
+    let (bw, bh) = if viewport_enabled {
+        background_size.unwrap_or(default_size)
+    } else {
+        default_size
+    };
     if bw == 0 || bh == 0 {
         return;
     }
@@ -2513,6 +2540,7 @@ fn render_output(state: &mut SelectorState, qh: &QueueHandle<SelectorState>, out
         output_scale,
         buf_width,
         buf_height,
+        viewport,
     ) = {
         let output = &state.outputs[output_idx];
         let buffer = &output.buffers[buffer_idx];
@@ -2521,9 +2549,14 @@ fn render_output(state: &mut SelectorState, qh: &QueueHandle<SelectorState>, out
             output.logical_geometry.clone(),
             output.layer_width,
             output.layer_height,
-            output.scale.max(1),
+            if viewport_enabled {
+                buffer.width as f64 / output.layer_width.max(1) as f64
+            } else {
+                output.scale.max(1) as f64
+            },
             buffer.width,
             buffer.height,
+            output.viewport.as_ref().cloned(),
         )
     };
     if let Some(name) = output_name.as_deref()
@@ -2632,7 +2665,13 @@ fn render_output(state: &mut SelectorState, qh: &QueueHandle<SelectorState>, out
     buffer.busy = true;
     surface.attach(Some(&buffer.buffer), 0, 0);
     surface.damage(0, 0, layer_width as i32, layer_height as i32);
-    surface.set_buffer_scale(scale);
+    if let Some(viewport) = viewport {
+        viewport.set_source(0.0, 0.0, buf_width as f64, buf_height as f64);
+        viewport.set_destination(layer_width as i32, layer_height as i32);
+        surface.set_buffer_scale(1);
+    } else {
+        surface.set_buffer_scale(scale);
+    }
     surface.commit();
     output.dirty = false;
     output.initial_render_done = true;
@@ -2874,6 +2913,9 @@ impl Dispatch<WlRegistry, ()> for SelectorState {
                 }
                 "wp_cursor_shape_manager_v1" => {
                     state.cursor_shape_manager = Some(registry.bind(name, version.min(1), qh, ()));
+                }
+                "wp_viewporter" => {
+                    state.viewporter = Some(registry.bind(name, version.min(1), qh, ()));
                 }
                 _ => {}
             }
