@@ -4,6 +4,8 @@ Standalone Rust screenshot backend for DankMaterialShell and DMS Quick Capture. 
 
 The backend lives in this repository so it can evolve together with Quick Capture. Release binaries are built by GitHub Actions and published separately so users can verify and install the executable explicitly.
 
+For the implementation model and extension guidelines, see the [Rust Backend Architecture](../docs/rust-backend-architecture.md).
+
 ## Quick Start
 
 From the repository root:
@@ -176,6 +178,8 @@ dms-screenshot-rs/
 The selector is an internal implementation derived from the interaction model of [`slurp-rs`](https://docs.rs/slurp-rs/latest/slurp_rs/), which follows [`emersion/slurp`](https://github.com/emersion/slurp). No selector crate or external selector process is required.
 
 The capture path uses `wlr-screencopy-unstable-v1` and `wl_shm`. Interactive selection uses `zwlr-layer-shell-v1`. Window capture uses Niri's IPC when `NIRI_SOCKET` is available, and compositor-specific geometry adapters for Hyprland and Mango.
+
+Scroll capture uses direct output-region capture when the compositor returns the requested dimensions. If the compositor rejects or silently clamps the region, the backend falls back to full-output capture and crops the requested region to keep frames aligned, including selections near output boundaries.
 
 Niri's `ScreenshotWindow` IPC currently does not expose a `no-notify` option, so Niri may show its own screenshot notification. Track [niri PR #1795](https://github.com/niri-wm/niri/pull/1795) for the upstream change.
 

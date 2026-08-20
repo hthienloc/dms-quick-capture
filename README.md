@@ -14,6 +14,7 @@ Screenshot annotation plugin for DankMaterialShell.
 
 - **[User Guide](docs/user-guide.md)**: capture workflow, annotation tools, shortcuts, floating images, and IPC commands.
 - **[Documentation Index](docs/index.md)**: architecture, annotation engine, settings reference, and contributor documentation.
+- **[Rust Backend Architecture](docs/rust-backend-architecture.md)**: capture flow, selector state, coordinates, scaling, scroll capture, and compositor fallbacks.
 
 ## Requirements
 

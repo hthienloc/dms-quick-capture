@@ -488,7 +488,21 @@ fn scroll_tick(state: &mut SelectorState, qh: &QueueHandle<SelectorState>) {
         local,
         state.config.capture_cursor,
     ) {
-        Ok(image) => image,
+        Ok(image) => {
+            let expected_width = (rect.width as f64 * image.scale).round().max(1.0) as u32;
+            let expected_height = (rect.height as f64 * image.scale).round().max(1.0) as u32;
+            if image.width == expected_width && image.height == expected_height {
+                image
+            } else {
+                match crate::wayland::capture_global_region(rect, state.config.capture_cursor) {
+                    Ok(image) => image,
+                    Err(_) => {
+                        state.scroll_next_capture = Some(now + interval);
+                        return;
+                    }
+                }
+            }
+        }
         Err(_) => match crate::wayland::capture_global_region(rect, state.config.capture_cursor) {
             Ok(image) => image,
             Err(_) => {
