@@ -657,15 +657,10 @@ pub fn capture_output_region_logical(
 /// Captures a region expressed in the compositor's global logical coordinates.
 ///
 /// Interactive selection and the shared last-region state use global positions,
-/// while `zwlr_screencopy` receives coordinates relative to one output. When
-/// the region spans several outputs, the intersecting outputs are captured
-/// and composited into one image.
+/// The intersecting outputs are captured and composited before cropping so
+/// this path behaves consistently across compositors.
 pub fn capture_global_region(requested: Rect, cursor: bool) -> Result<CapturedImage, String> {
     let outputs = list_outputs()?;
-    let (output, local) = resolve_global_region_in(&outputs, requested)?;
-    if region_fits_output(output, &local) {
-        return capture_output_region_logical(Some(&output.name), local, cursor);
-    }
     let mut captured = Vec::new();
     for output in outputs.iter() {
         let Some(bounds) = output_logical_bounds(output) else {
