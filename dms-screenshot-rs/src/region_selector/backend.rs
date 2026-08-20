@@ -1493,7 +1493,7 @@ fn logical_to_surface_rect(
         return None;
     }
 
-    let scale = scale.max(1.0);
+    let scale = crate::wayland::normalize_scale(scale);
     Some(SelectionBox {
         x: (x0 as f64 * scale).round() as i32,
         y: (y0 as f64 * scale).round() as i32,
@@ -1777,7 +1777,7 @@ fn cairo_stroke_selection_rect(
     output_scale: f64,
     outside: bool,
 ) {
-    let lw = border_weight.max(1) as f64 / output_scale.max(1.0);
+    let lw = border_weight.max(1) as f64 / crate::wayland::normalize_scale(output_scale);
     let offset = if outside { -lw / 2.0 } else { 0.0 };
     let width = (sel.width as f64 + if outside { lw } else { 0.0 }).max(1.0);
     let height = (sel.height as f64 + if outside { lw } else { 0.0 }).max(1.0);
@@ -3663,7 +3663,10 @@ impl Dispatch<WpCursorShapeDeviceV1, ()> for SelectorState {
 
 #[cfg(test)]
 mod tests {
-    use super::{OutputEntry, SelectionBox, clamp_selection_to_outputs, translated_selection};
+    use super::{
+        OutputEntry, SelectionBox, clamp_selection_to_outputs, logical_to_surface_rect,
+        translated_selection,
+    };
 
     #[test]
     fn translated_selection_preserves_size_and_grab_offset() {
@@ -3746,5 +3749,29 @@ mod tests {
             Some(super::ResizeHandle::BottomRight)
         );
         assert_eq!(super::resize_handle_at(&selection, 250, 275), None);
+    }
+
+    #[test]
+    fn logical_rect_preserves_fractional_surface_scale() {
+        let geometry = SelectionBox {
+            x: 0,
+            y: 0,
+            width: 1000,
+            height: 800,
+            label: None,
+        };
+        let selection = SelectionBox {
+            x: 100,
+            y: 200,
+            width: 400,
+            height: 200,
+            label: None,
+        };
+
+        let surface = logical_to_surface_rect(&geometry, 1000, 800, 0.75, &selection)
+            .expect("selection should map to the surface");
+
+        assert_eq!((surface.x, surface.y), (75, 150));
+        assert_eq!((surface.width, surface.height), (300, 150));
     }
 }
