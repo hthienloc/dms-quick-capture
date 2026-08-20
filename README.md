@@ -24,7 +24,6 @@ Screenshot annotation plugin for DankMaterialShell.
 | **img2pdf** | PDF export |
 | **tesseract** | OCR text scanner |
 | **zbar** (`zbarimg`) | QR scanner |
-| **Qt5Compat GraphicalEffects** (`qt6-qt5compat`) | Floating images |
 | **Rust screenshot backend** | Installed separately when the New Backend is selected |
 | **curl** and **sha256sum** | Verify and install the Rust backend release asset |
 

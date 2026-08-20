@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Layouts
-import Qt5Compat.GraphicalEffects as GE
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import qs.Common
@@ -382,14 +381,9 @@ PanelWindow {
             visible: opacity > 0
 
             layer.enabled: true
-            layer.effect: GE.OpacityMask {
-                maskSource: Rectangle {
-                    width: img.width
-                    height: img.height
-                    radius: Math.max(0, Theme.cornerRadius - window.borderWidth)
-                    visible: false
-                    antialiasing: true
-                }
+            layer.effect: MultiEffect {
+                maskEnabled: true
+                maskSource: imgMask
             }
 
             onStatusChanged: {
@@ -402,6 +396,15 @@ PanelWindow {
                     window.destroy();
                 }
             }
+        }
+
+        Rectangle {
+            id: imgMask
+            anchors.fill: img
+            radius: Math.max(0, Theme.cornerRadius - window.borderWidth)
+            visible: false
+            antialiasing: true
+            layer.enabled: true
         }
 
         // Minimized Icon
