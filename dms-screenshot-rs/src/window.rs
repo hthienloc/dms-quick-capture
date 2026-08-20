@@ -40,7 +40,7 @@ fn capture_hyprland(cursor: bool) -> Result<CapturedImage, String> {
         .iter()
         .find(|monitor| contains_window(monitor, window.at, window.size))
         .ok_or_else(|| "could not find output for active Hyprland window".to_string())?;
-    let scale = monitor.scale.max(1.0);
+    let scale = crate::wayland::normalize_scale(monitor.scale);
     let region = Rect {
         x: window.at[0] - monitor.x,
         y: window.at[1] - monitor.y,
@@ -61,8 +61,9 @@ fn capture_hyprland(cursor: bool) -> Result<CapturedImage, String> {
 fn contains_window(monitor: &HyprMonitor, at: [i32; 2], size: [i32; 2]) -> bool {
     let center_x = at[0] + size[0] / 2;
     let center_y = at[1] + size[1] / 2;
-    let logical_width = (monitor.width as f64 / monitor.scale.max(1.0)) as i32;
-    let logical_height = (monitor.height as f64 / monitor.scale.max(1.0)) as i32;
+    let scale = crate::wayland::normalize_scale(monitor.scale);
+    let logical_width = (monitor.width as f64 / scale) as i32;
+    let logical_height = (monitor.height as f64 / scale) as i32;
     center_x >= monitor.x
         && center_y >= monitor.y
         && center_x < monitor.x + logical_width
@@ -122,7 +123,7 @@ fn capture_mango(cursor: bool) -> Result<CapturedImage, String> {
     };
     crate::wayland::capture_output_region_logical(Some(&monitor.name), region, cursor).map(
         |mut image| {
-            image.scale = monitor.scale.max(1.0);
+            image.scale = crate::wayland::normalize_scale(monitor.scale);
             image
         },
     )
