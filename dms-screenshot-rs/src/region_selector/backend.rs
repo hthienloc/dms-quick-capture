@@ -315,6 +315,7 @@ struct SelectorState {
     background: Option<BackgroundImages>,
     scroll_active: bool,
     scroll_rect: Option<CaptureRect>,
+    scroll_capture_rect: Option<CaptureRect>,
     scroll_session: Option<ScrollCaptureSession>,
     scroll_next_capture: Option<Instant>,
     scroll_captured: Option<CapturedImage>,
@@ -457,7 +458,7 @@ fn scroll_tick(state: &mut SelectorState, qh: &QueueHandle<SelectorState>) {
     if state.scroll_next_capture.is_some_and(|next| next > now) {
         return;
     }
-    let Some(rect) = state.scroll_rect else {
+    let Some(rect) = state.scroll_capture_rect else {
         state.cancelled = true;
         state.running = false;
         return;
@@ -468,7 +469,7 @@ fn scroll_tick(state: &mut SelectorState, qh: &QueueHandle<SelectorState>) {
         match crate::wayland::resolve_global_region(rect) {
             Ok((name, local)) => {
                 state.scroll_output_name = Some(name);
-                state.scroll_local_rect = Some(inset_scroll_capture_rect(local));
+                state.scroll_local_rect = Some(local);
             }
             Err(_) => {
                 state.scroll_next_capture = Some(now + interval);
@@ -488,10 +489,13 @@ fn scroll_tick(state: &mut SelectorState, qh: &QueueHandle<SelectorState>) {
         state.config.capture_cursor,
     ) {
         Ok(image) => image,
-        Err(_) => {
-            state.scroll_next_capture = Some(now + interval);
-            return;
-        }
+        Err(_) => match crate::wayland::capture_global_region(rect, state.config.capture_cursor) {
+            Ok(image) => image,
+            Err(_) => {
+                state.scroll_next_capture = Some(now + interval);
+                return;
+            }
+        },
     };
     if state.scroll_session.is_none() {
         let mut session = ScrollCaptureSession::new(
@@ -584,6 +588,7 @@ fn enter_scroll_phase(
         width: selection.width.max(1) as u32,
         height: selection.height.max(1) as u32,
     });
+    state.scroll_capture_rect = state.scroll_rect.map(inset_scroll_capture_rect);
     state.scroll_active = true;
     state.scroll_next_capture = Some(Instant::now());
     for output in &state.outputs {
@@ -598,7 +603,7 @@ fn enter_scroll_phase(
 }
 
 fn update_scroll_preview_input_regions(state: &mut SelectorState, qh: &QueueHandle<SelectorState>) {
-    let Some(selection) = state.scroll_rect.as_ref() else {
+    let Some(selection) = state.scroll_capture_rect.as_ref() else {
         return;
     };
     let Some(session) = state.scroll_session.as_ref() else {
@@ -1738,7 +1743,7 @@ fn render_overlay_cairo(
                 params.output_scale,
                 params.transparent_overlay,
             );
-            if !params.config.scroll && seat.ctrl_pressed {
+            if !params.transparent_overlay && seat.ctrl_pressed {
                 cairo_draw_resize_handles(cr, sel);
             }
 
@@ -1983,7 +1988,7 @@ fn render_overlay_software(canvas: &mut PixelCanvas<'_>, params: &RenderParams<'
                 params.config.border_weight,
                 params.config.colors.border,
             );
-            if !params.config.scroll && seat.ctrl_pressed {
+            if !params.transparent_overlay && seat.ctrl_pressed {
                 draw_resize_handles_px(
                     canvas,
                     params.logical_geometry,
@@ -2530,7 +2535,7 @@ fn render_output(state: &mut SelectorState, qh: &QueueHandle<SelectorState>, out
     } else {
         None
     };
-    let scroll_rect = state.scroll_rect.as_ref();
+    let scroll_rect = state.scroll_capture_rect.as_ref();
 
     let (
         output_name,
@@ -2684,7 +2689,7 @@ fn pointer_is_over_scroll_preview(state: &SelectorState, seat_idx: usize) -> boo
     let Some(output_idx) = seat.pointer_selection.current_output else {
         return false;
     };
-    let Some(selection) = state.scroll_rect.as_ref() else {
+    let Some(selection) = state.scroll_capture_rect.as_ref() else {
         return false;
     };
     let Some(session) = state.scroll_session.as_ref() else {
@@ -2777,7 +2782,7 @@ fn set_pointer_cursor(
         .get(seat_idx)
         .is_some_and(|seat| seat.moving_selection && seat.button_state == WlButtonState::Pressed);
     let resize_handle = state.seats.get(seat_idx).and_then(|seat| {
-        if !seat.ctrl_pressed || state.config.scroll || !seat.pointer_selection.has_selection {
+        if !seat.ctrl_pressed || state.scroll_active || !seat.pointer_selection.has_selection {
             return None;
         }
         resize_handle_at(
@@ -3097,7 +3102,7 @@ impl Dispatch<WlPointer, SeatKey> for SelectorState {
 
                 let over_scroll_preview =
                     state.scroll_active && pointer_is_over_scroll_preview(state, seat_idx);
-                let resize_handle = if state.config.scroll || !state.seats[seat_idx].ctrl_pressed {
+                let resize_handle = if state.scroll_active || !state.seats[seat_idx].ctrl_pressed {
                     None
                 } else {
                     resize_handle_at(
@@ -3161,7 +3166,7 @@ impl Dispatch<WlPointer, SeatKey> for SelectorState {
                 };
                 let over_scroll_preview =
                     state.scroll_active && pointer_is_over_scroll_preview(state, seat_idx);
-                let resize_handle = if state.config.scroll || !state.seats[seat_idx].ctrl_pressed {
+                let resize_handle = if state.scroll_active || !state.seats[seat_idx].ctrl_pressed {
                     None
                 } else {
                     resize_handle_at(
@@ -3218,7 +3223,7 @@ impl Dispatch<WlPointer, SeatKey> for SelectorState {
                             let seat = &mut state.seats[seat_idx];
                             match button_state {
                                 WlButtonState::Pressed => {
-                                    let handle = if seat.ctrl_pressed && !state.config.scroll {
+                                    let handle = if seat.ctrl_pressed && !state.scroll_active {
                                         resize_handle_at(
                                             &seat.pointer_selection.selection,
                                             seat.pointer_selection.x,
