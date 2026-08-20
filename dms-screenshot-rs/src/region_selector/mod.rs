@@ -32,12 +32,11 @@ pub(crate) fn select_region_with_background(
     })
 }
 
-pub(crate) fn select_scroll_with_background(
+pub(crate) fn select_scroll(
     options: SelectOptions,
-    background: BackgroundImages,
 ) -> Result<(Selection, CapturedImage), SelectorError> {
     let config = config::from_options(&options)?;
-    let result = backend::run(&config, Some(background))
+    let result = backend::run(&config, None)
         .map_err(|message| SelectorError::from_backend_message(&message))?;
     let image = result
         .captured

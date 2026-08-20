@@ -180,9 +180,9 @@ fn capture_interactive_scroll(
     interval_ms: u64,
     cursor: bool,
 ) -> Result<wayland::CapturedImage, String> {
-    let frozen_output = wayland::capture_focused_output(cursor)?;
-    let background = selector::backgrounds_from_captures(&[frozen_output]);
-    let (_, image) = selector::select_scroll_with_background(background, interval_ms, cursor)?;
+    // Scroll selection must stay live. The selector supplies only a translucent
+    // dim layer; frames are captured after the user confirms the region.
+    let (_, image) = selector::select_scroll(interval_ms, cursor)?;
     Ok(image)
 }
 

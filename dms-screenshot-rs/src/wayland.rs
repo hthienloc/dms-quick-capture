@@ -364,21 +364,6 @@ pub fn capture_outputs(cursor: bool) -> Result<Vec<CapturedOutput>, String> {
         .collect()
 }
 
-pub fn capture_focused_output(cursor: bool) -> Result<CapturedOutput, String> {
-    let name = focused_output_name()
-        .or_else(|| {
-            list_outputs()
-                .ok()?
-                .into_iter()
-                .next()
-                .map(|output| output.name)
-        })
-        .ok_or_else(|| "Wayland compositor exposed no outputs".to_string())?;
-    let image = capture_output(Some(&name), cursor)
-        .map_err(|error| format!("capture output {name}: {error}"))?;
-    Ok(CapturedOutput { name, image })
-}
-
 fn capture_output_with_region(
     name: Option<&str>,
     requested_region: Option<Rect>,

@@ -2,7 +2,7 @@ use crate::region_selector::{
     BackgroundImages, SelectOptions, Selection, SelectorError,
     select_region as backend_select_region,
     select_region_with_background as backend_select_region_with_background,
-    select_scroll_with_background as backend_select_scroll_with_background,
+    select_scroll as backend_select_scroll,
 };
 use crate::selection::Rect;
 
@@ -36,20 +36,16 @@ pub fn select_region_with_background(
     Ok(result)
 }
 
-pub fn select_scroll_with_background(
-    background: BackgroundImages,
+pub fn select_scroll(
     interval_ms: u64,
     cursor: bool,
 ) -> Result<(Rect, crate::wayland::CapturedImage), String> {
-    let (selection, image) = backend_select_scroll_with_background(
-        SelectOptions {
-            scroll: true,
-            scroll_interval_ms: interval_ms,
-            capture_cursor: cursor,
-            ..SelectOptions::default()
-        },
-        background,
-    )
+    let (selection, image) = backend_select_scroll(SelectOptions {
+        scroll: true,
+        scroll_interval_ms: interval_ms,
+        capture_cursor: cursor,
+        ..SelectOptions::default()
+    })
     .map_err(map_selection_error)?;
     Ok((rect_from_selection(selection.rect)?, image))
 }

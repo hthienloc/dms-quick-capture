@@ -161,7 +161,7 @@ After confirmation:
 1. `scroll_capture_rect` is created by applying a small inset to the selected region.
 2. The inset avoids capturing the white boundary between frames.
 3. `scroll_local_rect` converts that capture rectangle to output-local coordinates.
-4. The selector remains live instead of using the frozen background.
+4. The selector remains live instead of using a frozen background. Scroll mode runs without a background image, so the layer only contributes the translucent dim overlay.
 5. Each interval captures one frame and feeds it to `ScrollCaptureSession`.
 6. Accepted frames update the stitched canvas and request a repaint.
 7. The preview panel displays the stitched canvas beside the capture rectangle.
