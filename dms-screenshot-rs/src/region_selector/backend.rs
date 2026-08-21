@@ -321,8 +321,6 @@ struct SelectorState {
     scroll_captured: Option<CapturedImage>,
     scroll_width: u32,
     scroll_scale: f64,
-    scroll_output_name: Option<String>,
-    scroll_local_rect: Option<CaptureRect>,
 }
 
 delegate_noop!(SelectorState: ignore WlRegion);
@@ -465,51 +463,12 @@ fn scroll_tick(state: &mut SelectorState, qh: &QueueHandle<SelectorState>) {
     };
 
     let interval = Duration::from_millis(state.config.scroll_interval_ms.max(1));
-    if state.scroll_local_rect.is_none() {
-        match crate::wayland::resolve_global_region(rect) {
-            Ok((name, local)) => {
-                state.scroll_output_name = Some(name);
-                state.scroll_local_rect = Some(local);
-            }
-            Err(_) => {
-                state.scroll_next_capture = Some(now + interval);
-                return;
-            }
+    let image = match crate::wayland::capture_global_region(rect, state.config.capture_cursor) {
+        Ok(image) => image,
+        Err(_) => {
+            state.scroll_next_capture = Some(now + interval);
+            return;
         }
-    }
-    let Some(name) = state.scroll_output_name.as_deref() else {
-        return;
-    };
-    let Some(local) = state.scroll_local_rect else {
-        return;
-    };
-    let image = match crate::wayland::capture_output_region_logical(
-        Some(name),
-        local,
-        state.config.capture_cursor,
-    ) {
-        Ok(image) => {
-            let expected_width = (rect.width as f64 * image.scale).round().max(1.0) as u32;
-            let expected_height = (rect.height as f64 * image.scale).round().max(1.0) as u32;
-            if image.width == expected_width && image.height == expected_height {
-                image
-            } else {
-                match crate::wayland::capture_global_region(rect, state.config.capture_cursor) {
-                    Ok(image) => image,
-                    Err(_) => {
-                        state.scroll_next_capture = Some(now + interval);
-                        return;
-                    }
-                }
-            }
-        }
-        Err(_) => match crate::wayland::capture_global_region(rect, state.config.capture_cursor) {
-            Ok(image) => image,
-            Err(_) => {
-                state.scroll_next_capture = Some(now + interval);
-                return;
-            }
-        },
     };
     if state.scroll_session.is_none() {
         let mut session = ScrollCaptureSession::new(
@@ -562,7 +521,7 @@ fn finish_scroll(state: &mut SelectorState) {
                 width,
                 height,
                 image,
-                scale: state.scroll_scale.max(1.0),
+                scale: crate::wayland::normalize_scale(state.scroll_scale),
                 origin_x: 0,
                 origin_y: 0,
             });
@@ -604,7 +563,9 @@ fn enter_scroll_phase(
     });
     state.scroll_capture_rect = state.scroll_rect.map(inset_scroll_capture_rect);
     state.scroll_active = true;
-    state.scroll_next_capture = Some(Instant::now());
+    // Let the newly committed scroll overlay reach the compositor before the
+    // first frame is captured.
+    state.scroll_next_capture = Some(Instant::now() + Duration::from_millis(16));
     for output in &state.outputs {
         if let (Some(surface), Some(compositor)) =
             (output.surface.as_ref(), state.compositor.as_ref())
@@ -2502,18 +2463,23 @@ fn render_output(state: &mut SelectorState, qh: &QueueHandle<SelectorState>, out
     }
 
     let scale = state.outputs[output_idx].scale.max(1);
-    let viewport_enabled = state.viewporter.is_some()
-        && state.outputs[output_idx].viewport.is_some()
-        && !state.scroll_active;
-    let background_size = state.outputs[output_idx]
+    let viewport_enabled =
+        state.viewporter.is_some() && state.outputs[output_idx].viewport.is_some();
+    let output = &state.outputs[output_idx];
+    let background_size = output
         .name
         .as_deref()
         .and_then(|name| state.background.as_ref()?.get(name))
         .map(|background| (background.width, background.height));
-    let default_size = (
-        state.outputs[output_idx].layer_width * scale as u32,
-        state.outputs[output_idx].layer_height * scale as u32,
-    );
+    let default_size =
+        if viewport_enabled && output.geometry.width > 0 && output.geometry.height > 0 {
+            (output.geometry.width as u32, output.geometry.height as u32)
+        } else {
+            (
+                output.layer_width * scale as u32,
+                output.layer_height * scale as u32,
+            )
+        };
     let (bw, bh) = if viewport_enabled {
         background_size.unwrap_or(default_size)
     } else {

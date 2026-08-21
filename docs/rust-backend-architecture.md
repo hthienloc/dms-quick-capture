@@ -142,7 +142,7 @@ Resize handles are intentionally gated by runtime state, not by the configured m
 
 When `wp_viewporter` is available, normal frozen-background selection can keep physical pixels in the SHM buffer and let the compositor scale the surface to logical output dimensions. This avoids resampling the frozen image for every selector frame.
 
-Scroll mode disables viewporter mode because its buffer changes continuously and must match the dynamic scroll canvas. It uses the regular output-scale buffer path instead.
+Scroll mode can use viewporter as well. Its selector buffer remains a full physical-output buffer while the layer surface stays in logical coordinates, so fractional scales keep the preview and selection mapping aligned even while the buffer is repainted.
 
 The fallback without viewporter must remain functional. Never assume the protocol is present just because it exists on the development machine.
 
@@ -160,16 +160,15 @@ After confirmation:
 
 1. `scroll_capture_rect` is created by applying a small inset to the selected region.
 2. The inset avoids capturing the white boundary between frames.
-3. `scroll_local_rect` converts that capture rectangle to output-local coordinates.
-4. The selector remains live instead of using a frozen background. Scroll mode runs without a background image, so the layer only contributes the translucent dim overlay.
-5. Each interval captures one frame and feeds it to `ScrollCaptureSession`.
-6. Accepted frames update the stitched canvas and request a repaint.
-7. The preview panel displays the stitched canvas beside the capture rectangle.
-8. Clicking the preview confirms; `Enter` or `Space` also confirms.
+3. The selector remains live instead of using a frozen background. Scroll mode runs without a background image, so the layer only contributes the translucent dim overlay.
+4. Each interval captures the global region and crops or composites it before feeding it to `ScrollCaptureSession`.
+5. Accepted frames update the stitched canvas and request a repaint.
+6. The preview panel displays the stitched canvas beside the capture rectangle.
+7. Clicking the preview confirms; `Enter` or `Space` also confirms.
 
 The distinction between `scroll_rect` and `scroll_capture_rect` is intentional. The first describes the user's selection; the second describes the pixels actually captured. Preview layout, preview input regions, and fallback capture must use `scroll_capture_rect` so the preview matches the output image.
 
-Direct region capture is attempted first for each scroll frame because it is substantially cheaper than capturing a full output. The returned dimensions are checked against the requested logical rectangle. Some compositors silently clamp a region that touches an output boundary instead of reporting an error; when the dimensions do not match, or when direct capture fails, the backend captures the relevant full output(s) and crops or composites the capture rectangle. This fallback is slower but prevents clipped frames from producing an offset preview or corrupted scroll output.
+Scroll deliberately uses global capture for every frame. This is more expensive than direct output-region capture, but it gives one coordinate path for single-output and cross-output regions and avoids compositor-specific clamping that can produce clipped frames or offset previews.
 
 `ScrollCaptureSession` owns timing and in-flight capture state. `ScrollStitcher` owns frame matching, overlap detection, duplicate rejection, sticky-header handling, and the final canvas. Keep these responsibilities separate.
 

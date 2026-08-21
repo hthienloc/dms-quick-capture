@@ -19,7 +19,6 @@ pub struct BackgroundImage {
 }
 
 pub type BackgroundImages = HashMap<String, BackgroundImage>;
-
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Selection {
     pub rect: Rect,

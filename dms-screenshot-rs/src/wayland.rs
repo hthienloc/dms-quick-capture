@@ -655,48 +655,15 @@ pub fn capture_global_region(requested: Rect, cursor: bool) -> Result<CapturedIm
             continue;
         }
         let name = output.name.clone();
-        let image = capture_output(Some(&name), cursor)?;
+        let mut image = capture_output(Some(&name), cursor)?;
+        // The screencopy frame is authoritative for physical dimensions. A
+        // compositor can report metadata that differs from the actual frame.
+        if let Some(logical_width) = output_logical_width(output) {
+            image.scale = normalize_scale(image.width as f64 / logical_width);
+        }
         captured.push(CapturedOutput { name, image });
     }
     crop_frozen_global_region(&captured, &outputs, requested)
-}
-
-pub fn resolve_global_region(requested: Rect) -> Result<(String, Rect), String> {
-    let outputs = list_outputs()?;
-    let (output, local) = resolve_global_region_in(&outputs, requested)?;
-    Ok((output.name.clone(), local))
-}
-
-fn resolve_global_region_in(
-    outputs: &[OutputInfo],
-    requested: Rect,
-) -> Result<(&OutputInfo, Rect), String> {
-    let center_x = requested.x + requested.width as i32 / 2;
-    let center_y = requested.y + requested.height as i32 / 2;
-    let output = outputs
-        .iter()
-        .find(|output| {
-            let Some((x, y)) = output.position else {
-                return false;
-            };
-            let scale = normalize_scale(output.scale);
-            let width = (output.width as f64 / scale).round() as i32;
-            let height = (output.height as f64 / scale).round() as i32;
-            center_x >= x && center_y >= y && center_x < x + width && center_y < y + height
-        })
-        .ok_or_else(|| "region does not intersect a Wayland output".to_string())?;
-    let (output_x, output_y) = output
-        .position
-        .ok_or_else(|| format!("output has no position: {}", output.name))?;
-    Ok((
-        output,
-        Rect {
-            x: requested.x - output_x,
-            y: requested.y - output_y,
-            width: requested.width,
-            height: requested.height,
-        },
-    ))
 }
 
 /// Whether an output-local region lies entirely within the output.
@@ -717,9 +684,15 @@ fn output_logical_bounds(output: &OutputInfo) -> Option<Rect> {
     Some(Rect {
         x,
         y,
-        width: (output.width as f64 / scale).round() as u32,
+        width: output_logical_width(output)?.round() as u32,
         height: (output.height as f64 / scale).round() as u32,
     })
+}
+
+fn output_logical_width(output: &OutputInfo) -> Option<f64> {
+    let scale = normalize_scale(output.scale);
+    let width = output.width as f64 / scale;
+    (width.is_finite() && width > 0.0).then_some(width)
 }
 
 fn bounds_intersect(a: &Rect, b: &Rect) -> bool {
