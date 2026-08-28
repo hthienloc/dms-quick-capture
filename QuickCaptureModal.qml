@@ -2105,10 +2105,10 @@ Item {
         }
     }
 
-    function drawExportBackgroundLayer(ctx, imgSource, isBackgroundActive) {
+    function drawExportBackgroundLayer(ctx, imgSource, isBackgroundActive, exportDpr) {
         if (isBackgroundActive) {
             window.drawEditorBackground(ctx, window.canvasWidth, window.canvasHeight);
-            window.drawScreenshotShadow(ctx, 1 / window.dpr);
+            window.drawScreenshotShadow(ctx, 1 / exportDpr);
             window.drawScreenshotImage(ctx, imgSource);
             return;
         }
@@ -2174,7 +2174,7 @@ Item {
 
     function finishExportCanvas(canvas) {
         const tempOut = `/tmp/dms_capture_${Date.now()}.png`;
-        canvas.save(tempOut);
+        canvas.save(tempOut, Qt.size(canvas.outputPixelWidth, canvas.outputPixelHeight));
 
         if (window.exportCallback) {
             const cb = window.exportCallback;
@@ -2189,10 +2189,10 @@ Item {
         const ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.save();
-        ctx.scale(1 / window.dpr, 1 / window.dpr);
+        ctx.scale(1 / canvas.exportDpr, 1 / canvas.exportDpr);
 
         const isBackgroundActive = window.effectiveBackgroundMode !== "none";
-        window.drawExportBackgroundLayer(ctx, imgSource, isBackgroundActive);
+        window.drawExportBackgroundLayer(ctx, imgSource, isBackgroundActive, canvas.exportDpr);
         window.drawExportAnnotationLayer(ctx, isBackgroundActive);
         window.drawWatermarkLayer(ctx, true);
 
@@ -2537,13 +2537,16 @@ Item {
             console.warn("exportCanvasItem is not initialized yet");
             return;
         }
-        if (window.hasSelection && window.effectiveBackgroundMode === "none") {
-            window.exportCanvasItem.width = window.cropRect.width / window.dpr;
-            window.exportCanvasItem.height = window.cropRect.height / window.dpr;
-        } else if (window.activeCanvas) {
-            window.exportCanvasItem.width = window.canvasWidth / window.dpr;
-            window.exportCanvasItem.height = window.canvasHeight / window.dpr;
-        }
+        const exportWidth = window.hasSelection && window.effectiveBackgroundMode === "none"
+            ? window.cropRect.width
+            : window.canvasWidth;
+        const exportHeight = window.hasSelection && window.effectiveBackgroundMode === "none"
+            ? window.cropRect.height
+            : window.canvasHeight;
+        window.exportCanvasItem.outputPixelWidth = Math.max(1, Math.round(exportWidth));
+        window.exportCanvasItem.outputPixelHeight = Math.max(1, Math.round(exportHeight));
+        window.exportCanvasItem.width = window.exportCanvasItem.outputPixelWidth / window.exportCanvasItem.exportDpr;
+        window.exportCanvasItem.height = window.exportCanvasItem.outputPixelHeight / window.exportCanvasItem.exportDpr;
         window.exportCanvasItem.requestPaint();
     }
 
@@ -4272,6 +4275,9 @@ Item {
 
                 Canvas {
                     id: exportCanvas
+                    readonly property real exportDpr: Screen.devicePixelRatio || 1.0
+                    property int outputPixelWidth: 1
+                    property int outputPixelHeight: 1
                     visible: true
                     opacity: 0
                     x: -9999
