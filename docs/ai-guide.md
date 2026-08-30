@@ -58,6 +58,13 @@ Key events are intercepted at the root Modal level via `modalFocusScope.Keys.onP
 | `O` | OCR Text Recognition | Toggles OCR tool |
 | `V` | Select / Move Tool | Selects tool |
 | `G` (Hold) | Magnifier Loupe | Enables circular magnifying zoom |
+| `Ctrl` + `Shift` + Scroll | Canvas Zoom | Zooms in/out canvas (`1.0`–`4.0`) at cursor |
+| `Ctrl` + `Shift` + Mouse Drag | Canvas Free Pan | Pans canvas freely in direction of mouse drag |
+| `Shift` + Scroll | Horizontal Pan | Pans canvas left / right |
+| `Ctrl` + Scroll | Vertical Pan | Pans canvas up / down |
+| Scroll (No modifier) | Stroke Width | Adjusts stroke thickness / tool intensity |
+| `+` / `-` / `[` / `]` | Brush Size Step | Increases/decreases stroke size by step |
+| `Ctrl+0` | Reset View | Resets canvas zoom and pan offsets to default |
 | `Tab` | Presets Toggle | Swaps between 2 latest presets |
 | `Esc` | Discard & Close | Closes modal editor |
 | `Enter` / `Return` | Done | Triggers save/copy pipeline |

@@ -13,9 +13,11 @@ Rectangle {
     required property var window
     required property var drawingCanvas
 
+    readonly property point mappedPos: (drawingCanvas && window.boardContainerItem) ? drawingCanvas.mapToItem(window.boardContainerItem, window.previewX, window.previewY) : Qt.point(window.previewX, window.previewY)
+
     visible: window.showSizePreview
-    x: window.previewX - (width / 2)
-    y: window.previewY - (height / 2)
+    x: mappedPos.x - (width / 2)
+    y: mappedPos.y - (height / 2)
 
     readonly property bool _showShape: window.effectiveTool !== "spotlight"
 
@@ -24,8 +26,8 @@ Rectangle {
     radius: _showShape ? shapeRadius : 0
     color: "transparent"
     border.color: _showShape ? shapeBorderColor : "transparent"
-    border.width: _showShape ? 1.5 / drawingCanvas.scale : 0
-    z: 20
+    border.width: _showShape ? 1.5 : 0
+    z: 200
 
     readonly property real shapeWidth: {
         let base = window.activeIntensity;
@@ -47,12 +49,12 @@ Rectangle {
                 base = bw * 2;
             }
         }
-        return base * window.editScale;
+        return base * window.editScale * (drawingCanvas ? drawingCanvas.scale : 1.0);
     }
     readonly property real shapeRadius: {
         const tool = window.effectiveTool;
         if (tool === "highlighter") return window.roundHighlighter ? shapeWidth / 2 : 0;
-        if (tool === "spotlight" || tool === "rect" || tool === "redact") return window.roundRect ? (Theme.cornerRadius * window.editScale) : 0;
+        if (tool === "spotlight" || tool === "rect" || tool === "redact") return window.roundRect ? (Theme.cornerRadius * window.editScale * (drawingCanvas ? drawingCanvas.scale : 1.0)) : 0;
         if (tool === "pixelate" || tool === "text") return 0;
         if (tool === "callout") {
             if (window.currentTool === "select" && !window.calloutDestDragging && window.selectedStroke) {
@@ -78,7 +80,7 @@ Rectangle {
     StyledText {
         id: valueLabel
         anchors.top: parent.bottom
-        anchors.topMargin: 16 / drawingCanvas.scale
+        anchors.topMargin: 12
         anchors.horizontalCenter: parent.horizontalCenter
         text: {
             if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "callout") {
@@ -95,7 +97,7 @@ Rectangle {
         }
 
         color: Theme.primary
-        font.pixelSize: 10 / drawingCanvas.scale
+        font.pixelSize: Theme.fontSizeSmall
         font.bold: true
     }
 }

@@ -2364,6 +2364,48 @@ Item {
     }
 
     // Dynamic scale to fit the screenshot (supports standard, high-DPI, and multi-monitor setups)
+    property real userZoomScale: 1.0
+    readonly property real effectiveFitScale: window.fitScale * window.userZoomScale
+    property real userPanX: 0.0
+    property real userPanY: 0.0
+    property bool isPanSpacePressed: false
+    property point lastPanMouse: Qt.point(0, 0)
+
+    function adjustUserZoom(delta, focusPt) {
+        const oldZoom = window.userZoomScale;
+        const nextZoom = Helpers.clamp(oldZoom + delta, 1.0, 4.0);
+        if (Math.abs(nextZoom - oldZoom) <= 0.001) return;
+
+        window.userZoomScale = Math.round(nextZoom * 100) / 100.0;
+        if (window.userZoomScale === 1.0) {
+            window.userPanX = 0;
+            window.userPanY = 0;
+            return;
+        }
+
+        if (focusPt && focusPt.x !== undefined && focusPt.y !== undefined) {
+            const ratio = window.userZoomScale / oldZoom;
+            const newPanX = window.userPanX - (ratio - 1.0) * (focusPt.x - window.userPanX);
+            const newPanY = window.userPanY - (ratio - 1.0) * (focusPt.y - window.userPanY);
+            window.updatePanOffset(newPanX, newPanY);
+        }
+    }
+
+    function resetUserZoom() {
+        window.userZoomScale = 1.0;
+        window.userPanX = 0;
+        window.userPanY = 0;
+    }
+
+    function updatePanOffset(newX, newY) {
+        const baseW = window.drawingCanvas ? window.drawingCanvas.width * window.drawingCanvas.scale : 800;
+        const baseH = window.drawingCanvas ? window.drawingCanvas.height * window.drawingCanvas.scale : 600;
+        const maxPanX = Math.max(500, (baseW * (window.userZoomScale || 1.0)) / 2);
+        const maxPanY = Math.max(500, (baseH * (window.userZoomScale || 1.0)) / 2);
+        window.userPanX = Helpers.clamp(newX, -maxPanX, maxPanX);
+        window.userPanY = Helpers.clamp(newY, -maxPanY, maxPanY);
+    }
+
     property real fitScale: {
         if (!activeCanvas || !bgImageItem || !boardContainerItem) return 1.0;
         const maxW = boardContainerItem.width;
@@ -2800,6 +2842,11 @@ Item {
 
     function handleEscapeShortcut(event) {
         if (event.key === Qt.Key_Escape) {
+            if (window.isPanSpacePressed) {
+                window.isPanSpacePressed = false;
+                window.lastPanMouse = Qt.point(0, 0);
+                return window.acceptKeyEvent(event);
+            }
             if (window.cancelPastePreview()) {
                 return window.acceptKeyEvent(event);
             }
@@ -3004,6 +3051,42 @@ Item {
         return window.acceptKeyEvent(event);
     }
 
+    function handleViewZoomShortcut(event, token, hasCtrl) {
+        if (!hasCtrl) return false;
+        if (token === "0") {
+            window.resetUserZoom();
+            return window.acceptKeyEvent(event);
+        }
+        if (event.key === Qt.Key_Plus || event.key === Qt.Key_Equal) {
+            window.adjustUserZoom(0.15);
+            return window.acceptKeyEvent(event);
+        }
+        if (event.key === Qt.Key_Minus) {
+            window.adjustUserZoom(-0.15);
+            return window.acceptKeyEvent(event);
+        }
+        return false;
+    }
+
+    function handleStrokeSizeShortcut(event, token, hasCtrl) {
+        if (hasCtrl || window.isTyping) return false;
+        const isDecrease = event.key === Qt.Key_Minus || event.key === Qt.Key_BracketLeft;
+        const isIncrease = event.key === Qt.Key_Plus || event.key === Qt.Key_Equal || event.key === Qt.Key_BracketRight;
+        if (!isDecrease && !isIncrease) return false;
+
+        const tool = window.effectiveTool;
+        const meta = Constants.getToolMeta(tool);
+        const multiplier = meta.step !== undefined ? meta.step : 1;
+        const step = isIncrease ? multiplier : -multiplier;
+
+        window.updateActiveIntensity(window.activeIntensity + step);
+        window.previewX = window.cursorX * window.editScale;
+        window.previewY = window.cursorY * window.editScale;
+        window.showSizePreview = true;
+        if (typeof previewTimer !== "undefined" && previewTimer) previewTimer.restart();
+        return window.acceptKeyEvent(event);
+    }
+
     function handleShortcutKey(event) {
         if (window.handleSelectedStrokeDeleteShortcut(event)) return;
         if (window.handleSelectedStrokeMoveShortcut(event)) return;
@@ -3015,6 +3098,8 @@ Item {
         if (window.handleCaptureActionShortcut(event, token, hasCtrl)) return;
         if (window.handleAnnotationVisibilityShortcut(event, token, hasCtrl)) return;
         if (window.handleStrokeClipboardShortcut(event, token, hasCtrl)) return;
+        if (window.handleViewZoomShortcut(event, token, hasCtrl)) return;
+        if (window.handleStrokeSizeShortcut(event, token, hasCtrl)) return;
 
         if (hasCtrl) {
             window.handleColorShortcut(event, token);
@@ -3062,6 +3147,13 @@ Item {
     }
 
     function handleZoomKeyPressed(event) {
+        if (event.key === Qt.Key_Space && !window.isTyping) {
+            if (!event.isAutoRepeat) {
+                window.isPanSpacePressed = !window.isPanSpacePressed;
+                window.lastPanMouse = Qt.point(0, 0);
+            }
+            return window.acceptKeyEvent(event);
+        }
         if (event.key !== Qt.Key_G || window.isTyping) return false;
         if (event.isAutoRepeat) {
             return window.acceptKeyEvent(event);
@@ -3071,6 +3163,9 @@ Item {
     }
 
     function handleZoomKeyReleased(event) {
+        if (event.key === Qt.Key_Space) {
+            return window.acceptKeyEvent(event);
+        }
         if (event.key !== Qt.Key_G || window.isTyping) return false;
         if (event.isAutoRepeat) {
             return window.acceptKeyEvent(event);
@@ -3176,6 +3271,11 @@ Item {
 
         window.showAnnotations = true;
         window.showSizePreview = false;
+        window.userZoomScale = 1.0;
+        window.userPanX = 0;
+        window.userPanY = 0;
+        window.isPanSpacePressed = false;
+        window.lastPanMouse = Qt.point(0, 0);
         window.previewX = 0;
         window.previewY = 0;
         window.cropRect = Qt.rect(0, 0, 0, 0);
@@ -4022,16 +4122,75 @@ Item {
                         Component.onCompleted: window.scanResultPopoverRef = scanResultPopover
                     }
 
-                    Rectangle {
+                    MouseArea {
+                        id: boardBackgroundMouseArea
                         anchors.fill: parent
-                        color: "transparent"
-                        border.width: 0
+                        z: -1
+                        hoverEnabled: true
+                        cursorShape: (window.lastPanMouse.x !== 0 || window.lastPanMouse.y !== 0) ? Qt.ClosedHandCursor : Qt.ArrowCursor
+
+                        onPositionChanged: (mouse) => {
+                            if (pressed && (mouse.buttons & Qt.LeftButton) && (mouse.modifiers & Qt.ControlModifier) && (mouse.modifiers & Qt.ShiftModifier)) {
+                                const currentPt = Qt.point(mouse.x, mouse.y);
+                                if (window.lastPanMouse.x === 0 && window.lastPanMouse.y === 0) {
+                                    window.lastPanMouse = currentPt;
+                                } else {
+                                    const dx = currentPt.x - window.lastPanMouse.x;
+                                    const dy = currentPt.y - window.lastPanMouse.y;
+                                    window.updatePanOffset(window.userPanX + dx, window.userPanY + dy);
+                                    window.lastPanMouse = currentPt;
+                                }
+                            }
+                        }
+
+                        onPressed: (mouse) => {
+                            if ((mouse.button === Qt.LeftButton) && (mouse.modifiers & Qt.ControlModifier) && (mouse.modifiers & Qt.ShiftModifier)) {
+                                window.lastPanMouse = Qt.point(mouse.x, mouse.y);
+                            }
+                        }
+
+                        onReleased: (mouse) => {
+                            window.lastPanMouse = Qt.point(0, 0);
+                        }
+
+                        onWheel: (wheel) => {
+                            if ((wheel.modifiers & Qt.ControlModifier) && (wheel.modifiers & Qt.ShiftModifier)) {
+                                const zoomStep = wheel.angleDelta.y > 0 ? 0.1 : -0.1;
+                                const focusPt = Qt.point(wheel.x - boardContainer.width / 2, wheel.y - boardContainer.height / 2);
+                                window.adjustUserZoom(zoomStep, focusPt);
+                                wheel.accepted = true;
+                                return;
+                            }
+
+                            if (wheel.modifiers & Qt.ControlModifier) {
+                                const scrollDelta = wheel.angleDelta.y !== 0 ? wheel.angleDelta.y : wheel.angleDelta.x;
+                                const panStep = scrollDelta > 0 ? 40 : -40;
+                                window.updatePanOffset(window.userPanX, window.userPanY + panStep);
+                                wheel.accepted = true;
+                                return;
+                            }
+
+                            if (wheel.modifiers & Qt.ShiftModifier) {
+                                const scrollDelta = wheel.angleDelta.y !== 0 ? wheel.angleDelta.y : wheel.angleDelta.x;
+                                const panStep = scrollDelta > 0 ? 40 : -40;
+                                window.updatePanOffset(window.userPanX + panStep, window.userPanY);
+                                wheel.accepted = true;
+                                return;
+                            }
+
+                            const normalScrollDelta = wheel.angleDelta.y !== 0 ? wheel.angleDelta.y : wheel.angleDelta.x;
+                            const normalPanStep = normalScrollDelta > 0 ? 40 : -40;
+                            window.updatePanOffset(window.userPanX, window.userPanY + normalPanStep);
+                            wheel.accepted = true;
+                        }
                     }
 
                     // Background Image Layer (Hardware Accelerated)
                     Item {
                         id: bgImageLayer
                         anchors.centerIn: parent
+                        anchors.horizontalCenterOffset: window.userPanX
+                        anchors.verticalCenterOffset: window.userPanY
                         width: drawingCanvas.width
                         height: drawingCanvas.height
                         scale: drawingCanvas.scale
@@ -4076,7 +4235,9 @@ Item {
                     Canvas {
                         id: backgroundCanvas
                         anchors.centerIn: parent
-                        scale: window.fitScale / window.editScale
+                        anchors.horizontalCenterOffset: window.userPanX
+                        anchors.verticalCenterOffset: window.userPanY
+                        scale: window.effectiveFitScale / window.editScale
                         transformOrigin: Item.Center
                         renderTarget: Canvas.Image
                         z: 0
@@ -4103,7 +4264,9 @@ Item {
                     Canvas {
                         id: bakedCanvas
                         anchors.centerIn: parent
-                        scale: window.fitScale / window.editScale
+                        anchors.horizontalCenterOffset: window.userPanX
+                        anchors.verticalCenterOffset: window.userPanY
+                        scale: window.effectiveFitScale / window.editScale
                         transformOrigin: Item.Center
                         renderTarget: Canvas.Image
                         z: 1
@@ -4129,7 +4292,9 @@ Item {
                     Canvas {
                         id: drawingCanvas
                         anchors.centerIn: parent
-                        scale: window.fitScale / window.editScale
+                        anchors.horizontalCenterOffset: window.userPanX
+                        anchors.verticalCenterOffset: window.userPanY
+                        scale: window.effectiveFitScale / window.editScale
                         transformOrigin: Item.Center
                         renderTarget: Canvas.Image
 
@@ -4202,12 +4367,6 @@ Item {
                             window: rootWindow
                             drawingCanvas: drawingCanvas
                         }
-
-                        SizePreviewCard {
-                            id: sizePreviewItem
-                            window: rootWindow
-                            drawingCanvas: drawingCanvas
-                        }
                     }
 
                     Rectangle {
@@ -4245,6 +4404,12 @@ Item {
                         modalFocusScope: modalFocusScope
                     }
 
+                    SizePreviewCard {
+                        id: sizePreviewItem
+                        window: rootWindow
+                        drawingCanvas: drawingCanvas
+                    }
+
                     Timer {
                         id: previewTimer
                         interval: 800
@@ -4264,6 +4429,8 @@ Item {
                         staticBgImage: staticBgImage
                         drawMouseArea: drawMouseArea
                     }
+
+
 
                     BusyIndicator {
                         anchors.centerIn: parent

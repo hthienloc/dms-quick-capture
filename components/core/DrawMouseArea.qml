@@ -473,6 +473,19 @@ MouseArea {
     }
 
     onPositionChanged: (mouse) => {
+         if (pressed && (mouse.buttons & Qt.LeftButton) && (mouse.modifiers & Qt.ControlModifier) && (mouse.modifiers & Qt.ShiftModifier)) {
+             const currentPt = drawMouseArea.mapToItem(window.boardContainerItem, mouse.x, mouse.y);
+             if (window.lastPanMouse.x === 0 && window.lastPanMouse.y === 0) {
+                 window.lastPanMouse = currentPt;
+             } else {
+                 const dx = currentPt.x - window.lastPanMouse.x;
+                 const dy = currentPt.y - window.lastPanMouse.y;
+                 window.updatePanOffset(window.userPanX + dx, window.userPanY + dy);
+                 window.lastPanMouse = currentPt;
+             }
+             return;
+         }
+
          const origX = mouse.x / window.editScale;
          const origY = mouse.y / window.editScale;
          window.cursorX = origX;
@@ -506,6 +519,9 @@ MouseArea {
     }
 
     cursorShape: {
+        if (window.lastPanMouse.x !== 0 || window.lastPanMouse.y !== 0) {
+            return Qt.ClosedHandCursor;
+        }
         if (window.pastePreviewActive) {
             return Qt.ClosedHandCursor;
         }
@@ -535,6 +551,11 @@ MouseArea {
         shiftLockAxis = "none";
         if (window.modalFocusScope) {
             window.modalFocusScope.forceActiveFocus();
+        }
+
+        if ((mouse.button === Qt.LeftButton) && (mouse.modifiers & Qt.ControlModifier) && (mouse.modifiers & Qt.ShiftModifier)) {
+            window.lastPanMouse = drawMouseArea.mapToItem(window.boardContainerItem, mouse.x, mouse.y);
+            return;
         }
 
         if (moreToolsMenu.opened) {
@@ -833,6 +854,10 @@ MouseArea {
 
     onReleased: (mouse) => {
         shiftLockAxis = "none";
+        if (window.lastPanMouse.x !== 0 || window.lastPanMouse.y !== 0) {
+            window.lastPanMouse = Qt.point(0, 0);
+            return;
+        }
         if (mouse.button === Qt.LeftButton && window.pastePreviewActive) {
             window.performPasteAction();
             return;
@@ -897,25 +922,40 @@ MouseArea {
      }
 
      onWheel: (wheel) => {
+         if ((wheel.modifiers & Qt.ControlModifier) && (wheel.modifiers & Qt.ShiftModifier)) {
+             const zoomStep = wheel.angleDelta.y > 0 ? 0.1 : -0.1;
+             let focusPt = null;
+             if (window.boardContainerItem) {
+                 const containerPt = drawMouseArea.mapToItem(window.boardContainerItem, wheel.x, wheel.y);
+                 focusPt = Qt.point(containerPt.x - window.boardContainerItem.width / 2, containerPt.y - window.boardContainerItem.height / 2);
+             }
+             window.adjustUserZoom(zoomStep, focusPt);
+             wheel.accepted = true;
+             return;
+         }
+
+         if (wheel.modifiers & Qt.ControlModifier) {
+             const scrollDelta = wheel.angleDelta.y !== 0 ? wheel.angleDelta.y : wheel.angleDelta.x;
+             const panStep = scrollDelta > 0 ? 40 : -40;
+             window.updatePanOffset(window.userPanX, window.userPanY + panStep);
+             wheel.accepted = true;
+             return;
+         }
+
+         if (wheel.modifiers & Qt.ShiftModifier) {
+             const scrollDelta = wheel.angleDelta.y !== 0 ? wheel.angleDelta.y : wheel.angleDelta.x;
+             const panStep = scrollDelta > 0 ? 40 : -40;
+             window.updatePanOffset(window.userPanX + panStep, window.userPanY);
+             wheel.accepted = true;
+             return;
+         }
+
          const step = wheel.angleDelta.y > 0 ? 1 : -1;
          if (window.enableMagnifier && window.isZoomPressed) {
              magnifier.zoomFactor = Helpers.clamp(magnifier.zoomFactor + (step * 0.5), 1.5, 4.0);
              wheel.accepted = true;
              return;
          }
-
-          if (window.pastePreviewActive) {
-              const tool = window.effectiveTool;
-              const multiplier = getIntensityMultiplier(tool);
-
-              window.updateActiveIntensity(window.activeIntensity + (step * multiplier));
-              window.previewX = wheel.x;
-              window.previewY = wheel.y;
-              window.showSizePreview = true;
-              previewTimer.restart();
-              wheel.accepted = true;
-              return;
-          }
 
           if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "callout") {
               const calloutMeta = Constants.getToolMeta("callout");
@@ -959,17 +999,17 @@ MouseArea {
               wheel.accepted = true;
               return;
           }
- 
+
           const tool = window.effectiveTool;
           const multiplier = getIntensityMultiplier(tool);
- 
+
           window.updateActiveIntensity(window.activeIntensity + (step * multiplier));
- 
+
           window.previewX = wheel.x;
           window.previewY = wheel.y;
           window.showSizePreview = true;
           previewTimer.restart();
-         wheel.accepted = true;
+          wheel.accepted = true;
      }
 
      Connections {
