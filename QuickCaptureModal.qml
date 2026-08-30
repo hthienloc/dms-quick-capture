@@ -1817,6 +1817,8 @@ Item {
             bgRotation: window.bgRotation,
             bgFlipH: window.bgFlipH,
             bgFlipV: window.bgFlipV,
+            hasActiveCropSelection: window.hasActiveCropSelection,
+            cropRect: window.cropRect,
             screenshotXOffset: window.screenshotXOffset,
             screenshotYOffset: window.screenshotYOffset,
             cropOffsetX: window.hasActiveCropSelection ? window.cropRect.x : 0,

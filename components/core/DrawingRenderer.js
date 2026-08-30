@@ -21,6 +21,58 @@ function ellipseEdgePoint(cx, cy, rx, ry, tx, ty) {
 }
 
 /**
+ * Maps canvas coordinates (x, y) to the un-transformed source image pixel coordinates (sx, sy)
+ * taking into account rotation, horizontal/vertical flips, and crop selection offsets.
+ */
+function getTransformedSourcePos(x, y, config) {
+    if (!config || !config.bgImageItem) return { x: Math.floor(x), y: Math.floor(y) };
+
+    const rawW = config.bgImageItem.sourceSize.width;
+    const rawH = config.bgImageItem.sourceSize.height;
+    const rot = (config.bgRotation !== undefined) ? config.bgRotation : 0;
+    const flipH = !!config.bgFlipH;
+    const flipV = !!config.bgFlipV;
+
+    const cropX = (config.hasActiveCropSelection && config.cropRect) ? config.cropRect.x : (config.cropOffsetX || 0);
+    const cropY = (config.hasActiveCropSelection && config.cropRect) ? config.cropRect.y : (config.cropOffsetY || 0);
+
+    const isRotated90 = (rot === 90 || rot === 270);
+    const uncroppedW = isRotated90 ? rawH : rawW;
+    const uncroppedH = isRotated90 ? rawW : rawH;
+
+    // 1. Shift by crop selection to get position relative to uncropped canvas center
+    let cx = (x + cropX) - uncroppedW / 2;
+    let cy = (y + cropY) - uncroppedH / 2;
+
+    // 2. Inverse rotation transform
+    let rcx = cx;
+    let rcy = cy;
+    if (rot === 90) {
+        rcx = cy;
+        rcy = -cx;
+    } else if (rot === 180) {
+        rcx = -cx;
+        rcy = -cy;
+    } else if (rot === 270) {
+        rcx = -cy;
+        rcy = cx;
+    }
+
+    // 3. Inverse flip transform
+    if (flipH) rcx = -rcx;
+    if (flipV) rcy = -rcy;
+
+    // 4. Translate back to raw image top-left
+    const sx = rcx + rawW / 2;
+    const sy = rcy + rawH / 2;
+
+    return {
+        x: Math.max(0, Math.min(Math.floor(sx), rawW - 1)),
+        y: Math.max(0, Math.min(Math.floor(sy), rawH - 1))
+    };
+}
+
+/**
  * Calculates the shared stamp leader geometry at the circle edge.
  * @param {object} stampPt - Stamp center point.
  * @param {object} leaderPt - Leader anchor point.
@@ -751,14 +803,18 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
                                 let h = (x * 374761393 + y * 668265263 + seed) >>> 0;
                                 h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0;
                                 h = (h ^ (h >>> 16)) >>> 0;
-                                sx = Math.max(0, Math.min(x + (h % bw), imgW - 1));
-                                sy = Math.max(0, Math.min(y + ((h >>> 8) % bh), imgH - 1));
+                                const sampledCanvasX = x + (h % bw);
+                                const sampledCanvasY = y + ((h >>> 8) % bh);
+                                const srcPos = getTransformedSourcePos(sampledCanvasX, sampledCanvasY, config);
+                                sx = srcPos.x;
+                                sy = srcPos.y;
                             } else {
                                 sampleSize = Math.max(1, Math.round(blockSize / 5));
-                                sx = Math.min(x + Math.floor(bw / 2), rx + rw - 1);
-                                sy = Math.min(y + Math.floor(bh / 2), ry + rh - 1);
-                                sx = Math.max(0, Math.min(sx, Math.max(0, imgW - sampleSize)));
-                                sy = Math.max(0, Math.min(sy, Math.max(0, imgH - sampleSize)));
+                                const sampledCanvasX = Math.min(x + Math.floor(bw / 2), rx + rw - 1);
+                                const sampledCanvasY = Math.min(y + Math.floor(bh / 2), ry + rh - 1);
+                                const srcPos = getTransformedSourcePos(sampledCanvasX, sampledCanvasY, config);
+                                sx = Math.max(0, Math.min(srcPos.x, Math.max(0, imgW - sampleSize)));
+                                sy = Math.max(0, Math.min(srcPos.y, Math.max(0, imgH - sampleSize)));
                             }
                             ctx.drawImage(config.bgImageItem, sx, sy, sampleSize, sampleSize, x, y, bw + 1, bh + 1);
                         }
