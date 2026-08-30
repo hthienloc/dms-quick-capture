@@ -522,6 +522,9 @@ MouseArea {
         if (window.lastPanMouse.x !== 0 || window.lastPanMouse.y !== 0) {
             return Qt.ClosedHandCursor;
         }
+        if (window.currentTool === "crop" && window.isCtrlPressed) {
+            return pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor;
+        }
         if (window.pastePreviewActive) {
             return Qt.ClosedHandCursor;
         }

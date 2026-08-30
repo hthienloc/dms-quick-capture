@@ -2369,6 +2369,7 @@ Item {
     property real userPanX: 0.0
     property real userPanY: 0.0
     property bool isPanSpacePressed: false
+    property bool isCtrlPressed: false
     property point lastPanMouse: Qt.point(0, 0)
 
     function adjustUserZoom(delta, focusPt) {
@@ -3221,6 +3222,9 @@ Item {
     }
 
     function handleModalKeyPressed(event) {
+        if (event.key === Qt.Key_Control) {
+            window.isCtrlPressed = true;
+        }
         if (event.key === Qt.Key_Escape && saveAsDialog.shouldBeVisible) {
             saveAsDialog.close();
             window.acceptKeyEvent(event);
@@ -3237,6 +3241,9 @@ Item {
     }
 
     function handleModalKeyReleased(event) {
+        if (event.key === Qt.Key_Control) {
+            window.isCtrlPressed = false;
+        }
         if (event.key === Qt.Key_Tab) {
             event.accepted = true;
             return;
