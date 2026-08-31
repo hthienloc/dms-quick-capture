@@ -3161,7 +3161,7 @@ Item {
     }
 
     function handleViewZoomShortcut(event, token, hasCtrl) {
-        if (!hasCtrl) return false;
+        if (window.isTyping) return false;
         if (token === "0") {
             window.resetUserZoom();
             return window.acceptKeyEvent(event);
@@ -3179,8 +3179,8 @@ Item {
 
     function handleStrokeSizeShortcut(event, token, hasCtrl) {
         if (hasCtrl || window.isTyping) return false;
-        const isDecrease = event.key === Qt.Key_Minus || event.key === Qt.Key_BracketLeft;
-        const isIncrease = event.key === Qt.Key_Plus || event.key === Qt.Key_Equal || event.key === Qt.Key_BracketRight;
+        const isDecrease = event.key === Qt.Key_BracketLeft;
+        const isIncrease = event.key === Qt.Key_BracketRight;
         if (!isDecrease && !isIncrease) return false;
 
         const tool = window.effectiveTool;
