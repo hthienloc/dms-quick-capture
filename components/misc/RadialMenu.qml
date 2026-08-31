@@ -162,15 +162,17 @@ Item {
 
                 // Highlight sector if hovered
                 if (root.selectedIndex === i) {
-                    ctx.fillStyle = Theme.primary;
+                    var preset = root.presets[i];
+                    ctx.fillStyle = (preset && preset.color) ? preset.color : Theme.primary;
                 } else {
-                    ctx.fillStyle = Theme.withAlpha(Theme.surfaceContainerHigh, 0.88);
+                    ctx.fillStyle = Theme.surfaceContainerHigh;
                 }
                 ctx.fill();
 
                 // Draw delicate border lines between sectors
-                ctx.strokeStyle = root.selectedIndex === i ? Theme.primary : Theme.withAlpha(Theme.outline, 0.15);
-                ctx.lineWidth = root.selectedIndex === i ? 2 : 1;
+                var isSelected = root.selectedIndex === i;
+                ctx.strokeStyle = isSelected ? Theme.onPrimary : Theme.withAlpha(Theme.outline, 0.15);
+                ctx.lineWidth = isSelected ? 2.5 : 1;
                 ctx.stroke();
             }
         }
@@ -232,10 +234,24 @@ Item {
         radius: root.centerRadius
         anchors.centerIn: parent
 
-        // Glow matching Matugen primary
-        color: root.selectedIndex === -2 ? Theme.withAlpha(Theme.primary, 0.12) : Theme.surfaceContainerHighest
-        border.color: root.selectedIndex === -2 ? Theme.primary : Theme.withAlpha(Theme.outline, 0.4)
-        border.width: root.selectedIndex === -2 ? 2.5 : 1
+        // Glow matching Matugen primary / preset color
+        color: {
+            if (root.selectedIndex === -2) return Theme.withAlpha(Theme.primary, 0.12);
+            if (root.selectedIndex >= 0 && root.selectedIndex < root.presets.length) {
+                var p = root.presets[root.selectedIndex];
+                return p && p.color ? Theme.withAlpha(p.color, 0.15) : Theme.withAlpha(Theme.primary, 0.15);
+            }
+            return Theme.surfaceContainerHighest;
+        }
+        border.color: {
+            if (root.selectedIndex === -2) return Theme.primary;
+            if (root.selectedIndex >= 0 && root.selectedIndex < root.presets.length) {
+                var p = root.presets[root.selectedIndex];
+                return p && p.color ? p.color : Theme.primary;
+            }
+            return Theme.withAlpha(Theme.outline, 0.4);
+        }
+        border.width: (root.selectedIndex >= 0 || root.selectedIndex === -2) ? 2.5 : 1
 
         scale: root.selectedIndex === -2 ? 1.05 : 1.0
         Behavior on scale { NumberAnimation { duration: 100 } }
