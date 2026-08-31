@@ -1046,6 +1046,9 @@ function copyStrokeProperties(source, target) {
     if (source.randomize !== undefined) target.randomize = source.randomize;
     if (source.randomSeed !== undefined) target.randomSeed = source.randomSeed;
     if (source.rotation !== undefined) target.rotation = source.rotation;
+    if (source.source !== undefined) target.source = source.source;
+    if (source.originalAspectRatio !== undefined) target.originalAspectRatio = source.originalAspectRatio;
+    if (source.opacity !== undefined) target.opacity = source.opacity;
 }
 
 /**

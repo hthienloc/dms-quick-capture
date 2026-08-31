@@ -3541,6 +3541,19 @@ Item {
                         points: rs.points ? rs.points.map(p => Qt.point(p.x, p.y)) : []
                     };
                     Helpers.copyStrokeProperties(rs, stroke);
+                    if (rs.tool === "image" && rs.source) {
+                        const restoredImg = Qt.createQmlObject('import QtQuick; Image { visible: false; source: "' + rs.source + '" }', window, "restoredImgLoader_" + rsi + "_" + Date.now());
+                        if (restoredImg) {
+                            stroke.imageObj = restoredImg;
+                            if (restoredImg.status !== Image.Ready) {
+                                restoredImg.statusChanged.connect(function() {
+                                    if (restoredImg.status === Image.Ready) {
+                                        window.requestPaintAll();
+                                    }
+                                });
+                            }
+                        }
+                    }
                     restoredStrokes.push(stroke);
                 }
                 window.strokes = restoredStrokes;
