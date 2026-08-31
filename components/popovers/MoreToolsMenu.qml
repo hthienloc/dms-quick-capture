@@ -273,6 +273,28 @@ Rectangle {
                 color: menuRoot.watermarkEnabled ? Theme.primary : Theme.surfaceText
             }
 
+            Rectangle {
+                id: watermarkBadge
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.spacingS
+                anchors.verticalCenter: parent.verticalCenter
+                height: 18
+                width: Math.max(18, watermarkShortcutText.implicitWidth + 8)
+                radius: 4
+                color: menuRoot.watermarkEnabled ? Theme.withAlpha(Theme.primary, 0.25) : (watermarkMouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.20) : Theme.withAlpha(Theme.surfaceContainerHighest, 0.8))
+                border.color: Theme.withAlpha(Theme.outline, 0.2)
+                border.width: 1
+
+                StyledText {
+                    id: watermarkShortcutText
+                    anchors.centerIn: parent
+                    text: "M"
+                    font.pixelSize: Theme.fontSizeSmall - 2
+                    font.weight: Font.Bold
+                    color: menuRoot.watermarkEnabled ? Theme.primary : Theme.surfaceVariantText
+                }
+            }
+
             MouseArea {
                 id: watermarkMouseArea
                 anchors.fill: parent
@@ -306,6 +328,7 @@ Rectangle {
         MenuActionItem {
             iconName: "add_photo_alternate"
             text: I18n.tr("Insert Image")
+            shortcut: "I"
             onActivated: {
                 menuRoot.close();
                 menuRoot.insertImageRequested();
@@ -314,7 +337,8 @@ Rectangle {
 
         MenuActionItem {
             iconName: "document_scanner"
-            text: I18n.tr("OCR (O)")
+            text: I18n.tr("OCR")
+            shortcut: "O"
             onActivated: {
                 menuRoot.close();
                 menuRoot.ocrRequested();
@@ -332,7 +356,8 @@ Rectangle {
 
         MenuActionItem {
             iconName: "auto_fix_normal"
-            text: I18n.tr("Eraser (T)")
+            text: I18n.tr("Eraser")
+            shortcut: "T"
             onActivated: {
                 menuRoot.close();
                 menuRoot.eraserRequested();

@@ -3126,6 +3126,14 @@ Item {
         return false;
     }
 
+    function handleWatermarkShortcut(event, token, hasCtrl) {
+        if (token === "M" && !hasCtrl) {
+            window.setWatermarkEnabled(!window.watermarkEnabled);
+            return window.acceptKeyEvent(event);
+        }
+        return false;
+    }
+
     function handleToolShortcut(event, token) {
         const toolShortcut = Helpers.findByKey(config.toolShortcuts, token);
         if (!toolShortcut) return false;
@@ -3207,6 +3215,7 @@ Item {
         }
 
         if (window.handleInsertImageShortcut(event, token, hasCtrl)) return;
+        if (window.handleWatermarkShortcut(event, token, hasCtrl)) return;
         if (window.handleOcrShortcut(event, token, hasCtrl)) return;
         window.handleToolShortcut(event, token);
     }

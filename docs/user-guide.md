@@ -43,6 +43,7 @@ Select a region, press <kbd>Space</kbd> or <kbd>Enter</kbd> to confirm, scroll t
 | <kbd>Z</kbd> | Area Zoom (Callout) |
 | <kbd>B</kbd> | Background Options |
 | <kbd>I</kbd> | Insert Image |
+| <kbd>M</kbd> | Toggle Watermark |
 | <kbd>O</kbd> | OCR Text Recognition |
 | <kbd>G</kbd> (hold) | Magnifier Lens |
 | <kbd>V</kbd> | Select |

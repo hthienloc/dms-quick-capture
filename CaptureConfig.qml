@@ -204,7 +204,8 @@ QtObject {
         { key: "T", tool: "eraser" },
         { key: "Z", tool: "callout" },
         { key: "B", tool: "background" },
-        { key: "I", tool: "insert_image" }
+        { key: "I", tool: "insert_image" },
+        { key: "M", tool: "watermark" }
     ]
 
     readonly property var colorShortcuts: [
