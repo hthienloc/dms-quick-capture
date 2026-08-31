@@ -45,15 +45,60 @@ Item {
         }
     ]
 
+    property bool hasDragged: false
+
     function open(x, y) {
         root.x = x - width / 2;
         root.y = y - height / 2;
         root.visibleState = true;
         selectedIndex = -1;
+        hasDragged = false;
     }
 
     function close() {
         root.visibleState = false;
+    }
+
+    function updateHoverPosition(parentX, parentY) {
+        if (!visibleState) return;
+        const localX = parentX - root.x;
+        const localY = parentY - root.y;
+
+        const dx = localX - width / 2;
+        const dy = localY - height / 2;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist >= 12) {
+            hasDragged = true;
+        }
+
+        if (dist < root.innerRadius) {
+            root.selectedIndex = -1;
+            return;
+        }
+
+        let angle = Math.atan2(dy, dx) * 180 / Math.PI + 90;
+        if (angle < 0) angle += 360;
+
+        const numSectors = root.presets.length || 8;
+        const sectorSize = 360 / numSectors;
+        const idx = Math.floor((angle + sectorSize / 2) % 360 / sectorSize);
+
+        if (idx >= 0 && idx < numSectors) {
+            root.selectedIndex = idx;
+        }
+    }
+
+    function confirmAndClose(isRelease) {
+        if (!visibleState) return;
+        if (isRelease && !hasDragged) {
+            // Single right-click tap: keep menu open on screen
+            return;
+        }
+        if (root.selectedIndex >= 0 && root.selectedIndex < root.presets.length) {
+            root.presetSelected(root.presets[root.selectedIndex]);
+        }
+        root.close();
     }
 
     width: outerRadius * 2
@@ -244,49 +289,27 @@ Item {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
         onPositionChanged: (mouse) => {
-            const dx = mouse.x - width / 2;
-            const dy = mouse.y - height / 2;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            
-            // Mouse inside center button -> select center
-            if (dist < root.innerRadius) {
-                root.selectedIndex = -2;
-                return;
-            }
-
-            // Mouse outside outer boundary -> no selection
-            if (dist > root.outerRadius) {
-                root.selectedIndex = -1;
-                return;
-            }
-
-            // Calculate sector index
-            let angle = Math.atan2(dy, dx) * 180 / Math.PI + 90;
-            if (angle < 0) angle += 360;
-            
-            const numSectors = root.presets.length || 8;
-            const sectorSize = 360 / numSectors;
-            // Shift angle to align sector boundaries correctly
-            const idx = Math.floor((angle + sectorSize / 2) % 360 / sectorSize);
-            
-            if (idx >= 0 && idx < numSectors) {
-                root.selectedIndex = idx;
-            }
+            root.updateHoverPosition(root.x + mouse.x, root.y + mouse.y);
         }
 
         onReleased: (mouse) => {
-            if (root.selectedIndex >= 0 && root.selectedIndex < root.presets.length) {
-                root.presetSelected(root.presets[root.selectedIndex]);
-            } else if (root.selectedIndex === -2) {
-                // Clicked center
-                root.centerClicked();
-            }
-            root.close();
+            root.confirmAndClose(false);
         }
-        
+
         onClicked: (mouse) => {
             if (mouse.button === Qt.RightButton) {
                 root.close();
+            } else if (mouse.button === Qt.LeftButton) {
+                const dx = mouse.x - width / 2;
+                const dy = mouse.y - height / 2;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < root.innerRadius) {
+                    root.centerClicked();
+                    root.close();
+                } else if (root.selectedIndex >= 0 && root.selectedIndex < root.presets.length) {
+                    root.presetSelected(root.presets[root.selectedIndex]);
+                    root.close();
+                }
             }
         }
     }

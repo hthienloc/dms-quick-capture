@@ -473,6 +473,12 @@ MouseArea {
     }
 
     onPositionChanged: (mouse) => {
+         if (typeof radialMenu !== "undefined" && radialMenu && radialMenu.visibleState) {
+             const mapped = drawMouseArea.mapToItem(radialMenu.parent, mouse.x, mouse.y);
+             radialMenu.updateHoverPosition(mapped.x, mapped.y);
+             return;
+         }
+
          if (pressed && (mouse.buttons & Qt.LeftButton) && (mouse.modifiers & Qt.ControlModifier) && (mouse.modifiers & Qt.ShiftModifier)) {
              const currentPt = drawMouseArea.mapToItem(window.boardContainerItem, mouse.x, mouse.y);
              if (window.lastPanMouse.x === 0 && window.lastPanMouse.y === 0) {
@@ -857,6 +863,10 @@ MouseArea {
 
     onReleased: (mouse) => {
         shiftLockAxis = "none";
+        if (typeof radialMenu !== "undefined" && radialMenu && radialMenu.visibleState) {
+            radialMenu.confirmAndClose(true);
+            return;
+        }
         if (window.lastPanMouse.x !== 0 || window.lastPanMouse.y !== 0) {
             window.lastPanMouse = Qt.point(0, 0);
             return;
