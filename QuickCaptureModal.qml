@@ -2491,6 +2491,96 @@ Item {
         }
     }
 
+    FileBrowserSurfaceModal {
+        id: insertImageDialog
+        browserTitle: I18n.tr("Insert Image")
+        browserIcon: "add_photo_alternate"
+        browserType: "quick_capture_insert_image"
+        saveMode: false
+        allowStacking: true
+        fileExtensions: ["*.png", "*.jpg", "*.jpeg", "*.webp", "*.svg", "*.gif", "*.bmp"]
+        onFileSelected: path => window.insertImageFromFile(path)
+    }
+
+    Connections {
+        target: insertImageDialog
+        function onDialogClosed() {
+            window.shouldHaveFocus = Qt.binding(() => window.shouldBeVisible);
+            if (window.floatingMode)
+                Qt.callLater(() => window.focusModalAfterToolbarAction());
+        }
+    }
+
+    function openInsertImageDialog() {
+        if (insertImageDialog.shouldBeVisible) return;
+        insertImageDialog.useOverlayLayer = true;
+        insertImageDialog.fileExtensions = ["*.png", "*.jpg", "*.jpeg", "*.webp", "*.svg", "*.gif", "*.bmp"];
+        window.shouldHaveFocus = false;
+        insertImageDialog.open();
+    }
+
+    function insertImageFromFile(filePath) {
+        if (!filePath) return;
+        let fileUrl = String(filePath).trim();
+        if (!fileUrl.startsWith("file://") && !fileUrl.startsWith("http://") && !fileUrl.startsWith("https://") && !fileUrl.startsWith("data:")) {
+            fileUrl = "file://" + fileUrl;
+        }
+
+        const tempImg = Qt.createQmlObject('import QtQuick; Image { visible: false; source: "' + fileUrl + '" }', window, "tempImgLoader_" + Date.now());
+        if (!tempImg) return;
+
+        function processAndInsert() {
+            let origW = tempImg.implicitWidth || tempImg.sourceSize.width || 300;
+            let origH = tempImg.implicitHeight || tempImg.sourceSize.height || 300;
+            if (origW <= 0) origW = 300;
+            if (origH <= 0) origH = 300;
+
+            const visW = window.editWidth || 800;
+            const visH = window.editHeight || 600;
+            const centerX = visW / 2;
+            const centerY = visH / 2;
+
+            const maxW = visW * 0.5;
+            const maxH = visH * 0.5;
+            const scaleFactor = Math.min(1.0, maxW / origW, maxH / origH);
+
+            const finalW = Math.round(origW * scaleFactor);
+            const finalH = Math.round(origH * scaleFactor);
+
+            const x1 = Math.round(centerX - finalW / 2);
+            const y1 = Math.round(centerY - finalH / 2);
+            const x2 = x1 + finalW;
+            const y2 = y1 + finalH;
+
+            const newStroke = {
+                id: "img_" + Date.now(),
+                tool: "image",
+                color: "#000000",
+                width: 1,
+                points: [{ x: x1, y: y1 }, { x: x2, y: y2 }],
+                source: fileUrl,
+                imageObj: tempImg,
+                originalAspectRatio: origW / origH,
+                opacity: 1.0
+            };
+
+            window.strokes = [...window.strokes, newStroke];
+            window.currentTool = "select";
+            window.selectStrokeForEditing(newStroke, true);
+            window.requestPaintAll();
+        }
+
+        if (tempImg.status === Image.Ready) {
+            processAndInsert();
+        } else {
+            tempImg.statusChanged.connect(function() {
+                if (tempImg.status === Image.Ready) {
+                    processAndInsert();
+                }
+            });
+        }
+    }
+
     function getHoveredHandle(mx, my) {
         if (!hasSelection || currentTool !== "crop") return "none";
         const threshold = 15;
@@ -3028,6 +3118,14 @@ Item {
         return false;
     }
 
+    function handleInsertImageShortcut(event, token, hasCtrl) {
+        if (token === "I" && !hasCtrl) {
+            window.openInsertImageDialog();
+            return window.acceptKeyEvent(event);
+        }
+        return false;
+    }
+
     function handleToolShortcut(event, token) {
         const toolShortcut = Helpers.findByKey(config.toolShortcuts, token);
         if (!toolShortcut) return false;
@@ -3108,6 +3206,7 @@ Item {
             return;
         }
 
+        if (window.handleInsertImageShortcut(event, token, hasCtrl)) return;
         if (window.handleOcrShortcut(event, token, hasCtrl)) return;
         window.handleToolShortcut(event, token);
     }
@@ -3228,6 +3327,11 @@ Item {
         }
         if (event.key === Qt.Key_Escape && saveAsDialog.shouldBeVisible) {
             saveAsDialog.close();
+            window.acceptKeyEvent(event);
+            return;
+        }
+        if (event.key === Qt.Key_Escape && insertImageDialog.shouldBeVisible) {
+            insertImageDialog.close();
             window.acceptKeyEvent(event);
             return;
         }
@@ -4551,6 +4655,7 @@ Item {
                     onEraserRequested: window.currentTool = "eraser"
                     onWatermarkToggled: (enabled) => window.setWatermarkEnabled(enabled)
                     onEditorPresentationToggled: window.togglePresentationMode()
+                    onInsertImageRequested: window.openInsertImageDialog()
                     onCopyColorRequested: {
                         window.colorPickerMode = "copy";
                         window.currentTool = "colorpicker";

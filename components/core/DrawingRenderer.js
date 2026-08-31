@@ -1304,6 +1304,26 @@ function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
             }
         }
         ctx.restore();
+
+    } else if (stroke.tool === "image") {
+        if (stroke.points && stroke.points.length >= 2) {
+            const p0 = stroke.points[0];
+            const p1 = stroke.points[stroke.points.length - 1];
+            const bounds = Helpers.getRectBounds(p0, p1);
+            const rx = bounds.x1;
+            const ry = bounds.y1;
+            const rw = bounds.x2 - bounds.x1;
+            const rh = bounds.y2 - bounds.y1;
+
+            if (rw > 0 && rh > 0 && stroke.imageObj) {
+                ctx.save();
+                if (stroke.opacity !== undefined && stroke.opacity !== 1.0) {
+                    ctx.globalAlpha = stroke.opacity;
+                }
+                ctx.drawImage(stroke.imageObj, rx, ry, rw, rh);
+                ctx.restore();
+            }
+        }
     }
 }
 
@@ -1357,7 +1377,7 @@ function drawSelectionHandles(ctx, stroke, Theme, Qt, Helpers) {
     }
 
     if (stroke.tool === "rect" || stroke.tool === "redact" ||
-        stroke.tool === "pixelate" || stroke.tool === "spotlight") {
+        stroke.tool === "pixelate" || stroke.tool === "spotlight" || stroke.tool === "image") {
         if (stroke.points.length < 2) return;
         const p0 = stroke.points[0];
         const p1 = stroke.points[stroke.points.length - 1];

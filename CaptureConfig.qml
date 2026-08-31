@@ -203,7 +203,8 @@ QtObject {
         { key: "F", tool: "colorpicker" },
         { key: "T", tool: "eraser" },
         { key: "Z", tool: "callout" },
-        { key: "B", tool: "background" }
+        { key: "B", tool: "background" },
+        { key: "I", tool: "insert_image" }
     ]
 
     readonly property var colorShortcuts: [

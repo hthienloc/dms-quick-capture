@@ -536,6 +536,14 @@ function getStrokeBBox(stroke, measureTextBoundsFn) {
             minY = p0.y - radius;
             maxY = p0.y + radius;
         }
+    } else if (stroke.tool === "image") {
+        const p0 = pts[0];
+        const p1 = pts[len - 1];
+        const bounds = getRectBounds(p0, p1);
+        minX = bounds.x1;
+        minY = bounds.y1;
+        maxX = bounds.x2;
+        maxY = bounds.y2;
     } else {
         for (let i = 0; i < len; i++) {
             const p = pts[i];
@@ -626,7 +634,7 @@ function findStrokeAt(mx, my, strokes, measureTextBoundsFn) {
                     return i;
                 }
             }
-        } else if (stroke.tool === "pixelate" || stroke.tool === "spotlight") {
+        } else if (stroke.tool === "pixelate" || stroke.tool === "spotlight" || stroke.tool === "image") {
             const p0 = stroke.points[0];
             const p1 = stroke.points[stroke.points.length - 1];
             const bounds = getRectBounds(p0, p1);
@@ -746,7 +754,7 @@ function getStrokeHandleAt(mx, my, stroke, measureTextBoundsFn) {
     }
 
     if (stroke.tool === "rect" || stroke.tool === "ellipse" || stroke.tool === "redact" ||
-        stroke.tool === "pixelate" || stroke.tool === "spotlight") {
+        stroke.tool === "pixelate" || stroke.tool === "spotlight" || stroke.tool === "image") {
         if (stroke.points.length < 2) return "none";
         const p0 = stroke.points[0];
         const p1 = stroke.points[stroke.points.length - 1];

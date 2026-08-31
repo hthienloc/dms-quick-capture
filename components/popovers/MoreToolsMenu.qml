@@ -33,6 +33,7 @@ Rectangle {
     signal eraserRequested()
     signal watermarkToggled(bool enabled)
     signal editorPresentationToggled()
+    signal insertImageRequested()
 
     states: [
         State {
@@ -302,7 +303,15 @@ Rectangle {
             color: Theme.withAlpha(Theme.outline, 0.15)
         }
 
-        // ── Tools ─────────────────────────────────────────────────────────
+        MenuActionItem {
+            iconName: "add_photo_alternate"
+            text: I18n.tr("Insert Image")
+            onActivated: {
+                menuRoot.close();
+                menuRoot.insertImageRequested();
+            }
+        }
+
         MenuActionItem {
             iconName: "document_scanner"
             text: I18n.tr("OCR (O)")

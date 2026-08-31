@@ -99,7 +99,7 @@ MouseArea {
     }
 
     // Applies the shared rectangle resize rules used by shapes and callouts.
-    function resizeRectEndpoints(p0, p1, handle, dx, dy, keepSquare) {
+    function resizeRectEndpoints(p0, p1, handle, dx, dy, keepSquare, targetRatio) {
         let x1 = Math.min(p0.x, p1.x);
         let y1 = Math.min(p0.y, p1.y);
         let x2 = Math.max(p0.x, p1.x);
@@ -118,11 +118,22 @@ MouseArea {
         }
 
         if (keepSquare && ["tl", "tr", "bl", "br"].indexOf(handle) !== -1) {
-            const side = Math.max(x2 - x1, y2 - y1);
-            if (handle === "br") { x2 = x1 + side; y2 = y1 + side; }
-            else if (handle === "tl") { x1 = x2 - side; y1 = y2 - side; }
-            else if (handle === "tr") { x2 = x1 + side; y1 = y2 - side; }
-            else if (handle === "bl") { x1 = x2 - side; y2 = y1 + side; }
+            const ratio = (targetRatio && targetRatio > 0) ? targetRatio : 1.0;
+            const currentW = x2 - x1;
+            const currentH = y2 - y1;
+            if (currentW / Math.max(1, currentH) > ratio) {
+                const newH = currentW / ratio;
+                if (handle === "br") { y2 = y1 + newH; }
+                else if (handle === "tl") { y1 = y2 - newH; }
+                else if (handle === "tr") { y1 = y2 - newH; }
+                else if (handle === "bl") { y2 = y1 + newH; }
+            } else {
+                const newW = currentH * ratio;
+                if (handle === "br") { x2 = x1 + newW; }
+                else if (handle === "tl") { x1 = x2 - newW; }
+                else if (handle === "tr") { x2 = x1 + newW; }
+                else if (handle === "bl") { x1 = x2 - newW; }
+            }
         }
 
         return {
@@ -324,8 +335,19 @@ MouseArea {
                     }
                     window.selectedStroke.rotation = window.originalRotation + angle * 180 / Math.PI;
                 } else if (tool === "rect" || tool === "ellipse" || tool === "redact" ||
-                    tool === "pixelate" || tool === "spotlight") {
-                    const resized = resizeRectEndpoints(orig[0], orig[orig.length - 1], window.activeHandle, dx, dy, mouse.modifiers & Qt.ShiftModifier);
+                    tool === "pixelate" || tool === "spotlight" || tool === "image") {
+                    let imageRatio = 0;
+                    if (tool === "image" && window.selectedStroke) {
+                        const s = window.selectedStroke;
+                        if (s.originalAspectRatio && s.originalAspectRatio > 0) {
+                            imageRatio = s.originalAspectRatio;
+                        } else if (s.imageObj && s.imageObj.implicitHeight > 0) {
+                            imageRatio = s.imageObj.implicitWidth / s.imageObj.implicitHeight;
+                        } else if (s.aspectRatio && s.aspectRatio > 0) {
+                            imageRatio = s.aspectRatio;
+                        }
+                    }
+                    const resized = resizeRectEndpoints(orig[0], orig[orig.length - 1], window.activeHandle, dx, dy, mouse.modifiers & Qt.ShiftModifier, imageRatio);
                     const newPoints = [...window.selectedStroke.points];
                     newPoints[0] = resized.start;
                     newPoints[newPoints.length - 1] = resized.end;
