@@ -437,6 +437,48 @@ function setDashedSelectionStyle(ctx, stroke, Helpers, Qt) {
 }
 
 /**
+ * Draws a dashed rectangle with dashes anchored to absolute screen coordinates.
+ * Prevents dashes on right, bottom, and left edges from sliding/shifting during resize.
+ * @param {object} ctx - The Canvas 2D context.
+ * @param {number} x - X coordinate.
+ * @param {number} y - Y coordinate.
+ * @param {number} w - Width.
+ * @param {number} h - Height.
+ */
+function drawStableDashedRect(ctx, x, y, w, h) {
+    const x1 = Math.min(x, x + w);
+    const x2 = Math.max(x, x + w);
+    const y1 = Math.min(y, y + h);
+    const y2 = Math.max(y, y + h);
+
+    ctx.lineDashOffset = 0;
+
+    // Top edge
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y1);
+    ctx.stroke();
+
+    // Right edge
+    ctx.beginPath();
+    ctx.moveTo(x2, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+
+    // Bottom edge
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x1, y2);
+    ctx.stroke();
+
+    // Left edge
+    ctx.beginPath();
+    ctx.moveTo(x1, y2);
+    ctx.lineTo(x1, y1);
+    ctx.stroke();
+}
+
+/**
  * Draws a high-contrast dual-tone (alternating black and white dashes) selection rectangle.
  * @param {object} ctx - The Canvas 2D context.
  * @param {number} x - X coordinate.
@@ -455,9 +497,8 @@ function drawHighContrastDashedRect(ctx, x, y, w, h) {
 
     // Layer 2: Black dashed line on top (gap reveals white underneath)
     ctx.setLineDash([4, 4]);
-    ctx.lineDashOffset = 0;
     ctx.strokeStyle = "#000000";
-    ctx.strokeRect(x, y, w, h);
+    drawStableDashedRect(ctx, x, y, w, h);
 
     ctx.restore();
 }
@@ -496,6 +537,9 @@ function drawHandlePoints(ctx, points, hh, hs, Theme) {
  */
 function drawStroke(ctx, stroke, Helpers, Qt, Theme, config) {
     if (!stroke || !stroke.points || stroke.points.length === 0) return;
+
+    ctx.setLineDash([]);
+    ctx.lineDashOffset = 0;
 
     const rgb = Helpers.hexToRgb(stroke.color, Qt);
 
@@ -1394,7 +1438,7 @@ function drawSelectionHandles(ctx, stroke, Theme, Qt, Helpers) {
         } else {
             ctx.save();
             setDashedSelectionStyle(ctx, stroke, Helpers, Qt);
-            ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+            drawStableDashedRect(ctx, x1, y1, x2 - x1, y2 - y1);
             ctx.restore();
         }
 
@@ -1540,16 +1584,19 @@ function drawSelectionHandles(ctx, stroke, Theme, Qt, Helpers) {
         const sh = y2 - y1;
         if (sw <= 0 || sh <= 0) return;
 
-        ctx.save();
-        setDashedSelectionStyle(ctx, stroke, Helpers, Qt);
         if (stroke.calloutShape === "ellipse") {
+            ctx.save();
+            setDashedSelectionStyle(ctx, stroke, Helpers, Qt);
             ctx.beginPath();
             drawEllipsePath(ctx, cx, cy, sw / 2, sh / 2);
+            ctx.stroke();
+            ctx.restore();
         } else {
-            ctx.rect(x1, y1, sw, sh);
+            ctx.save();
+            setDashedSelectionStyle(ctx, stroke, Helpers, Qt);
+            drawStableDashedRect(ctx, x1, y1, sw, sh);
+            ctx.restore();
         }
-        ctx.stroke();
-        ctx.restore();
 
         drawHandlePoints(ctx, [
             {x: x1, y: y1}, {x: x2, y: y1},
