@@ -3086,7 +3086,6 @@ Item {
         window.previewX = window.cursorX * window.editScale;
         window.previewY = window.cursorY * window.editScale;
         window.showSizePreview = true;
-        if (typeof previewTimer !== "undefined" && previewTimer) previewTimer.restart();
         return window.acceptKeyEvent(event);
     }
 
@@ -4358,7 +4357,6 @@ Item {
                             anchors.fill: parent
                             window: rootWindow
                             drawingCanvas: drawingCanvas
-                            previewTimer: previewTimer
                             magnifier: magnifier
                             radialMenu: radialMenu
                             textInputDialog: textInputDialog
@@ -4417,16 +4415,6 @@ Item {
                         id: sizePreviewItem
                         window: rootWindow
                         drawingCanvas: drawingCanvas
-                    }
-
-                    Timer {
-                        id: previewTimer
-                        interval: 800
-                        running: false
-                        repeat: false
-                        onTriggered: {
-                            window.showSizePreview = false;
-                        }
                     }
 
                     MagnifierLoupe {

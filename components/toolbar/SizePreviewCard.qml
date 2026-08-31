@@ -19,6 +19,35 @@ Rectangle {
     x: mappedPos.x - (width / 2)
     y: mappedPos.y - (height / 2)
 
+    onVisibleChanged: {
+        if (visible) {
+            hideTimer.restart();
+        } else {
+            hideTimer.stop();
+        }
+    }
+
+    onShapeWidthChanged: {
+        if (visible) {
+            hideTimer.restart();
+        }
+    }
+
+    onMappedPosChanged: {
+        if (visible) {
+            hideTimer.restart();
+        }
+    }
+
+    Timer {
+        id: hideTimer
+        interval: 800
+        repeat: false
+        onTriggered: {
+            window.showSizePreview = false;
+        }
+    }
+
     readonly property bool _showShape: window.effectiveTool !== "spotlight"
 
     width: _showShape ? shapeWidth : 0

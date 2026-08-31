@@ -12,7 +12,6 @@ MouseArea {
 
     required property var window
     required property var drawingCanvas
-    required property var previewTimer
     required property var magnifier
     required property var radialMenu
     required property var textInputDialog
@@ -1021,7 +1020,6 @@ MouseArea {
           window.previewX = wheel.x;
           window.previewY = wheel.y;
           window.showSizePreview = true;
-          previewTimer.restart();
           wheel.accepted = true;
      }
 
