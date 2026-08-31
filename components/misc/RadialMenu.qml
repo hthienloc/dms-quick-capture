@@ -12,8 +12,8 @@ Item {
     property int selectedIndex: -1
     
     // Hover Trigger Config
-    property bool hoverTrigger: false
-    property int hoverDelay: 300
+    property bool hoverTrigger: true
+    property int hoverDelay: 200
     property real menuOpacity: 1.0
     
     // Premium geometry config

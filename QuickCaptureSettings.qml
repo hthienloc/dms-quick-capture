@@ -548,7 +548,7 @@ PluginSettings {
             id: skipConfirm
             settingKey: "skipConfirm"
             label: I18n.tr("Skip Confirmation")
-            defaultValue: true
+            defaultValue: false
         }
 
         Separator {}
@@ -1148,7 +1148,7 @@ PluginSettings {
                 { label: I18n.tr("Modal"), value: "modal" },
                 { label: I18n.tr("Floating"), value: "floating" }
             ]
-            defaultValue: "modal"
+            defaultValue: "floating"
         }
 
         ButtonGroupSettingPlus {
@@ -3093,7 +3093,7 @@ PluginSettings {
             settingKey: "radialHoverTrigger"
             label: I18n.tr("Trigger on Hover")
             description: I18n.tr("Auto-select a tool preset on hover, without releasing the mouse.")
-            defaultValue: false
+            defaultValue: true
         }
 
         Separator {
@@ -3105,11 +3105,11 @@ PluginSettings {
             id: radialHoverDelay
             settingKey: "radialHoverDelay"
             label: I18n.tr("Hover Trigger Delay")
-            defaultValue: 300
+            defaultValue: 200
             minimum: 100
-            maximum: 1000
+            maximum: 500
             leftLabel: "100"
-            rightLabel: "1000"
+            rightLabel: "500"
             unit: "ms"
             visible: radialHoverTrigger.value
             height: visible ? implicitHeight : 0

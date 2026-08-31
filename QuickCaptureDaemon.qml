@@ -38,7 +38,7 @@ PluginComponent {
     function modeFlags(mode) {
         const flags = [];
 
-        if (mode === "region" && pluginData.skipConfirm !== false)
+        if (mode === "region" && pluginData.skipConfirm === true)
             flags.push("--no-confirm");
 
         if (mode === "scroll") {
