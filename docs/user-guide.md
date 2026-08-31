@@ -74,6 +74,13 @@ Hold <kbd>Shift</kbd> while drawing to constrain shapes: Pen draws straight line
 | <kbd>Shift</kbd> + right-click with Text active | Text options |
 | <kbd>Shift</kbd> + right-click with Line active | Line options |
 
+### Canvas Zoom and Pan
+
+- **Focal Zoom**: Hold <kbd>Ctrl</kbd> + <kbd>Shift</kbd> and scroll the mouse wheel to zoom in or out centered at the cursor location.
+- **Keyboard Zoom**: Press <kbd>Ctrl</kbd> + <kbd>+</kbd> or <kbd>Ctrl</kbd> + <kbd>=</kbd> to zoom in, <kbd>Ctrl</kbd> + <kbd>-</kbd> to zoom out, and <kbd>Ctrl</kbd> + <kbd>0</kbd> to reset zoom to 100%.
+- **Free Pan**: Hold <kbd>Ctrl</kbd> + <kbd>Shift</kbd> and drag with the left mouse button to pan freely across the canvas.
+- **Directional Scroll**: Hold <kbd>Ctrl</kbd> and scroll to pan vertically; hold <kbd>Shift</kbd> and scroll to pan horizontally.
+
 ### Special Tools
 
 - Hold <kbd>G</kbd> for the magnifier lens and scroll to adjust zoom from 1.5x to 4x.
@@ -93,6 +100,11 @@ Hold <kbd>Shift</kbd> while drawing to constrain shapes: Pen draws straight line
 | <kbd>Ctrl</kbd> + <kbd>A</kbd> | Copy and save |
 | <kbd>Ctrl</kbd> + <kbd>F</kbd> | Float image |
 | <kbd>Ctrl</kbd> + <kbd>X</kbd> | Crop or resize |
+| <kbd>Ctrl</kbd> + <kbd>+</kbd> / <kbd>=</kbd> | Zoom in canvas |
+| <kbd>Ctrl</kbd> + <kbd>-</kbd> | Zoom out canvas |
+| <kbd>Ctrl</kbd> + <kbd>0</kbd> | Reset canvas zoom to 100% |
+| <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + Drag | Free pan canvas |
+| <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + Scroll | Focal zoom canvas centered at cursor |
 | <kbd>Ctrl</kbd> + <kbd>1</kbd> to <kbd>4</kbd> | Select color slots 1 to 4 |
 | <kbd>Ctrl</kbd> + <kbd>Q</kbd> to <kbd>R</kbd> | Select color slots 5 to 8 |
 
