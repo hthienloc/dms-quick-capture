@@ -76,15 +76,7 @@ Rectangle {
             if (window.effectiveBackgroundMode !== "none") {
                 window.drawEditorBackground(ctx, window.canvasWidth, window.canvasHeight);
                 window.drawScreenshotShadow(ctx, magnifier.zoomFactor);
-                
-                // Draw screenshot image directly to bypass nested clip path bug in Qt Canvas
-                if (bgImage.status === Image.Ready) {
-                    if (window.hasSelection) {
-                        ctx.drawImage(bgImage, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, window.screenshotXOffset, window.screenshotYOffset, window.screenshotWidth, window.screenshotHeight);
-                    } else {
-                        ctx.drawImage(bgImage, window.screenshotXOffset, window.screenshotYOffset, window.screenshotWidth, window.screenshotHeight);
-                    }
-                }
+                window.drawScreenshotImage(ctx, bgImage, true);
                 
                 // 2. Draw annotations
                 if (window.showAnnotations) {
@@ -104,11 +96,7 @@ Rectangle {
                 }
             } else {
                 if (staticBgImage.status === Image.Ready || staticBgImage.width > 0) {
-                    if (window.hasActiveCropSelection) {
-                        ctx.drawImage(staticBgImage, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, 0, 0, window.canvasWidth, window.canvasHeight);
-                    } else {
-                        ctx.drawImage(staticBgImage, 0, 0, window.canvasWidth, window.canvasHeight);
-                    }
+                    window.drawExportBackgroundLayer(ctx, staticBgImage, false, 1.0);
                 }
                 if (window.showAnnotations) {
                     for (var i = 0; i < window.strokes.length; i++) {

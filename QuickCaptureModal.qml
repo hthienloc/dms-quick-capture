@@ -1257,7 +1257,7 @@ Item {
         ctx.restore();
     }
 
-    function drawScreenshotImage(ctx, imgSource) {
+    function drawScreenshotImage(ctx, imgSource, skipClip) {
         if (!imgSource || imgSource.status !== Image.Ready) return;
         ctx.save();
         ctx.imageSmoothingEnabled = true;
@@ -1272,22 +1272,24 @@ Item {
         const w = layout.w;
         const h = layout.h;
         
-        ctx.beginPath();
-        if (r > 0) {
-            ctx.moveTo(x + r, y);
-            ctx.lineTo(x + w - r, y);
-            ctx.arcTo(x + w, y, x + w, y + r, r);
-            ctx.lineTo(x + w, y + h - r);
-            ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
-            ctx.lineTo(x + r, y + h);
-            ctx.arcTo(x, y + h, x, y + h - r, r);
-            ctx.lineTo(x, y + r);
-            ctx.arcTo(x, y, x + r, y, r);
-        } else {
-            ctx.rect(x, y, w, h);
+        if (!skipClip) {
+            ctx.beginPath();
+            if (r > 0) {
+                ctx.moveTo(x + r, y);
+                ctx.lineTo(x + w - r, y);
+                ctx.arcTo(x + w, y, x + w, y + r, r);
+                ctx.lineTo(x + w, y + h - r);
+                ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+                ctx.lineTo(x + r, y + h);
+                ctx.arcTo(x, y + h, x, y + h - r, r);
+                ctx.lineTo(x, y + r);
+                ctx.arcTo(x, y, x + r, y, r);
+            } else {
+                ctx.rect(x, y, w, h);
+            }
+            ctx.closePath();
+            ctx.clip();
         }
-        ctx.closePath();
-        ctx.clip();
         
         const rawW = imgSource.sourceSize.width;
         const rawH = imgSource.sourceSize.height;
@@ -2100,11 +2102,29 @@ Item {
 
         if (window.currentTool !== "colorpicker" || imgSource.status !== Image.Ready) return;
 
+        ctx.save();
+        const rawW = imgSource.sourceSize.width;
+        const rawH = imgSource.sourceSize.height;
+        const isRotated90 = (window.bgRotation === 90 || window.bgRotation === 270);
+        const uncroppedW = isRotated90 ? rawH : rawW;
+        const uncroppedH = isRotated90 ? rawW : rawH;
+
         if (window.hasSelection) {
-            ctx.drawImage(imgSource, window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height, 0, 0, window.canvasWidth, window.canvasHeight);
-        } else {
-            ctx.drawImage(imgSource, 0, 0, window.canvasWidth, window.canvasHeight);
+            ctx.translate(-window.cropRect.x, -window.cropRect.y);
         }
+
+        ctx.translate(uncroppedW / 2, uncroppedH / 2);
+        if (window.bgRotation !== 0) {
+            ctx.rotate(window.bgRotation * Math.PI / 180);
+        }
+        const sx = window.bgFlipH ? -1 : 1;
+        const sy = window.bgFlipV ? -1 : 1;
+        if (sx !== 1 || sy !== 1) {
+            ctx.scale(sx, sy);
+        }
+
+        ctx.drawImage(imgSource, -rawW / 2, -rawH / 2, rawW, rawH);
+        ctx.restore();
     }
 
     function drawExportBackgroundLayer(ctx, imgSource, isBackgroundActive, exportDpr) {
