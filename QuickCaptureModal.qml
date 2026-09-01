@@ -2176,7 +2176,7 @@ Item {
 
     function finishExportCanvas(canvas) {
         const tempOut = `/tmp/dms_capture_${Date.now()}.png`;
-        canvas.save(tempOut, Qt.size(canvas.outputPixelWidth, canvas.outputPixelHeight));
+        canvas.save(tempOut);
 
         if (window.exportCallback) {
             const cb = window.exportCallback;
