@@ -507,31 +507,14 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Capture Options")
             icon: "settings"
-            showReset: outputTargetName.isDirty || defaultHideControlCenter.isDirty || skipConfirm.isDirty || includeCursor.isDirty || resetLastRegion.isDirty || screenshotBackend.isDirty
+            showReset: outputTargetName.isDirty || defaultHideControlCenter.isDirty || skipConfirm.isDirty || includeCursor.isDirty || resetLastRegion.isDirty
             onResetClicked: {
                 outputTargetName.resetToDefault();
                 defaultHideControlCenter.resetToDefault();
                 skipConfirm.resetToDefault();
                 includeCursor.resetToDefault();
                 resetLastRegion.resetToDefault();
-                screenshotBackend.resetToDefault();
             }
-        }
-
-        ButtonGroupSettingPlus {
-            id: screenshotBackend
-            settingKey: "screenshotBackend"
-            label: I18n.tr("Screenshot Backend")
-            options: [
-                { label: I18n.tr("Old"), value: "dms" },
-                { label: I18n.tr("New"), value: "rust" }
-            ]
-            defaultValue: "dms"
-        }
-
-        InfoText {
-            text: I18n.tr("Install the Rust backend with the command documented in the plugin README before selecting New Backend.")
-            opacity: 0.85
         }
 
         StringSettingPlus {

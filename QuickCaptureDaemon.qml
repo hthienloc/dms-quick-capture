@@ -48,8 +48,7 @@ PluginComponent {
 
         if (mode === "output") {
             const outName = root.captureOutputName || pluginData.outputTargetName || "";
-            if (outName || !root.usesNewScreenshotBackend(mode))
-                flags.push("--output", outName || "DP-1");
+            flags.push("--output", outName || "DP-1");
         }
 
         if (pluginData.resetLastRegion)
@@ -58,29 +57,11 @@ PluginComponent {
         return flags;
     }
 
-    function usesNewScreenshotBackend(mode) {
-        return (pluginData.screenshotBackend || "dms") === "rust" &&
-            ["region", "window", "full", "output", "all", "last", "scroll"].includes(mode);
-    }
-
-    function newScreenshotBackendCommand() {
-        if (pluginService && pluginId) {
-            const pluginPath = pluginService.getPluginPath(pluginId);
-            if (pluginPath)
-                return pluginPath + "/backend/dms-screenshot-rs";
-        }
-        return "dms-screenshot-rs";
-    }
-
     function screenshotArgs(mode, filename) {
         const cursorVal = pluginData.includeCursor ? "on" : "off";
-        const command = usesNewScreenshotBackend(mode) ? root.newScreenshotBackendCommand() : "dms";
-        const args = usesNewScreenshotBackend(mode)
-            ? [command, mode]
-            : [command, "screenshot", mode];
-        return args.concat(["--no-clipboard", "--dir", "/tmp",
+        return ["dms", "screenshot", mode, "--no-clipboard", "--dir", "/tmp",
                 "--filename", filename, "--format", "png", "--cursor", cursorVal,
-                "--no-notify", "--json"], root.modeFlags(mode));
+                "--no-notify", "--json"].concat(root.modeFlags(mode));
     }
 
     function triggerCaptureWithAction(mode, action) {
@@ -147,7 +128,6 @@ PluginComponent {
         const mode = root.pendingCaptureMode;
         const action = root.pendingCaptureAction;
         const timeout = mode === "scroll" ? root.scrollCaptureTimeoutMs : root.captureTimeoutMs;
-        const newBackend = root.usesNewScreenshotBackend(mode);
 
         root.currentCapturePath = root.capturePath();
         const filename = root.currentCapturePath.split("/").pop();
@@ -166,11 +146,7 @@ PluginComponent {
                     root.toastError(meta.message || meta.error || I18n.tr("Screenshot failed (mode: %1).").arg(mode));
                 }
             } catch (e) {
-                if (newBackend) {
-                    root.toastError(I18n.tr("The Rust screenshot backend is not installed or unavailable for this architecture."));
-                } else {
-                    root.toastError((stdout && stdout.trim()) || I18n.tr("Screenshot failed (mode: %1).").arg(mode));
-                }
+                root.toastError((stdout && stdout.trim()) || I18n.tr("Screenshot failed (mode: %1).").arg(mode));
             }
         }, 0, timeout);
     }
