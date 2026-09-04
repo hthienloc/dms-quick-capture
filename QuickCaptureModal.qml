@@ -10,7 +10,6 @@ import qs.Modals.FileBrowser
 import qs.Services
 import "./dms-common"
 import "components/core"
-import "components/floating"
 import "components/misc"
 import "components/popovers"
 import "components/toolbar"
@@ -107,7 +106,7 @@ Item {
         onBackgroundClicked: window.backgroundClicked()
     }
 
-    QuickCaptureFloatingWindow {
+    DankFloatingWindow {
         id: floatingSurface
         title: I18n.tr("Quick Capture")
         objectName: "quickCaptureEditor"

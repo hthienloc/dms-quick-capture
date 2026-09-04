@@ -19,7 +19,7 @@ Screenshot annotation plugin for DankMaterialShell.
 
 | Dependency | Purpose |
 | --- | --- |
-| DankMaterialShell >= **1.5.2** | Required for scrolling capture |
+| DankMaterialShell >= **1.6.0** | Required for floating window and scrolling capture |
 | **ImageMagick** (`magick`/`mogrify`) | WebP/JPEG exports and OCR/QR crop |
 | **img2pdf** | PDF export |
 | **tesseract** | OCR text scanner |
