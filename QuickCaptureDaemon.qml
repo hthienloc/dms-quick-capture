@@ -515,10 +515,6 @@ PluginComponent {
         daemon: root
     }
 
-    RecordingRegionBorder {
-        id: recordingRegionBorderItem
-        recordingController: recordingControllerItem
-    }
 
     // ── Lifecycle: register self so widget surface can delegate to daemon ─────
     Component.onCompleted: {

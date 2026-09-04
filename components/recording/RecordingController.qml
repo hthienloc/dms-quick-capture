@@ -40,7 +40,6 @@ Item {
     readonly property string systemAudioDevice: pluginData.systemAudioDevice || "default_output"
     readonly property string micDevice: pluginData.micDevice || "default_input"
     readonly property string audioCodec: pluginData.audioCodec || "opus"
-    readonly property bool showRegionBorder: pluginData.showRegionBorder !== false
 
     property var audioInputsList: [{"label": I18n.tr("Default Microphone"), "value": "default_input"}]
     property var audioOutputsList: [{"label": I18n.tr("Default Output"), "value": "default_output"}]
