@@ -18,6 +18,14 @@ PluginComponent {
 
     readonly property alias recordingController: recordingControllerItem
     readonly property bool isRecording: recordingControllerItem ? recordingControllerItem.isRecording : false
+    readonly property var audioInputsList: recordingControllerItem ? recordingControllerItem.audioInputsList : [{"label": I18n.tr("Default Microphone"), "value": "default_input"}]
+    readonly property var audioOutputsList: recordingControllerItem ? recordingControllerItem.audioOutputsList : [{"label": I18n.tr("Default Output"), "value": "default_output"}]
+    readonly property string systemAudioDevice: pluginData.systemAudioDevice || "default_output"
+    readonly property string micDevice: pluginData.micDevice || "default_input"
+
+    function refreshAudioDevices() {
+        if (recordingControllerItem) recordingControllerItem.refreshAudioDevices();
+    }
 
     // ── State ────────────────────────────────────────────────────────────────
     property string widgetMode: "photo"
@@ -518,6 +526,9 @@ PluginComponent {
             const newInstances = Object.assign({}, pluginService.pluginInstances);
             newInstances[pluginId] = root;
             pluginService.pluginInstances = newInstances;
+            if (typeof pluginService.setGlobalVar === "function") {
+                pluginService.setGlobalVar(pluginId, "instance", root);
+            }
         }
     }
 

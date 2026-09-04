@@ -16,7 +16,7 @@ PluginComponent {
     // ── Bar Pill appearance ───────────────────────────────────────────────────
     readonly property bool isActive: daemon ? (daemon.isCapturing || daemon.isAnnotating) : false
     readonly property bool isDownloading: daemon ? daemon.isDownloading : false
-    readonly property bool blinkRecordDot: pluginData.blinkRecordDot ?? false
+    readonly property bool blinkRecordDot: pluginData.blinkRecordDot ?? true
     readonly property bool showRecordingDot: pluginData.showRecordingDot ?? true
     readonly property bool showPillBorder: pluginData.showPillBorder ?? false
     readonly property int recordingIconSize: showPillBorder ? 12 : Theme.iconSizeSmall
@@ -31,8 +31,40 @@ PluginComponent {
         ? (daemon.pluginData.recordMic ?? false)
         : (pluginData.recordMic ?? false)
     readonly property bool recordSystemAudio: (daemon && daemon.pluginData && daemon.pluginData.recordSystemAudio !== undefined)
-        ? (daemon.pluginData.recordSystemAudio ?? false)
-        : (pluginData.recordSystemAudio ?? false)
+        ? (daemon.pluginData.recordSystemAudio ?? true)
+        : (pluginData.recordSystemAudio ?? true)
+
+    readonly property string systemAudioDevice: (daemon && daemon.pluginData && daemon.pluginData.systemAudioDevice !== undefined)
+        ? (daemon.pluginData.systemAudioDevice || "default_output")
+        : (pluginData.systemAudioDevice || "default_output")
+    readonly property string micDevice: (daemon && daemon.pluginData && daemon.pluginData.micDevice !== undefined)
+        ? (daemon.pluginData.micDevice || "default_input")
+        : (pluginData.micDevice || "default_input")
+
+    readonly property var audioInputsList: daemon && daemon.audioInputsList && daemon.audioInputsList.length > 0
+        ? daemon.audioInputsList
+        : [{"label": I18n.tr("Default Microphone"), "value": "default_input"}]
+    readonly property var audioOutputsList: daemon && daemon.audioOutputsList && daemon.audioOutputsList.length > 0
+        ? daemon.audioOutputsList
+        : [{"label": I18n.tr("Default Output"), "value": "default_output"}]
+
+    readonly property string currentMicLabel: {
+        const list = root.audioInputsList;
+        const val = root.micDevice;
+        for (let i = 0; i < list.length; i++) {
+            if (list[i].value === val) return list[i].label;
+        }
+        return val === "default_input" ? I18n.tr("Default Microphone") : val;
+    }
+
+    readonly property string currentAudioLabel: {
+        const list = root.audioOutputsList;
+        const val = root.systemAudioDevice;
+        for (let i = 0; i < list.length; i++) {
+            if (list[i].value === val) return list[i].label;
+        }
+        return val === "default_output" ? I18n.tr("Default Output") : val;
+    }
 
     function savePluginData(key, value) {
         if (daemon && typeof daemon.savePluginData === "function") {
@@ -105,7 +137,9 @@ PluginComponent {
 
     // ── Popout (left-click menu) ──────────────────────────────────────────────
     popoutWidth: 260
-    popoutHeight: root.widgetMode === "video" ? (root.daemon && root.daemon.isRecording ? 240 : 280) : (outputExpanded ? 445 + Math.min(outputList.length, 5) * 32 : 445)
+    popoutHeight: root.widgetMode === "video"
+        ? (root.daemon && root.daemon.isRecording ? 240 : 290)
+        : (outputExpanded ? 445 + Math.min(outputList.length, 5) * 32 : 445)
 
     popoutContent: Component {
         PopoutComponent {
@@ -113,6 +147,12 @@ PluginComponent {
             headerText: I18n.tr("Quick Capture")
             showCloseButton: false
             closePopout: () => root.closePopout()
+
+            Component.onCompleted: {
+                if (root.daemon && typeof root.daemon.refreshAudioDevices === "function") {
+                    root.daemon.refreshAudioDevices();
+                }
+            }
 
             headerActions: Component {
                 Row {
@@ -586,11 +626,21 @@ PluginComponent {
                             anchors.horizontalCenter: parent.horizontalCenter
 
                             Rectangle {
+                                id: toolbarRecordDot
                                 width: 10
                                 height: 10
                                 radius: 5
                                 color: (root.daemon && root.daemon.recordingController && root.daemon.recordingController.isPaused) ? Theme.warning : Theme.error
                                 anchors.verticalCenter: parent.verticalCenter
+                                opacity: 1.0
+
+                                SequentialAnimation {
+                                    running: root.daemon && root.daemon.isRecording && root.daemon.recordingController && !root.daemon.recordingController.isPaused && root.blinkRecordDot
+                                    loops: Animation.Infinite
+                                    NumberAnimation { target: toolbarRecordDot; property: "opacity"; to: 0.35; duration: 800; easing.type: Easing.InOutSine }
+                                    NumberAnimation { target: toolbarRecordDot; property: "opacity"; to: 1.0; duration: 800; easing.type: Easing.InOutSine }
+                                    onRunningChanged: if (!running) toolbarRecordDot.opacity = 1.0
+                                }
                             }
 
                             StyledText {
@@ -605,7 +655,7 @@ PluginComponent {
                                 text: (root.daemon && root.daemon.recordingController) ? root.daemon.recordingController.formatDuration(root.daemon.recordingController.recordingSeconds) : "00:00"
                                 font.pixelSize: Theme.fontSizeMedium
                                 font.weight: Font.Medium
-                                font.family: "monospace"
+                                font.features: { "tnum": 1 }
                                 color: Theme.surfaceText
                                 anchors.verticalCenter: parent.verticalCenter
                             }
@@ -737,15 +787,15 @@ PluginComponent {
 
 
 
-                    // Audio quick toggles row
+                    // Microphone source row: toggle pill + inline device dropdown
                     Row {
                         width: parent.width
                         spacing: Theme.spacingS
 
                         Rectangle {
                             id: micBox
-                            width: Math.floor((parent.width - Theme.spacingS) / 2)
-                            height: 34
+                            width: 40
+                            height: 40
                             radius: Theme.cornerRadius
                             readonly property bool isMicOn: root.recordMic
                             color: isMicOn ? Theme.withAlpha(Theme.primary, 0.15) : (micArea.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerLow)
@@ -755,25 +805,12 @@ PluginComponent {
                             Behavior on color { ColorAnimation { duration: Theme.shorterDuration; easing.type: Theme.standardEasing } }
                             Behavior on border.color { ColorAnimation { duration: Theme.shorterDuration; easing.type: Theme.standardEasing } }
 
-                            Row {
+                            DankIcon {
                                 anchors.centerIn: parent
-                                spacing: 6
-
-                                DankIcon {
-                                    name: micBox.isMicOn ? "mic" : "mic_off"
-                                    size: 16
-                                    color: micBox.isMicOn ? Theme.primary : Theme.surfaceVariantText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    Behavior on color { ColorAnimation { duration: Theme.shorterDuration; easing.type: Theme.standardEasing } }
-                                }
-
-                                StyledText {
-                                    text: I18n.tr("Mic")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: micBox.isMicOn ? Theme.primary : Theme.surfaceVariantText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    Behavior on color { ColorAnimation { duration: Theme.shorterDuration; easing.type: Theme.standardEasing } }
-                                }
+                                name: micBox.isMicOn ? "mic" : "mic_off"
+                                size: 20
+                                color: micBox.isMicOn ? Theme.primary : Theme.surfaceVariantText
+                                Behavior on color { ColorAnimation { duration: Theme.shorterDuration; easing.type: Theme.standardEasing } }
                             }
 
                             DankRipple {
@@ -796,10 +833,35 @@ PluginComponent {
                             }
                         }
 
+                        DankDropdown {
+                            width: parent.width - micBox.width - Theme.spacingS
+                            height: 40
+                            compactMode: true
+                            visible: root.recordMic
+                            currentValue: root.currentMicLabel
+                            options: root.audioInputsList.map(function(item) { return item.label; })
+                            onValueChanged: {
+                                for (let i = 0; i < root.audioInputsList.length; i++) {
+                                    if (root.audioInputsList[i].label === value) {
+                                        root.savePluginData("micDevice", root.audioInputsList[i].value);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Item { width: parent.width; height: 4 }
+
+                    // System audio source row: toggle pill + inline device dropdown
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingS
+
                         Rectangle {
                             id: audioBox
-                            width: Math.floor((parent.width - Theme.spacingS) / 2)
-                            height: 34
+                            width: 40
+                            height: 40
                             radius: Theme.cornerRadius
                             readonly property bool isAudioOn: root.recordSystemAudio
                             color: isAudioOn ? Theme.withAlpha(Theme.primary, 0.15) : (sysAudioArea.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerLow)
@@ -809,25 +871,12 @@ PluginComponent {
                             Behavior on color { ColorAnimation { duration: Theme.shorterDuration; easing.type: Theme.standardEasing } }
                             Behavior on border.color { ColorAnimation { duration: Theme.shorterDuration; easing.type: Theme.standardEasing } }
 
-                            Row {
+                            DankIcon {
                                 anchors.centerIn: parent
-                                spacing: 6
-
-                                DankIcon {
-                                    name: audioBox.isAudioOn ? "volume_up" : "volume_off"
-                                    size: 16
-                                    color: audioBox.isAudioOn ? Theme.primary : Theme.surfaceVariantText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    Behavior on color { ColorAnimation { duration: Theme.shorterDuration; easing.type: Theme.standardEasing } }
-                                }
-
-                                StyledText {
-                                    text: I18n.tr("Audio")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: audioBox.isAudioOn ? Theme.primary : Theme.surfaceVariantText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    Behavior on color { ColorAnimation { duration: Theme.shorterDuration; easing.type: Theme.standardEasing } }
-                                }
+                                name: audioBox.isAudioOn ? "volume_up" : "volume_off"
+                                size: 20
+                                color: audioBox.isAudioOn ? Theme.primary : Theme.surfaceVariantText
+                                Behavior on color { ColorAnimation { duration: Theme.shorterDuration; easing.type: Theme.standardEasing } }
                             }
 
                             DankRipple {
@@ -846,6 +895,23 @@ PluginComponent {
                                 onPressed: mouse => audioRipple.trigger(mouse.x, mouse.y)
                                 onClicked: {
                                     root.savePluginData("recordSystemAudio", !audioBox.isAudioOn);
+                                }
+                            }
+                        }
+
+                        DankDropdown {
+                            width: parent.width - audioBox.width - Theme.spacingS
+                            height: 40
+                            compactMode: true
+                            visible: root.recordSystemAudio
+                            currentValue: root.currentAudioLabel
+                            options: root.audioOutputsList.map(function(item) { return item.label; })
+                            onValueChanged: {
+                                for (let i = 0; i < root.audioOutputsList.length; i++) {
+                                    if (root.audioOutputsList[i].label === value) {
+                                        root.savePluginData("systemAudioDevice", root.audioOutputsList[i].value);
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -962,29 +1028,12 @@ PluginComponent {
             readonly property bool isPaused: isRecording && root.daemon && root.daemon.recordingController && root.daemon.recordingController.isPaused
             property bool draggingOver: false
 
-            implicitWidth: isRecording ? (recordRow.implicitWidth + (root.showPillBorder ? Theme.spacingM * 2 : 0)) : Theme.iconSizeSmall
+            implicitWidth: isRecording ? recordRow.implicitWidth : Theme.iconSizeSmall
             implicitHeight: Theme.iconSize
             anchors.verticalCenter: parent.verticalCenter
 
             Behavior on implicitWidth {
                 NumberAnimation { duration: 250; easing.type: Easing.InOutQuad }
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                radius: Theme.cornerRadius
-                color: isRecording && root.showPillBorder ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.1) : "transparent"
-                border.color: isRecording && root.showPillBorder ? Theme.error : "transparent"
-                border.width: isRecording && root.showPillBorder ? 1 : 0
-            }
-
-            Timer {
-                id: hBlinkTimer
-                interval: 600
-                repeat: true
-                running: isRecording && !isPaused && root.blinkRecordDot
-                property bool blinkOn: true
-                onTriggered: blinkOn = !blinkOn
             }
 
             Row {
@@ -994,29 +1043,42 @@ PluginComponent {
                 scale: draggingOver ? 1.2 : 1.0
                 Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
 
-                Item {
-                    id: hIconWrapper
-                    width: isRecording ? root.recordingIconSize : Theme.iconSizeSmall
-                    height: width
+                // Idle mode icon
+                DankIcon {
+                    visible: !isRecording
+                    name: root.isDownloading ? "download" : (root.widgetMode === "video" ? "videocam" : "screenshot_region")
+                    size: Theme.iconSizeSmall
+                    color: draggingOver ? Theme.primary : (root.isActive || root.isDownloading ? Theme.primary : Theme.surfaceText)
                     anchors.verticalCenter: parent.verticalCenter
-                    visible: isRecording ? root.showRecordingDot : true
+                }
 
-                    DankIcon {
-                        anchors.centerIn: parent
-                        name: isRecording ? "fiber_manual_record" : (root.isDownloading ? "download" : (root.widgetMode === "video" ? "videocam" : "screenshot_region"))
-                        size: parent.width
-                        color: isRecording ? (isPaused ? Theme.warning : Theme.error) : (draggingOver ? Theme.primary : (root.isActive || root.isDownloading ? Theme.primary : Theme.surfaceText))
-                        opacity: isRecording ? (root.blinkRecordDot ? (hBlinkTimer.blinkOn ? 1.0 : 0.3) : 1.0) : 1.0
+                // Minimalist recording dot
+                Rectangle {
+                    id: hRecordDot
+                    visible: isRecording && root.showRecordingDot
+                    width: 8
+                    height: 8
+                    radius: 4
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: isPaused ? Theme.warning : Theme.error
+                    opacity: 1.0
+
+                    SequentialAnimation {
+                        running: isRecording && !isPaused && root.blinkRecordDot
+                        loops: Animation.Infinite
+                        NumberAnimation { target: hRecordDot; property: "opacity"; to: 0.35; duration: 800; easing.type: Easing.InOutSine }
+                        NumberAnimation { target: hRecordDot; property: "opacity"; to: 1.0; duration: 800; easing.type: Easing.InOutSine }
+                        onRunningChanged: if (!running) hRecordDot.opacity = 1.0
                     }
                 }
 
                 StyledText {
                     visible: isRecording
                     text: (root.daemon && root.daemon.recordingController) ? root.daemon.recordingController.formatDuration(root.daemon.recordingController.recordingSeconds) : "00:00"
-                    color: isPaused ? Theme.warning : Theme.surfaceText
-                    font.pixelSize: Theme.fontSizeSmall
+                    color: isPaused ? Theme.warning : Theme.widgetTextColor
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig ? root.barConfig.fontScale : undefined, root.barConfig ? root.barConfig.maximizeWidgetText : undefined)
                     font.weight: Font.Medium
-                    font.family: "monospace"
+                    font.features: { "tnum": 1 }
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
@@ -1027,7 +1089,9 @@ PluginComponent {
                     height: 24
                     radius: 12
                     anchors.verticalCenter: parent.verticalCenter
-                    color: hPauseMouse.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2) : Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1)
+                    color: !isPaused
+                        ? (hPauseMouse.containsMouse ? Qt.darker(Theme.primary, 1.15) : Theme.primary)
+                        : (hPauseMouse.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2) : Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1))
 
                     Behavior on color {
                         ColorAnimation { duration: 90; easing.type: Theme.standardEasing }
@@ -1037,7 +1101,7 @@ PluginComponent {
                         anchors.centerIn: parent
                         name: isPaused ? "play_arrow" : "pause"
                         size: 14
-                        color: Theme.primary
+                        color: !isPaused ? Theme.background : Theme.primary
                     }
 
                     MouseArea {
@@ -1058,7 +1122,7 @@ PluginComponent {
                     height: 24
                     radius: 12
                     anchors.verticalCenter: parent.verticalCenter
-                    color: hStopMouse.containsMouse ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.2) : Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.1)
+                    color: hStopMouse.containsMouse ? Qt.darker(Theme.error, 1.15) : Theme.error
 
                     Behavior on color {
                         ColorAnimation { duration: 90; easing.type: Theme.standardEasing }
@@ -1068,7 +1132,7 @@ PluginComponent {
                         anchors.centerIn: parent
                         name: "stop"
                         size: 14
-                        color: Theme.error
+                        color: Theme.background
                     }
 
                     MouseArea {
@@ -1078,37 +1142,6 @@ PluginComponent {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
                             if (root.daemon) root.daemon.stopRecording();
-                        }
-                    }
-                }
-
-                // Cancel button
-                Rectangle {
-                    visible: isRecording
-                    width: isRecording ? 24 : 0
-                    height: 24
-                    radius: 12
-                    anchors.verticalCenter: parent.verticalCenter
-                    color: hCancelMouse.containsMouse ? Qt.rgba(Theme.surfaceVariantText.r, Theme.surfaceVariantText.g, Theme.surfaceVariantText.b, 0.2) : Qt.rgba(Theme.surfaceVariantText.r, Theme.surfaceVariantText.g, Theme.surfaceVariantText.b, 0.1)
-
-                    Behavior on color {
-                        ColorAnimation { duration: 90; easing.type: Theme.standardEasing }
-                    }
-
-                    DankIcon {
-                        anchors.centerIn: parent
-                        name: "close"
-                        size: 14
-                        color: Theme.surfaceVariantText
-                    }
-
-                    MouseArea {
-                        id: hCancelMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            if (root.daemon) root.daemon.cancelRecording();
                         }
                     }
                 }
@@ -1150,66 +1183,39 @@ PluginComponent {
             implicitHeight: vColumn.implicitHeight
             anchors.horizontalCenter: parent.horizontalCenter
 
-            Timer {
-                id: vBlinkTimer
-                interval: 600
-                repeat: true
-                running: isRecording && !isPaused && root.blinkRecordDot
-                property bool blinkOn: true
-                onTriggered: blinkOn = !blinkOn
-            }
-
             Column {
                 id: vColumn
                 anchors.centerIn: parent
-                spacing: Theme.spacingXS
+                spacing: isRecording ? Theme.spacingXS : 0
                 scale: draggingOver ? 1.2 : 1.0
                 Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
 
-                Item {
-                    id: vIconWrapper
-                    width: isRecording ? root.recordingIconSize : Theme.iconSizeSmall
-                    height: width
+                // Idle mode icon
+                DankIcon {
+                    visible: !isRecording
+                    name: root.isDownloading ? "download" : (root.widgetMode === "video" ? "videocam" : "screenshot_region")
+                    size: Theme.iconSizeSmall
+                    color: draggingOver ? Theme.primary : (root.isActive || root.isDownloading ? Theme.primary : Theme.surfaceText)
                     anchors.horizontalCenter: parent.horizontalCenter
-                    visible: isRecording ? root.showRecordingDot : true
-
-                    DankIcon {
-                        anchors.centerIn: parent
-                        name: isRecording ? "fiber_manual_record" : (root.isDownloading ? "download" : (root.widgetMode === "video" ? "videocam" : "screenshot_region"))
-                        size: parent.width
-                        color: isRecording ? (isPaused ? Theme.warning : Theme.error) : (draggingOver ? Theme.primary : (root.isActive || root.isDownloading ? Theme.primary : Theme.surfaceText))
-                        opacity: isRecording ? (root.blinkRecordDot ? (vBlinkTimer.blinkOn ? 1.0 : 0.3) : 1.0) : 1.0
-                    }
                 }
 
-                // Stop button
+                // Minimalist recording dot
                 Rectangle {
-                    visible: isRecording
-                    width: isRecording ? 24 : 0
-                    height: 24
-                    radius: 12
+                    id: vRecordDot
+                    visible: isRecording && root.showRecordingDot
+                    width: 8
+                    height: 8
+                    radius: 4
                     anchors.horizontalCenter: parent.horizontalCenter
-                    color: vStopMouseArea.containsMouse ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.2) : Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.1)
+                    color: isPaused ? Theme.warning : Theme.error
+                    opacity: 1.0
 
-                    Behavior on color {
-                        ColorAnimation { duration: 90; easing.type: Theme.standardEasing }
-                    }
-
-                    DankIcon {
-                        anchors.centerIn: parent
-                        name: "stop"
-                        size: 14
-                        color: Theme.error
-                    }
-
-                    MouseArea {
-                        id: vStopMouseArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            if (root.daemon) root.daemon.stopRecording();
-                        }
+                    SequentialAnimation {
+                        running: isRecording && !isPaused && root.blinkRecordDot
+                        loops: Animation.Infinite
+                        NumberAnimation { target: vRecordDot; property: "opacity"; to: 0.35; duration: 800; easing.type: Easing.InOutSine }
+                        NumberAnimation { target: vRecordDot; property: "opacity"; to: 1.0; duration: 800; easing.type: Easing.InOutSine }
+                        onRunningChanged: if (!running) vRecordDot.opacity = 1.0
                     }
                 }
 
@@ -1220,7 +1226,9 @@ PluginComponent {
                     height: 24
                     radius: 12
                     anchors.horizontalCenter: parent.horizontalCenter
-                    color: vPauseMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2) : Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1)
+                    color: !isPaused
+                        ? (vPauseMouseArea.containsMouse ? Qt.darker(Theme.primary, 1.15) : Theme.primary)
+                        : (vPauseMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2) : Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1))
 
                     Behavior on color {
                         ColorAnimation { duration: 90; easing.type: Theme.standardEasing }
@@ -1230,7 +1238,7 @@ PluginComponent {
                         anchors.centerIn: parent
                         name: isPaused ? "play_arrow" : "pause"
                         size: 14
-                        color: Theme.primary
+                        color: !isPaused ? Theme.background : Theme.primary
                     }
 
                     MouseArea {
@@ -1244,14 +1252,14 @@ PluginComponent {
                     }
                 }
 
-                // Cancel button
+                // Stop button
                 Rectangle {
                     visible: isRecording
                     width: isRecording ? 24 : 0
                     height: 24
                     radius: 12
                     anchors.horizontalCenter: parent.horizontalCenter
-                    color: vCancelMouseArea.containsMouse ? Qt.rgba(Theme.surfaceVariantText.r, Theme.surfaceVariantText.g, Theme.surfaceVariantText.b, 0.2) : Qt.rgba(Theme.surfaceVariantText.r, Theme.surfaceVariantText.g, Theme.surfaceVariantText.b, 0.1)
+                    color: vStopMouseArea.containsMouse ? Qt.darker(Theme.error, 1.15) : Theme.error
 
                     Behavior on color {
                         ColorAnimation { duration: 90; easing.type: Theme.standardEasing }
@@ -1259,18 +1267,18 @@ PluginComponent {
 
                     DankIcon {
                         anchors.centerIn: parent
-                        name: "close"
+                        name: "stop"
                         size: 14
-                        color: Theme.surfaceVariantText
+                        color: Theme.background
                     }
 
                     MouseArea {
-                        id: vCancelMouseArea
+                        id: vStopMouseArea
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            if (root.daemon) root.daemon.cancelRecording();
+                            if (root.daemon) root.daemon.stopRecording();
                         }
                     }
                 }
@@ -1278,9 +1286,10 @@ PluginComponent {
                 StyledText {
                     visible: isRecording
                     text: (root.daemon && root.daemon.recordingController) ? root.daemon.recordingController.formatDuration(root.daemon.recordingController.recordingSeconds).split(':').join('\n') : "00\n00"
-                    color: isPaused ? Theme.warning : Theme.surfaceText
-                    font.pixelSize: Theme.fontSizeSmall
-                    font.family: "monospace"
+                    color: isPaused ? Theme.warning : Theme.widgetTextColor
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig ? root.barConfig.fontScale : undefined, root.barConfig ? root.barConfig.maximizeWidgetText : undefined)
+                    font.weight: Font.Medium
+                    font.features: { "tnum": 1 }
                     horizontalAlignment: Text.AlignHCenter
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -1548,18 +1557,28 @@ PluginComponent {
                         anchors.verticalCenter: parent.verticalCenter
 
                         Rectangle {
+                            id: ccRecordDot
                             width: 10
                             height: 10
                             radius: 5
                             color: (root.daemon && root.daemon.recordingController && root.daemon.recordingController.isPaused) ? Theme.warning : Theme.error
                             anchors.verticalCenter: parent.verticalCenter
+                            opacity: 1.0
+
+                            SequentialAnimation {
+                                running: root.daemon && root.daemon.isRecording && root.daemon.recordingController && !root.daemon.recordingController.isPaused && root.blinkRecordDot
+                                loops: Animation.Infinite
+                                NumberAnimation { target: ccRecordDot; property: "opacity"; to: 0.35; duration: 800; easing.type: Easing.InOutSine }
+                                NumberAnimation { target: ccRecordDot; property: "opacity"; to: 1.0; duration: 800; easing.type: Easing.InOutSine }
+                                onRunningChanged: if (!running) ccRecordDot.opacity = 1.0
+                            }
                         }
 
                         StyledText {
                             text: (root.daemon && root.daemon.recordingController) ? root.daemon.recordingController.formatDuration(root.daemon.recordingController.recordingSeconds) : "00:00"
                             font.pixelSize: Theme.fontSizeLarge
-                            font.family: "monospace"
                             font.weight: Font.Bold
+                            font.features: { "tnum": 1 }
                             color: (root.daemon && root.daemon.recordingController && root.daemon.recordingController.isPaused) ? Theme.warning : Theme.error
                             anchors.verticalCenter: parent.verticalCenter
                         }

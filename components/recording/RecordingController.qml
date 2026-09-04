@@ -24,15 +24,18 @@ Item {
     property int regionW: 0
     property int regionH: 0
     property string regionGeometry: ""
+    property int _recordedAudioCount: 0
 
     // Settings preferences
+    property string targetGifPath: ""
     readonly property string outputDirectory: pluginData.recordingDirectory || "~/Videos/Recordings"
     readonly property string videoFormat: pluginData.recordingFormat || "mp4"
     readonly property int framerate: parseInt(pluginData.recordingFramerate, 10) || 60
+    readonly property int gifFramerate: parseInt(pluginData.recordingGifFramerate, 10) || 15
     readonly property string videoQuality: pluginData.recordingQuality || "medium"
     readonly property string videoCodec: pluginData.recordingCodec || "auto"
     readonly property bool showCursor: pluginData.recordCursor !== false
-    readonly property bool recordAudio: pluginData.recordSystemAudio ?? false
+    readonly property bool recordAudio: pluginData.recordSystemAudio ?? true
     readonly property bool recordMic: pluginData.recordMic ?? false
     readonly property string systemAudioDevice: pluginData.systemAudioDevice || "default_output"
     readonly property string micDevice: pluginData.micDevice || "default_input"
@@ -189,10 +192,12 @@ Item {
 
             const wasCancelling = root.isCancelling;
             const finishedPath = root.outputPath;
+            const gifTarget = root.targetGifPath;
 
             root.isRecording = false;
             root.isPaused = false;
-            root.recordingState = "idle";
+            root.recordingState = (gifTarget && !wasCancelling && (exitCode === 0 || exitCode === 130)) ? "processing" : "idle";
+            root.isProcessing = (root.recordingState === "processing");
             root.isCancelling = false;
             root.activeRecordingMode = "";
             root.clearRegion();
@@ -201,13 +206,21 @@ Item {
                 if (finishedPath) {
                     Proc.runCommand("cleanup-cancelled-recording", ["rm", "-f", finishedPath]);
                 }
+                if (gifTarget) {
+                    Proc.runCommand("cleanup-cancelled-gif", ["rm", "-f", gifTarget]);
+                }
+                root.targetGifPath = "";
                 return;
             }
 
             if (exitCode === 0 || exitCode === 130) {
-                root.finalizeRecording(finishedPath);
+                root.finalizeRecording(finishedPath, gifTarget);
             } else {
                 root.sendNotification(I18n.tr("Recording ended with error code %1.").arg(exitCode), true);
+                if (finishedPath) {
+                    Proc.runCommand("cleanup-failed-recording", ["rm", "-f", finishedPath]);
+                }
+                root.targetGifPath = "";
             }
         }
     }
@@ -245,7 +258,14 @@ Item {
         const resolvedDir = root.getResolvedDir();
 
         Proc.runCommand("screenRecorder.mkdir", ["mkdir", "-p", resolvedDir], () => {
-            root.outputPath = resolvedDir + "/recording_" + root.getTimestampString() + "." + root.videoFormat;
+            const isGif = root.videoFormat === "gif";
+            if (isGif) {
+                root.targetGifPath = resolvedDir + "/recording_" + root.getTimestampString() + ".gif";
+                root.outputPath = "/tmp/dms_rec_tmp_" + Date.now() + ".mp4";
+            } else {
+                root.targetGifPath = "";
+                root.outputPath = resolvedDir + "/recording_" + root.getTimestampString() + "." + root.videoFormat;
+            }
 
             let source = "screen";
             if (activeMode === "window" || activeMode === "portal") {
@@ -259,21 +279,28 @@ Item {
                 args.push("-region", geom);
             }
 
-            args.push("-f", root.framerate.toString(), "-o", root.outputPath);
+            const fps = isGif ? Math.min(root.framerate, root.gifFramerate) : root.framerate;
+            args.push("-f", fps.toString(), "-o", root.outputPath);
             args.push("-cursor", root.showCursor ? "yes" : "no");
 
             let hasAudio = false;
-            if (root.recordAudio) {
-                args.push("-a", root.systemAudioDevice || "default_output");
-                hasAudio = true;
+            let audioCount = 0;
+            if (!isGif) {
+                if (root.recordAudio) {
+                    args.push("-a", root.systemAudioDevice || "default_output");
+                    hasAudio = true;
+                    audioCount++;
+                }
+                if (root.recordMic) {
+                    args.push("-a", root.micDevice || "default_input");
+                    hasAudio = true;
+                    audioCount++;
+                }
+                if (hasAudio) {
+                    args.push("-ac", root.audioCodec);
+                }
             }
-            if (root.recordMic) {
-                args.push("-a", root.micDevice || "default_input");
-                hasAudio = true;
-            }
-            if (hasAudio) {
-                args.push("-ac", root.audioCodec);
-            }
+            root._recordedAudioCount = audioCount;
 
             args.push("-q", root.videoQuality);
 
@@ -315,27 +342,101 @@ Item {
         root.recordingState = "idle";
         root.isRecording = false;
         root.isPaused = false;
+        root.isProcessing = false;
         root.activeRecordingMode = "";
         root.clearRegion();
+        if (root.targetGifPath) {
+            Proc.runCommand("cleanup-cancelled-gif", ["rm", "-f", root.targetGifPath]);
+            root.targetGifPath = "";
+        }
         Proc.runCommand("screenRecorder.kill", ["killall", "-KILL", "gpu-screen-recorder"]);
     }
 
-    function finalizeRecording(videoPath) {
+    function _mergeAudio(videoPath, callback) {
+        root.isProcessing = true;
+        root.recordingState = "processing";
+        if (typeof ToastService !== "undefined" && ToastService) {
+            ToastService.showInfo(I18n.tr("Merging audio tracks..."));
+        }
+        const ext = root.videoFormat;
+        const tempOut = videoPath + ".audio_merged." + ext;
+
+        const ffmpegArgs = ["ffmpeg", "-y", "-i", videoPath,
+            "-filter_complex", "[0:a:0]anull[a0];[0:a:1]anull[a1];[a0][a1]amix=inputs=2:duration=first:normalize=0[a]",
+            "-map", "0:v", "-map", "[a]", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", tempOut];
+
+        Proc.runCommand("quickCapture.mergeAudio", ffmpegArgs, (stdout, exitCode) => {
+            if (exitCode === 0) {
+                Proc.runCommand("quickCapture.replaceMerged", ["mv", "-f", tempOut, videoPath], () => {
+                    root.isProcessing = false;
+                    root.recordingState = "idle";
+                    if (callback) callback();
+                });
+            } else {
+                Proc.runCommand("quickCapture.cleanupTemp", ["rm", "-f", tempOut]);
+                root.isProcessing = false;
+                root.recordingState = "idle";
+                if (callback) callback();
+            }
+        });
+    }
+
+    function finalizeRecording(videoPath, gifTarget) {
         if (!videoPath) return;
         const durationSecs = root.recordingSeconds;
         root.recordingSeconds = 0;
+        root.targetGifPath = "";
+
+        if (gifTarget) {
+            root.isProcessing = true;
+            root.recordingState = "processing";
+            if (typeof ToastService !== "undefined" && ToastService) {
+                ToastService.showInfo(I18n.tr("Converting recording to GIF..."));
+            }
+
+            const gifFps = root.gifFramerate;
+            const gifFilter = `fps=${gifFps},split[s0][s1];[s0]palettegen=stats_mode=diff[p];[s1][p]paletteuse=dither=bayer:bayer_scale=5`;
+            const gifArgs = ["ffmpeg", "-y", "-i", videoPath, "-vf", gifFilter, gifTarget];
+
+            Proc.runCommand("convert-to-gif", gifArgs, (convOut, convCode) => {
+                Proc.runCommand("cleanup-temp-mp4", ["rm", "-f", videoPath]);
+                root.isProcessing = false;
+                root.recordingState = "idle";
+
+                if (convCode !== 0) {
+                    root.sendNotification(I18n.tr("Failed to convert recording to GIF."), true);
+                    return;
+                }
+
+                root.extractThumbnailAndNotify(gifTarget, durationSecs);
+            });
+            return;
+        }
+
+        if (root._recordedAudioCount > 1) {
+            root._mergeAudio(videoPath, () => {
+                root._recordedAudioCount = 1;
+                root.extractThumbnailAndNotify(videoPath, durationSecs);
+            });
+            return;
+        }
+
+        root.extractThumbnailAndNotify(videoPath, durationSecs);
+    }
+
+    function extractThumbnailAndNotify(targetPath, durationSecs) {
         const thumbPath = "/tmp/dms_recording_thumb_" + Date.now() + ".png";
         const ffmpegArgs = ["ffmpeg", "-y"];
         if (durationSecs >= 1) {
             ffmpegArgs.push("-ss", "00:00:01");
         }
-        ffmpegArgs.push("-i", videoPath, "-vf", "crop='min(iw,ih)':'min(iw,ih)',scale='min(256,iw)':'min(256,ih)'", "-vframes", "1", thumbPath);
+        ffmpegArgs.push("-i", targetPath, "-vf", "crop='min(iw,ih)':'min(iw,ih)',scale='min(256,iw)':'min(256,ih)'", "-vframes", "1", thumbPath);
         Proc.runCommand("extract-thumb", ffmpegArgs, (stdout, exitCode) => {
             const icon = (exitCode === 0) ? thumbPath : "video-x-generic";
             const durationStr = root.formatDuration(durationSecs);
-            const filename = videoPath.split("/").pop();
+            const filename = targetPath.split("/").pop();
             const msg = I18n.tr("Saved %1 (%2)").arg(filename).arg(durationStr);
-            root.sendNotification(msg, false, icon, videoPath);
+            root.sendNotification(msg, false, icon, targetPath);
         });
     }
 

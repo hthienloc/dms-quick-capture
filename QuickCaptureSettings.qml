@@ -16,6 +16,52 @@ PluginSettings {
 
     property int radialMenuOpacityValue: 100
 
+    readonly property var daemon: (pluginService && pluginService.pluginInstances && pluginService.pluginInstances[pluginId]) ? pluginService.pluginInstances[pluginId] : null
+    property var audioInputsList: daemon && daemon.audioInputsList && daemon.audioInputsList.length > 0
+        ? daemon.audioInputsList
+        : [{"label": I18n.tr("Default Microphone"), "value": "default_input"}]
+    property var audioOutputsList: daemon && daemon.audioOutputsList && daemon.audioOutputsList.length > 0
+        ? daemon.audioOutputsList
+        : [{"label": I18n.tr("Default Output"), "value": "default_output"}]
+
+    function refreshAudioDevices() {
+        if (daemon && typeof daemon.refreshAudioDevices === "function") {
+            daemon.refreshAudioDevices();
+        }
+        Proc.runCommand("quickCapture.listAudioDevices", ["gpu-screen-recorder", "--list-audio-devices"], (stdout, exitCode) => {
+            const inputs = [{"label": I18n.tr("Default Microphone"), "value": "default_input"}];
+            const outputs = [{"label": I18n.tr("Default Output"), "value": "default_output"}];
+
+            if (exitCode === 0 && stdout) {
+                const lines = stdout.trim().split("\n");
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+                    const parts = line.split("|");
+                    if (parts.length >= 2) {
+                        const name = parts[0];
+                        const label = parts[1];
+                        if (name.includes(".monitor") || name.includes("output") || name === "default_output") {
+                            if (name !== "default_output") {
+                                outputs.push({ "label": label, "value": name });
+                            }
+                        } else {
+                            if (name !== "default_input") {
+                                inputs.push({ "label": label, "value": name });
+                            }
+                        }
+                    }
+                }
+            }
+            root.audioInputsList = inputs;
+            root.audioOutputsList = outputs;
+        });
+    }
+
+    Component.onCompleted: {
+        root.refreshAudioDevices();
+    }
+
     component ShortcutRow : Item {
         id: rowRoot
         width: parent.width
@@ -626,10 +672,11 @@ PluginSettings {
                 SectionTitle {
                     text: I18n.tr("Video Settings")
                     icon: "videocam"
-                    showReset: recordingDirectory.isDirty || recordingFormat.isDirty || recordingFramerate.isDirty || recordingQuality.isDirty || recordingCodec.isDirty || recordCursor.isDirty
+                    showReset: recordingDirectory.isDirty || recordingFormat.isDirty || recordingGifFramerate.isDirty || recordingFramerate.isDirty || recordingQuality.isDirty || recordingCodec.isDirty || recordCursor.isDirty
                     onResetClicked: {
                         recordingDirectory.resetToDefault();
                         recordingFormat.resetToDefault();
+                        recordingGifFramerate.resetToDefault();
                         recordingFramerate.resetToDefault();
                         recordingQuality.resetToDefault();
                         recordingCodec.resetToDefault();
@@ -656,9 +703,28 @@ PluginSettings {
                         { label: "MP4", value: "mp4" },
                         { label: "MKV", value: "mkv" },
                         { label: "WebM", value: "webm" },
-                        { label: "FLV", value: "flv" }
+                        { label: "FLV", value: "flv" },
+                        { label: "GIF", value: "gif" }
                     ]
                     defaultValue: "mp4"
+                }
+
+                Separator {
+                    visible: recordingFormat.value === "gif"
+                }
+
+                ButtonGroupSettingPlus {
+                    id: recordingGifFramerate
+                    settingKey: "recordingGifFramerate"
+                    label: I18n.tr("GIF Framerate")
+                    visible: recordingFormat.value === "gif"
+                    options: [
+                        { label: "10 FPS", value: "10" },
+                        { label: "15 FPS", value: "15" },
+                        { label: "24 FPS", value: "24" },
+                        { label: "30 FPS", value: "30" }
+                    ]
+                    defaultValue: "15"
                 }
 
                 Separator {}
@@ -722,10 +788,12 @@ PluginSettings {
                 SectionTitle {
                     text: I18n.tr("Audio & Overlay")
                     icon: "graphic_eq"
-                    showReset: recordSystemAudio.isDirty || recordMic.isDirty || audioCodec.isDirty || showPillBorder.isDirty || blinkRecordDot.isDirty || showRegionBorder.isDirty
+                    showReset: recordSystemAudio.isDirty || systemAudioDevice.isDirty || recordMic.isDirty || micDevice.isDirty || audioCodec.isDirty || showPillBorder.isDirty || blinkRecordDot.isDirty || showRegionBorder.isDirty
                     onResetClicked: {
                         recordSystemAudio.resetToDefault();
+                        systemAudioDevice.resetToDefault();
                         recordMic.resetToDefault();
+                        micDevice.resetToDefault();
                         audioCodec.resetToDefault();
                         showPillBorder.resetToDefault();
                         blinkRecordDot.resetToDefault();
@@ -737,10 +805,21 @@ PluginSettings {
                     id: recordSystemAudio
                     settingKey: "recordSystemAudio"
                     label: I18n.tr("Record System Audio")
-                    defaultValue: false
+                    defaultValue: true
                 }
 
-                Separator {}
+                SelectionSettingPlus {
+                    id: systemAudioDevice
+                    settingKey: "systemAudioDevice"
+                    label: I18n.tr("System Audio Device")
+                    options: root.audioOutputsList
+                    defaultValue: "default_output"
+                    visible: recordSystemAudio.value === true
+                }
+
+                Separator {
+                    visible: recordSystemAudio.value === true
+                }
 
                 ToggleSettingPlus {
                     id: recordMic
@@ -749,7 +828,18 @@ PluginSettings {
                     defaultValue: false
                 }
 
-                Separator {}
+                SelectionSettingPlus {
+                    id: micDevice
+                    settingKey: "micDevice"
+                    label: I18n.tr("Microphone Device")
+                    options: root.audioInputsList
+                    defaultValue: "default_input"
+                    visible: recordMic.value === true
+                }
+
+                Separator {
+                    visible: recordMic.value === true
+                }
 
                 ButtonGroupSettingPlus {
                     id: audioCodec
@@ -778,7 +868,7 @@ PluginSettings {
                     id: blinkRecordDot
                     settingKey: "blinkRecordDot"
                     label: I18n.tr("Blink Recording Dot")
-                    defaultValue: false
+                    defaultValue: true
                 }
 
                 Separator {}
