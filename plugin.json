@@ -2,7 +2,7 @@
     "$schema": "https://github.com/AvengeMedia/DankMaterialShell/raw/refs/heads/master/PLUGINS/plugin-schema.json",
     "id": "quickCapture",
     "name": "Quick Capture",
-    "description": "A screenshot annotation tool",
+    "description": "Screenshot annotation and screen recording tool",
     "version": "5.2.0",
     "author": "Loc Huynh",
     "icon": "screenshot_region",

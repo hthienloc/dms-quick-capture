@@ -6,7 +6,7 @@
   </a>
 </p>
 
-Screenshot annotation plugin for DankMaterialShell.
+Screenshot annotation and screen recording plugin for DankMaterialShell.
 
 <img src="screenshot.png" width="800" alt="Screenshot">
 
@@ -20,6 +20,8 @@ Screenshot annotation plugin for DankMaterialShell.
 | Dependency | Purpose |
 | --- | --- |
 | DankMaterialShell >= **1.6.0** | Required for floating window and scrolling capture |
+| **gpu-screen-recorder** | Screen recording backend |
+| **ffmpeg** | Video thumbnail generation |
 | **ImageMagick** (`magick`/`mogrify`) | WebP/JPEG exports and OCR/QR crop |
 | **img2pdf** | PDF export |
 | **tesseract** | OCR text scanner |

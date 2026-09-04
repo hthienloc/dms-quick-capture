@@ -24,10 +24,18 @@ Commands that capture or open images accept an `action` parameter (`edit` / `flo
 | `openImage` | `path`, `action` | Opens a local image file. |
 | `close` | *(none)* | Closes the annotator. |
 | `showHistory` | *(none)* | Opens the Recent Edits history carousel. |
+| `recordStart` | `mode` (`screen`, `region`, `portal`) | Starts screen recording. |
+| `recordStop` | *(none)* | Stops screen recording. |
+| `recordPause` | *(none)* | Toggles pause/resume. |
+| `recordCancel` | *(none)* | Cancels screen recording. |
+| `recordToggle` | `mode` | Toggles screen recording. |
+| `recordStatus` | *(none)* | Returns recorder status. |
 
 ```bash
 dms ipc call quickCapture screenshot region edit    # open editor
 dms ipc call quickCapture screenshot region float   # float directly
+dms ipc call quickCapture recordStart region        # record selected region
+dms ipc call quickCapture recordStop                # stop recording
 ```
 
 ### Integration Examples

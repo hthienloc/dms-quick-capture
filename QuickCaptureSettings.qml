@@ -358,6 +358,7 @@ PluginSettings {
             Repeater {
                 model: [
                     { label: I18n.tr("Capture"),       icon: "camera"             },
+                    { label: I18n.tr("Recording"),     icon: "videocam"           },
                     { label: I18n.tr("Saving"),        icon: "save"               },
                     { label: I18n.tr("Notifications"), icon: "notifications"      },
                     { label: I18n.tr("Toolbar"),       icon: "dock"               },
@@ -609,9 +610,192 @@ PluginSettings {
         }
     }
 
-    // ── Tab 1: Save ────────────────────────────────────────────────────────────
+    // ── Tab 1: Recording ───────────────────────────────────────────────────────
     Item {
         visible: tabBar.currentIndex === 1
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        implicitHeight: recordingTabCol.implicitHeight
+        Column {
+            id: recordingTabCol
+            width: parent.width
+            spacing: Theme.spacingM
+
+            SettingsCard {
+                id: recordingVideoCard
+                SectionTitle {
+                    text: I18n.tr("Video Settings")
+                    icon: "videocam"
+                    showReset: recordingDirectory.isDirty || recordingFormat.isDirty || recordingFramerate.isDirty || recordingQuality.isDirty || recordingCodec.isDirty || recordCursor.isDirty
+                    onResetClicked: {
+                        recordingDirectory.resetToDefault();
+                        recordingFormat.resetToDefault();
+                        recordingFramerate.resetToDefault();
+                        recordingQuality.resetToDefault();
+                        recordingCodec.resetToDefault();
+                        recordCursor.resetToDefault();
+                    }
+                }
+
+                StringSettingPlus {
+                    id: recordingDirectory
+                    settingKey: "recordingDirectory"
+                    label: I18n.tr("Recordings Directory")
+                    placeholder: "~/Videos/Recordings"
+                    defaultValue: "~/Videos/Recordings"
+                    isDirectory: true
+                }
+
+                Separator {}
+
+                ButtonGroupSettingPlus {
+                    id: recordingFormat
+                    settingKey: "recordingFormat"
+                    label: I18n.tr("Container Format")
+                    options: [
+                        { label: "MP4", value: "mp4" },
+                        { label: "MKV", value: "mkv" },
+                        { label: "WebM", value: "webm" },
+                        { label: "FLV", value: "flv" }
+                    ]
+                    defaultValue: "mp4"
+                }
+
+                Separator {}
+
+                ButtonGroupSettingPlus {
+                    id: recordingFramerate
+                    settingKey: "recordingFramerate"
+                    label: I18n.tr("Framerate")
+                    options: [
+                        { label: "30 FPS", value: "30" },
+                        { label: "60 FPS", value: "60" },
+                        { label: "120 FPS", value: "120" }
+                    ]
+                    defaultValue: "60"
+                }
+
+                Separator {}
+
+                SelectionSettingPlus {
+                    id: recordingQuality
+                    settingKey: "recordingQuality"
+                    label: I18n.tr("Video Quality")
+                    options: [
+                        { label: I18n.tr("Very High"), value: "very_high" },
+                        { label: I18n.tr("High"), value: "high" },
+                        { label: I18n.tr("Medium"), value: "medium" },
+                        { label: I18n.tr("Low"), value: "low" }
+                    ]
+                    defaultValue: "medium"
+                }
+
+                Separator {}
+
+                SelectionSettingPlus {
+                    id: recordingCodec
+                    settingKey: "recordingCodec"
+                    label: I18n.tr("Video Codec")
+                    options: [
+                        { label: I18n.tr("Auto Detect"), value: "auto" },
+                        { label: "H.264", value: "h264" },
+                        { label: "HEVC (H.265)", value: "hevc" },
+                        { label: "AV1", value: "av1" },
+                        { label: "VP8", value: "vp8" },
+                        { label: "VP9", value: "vp9" }
+                    ]
+                    defaultValue: "auto"
+                }
+
+                Separator {}
+
+                ToggleSettingPlus {
+                    id: recordCursor
+                    settingKey: "recordCursor"
+                    label: I18n.tr("Record Mouse Cursor")
+                    defaultValue: true
+                }
+            }
+
+            SettingsCard {
+                id: recordingAudioCard
+                SectionTitle {
+                    text: I18n.tr("Audio & Overlay")
+                    icon: "graphic_eq"
+                    showReset: recordSystemAudio.isDirty || recordMic.isDirty || audioCodec.isDirty || showPillBorder.isDirty || blinkRecordDot.isDirty || showRegionBorder.isDirty
+                    onResetClicked: {
+                        recordSystemAudio.resetToDefault();
+                        recordMic.resetToDefault();
+                        audioCodec.resetToDefault();
+                        showPillBorder.resetToDefault();
+                        blinkRecordDot.resetToDefault();
+                        showRegionBorder.resetToDefault();
+                    }
+                }
+
+                ToggleSettingPlus {
+                    id: recordSystemAudio
+                    settingKey: "recordSystemAudio"
+                    label: I18n.tr("Record System Audio")
+                    defaultValue: false
+                }
+
+                Separator {}
+
+                ToggleSettingPlus {
+                    id: recordMic
+                    settingKey: "recordMic"
+                    label: I18n.tr("Record Microphone")
+                    defaultValue: false
+                }
+
+                Separator {}
+
+                ButtonGroupSettingPlus {
+                    id: audioCodec
+                    settingKey: "audioCodec"
+                    label: I18n.tr("Audio Codec")
+                    options: [
+                        { label: "Opus", value: "opus" },
+                        { label: "AAC", value: "aac" },
+                        { label: "FLAC", value: "flac" }
+                    ]
+                    defaultValue: "opus"
+                }
+
+                Separator {}
+
+                ToggleSettingPlus {
+                    id: showPillBorder
+                    settingKey: "showPillBorder"
+                    label: I18n.tr("Show Pill Border")
+                    defaultValue: false
+                }
+
+                Separator {}
+
+                ToggleSettingPlus {
+                    id: blinkRecordDot
+                    settingKey: "blinkRecordDot"
+                    label: I18n.tr("Blink Recording Dot")
+                    defaultValue: false
+                }
+
+                Separator {}
+
+                ToggleSettingPlus {
+                    id: showRegionBorder
+                    settingKey: "showRegionBorder"
+                    label: I18n.tr("Show Region Border")
+                    defaultValue: true
+                }
+            }
+        }
+    }
+
+    // ── Tab 2: Save ────────────────────────────────────────────────────────────
+    Item {
+        visible: tabBar.currentIndex === 2
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: saveTabCol.implicitHeight
@@ -729,9 +913,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 2: Notifications ─────────────────────────────────────────────────────
+    // ── Tab 3: Notifications ─────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 2
+        visible: tabBar.currentIndex === 3
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: notificationsTabCol.implicitHeight
@@ -767,9 +951,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 3: Toolbar ───────────────────────────────────────────────────────────
+    // ── Tab 4: Toolbar ───────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 3
+        visible: tabBar.currentIndex === 4
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: toolbarTabCol.implicitHeight
@@ -848,9 +1032,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 4: Palette ───────────────────────────────────────────────────────────
+    // ── Tab 5: Palette ───────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 4
+        visible: tabBar.currentIndex === 5
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: paletteTabCol.implicitHeight
@@ -1071,9 +1255,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 5: Editor ─────────────────────────────────────────────────────────────
+    // ── Tab 6: Editor ─────────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 5
+        visible: tabBar.currentIndex === 6
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: stylesTabCol.implicitHeight
@@ -1204,9 +1388,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 6: Drawing ───────────────────────────────────────────────────────────
+    // ── Tab 7: Drawing ───────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 6
+        visible: tabBar.currentIndex === 7
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: drawingTabCol.implicitHeight
@@ -1502,9 +1686,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 7: Text ──────────────────────────────────────────────────────────────
+    // ── Tab 8: Text ──────────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 7
+        visible: tabBar.currentIndex === 8
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: textTabCol.implicitHeight
@@ -1614,9 +1798,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 8: Shapes ────────────────────────────────────────────────────────────
+    // ── Tab 9: Shapes ────────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 8
+        visible: tabBar.currentIndex === 9
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: shapesTabCol.implicitHeight
@@ -1682,9 +1866,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 9: Background ──────────────────────────────────────────────────────────
+    // ── Tab 10: Background ──────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 9
+        visible: tabBar.currentIndex === 10
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: backgroundTabCol.implicitHeight
@@ -1952,9 +2136,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 10: Watermark ────────────────────────────────────────────────────────
+    // ── Tab 11: Watermark ────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 10
+        visible: tabBar.currentIndex === 11
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: watermarkTabCol.implicitHeight
@@ -2421,9 +2605,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 11: Float Window ─────────────────────────────────────────────────────
+    // ── Tab 12: Float Window ─────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 11
+        visible: tabBar.currentIndex === 12
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: floatTabCol.implicitHeight
@@ -2581,9 +2765,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 12: Radial Menu ───────────────────────────────────────────────────────
+    // ── Tab 13: Radial Menu ───────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 12
+        visible: tabBar.currentIndex === 13
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: presetsTabCol.implicitHeight
@@ -3121,9 +3305,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 13: Shortcuts ────────────────────────────────────────────────────────
+    // ── Tab 14: Shortcuts ────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 13
+        visible: tabBar.currentIndex === 14
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: shortcutsTabCol.implicitHeight
@@ -3224,9 +3408,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 14: Help ─────────────────────────────────────────────────────────────
+    // ── Tab 15: Help ─────────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 14
+        visible: tabBar.currentIndex === 15
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: helpTabCol.implicitHeight
@@ -3357,6 +3541,36 @@ PluginSettings {
                 label: I18n.tr("Show Recent Edits History")
                 text: "dms ipc call quickCapture showHistory"
             }
+
+            CopyBox {
+                label: I18n.tr("Screen Recording (Interactive Region)")
+                text: "dms ipc call quickCapture recordStart region"
+            }
+            CopyBox {
+                label: I18n.tr("Screen Recording (Full Screen)")
+                text: "dms ipc call quickCapture recordStart screen"
+            }
+            CopyBox {
+                label: I18n.tr("Screen Recording (Window / Portal)")
+                text: "dms ipc call quickCapture recordStart portal"
+            }
+            CopyBox {
+                label: I18n.tr("Screen Recording (Stop & Save)")
+                text: "dms ipc call quickCapture recordStop"
+            }
+            CopyBox {
+                label: I18n.tr("Screen Recording (Pause / Resume)")
+                text: "dms ipc call quickCapture recordPause"
+            }
+            CopyBox {
+                label: I18n.tr("Screen Recording (Cancel)")
+                text: "dms ipc call quickCapture recordCancel"
+            }
+            CopyBox {
+                label: I18n.tr("Screen Recording (Toggle Start / Stop)")
+                text: "dms ipc call quickCapture recordToggle"
+            }
+
 
             Separator { opacity: 0.1 }
 

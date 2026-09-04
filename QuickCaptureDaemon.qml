@@ -1,6 +1,7 @@
 import "./dms-common"
 import "./components/floating"
 import "./components/history"
+import "./components/recording"
 import QtQuick
 import QtQuick.Controls
 import Quickshell
@@ -15,7 +16,11 @@ import qs.Modals.FileBrowser
 PluginComponent {
     id: root
 
+    readonly property alias recordingController: recordingControllerItem
+    readonly property bool isRecording: recordingControllerItem ? recordingControllerItem.isRecording : false
+
     // ── State ────────────────────────────────────────────────────────────────
+    property string widgetMode: "photo"
     property bool isCapturing: false
     readonly property string middleClickAction: (pluginData.middleClickAction || "region")
     readonly property var allowedModes: ["region", "window", "full", "output", "all", "last", "scroll"]
@@ -337,6 +342,46 @@ PluginComponent {
             return "SUCCESS";
         }
 
+        function recordStart(mode: string, geometry: string) : string {
+            root.startRecording(mode || "screen", geometry || "");
+            return "SUCCESS";
+        }
+
+        function recordStop() : string {
+            root.stopRecording();
+            return "SUCCESS";
+        }
+
+        function recordPause() : string {
+            root.pauseRecording();
+            return "SUCCESS";
+        }
+
+        function recordCancel() : string {
+            root.cancelRecording();
+            return "SUCCESS";
+        }
+
+        function recordToggle(mode: string) : string {
+            if (root.isRecording) {
+                root.stopRecording();
+                return "STOPPED";
+            } else {
+                root.startRecording(mode || "screen");
+                return "STARTED";
+            }
+        }
+
+        function recordStatus() : string {
+            return JSON.stringify({
+                "recordingState": recordingControllerItem.recordingState,
+                "isRecording": recordingControllerItem.isRecording,
+                "isPaused": recordingControllerItem.isPaused,
+                "duration": recordingControllerItem.recordingSeconds,
+                "outputPath": recordingControllerItem.outputPath
+            });
+        }
+
         target: "quickCapture"
         enabled: true
     }
@@ -428,6 +473,43 @@ PluginComponent {
         readonly property real _screenH: targetScreen ? targetScreen.height : (Quickshell.screens[0] ? Quickshell.screens[0].height : 1080)
         modalWidth: Math.round(_screenW * 0.9)
         modalHeight: Math.round(_screenH * (historyModal.contentLoader && historyModal.contentLoader.item ? historyModal.contentLoader.item.heightFraction : 0.45))
+    }
+
+    // ── Screen Recording Controller & Overlays ────────────────────────────────
+    function startRecording(mode, customGeometry) {
+        root.closeControlCenter();
+        recordingControllerItem.startRecording(mode, customGeometry);
+    }
+
+    function stopRecording() {
+        recordingControllerItem.stopRecording();
+    }
+
+    function pauseRecording() {
+        recordingControllerItem.pauseRecording();
+    }
+
+    function cancelRecording() {
+        recordingControllerItem.cancelRecording();
+    }
+
+    function savePluginData(key, value) {
+        if (pluginService && pluginId) {
+            pluginService.savePluginData(pluginId, key, value);
+        }
+        const pData = Object.assign({}, root.pluginData);
+        pData[key] = value;
+        root.pluginData = pData;
+    }
+
+    RecordingController {
+        id: recordingControllerItem
+        daemon: root
+    }
+
+    RecordingRegionBorder {
+        id: recordingRegionBorderItem
+        recordingController: recordingControllerItem
     }
 
     // ── Lifecycle: register self so widget surface can delegate to daemon ─────
