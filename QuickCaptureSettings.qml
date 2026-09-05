@@ -3483,44 +3483,92 @@ PluginSettings {
             width: parent.width
             spacing: Theme.spacingM
             SettingsCard {
-                id: shortcutsCard
-                SectionTitle {
-                    text: I18n.tr("Keyboard Shortcuts")
-                    icon: "keyboard"
-                    showReset: false
+                SectionTitle { 
+                    id: usageTitle
+                    text: I18n.tr("Usage Guide")
+                    icon: "menu_book" 
+                    collapsible: true
+                    settingKey: "usageGuideExpanded"
                 }
 
-                Repeater {
-                    model: captureConfig.shortcutEntries
-                    delegate: Column {
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacingM
+                    visible: usageTitle.isExpanded
+
+                    StyledText {
+                        text: I18n.tr("Bar Interactions")
+                        font.pixelSize: Theme.fontSizeLarge
+                        font.bold: true
+                        color: Theme.primary
+                    }
+
+                    Column {
                         width: parent.width
-                        spacing: Theme.spacingS
+                        spacing: 2
 
-                        Row {
-                            width: parent.width
-                            spacing: Theme.spacingM
+                        ShortcutRow { keyText: I18n.tr("Action"); actionText: I18n.tr("Interaction / Result"); isHeader: true }
+                        ShortcutRow { keyText: I18n.tr("Left Click"); actionText: I18n.tr("Open Quick Capture menu (Popout)") }
+                        ShortcutRow { keyText: I18n.tr("Middle Click"); actionText: I18n.tr("Trigger Middle-Click Action (Default: Interactive Region)") }
+                        ShortcutRow { keyText: I18n.tr("Right Click"); actionText: I18n.tr("Trigger Right-Click Action (Default: Clipboard Annotate)") }
+                        ShortcutRow { keyText: I18n.tr("Drag Image"); actionText: I18n.tr("Drop image onto bar icon to annotate it") }
+                    }
 
-                            StyledText {
-                                text: modelData.key
-                                font.pixelSize: Theme.fontSizeMedium
-                                font.weight: Font.Bold
-                                isMonospace: true
-                                color: Theme.primary
-                                width: 140
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
+                    Separator { opacity: 0.1 }
 
-                            StyledText {
-                                text: modelData.description
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
+                    StyledText {
+                        text: I18n.tr("Annotation Tools")
+                        font.pixelSize: Theme.fontSizeLarge
+                        font.bold: true
+                        color: Theme.primary
+                    }
 
-                        Separator {
-                            visible: index < captureConfig.shortcutEntries.length - 1
-                        }
+                    Column {
+                        width: parent.width
+                        spacing: 2
+
+                        ShortcutRow { keyText: I18n.tr("Key"); actionText: I18n.tr("Selected Tool / Action"); isHeader: true }
+                        ShortcutRow { keyText: "V"; actionText: I18n.tr("Select / Move stroke") }
+                        ShortcutRow { keyText: "1 - 4"; actionText: I18n.tr("Pen, Line, Arrow, Rect") }
+                        ShortcutRow { keyText: "Q - R"; actionText: I18n.tr("Ellipse, Text, Pixelate, Redact (Q, W, E, R)") }
+                        ShortcutRow { keyText: "A - D"; actionText: I18n.tr("Stamp, Highlighter, Spotlight (A, S, D)") }
+                        ShortcutRow { keyText: "Z / B"; actionText: I18n.tr("Callout, Background (Z, B)") }
+                        ShortcutRow { keyText: "F / T"; actionText: I18n.tr("Color Picker, Eraser (F, T)") }
+                    }
+
+                    Separator { opacity: 0.1 }
+
+                    StyledText {
+                        text: I18n.tr("General Shortcuts")
+                        font.pixelSize: Theme.fontSizeLarge
+                        font.bold: true
+                        color: Theme.primary
+                    }
+
+                    Column {
+                        width: parent.width
+                        spacing: 2
+
+                        ShortcutRow { keyText: I18n.tr("Key"); actionText: I18n.tr("Shortcut Action"); isHeader: true }
+                        ShortcutRow { keyText: "Enter"; actionText: I18n.tr("Done (Action based on settings)") }
+                        ShortcutRow { keyText: "Esc"; actionText: I18n.tr("Discard & Close") }
+                        ShortcutRow { keyText: "Tab"; actionText: I18n.tr("Toggle between 2 latest presets") }
+                        ShortcutRow { keyText: "V"; actionText: I18n.tr("Switch to Select Tool") }
+                        ShortcutRow { keyText: "C"; actionText: I18n.tr("Copy vector / Paste / Duplicate") }
+                        ShortcutRow { keyText: "G (Hold)"; actionText: I18n.tr("Magnifier Loupe") }
+                        ShortcutRow { keyText: "O"; actionText: I18n.tr("OCR Text Recognition") }
+                        ShortcutRow { keyText: "X"; actionText: I18n.tr("Toggle Hide/Show Annotations") }
+                        ShortcutRow { keyText: "Ctrl + Z"; actionText: I18n.tr("Undo last stroke") }
+                        ShortcutRow { keyText: "Ctrl + Y"; actionText: I18n.tr("Redo last undone stroke") }
+                        ShortcutRow { keyText: "Ctrl + Shift + Z"; actionText: I18n.tr("Redo last undone stroke") }
+                        ShortcutRow { keyText: "Ctrl + S"; actionText: I18n.tr("Force Save to File") }
+                        ShortcutRow { keyText: "Ctrl + C"; actionText: I18n.tr("Force Copy to Clipboard") }
+                        ShortcutRow { keyText: "Ctrl + Shift + C"; actionText: I18n.tr("Anonymous Copy (stripped metadata)") }
+                        ShortcutRow { keyText: "Ctrl + A"; actionText: I18n.tr("Force Copy & Save") }
+                        ShortcutRow { keyText: "Ctrl + F"; actionText: I18n.tr("Float Image") }
+                        ShortcutRow { keyText: "Ctrl + X"; actionText: I18n.tr("Crop / Resize Area") }
+                        ShortcutRow { keyText: "Ctrl + 1..4"; actionText: I18n.tr("Select Color Slots 1 - 4") }
+                        ShortcutRow { keyText: "Ctrl + Q..R"; actionText: I18n.tr("Select Color Slots 5 - 8 (Q, W, E, R)") }
                     }
                 }
             }
@@ -3538,275 +3586,170 @@ PluginSettings {
             width: parent.width
             spacing: Theme.spacingM
             SettingsCard {
-        SectionTitle { 
-            id: usageTitle
-            text: I18n.tr("Usage Guide")
-            icon: "menu_book" 
-            collapsible: true
-            settingKey: "usageGuideExpanded"
-        }
+                SectionTitle {
+                    id: ipcTitle
+                    text: I18n.tr("IPC Commands")
+                    icon: "terminal"
+                    collapsible: true
+                    isExpanded: false
+                    settingKey: "ipcCommandsExpanded"
+                }
 
-        Column {
-            width: parent.width
-            spacing: Theme.spacingM
-            visible: usageTitle.isExpanded
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacingM
+                    visible: ipcTitle.isExpanded
 
-            StyledText {
-                text: I18n.tr("Bar Interactions")
-                font.pixelSize: Theme.fontSizeLarge
-                font.bold: true
-                color: Theme.primary
-            }
+                    StyledText {
+                        width: parent.width
+                        text: I18n.tr("Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).")
+                        wrapMode: Text.WordWrap
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        textFormat: Text.RichText
+                    }
 
-            Column {
-                width: parent.width
-                spacing: 2
+                    CopyBox {
+                        label: I18n.tr("Screenshot (Interactive Region) — Edit")
+                        text: "dms ipc call quickCapture screenshot region edit"
+                    }
+                    CopyBox {
+                        label: I18n.tr("Screenshot (Interactive Region) — Float")
+                        text: "dms ipc call quickCapture screenshot region float"
+                    }
 
-                ShortcutRow { keyText: I18n.tr("Action"); actionText: I18n.tr("Interaction / Result"); isHeader: true }
-                ShortcutRow { keyText: I18n.tr("Left Click"); actionText: I18n.tr("Open Quick Capture menu (Popout)") }
-                ShortcutRow { keyText: I18n.tr("Middle Click"); actionText: I18n.tr("Trigger Middle-Click Action (Default: Interactive Region)") }
-                ShortcutRow { keyText: I18n.tr("Right Click"); actionText: I18n.tr("Trigger Right-Click Action (Default: Clipboard Annotate)") }
-                ShortcutRow { keyText: I18n.tr("Drag Image"); actionText: I18n.tr("Drop image onto bar icon to annotate it") }
-            }
+                    CopyBox {
+                        label: I18n.tr("Screenshot (Full Screen) — Edit")
+                        text: "dms ipc call quickCapture screenshot full edit"
+                    }
+                    CopyBox {
+                        label: I18n.tr("Screenshot (Full Screen) — Float")
+                        text: "dms ipc call quickCapture screenshot full float"
+                    }
 
-            Separator { opacity: 0.1 }
+                    CopyBox {
+                        label: I18n.tr("Screenshot (All Combined Outputs) — Edit")
+                        text: "dms ipc call quickCapture screenshot all edit"
+                    }
+                    CopyBox {
+                        label: I18n.tr("Screenshot (All Combined Outputs) — Float")
+                        text: "dms ipc call quickCapture screenshot all float"
+                    }
 
-            StyledText {
-                text: I18n.tr("Annotation Tools")
-                font.pixelSize: Theme.fontSizeLarge
-                font.bold: true
-                color: Theme.primary
-            }
+                    CopyBox {
+                        label: I18n.tr("Screenshot (Specific Output) — Edit")
+                        text: "dms ipc call quickCapture screenshot output edit"
+                    }
+                    CopyBox {
+                        label: I18n.tr("Screenshot (Specific Output) — Float")
+                        text: "dms ipc call quickCapture screenshot output float"
+                    }
 
-            Column {
-                width: parent.width
-                spacing: 2
+                    CopyBox {
+                        label: I18n.tr("Screenshot (Focused Window) — Edit")
+                        text: "dms ipc call quickCapture screenshot window edit"
+                    }
+                    CopyBox {
+                        label: I18n.tr("Screenshot (Focused Window) — Float")
+                        text: "dms ipc call quickCapture screenshot window float"
+                    }
 
-                ShortcutRow { keyText: I18n.tr("Key"); actionText: I18n.tr("Selected Tool / Action"); isHeader: true }
-                ShortcutRow { keyText: "V"; actionText: I18n.tr("Select / Move stroke") }
-                ShortcutRow { keyText: "1 - 4"; actionText: I18n.tr("Pen, Line, Arrow, Rect") }
-                ShortcutRow { keyText: "Q - R"; actionText: I18n.tr("Ellipse, Text, Pixelate, Redact (Q, W, E, R)") }
-                ShortcutRow { keyText: "A - D"; actionText: I18n.tr("Stamp, Highlighter, Spotlight (A, S, D)") }
-                ShortcutRow { keyText: "Z / B"; actionText: I18n.tr("Callout, Background (Z, B)") }
-                ShortcutRow { keyText: "F / T"; actionText: I18n.tr("Color Picker, Eraser (F, T)") }
-            }
+                    CopyBox {
+                        label: I18n.tr("Screenshot (Last Selected Region) — Edit")
+                        text: "dms ipc call quickCapture screenshot last edit"
+                    }
+                    CopyBox {
+                        label: I18n.tr("Screenshot (Last Selected Region) — Float")
+                        text: "dms ipc call quickCapture screenshot last float"
+                    }
 
-            Separator { opacity: 0.1 }
+                    CopyBox {
+                        label: I18n.tr("Screenshot (Scrolling Capture) — Edit")
+                        text: "dms ipc call quickCapture screenshot scroll edit"
+                    }
+                    CopyBox {
+                        label: I18n.tr("Screenshot (Scrolling Capture) — Float")
+                        text: "dms ipc call quickCapture screenshot scroll float"
+                    }
 
-            StyledText {
-                text: I18n.tr("General Shortcuts")
-                font.pixelSize: Theme.fontSizeLarge
-                font.bold: true
-                color: Theme.primary
-            }
+                    CopyBox {
+                        label: I18n.tr("Select Image File — Edit")
+                        text: "dms ipc call quickCapture selectFile edit"
+                    }
+                    CopyBox {
+                        label: I18n.tr("Select Image File — Float")
+                        text: "dms ipc call quickCapture selectFile float"
+                    }
 
-            Column {
-                width: parent.width
-                spacing: 2
+                    CopyBox {
+                        label: I18n.tr("Edit Image from Clipboard — Edit")
+                        text: "dms ipc call quickCapture fromClipboard edit"
+                    }
+                    CopyBox {
+                        label: I18n.tr("Edit Image from Clipboard — Float")
+                        text: "dms ipc call quickCapture fromClipboard float"
+                    }
 
-                ShortcutRow { keyText: I18n.tr("Key"); actionText: I18n.tr("Shortcut Action"); isHeader: true }
-                ShortcutRow { keyText: "Enter"; actionText: I18n.tr("Done (Action based on settings)") }
-                ShortcutRow { keyText: "Esc"; actionText: I18n.tr("Discard & Close") }
-                ShortcutRow { keyText: "Tab"; actionText: I18n.tr("Toggle between 2 latest presets") }
-                ShortcutRow { keyText: "V"; actionText: I18n.tr("Switch to Select Tool") }
-                ShortcutRow { keyText: "C"; actionText: I18n.tr("Copy vector / Paste / Duplicate") }
-                ShortcutRow { keyText: "G (Hold)"; actionText: I18n.tr("Magnifier Loupe") }
-                ShortcutRow { keyText: "O"; actionText: I18n.tr("OCR Text Recognition") }
-                ShortcutRow { keyText: "X"; actionText: I18n.tr("Toggle Hide/Show Annotations") }
-                ShortcutRow { keyText: "Ctrl + Z"; actionText: I18n.tr("Undo last stroke") }
-                ShortcutRow { keyText: "Ctrl + Y"; actionText: I18n.tr("Redo last undone stroke") }
-                ShortcutRow { keyText: "Ctrl + Shift + Z"; actionText: I18n.tr("Redo last undone stroke") }
-                ShortcutRow { keyText: "Ctrl + S"; actionText: I18n.tr("Force Save to File") }
-                ShortcutRow { keyText: "Ctrl + C"; actionText: I18n.tr("Force Copy to Clipboard") }
-                ShortcutRow { keyText: "Ctrl + Shift + C"; actionText: I18n.tr("Anonymous Copy (stripped metadata)") }
-                ShortcutRow { keyText: "Ctrl + A"; actionText: I18n.tr("Force Copy & Save") }
-                ShortcutRow { keyText: "Ctrl + F"; actionText: I18n.tr("Float Image") }
-                ShortcutRow { keyText: "Ctrl + X"; actionText: I18n.tr("Crop / Resize Area") }
-                ShortcutRow { keyText: "Ctrl + 1..4"; actionText: I18n.tr("Select Color Slots 1 - 4") }
-                ShortcutRow { keyText: "Ctrl + Q..R"; actionText: I18n.tr("Select Color Slots 5 - 8 (Q, W, E, R)") }
-            }
-        }
-    }
-        }
-    }
+                    CopyBox {
+                        label: I18n.tr("Open Specific Image Path — Edit")
+                        text: "dms ipc call quickCapture openImage /path/to/image.png edit"
+                    }
+                    CopyBox {
+                        label: I18n.tr("Open Specific Image Path — Float")
+                        text: "dms ipc call quickCapture openImage /path/to/image.png float"
+                    }
 
-    // ── Tab 15: Help ─────────────────────────────────────────────────────────────
-    Item {
-        visible: tabBar.currentIndex === 15
-        width: parent.width
-        height: visible ? implicitHeight : 0
-        implicitHeight: helpTabCol.implicitHeight
-        Column {
-            id: helpTabCol
-            width: parent.width
-            spacing: Theme.spacingM
-            SettingsCard {
-        SectionTitle {
-            id: ipcTitle
-            text: I18n.tr("IPC Commands")
-            icon: "terminal"
-            collapsible: true
-            isExpanded: false
-            settingKey: "ipcCommandsExpanded"
-        }
+                    CopyBox {
+                        label: I18n.tr("Close Annotator")
+                        text: "dms ipc call quickCapture close"
+                    }
 
-        Column {
-            width: parent.width
-            spacing: Theme.spacingM
-            visible: ipcTitle.isExpanded
+                    CopyBox {
+                        label: I18n.tr("Show Recent Edits History")
+                        text: "dms ipc call quickCapture showHistory"
+                    }
 
-            StyledText {
-                width: parent.width
-                text: I18n.tr("Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).")
-                wrapMode: Text.WordWrap
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceVariantText
-                textFormat: Text.RichText
-            }
+                    CopyBox {
+                        label: I18n.tr("Screen Recording (Interactive Region)")
+                        text: "dms ipc call quickCapture recordStart region"
+                    }
+                    CopyBox {
+                        label: I18n.tr("Screen Recording (Full Screen)")
+                        text: "dms ipc call quickCapture recordStart screen"
+                    }
+                    CopyBox {
+                        label: I18n.tr("Screen Recording (Window / Portal)")
+                        text: "dms ipc call quickCapture recordStart portal"
+                    }
+                    CopyBox {
+                        label: I18n.tr("Screen Recording (Stop & Save)")
+                        text: "dms ipc call quickCapture recordStop"
+                    }
+                    CopyBox {
+                        label: I18n.tr("Screen Recording (Pause / Resume)")
+                        text: "dms ipc call quickCapture recordPause"
+                    }
+                    CopyBox {
+                        label: I18n.tr("Screen Recording (Cancel)")
+                        text: "dms ipc call quickCapture recordCancel"
+                    }
+                    CopyBox {
+                        label: I18n.tr("Screen Recording (Toggle Start / Stop)")
+                        text: "dms ipc call quickCapture recordToggle"
+                    }
 
-            CopyBox {
-                label: I18n.tr("Screenshot (Interactive Region) — Edit")
-                text: "dms ipc call quickCapture screenshot region edit"
-            }
-            CopyBox {
-                label: I18n.tr("Screenshot (Interactive Region) — Float")
-                text: "dms ipc call quickCapture screenshot region float"
-            }
+                    Separator { opacity: 0.1 }
 
-            CopyBox {
-                label: I18n.tr("Screenshot (Full Screen) — Edit")
-                text: "dms ipc call quickCapture screenshot full edit"
-            }
-            CopyBox {
-                label: I18n.tr("Screenshot (Full Screen) — Float")
-                text: "dms ipc call quickCapture screenshot full float"
-            }
-
-            CopyBox {
-                label: I18n.tr("Screenshot (All Combined Outputs) — Edit")
-                text: "dms ipc call quickCapture screenshot all edit"
-            }
-            CopyBox {
-                label: I18n.tr("Screenshot (All Combined Outputs) — Float")
-                text: "dms ipc call quickCapture screenshot all float"
-            }
-
-            CopyBox {
-                label: I18n.tr("Screenshot (Specific Output) — Edit")
-                text: "dms ipc call quickCapture screenshot output edit"
-            }
-            CopyBox {
-                label: I18n.tr("Screenshot (Specific Output) — Float")
-                text: "dms ipc call quickCapture screenshot output float"
-            }
-
-            CopyBox {
-                label: I18n.tr("Screenshot (Focused Window) — Edit")
-                text: "dms ipc call quickCapture screenshot window edit"
-            }
-            CopyBox {
-                label: I18n.tr("Screenshot (Focused Window) — Float")
-                text: "dms ipc call quickCapture screenshot window float"
+                    CopyBox {
+                        label: I18n.tr("Niri Binding Example")
+                        text: "binds {\n    Print { spawn \"dms\" \"ipc\" \"call\" \"quickCapture\" \"screenshot\" \"region\" \"edit\"; }\n}"
+                    }
+                }
             }
 
-            CopyBox {
-                label: I18n.tr("Screenshot (Last Selected Region) — Edit")
-                text: "dms ipc call quickCapture screenshot last edit"
+            PluginAbout {
+                repoUrl: "https://github.com/hthienloc/dms-quick-capture"
             }
-            CopyBox {
-                label: I18n.tr("Screenshot (Last Selected Region) — Float")
-                text: "dms ipc call quickCapture screenshot last float"
-            }
-
-            CopyBox {
-                label: I18n.tr("Screenshot (Scrolling Capture) — Edit")
-                text: "dms ipc call quickCapture screenshot scroll edit"
-            }
-            CopyBox {
-                label: I18n.tr("Screenshot (Scrolling Capture) — Float")
-                text: "dms ipc call quickCapture screenshot scroll float"
-            }
-
-            CopyBox {
-                label: I18n.tr("Select Image File — Edit")
-                text: "dms ipc call quickCapture selectFile edit"
-            }
-            CopyBox {
-                label: I18n.tr("Select Image File — Float")
-                text: "dms ipc call quickCapture selectFile float"
-            }
-
-            CopyBox {
-                label: I18n.tr("Edit Image from Clipboard — Edit")
-                text: "dms ipc call quickCapture fromClipboard edit"
-            }
-            CopyBox {
-                label: I18n.tr("Edit Image from Clipboard — Float")
-                text: "dms ipc call quickCapture fromClipboard float"
-            }
-
-            CopyBox {
-                label: I18n.tr("Open Specific Image Path — Edit")
-                text: "dms ipc call quickCapture openImage /path/to/image.png edit"
-            }
-            CopyBox {
-                label: I18n.tr("Open Specific Image Path — Float")
-                text: "dms ipc call quickCapture openImage /path/to/image.png float"
-            }
-
-            CopyBox {
-                label: I18n.tr("Close Annotator")
-                text: "dms ipc call quickCapture close"
-            }
-
-            CopyBox {
-                label: I18n.tr("Show Recent Edits History")
-                text: "dms ipc call quickCapture showHistory"
-            }
-
-            CopyBox {
-                label: I18n.tr("Screen Recording (Interactive Region)")
-                text: "dms ipc call quickCapture recordStart region"
-            }
-            CopyBox {
-                label: I18n.tr("Screen Recording (Full Screen)")
-                text: "dms ipc call quickCapture recordStart screen"
-            }
-            CopyBox {
-                label: I18n.tr("Screen Recording (Window / Portal)")
-                text: "dms ipc call quickCapture recordStart portal"
-            }
-            CopyBox {
-                label: I18n.tr("Screen Recording (Stop & Save)")
-                text: "dms ipc call quickCapture recordStop"
-            }
-            CopyBox {
-                label: I18n.tr("Screen Recording (Pause / Resume)")
-                text: "dms ipc call quickCapture recordPause"
-            }
-            CopyBox {
-                label: I18n.tr("Screen Recording (Cancel)")
-                text: "dms ipc call quickCapture recordCancel"
-            }
-            CopyBox {
-                label: I18n.tr("Screen Recording (Toggle Start / Stop)")
-                text: "dms ipc call quickCapture recordToggle"
-            }
-
-
-            Separator { opacity: 0.1 }
-
-            CopyBox {
-                label: I18n.tr("Niri Binding Example")
-                text: "binds {\n    Print { spawn \"dms\" \"ipc\" \"call\" \"quickCapture\" \"screenshot\" \"region\" \"edit\"; }\n}"
-            }
-        }
-    }
-
-    PluginAbout {
-        repoUrl: "https://github.com/hthienloc/dms-quick-capture"
-    }
-
         }
     }
 
