@@ -29,6 +29,7 @@ Item {
     // Settings preferences
     property string targetGifPath: ""
     readonly property string outputDirectory: pluginData.recordingDirectory || "~/Videos/Recordings"
+    readonly property string recordingScreenTarget: pluginData.recordingScreenTarget || "screen"
     readonly property string videoFormat: pluginData.recordingFormat || "mp4"
     readonly property int framerate: parseInt(pluginData.recordingFramerate, 10) || 60
     readonly property int gifFramerate: parseInt(pluginData.recordingGifFramerate, 10) || 15
@@ -279,6 +280,16 @@ Item {
                 source = "portal";
             } else if (activeMode === "region") {
                 source = "region";
+            } else if (activeMode === "screen") {
+                const target = root.recordingScreenTarget;
+                if (target === "focused") {
+                    const focused = CompositorService.getFocusedScreen();
+                    source = (focused && focused.name) ? focused.name : "screen";
+                } else if (target && target !== "screen") {
+                    source = target;
+                } else {
+                    source = "screen";
+                }
             }
 
             const args = ["gpu-screen-recorder", "-w", source];

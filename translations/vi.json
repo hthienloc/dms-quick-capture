@@ -200,6 +200,9 @@
   "Choose whether the editor opens as a modal overlay or a movable floating window.": {
     "Choose whether the editor opens as a modal overlay or a movable floating window.": ""
   },
+  "Choose which monitor to capture during full screen recording.": {
+    "Choose which monitor to capture during full screen recording.": ""
+  },
   "Classic (Tailwind)": {
     "Classic (Tailwind)": ""
   },
@@ -542,6 +545,9 @@
   "Full Screen": {
     "Full Screen": "Toàn màn hình"
   },
+  "Full Screen Target": {
+    "Full Screen Target": ""
+  },
   "GIF Framerate": {
     "GIF Framerate": ""
   },
@@ -880,6 +886,9 @@
   },
   "Primary": {
     "Primary": ""
+  },
+  "Primary Screen": {
+    "Primary Screen": ""
   },
   "QR Result": {
     "QR Result": ""

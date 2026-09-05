@@ -672,9 +672,10 @@ PluginSettings {
                 SectionTitle {
                     text: I18n.trFor("quickCapture", "Video Settings")
                     icon: "videocam"
-                    showReset: recordingDirectory.isDirty || recordingFormat.isDirty || recordingGifFramerate.isDirty || recordingFramerate.isDirty || recordingQuality.isDirty || recordingCodec.isDirty || recordCursor.isDirty
+                    showReset: recordingDirectory.isDirty || recordingScreenTarget.isDirty || recordingFormat.isDirty || recordingGifFramerate.isDirty || recordingFramerate.isDirty || recordingQuality.isDirty || recordingCodec.isDirty || recordCursor.isDirty
                     onResetClicked: {
                         recordingDirectory.resetToDefault();
+                        recordingScreenTarget.resetToDefault();
                         recordingFormat.resetToDefault();
                         recordingGifFramerate.resetToDefault();
                         recordingFramerate.resetToDefault();
@@ -691,6 +692,34 @@ PluginSettings {
                     placeholder: "~/Videos/Recordings"
                     defaultValue: "~/Videos/Recordings"
                     isDirectory: true
+                }
+
+                Separator {}
+
+                SelectionSettingPlus {
+                    id: recordingScreenTarget
+                    settingKey: "recordingScreenTarget"
+                    label: I18n.trFor("quickCapture", "Full Screen Target")
+                    description: I18n.trFor("quickCapture", "Choose which monitor to capture during full screen recording.")
+                    options: {
+                        const list = [
+                            { label: I18n.trFor("quickCapture", "Primary Screen"), value: "screen" },
+                            { label: I18n.trFor("quickCapture", "Focused Screen"), value: "focused" }
+                        ];
+                        if (Quickshell.screens) {
+                            for (let i = 0; i < Quickshell.screens.length; i++) {
+                                const scr = Quickshell.screens[i];
+                                if (scr && scr.name) {
+                                    list.push({
+                                        label: I18n.trFor("quickCapture", "Screen: %1 (%2x%3)").arg(scr.name).arg(scr.width).arg(scr.height),
+                                        value: scr.name
+                                    });
+                                }
+                            }
+                        }
+                        return list;
+                    }
+                    defaultValue: "screen"
                 }
 
                 Separator {}
