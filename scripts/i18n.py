@@ -27,17 +27,44 @@ REPO_ROOT        = Path(__file__).parent.parent
 TRANSLATIONS_DIR = REPO_ROOT / "translations"
 POEXPORTS_DIR    = TRANSLATIONS_DIR / "poexports"
 
-# ── Target languages ───────────────────────────────────────────────────────────
-LANGUAGES = {
-    "vi":    {"name": "Vietnamese",            "file": "vi.json"},
-    "ja":    {"name": "Japanese",              "file": "ja.json"},
-    "zh-CN": {"name": "Chinese (Simplified)",  "file": "zh_CN.json"},
-    "ko":    {"name": "Korean",                "file": "ko.json"},
-    "fr":    {"name": "French",                "file": "fr.json"},
-    "de":    {"name": "German",                "file": "de.json"},
-    "es":    {"name": "Spanish",               "file": "es.json"},
-    "ru":    {"name": "Russian",               "file": "ru.json"},
+# ── Target languages & mapping ──────────────────────────────────────────────────
+KNOWN_LANGUAGES = {
+    "de":    "German",
+    "es":    "Spanish",
+    "fr":    "French",
+    "ja":    "Japanese",
+    "ko":    "Korean",
+    "ru":    "Russian",
+    "vi":    "Vietnamese",
+    "zh_CN": "Chinese (Simplified)",
+    "zh-CN": "Chinese (Simplified)",
+    "it":    "Italian",
+    "pt_BR": "Portuguese (Brazil)",
+    "pl":    "Polish",
+    "nl":    "Dutch",
+    "tr":    "Turkish",
+    "uk":    "Ukrainian",
 }
+
+def get_languages() -> list[dict]:
+    """Return all configured and discovered translation files sorted alphabetically by locale code."""
+    langs = []
+    seen_files = set()
+    if TRANSLATIONS_DIR.exists():
+        for p in TRANSLATIONS_DIR.glob("*.json"):
+            seen_files.add(p.name)
+            code = p.stem.replace("_", "-") if p.stem == "zh_CN" else p.stem
+            name = KNOWN_LANGUAGES.get(p.stem, KNOWN_LANGUAGES.get(code, p.stem))
+            langs.append({"code": code, "file": p.name, "name": name})
+
+    for code, name in KNOWN_LANGUAGES.items():
+        fname = f"{code}.json"
+        if fname not in seen_files and code in ["de", "es", "fr", "ja", "ko", "ru", "vi", "zh_CN"]:
+            langs.append({"code": code.replace("_", "-"), "file": fname, "name": name})
+            seen_files.add(fname)
+
+    langs.sort(key=lambda x: x["code"].lower())
+    return langs
 
 README_FILE = REPO_ROOT / "README.md"
 TABLE_START = "<!-- TRANSLATIONS_TABLE_START -->"
@@ -111,8 +138,9 @@ def cmd_extract(_args):
 
     TRANSLATIONS_DIR.mkdir(parents=True, exist_ok=True)
 
-    for code, info_dict in LANGUAGES.items():
-        filename = info_dict["file"]
+    for item in get_languages():
+        code = item["code"]
+        filename = item["file"]
         out_path = TRANSLATIONS_DIR / filename
         old_po_path = POEXPORTS_DIR / filename
 
@@ -156,9 +184,10 @@ def cmd_status(args):
     print(f"\n{'Language':<22} {'Locale':<8} {'File':<15} {'Done':>6} {'Missing':>8} {'Coverage':>10}")
     print("-" * 75)
 
-    for code, info_dict in LANGUAGES.items():
-        name = info_dict["name"]
-        filename = info_dict["file"]
+    for item in get_languages():
+        name = item["name"]
+        code = item["code"]
+        filename = item["file"]
         path = TRANSLATIONS_DIR / filename
         existing = _read_translations(path)
         done = sum(1 for s in strings if existing.get(s, "").strip())
