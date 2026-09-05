@@ -411,6 +411,7 @@ PluginSettings {
                     { label: I18n.tr("Color Palette"),  icon: "palette"            },
                     { label: I18n.tr("Editor"),        icon: "aspect_ratio"       },
                     { label: I18n.tr("Drawing"),       icon: "brush"              },
+                    { label: I18n.tr("Tool Defaults"), icon: "tune"               },
                     { label: I18n.tr("Text"),          icon: "format_size"        },
                     { label: I18n.tr("Shapes"),        icon: "category"           },
                     { label: I18n.tr("Background"),      icon: "wallpaper"          },
@@ -1579,33 +1580,60 @@ PluginSettings {
             visible: defaultToolMode.value === "custom"
         }
 
-        ToggleSettingPlus {
-            id: penAutoClose
-            settingKey: "penAutoClose"
-            label: I18n.tr("Pen Auto-Close")
-            description: I18n.tr("Auto-close the loop when ending near the start point.")
-            defaultValue: true
+            ToggleSettingPlus {
+                id: penAutoClose
+                settingKey: "penAutoClose"
+                label: I18n.tr("Pen Auto-Close")
+                description: I18n.tr("Auto-close the loop when ending near the start point.")
+                defaultValue: true
+            }
         }
     }
+}
+
+    // ── Tab 8: Tool Defaults ───────────────────────────────────────────────────────
+    Item {
+        visible: tabBar.currentIndex === 8
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        implicitHeight: toolDefaultsTabCol.implicitHeight
+        Column {
+            id: toolDefaultsTabCol
+            width: parent.width
+            spacing: Theme.spacingM
 
             SettingsCard {
                 id: toolDefaultsCard
                 SectionTitle {
                     text: I18n.tr("Tool Defaults")
                     icon: "tune"
-                    showReset: defaultPenThickness.isDirty || defaultLineThickness.isDirty || defaultArrowThickness.isDirty
-                        || defaultRectThickness.isDirty || defaultEllipseThickness.isDirty || defaultHighlighterThickness.isDirty
-                        || defaultRedactThickness.isDirty || defaultStampSize.isDirty || defaultPixelateIntensity.isDirty
+                    showReset: defaultPenThickness.isDirty || defaultPenColor.isDirty
+                        || defaultLineThickness.isDirty || defaultLineColor.isDirty
+                        || defaultArrowThickness.isDirty || defaultArrowColor.isDirty
+                        || defaultRectThickness.isDirty || defaultRectColor.isDirty
+                        || defaultEllipseThickness.isDirty || defaultEllipseColor.isDirty
+                        || defaultHighlighterThickness.isDirty || defaultHighlighterColor.isDirty
+                        || defaultStampSize.isDirty || defaultStampColor.isDirty
+                        || defaultTextColor.isDirty
+                        || defaultRedactThickness.isDirty || defaultPixelateIntensity.isDirty
                         || defaultSpotlightIntensity.isDirty || defaultCalloutZoom.isDirty
                     onResetClicked: {
                         defaultPenThickness.resetToDefault();
+                        defaultPenColor.resetToDefault();
                         defaultLineThickness.resetToDefault();
+                        defaultLineColor.resetToDefault();
                         defaultArrowThickness.resetToDefault();
+                        defaultArrowColor.resetToDefault();
                         defaultRectThickness.resetToDefault();
+                        defaultRectColor.resetToDefault();
                         defaultEllipseThickness.resetToDefault();
+                        defaultEllipseColor.resetToDefault();
                         defaultHighlighterThickness.resetToDefault();
-                        defaultRedactThickness.resetToDefault();
+                        defaultHighlighterColor.resetToDefault();
                         defaultStampSize.resetToDefault();
+                        defaultStampColor.resetToDefault();
+                        defaultTextColor.resetToDefault();
+                        defaultRedactThickness.resetToDefault();
                         defaultPixelateIntensity.resetToDefault();
                         defaultSpotlightIntensity.resetToDefault();
                         defaultCalloutZoom.resetToDefault();
@@ -1624,6 +1652,13 @@ PluginSettings {
                     previewType: "thickness"
                 }
 
+                ColorSettingPlus {
+                    id: defaultPenColor
+                    label: I18n.tr("Pen Color")
+                    settingKey: "defaultPenColor"
+                    defaultValue: "primary"
+                }
+
                 Separator {}
 
                 SliderSettingPlus {
@@ -1636,6 +1671,13 @@ PluginSettings {
                     leftLabel: Constants.getToolMeta("line").min.toString()
                     rightLabel: Constants.getToolMeta("line").max.toString()
                     previewType: "thickness"
+                }
+
+                ColorSettingPlus {
+                    id: defaultLineColor
+                    label: I18n.tr("Line Color")
+                    settingKey: "defaultLineColor"
+                    defaultValue: "primary"
                 }
 
                 Separator {}
@@ -1652,6 +1694,13 @@ PluginSettings {
                     previewType: "thickness"
                 }
 
+                ColorSettingPlus {
+                    id: defaultArrowColor
+                    label: I18n.tr("Arrow Color")
+                    settingKey: "defaultArrowColor"
+                    defaultValue: "primary"
+                }
+
                 Separator {}
 
                 SliderSettingPlus {
@@ -1664,6 +1713,13 @@ PluginSettings {
                     leftLabel: Constants.getToolMeta("rect").min.toString()
                     rightLabel: Constants.getToolMeta("rect").max.toString()
                     previewType: "thickness"
+                }
+
+                ColorSettingPlus {
+                    id: defaultRectColor
+                    label: I18n.tr("Rectangle Color")
+                    settingKey: "defaultRectColor"
+                    defaultValue: "primary"
                 }
 
                 Separator {}
@@ -1680,6 +1736,13 @@ PluginSettings {
                     previewType: "thickness"
                 }
 
+                ColorSettingPlus {
+                    id: defaultEllipseColor
+                    label: I18n.tr("Ellipse Color")
+                    settingKey: "defaultEllipseColor"
+                    defaultValue: "primary"
+                }
+
                 Separator {}
 
                 SliderSettingPlus {
@@ -1694,18 +1757,20 @@ PluginSettings {
                     previewType: "thickness"
                 }
 
+                ColorSettingPlus {
+                    id: defaultHighlighterColor
+                    label: I18n.tr("Highlighter Color")
+                    settingKey: "defaultHighlighterColor"
+                    defaultValue: "primary"
+                }
+
                 Separator {}
 
-                SliderSettingPlus {
-                    id: defaultRedactThickness
-                    label: I18n.tr("Redact Thickness")
-                    settingKey: "defaultRedactThickness"
-                    defaultValue: Constants.getToolMeta("redact").defaultValue
-                    minimum: Constants.getToolMeta("redact").min
-                    maximum: Constants.getToolMeta("redact").max
-                    leftLabel: Constants.getToolMeta("redact").min.toString()
-                    rightLabel: Constants.getToolMeta("redact").max.toString()
-                    previewType: "thickness"
+                ColorSettingPlus {
+                    id: defaultTextColor
+                    label: I18n.tr("Text Color")
+                    settingKey: "defaultTextColor"
+                    defaultValue: "primary"
                 }
 
                 Separator {}
@@ -1719,6 +1784,27 @@ PluginSettings {
                     maximum: Constants.getToolMeta("stamp").max
                     leftLabel: Constants.getToolMeta("stamp").min.toString()
                     rightLabel: Constants.getToolMeta("stamp").max.toString()
+                    previewType: "thickness"
+                }
+
+                ColorSettingPlus {
+                    id: defaultStampColor
+                    label: I18n.tr("Stamp Color")
+                    settingKey: "defaultStampColor"
+                    defaultValue: "primary"
+                }
+
+                Separator {}
+
+                SliderSettingPlus {
+                    id: defaultRedactThickness
+                    label: I18n.tr("Redact Thickness")
+                    settingKey: "defaultRedactThickness"
+                    defaultValue: Constants.getToolMeta("redact").defaultValue
+                    minimum: Constants.getToolMeta("redact").min
+                    maximum: Constants.getToolMeta("redact").max
+                    leftLabel: Constants.getToolMeta("redact").min.toString()
+                    rightLabel: Constants.getToolMeta("redact").max.toString()
                     previewType: "thickness"
                 }
 
@@ -1767,9 +1853,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 8: Text ──────────────────────────────────────────────────────────────
+    // ── Tab 9: Text ──────────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 8
+        visible: tabBar.currentIndex === 9
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: textTabCol.implicitHeight
@@ -1879,9 +1965,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 9: Shapes ────────────────────────────────────────────────────────────
+    // ── Tab 10: Shapes ────────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 9
+        visible: tabBar.currentIndex === 10
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: shapesTabCol.implicitHeight
@@ -1947,9 +2033,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 10: Background ──────────────────────────────────────────────────────────
+    // ── Tab 11: Background ──────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 10
+        visible: tabBar.currentIndex === 11
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: backgroundTabCol.implicitHeight
@@ -2217,9 +2303,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 11: Watermark ────────────────────────────────────────────────────────
+    // ── Tab 12: Watermark ────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 11
+        visible: tabBar.currentIndex === 12
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: watermarkTabCol.implicitHeight
@@ -2686,9 +2772,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 12: Float Window ─────────────────────────────────────────────────────
+    // ── Tab 13: Float Window ─────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 12
+        visible: tabBar.currentIndex === 13
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: floatTabCol.implicitHeight
@@ -2846,9 +2932,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 13: Radial Menu ───────────────────────────────────────────────────────
+    // ── Tab 14: Radial Menu ───────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 13
+        visible: tabBar.currentIndex === 14
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: presetsTabCol.implicitHeight
@@ -3386,9 +3472,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 14: Shortcuts ────────────────────────────────────────────────────────
+    // ── Tab 15: Shortcuts ────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 14
+        visible: tabBar.currentIndex === 15
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: shortcutsTabCol.implicitHeight
@@ -3396,7 +3482,62 @@ PluginSettings {
             id: shortcutsTabCol
             width: parent.width
             spacing: Theme.spacingM
-    SettingsCard {
+            SettingsCard {
+                id: shortcutsCard
+                SectionTitle {
+                    text: I18n.tr("Keyboard Shortcuts")
+                    icon: "keyboard"
+                    showReset: false
+                }
+
+                Repeater {
+                    model: captureConfig.shortcutEntries
+                    delegate: Column {
+                        width: parent.width
+                        spacing: Theme.spacingS
+
+                        Row {
+                            width: parent.width
+                            spacing: Theme.spacingM
+
+                            StyledText {
+                                text: modelData.key
+                                font.pixelSize: Theme.fontSizeMedium
+                                font.weight: Font.Bold
+                                isMonospace: true
+                                color: Theme.primary
+                                width: 140
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            StyledText {
+                                text: modelData.description
+                                font.pixelSize: Theme.fontSizeMedium
+                                color: Theme.surfaceText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        Separator {
+                            visible: index < captureConfig.shortcutEntries.length - 1
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // ── Tab 16: Help ─────────────────────────────────────────────────────────────
+    Item {
+        visible: tabBar.currentIndex === 16
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        implicitHeight: helpTabCol.implicitHeight
+        Column {
+            id: helpTabCol
+            width: parent.width
+            spacing: Theme.spacingM
+            SettingsCard {
         SectionTitle { 
             id: usageTitle
             text: I18n.tr("Usage Guide")

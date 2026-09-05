@@ -434,6 +434,62 @@ Item {
         window.applyToolIntensity(window.currentTool, window.sessionToolIntensity(window.currentTool));
     }
 
+    readonly property var colorTools: [
+        "pen", "line", "arrow", "rect", "ellipse", "highlighter", "stamp", "text"
+    ]
+
+    property var sessionToolColors: ({})
+
+    function isColorTool(tool) {
+        return window.colorTools.indexOf(tool) !== -1;
+    }
+
+    function colorSettingKey(tool) {
+        const keys = {
+            pen: "defaultPenColor",
+            line: "defaultLineColor",
+            arrow: "defaultArrowColor",
+            rect: "defaultRectColor",
+            ellipse: "defaultEllipseColor",
+            highlighter: "defaultHighlighterColor",
+            stamp: "defaultStampColor",
+            text: "defaultTextColor"
+        };
+        return keys[tool] || "";
+    }
+
+    function configuredToolColor(tool) {
+        const key = window.colorSettingKey(tool);
+        let rawValue = key ? window.pluginData[key] : undefined;
+        if (rawValue === undefined) {
+            return "primary";
+        }
+        return rawValue;
+    }
+
+    function resetSessionToolColors() {
+        const values = {};
+        for (let i = 0; i < window.colorTools.length; i++) {
+            const tool = window.colorTools[i];
+            values[tool] = window.configuredToolColor(tool);
+        }
+        window.sessionToolColors = values;
+    }
+
+    function updateSessionToolColor(tool, colorValue) {
+        if (!window.isColorTool(tool)) return;
+        const nextValues = Object.assign({}, window.sessionToolColors);
+        nextValues[tool] = colorValue ? colorValue.toString() : "primary";
+        window.sessionToolColors = nextValues;
+    }
+
+    function sessionToolColor(tool) {
+        if (!window.isColorTool(tool)) return window.currentColor;
+        const current = window.sessionToolColors[tool];
+        if (current !== undefined) return config.resolveColor(current);
+        return config.resolveColor(window.configuredToolColor(tool));
+    }
+
     function shouldSkipCurrentStrokeCommit(stroke) {
         if (!stroke || stroke.tool === "text") return true;
 
@@ -526,6 +582,10 @@ Item {
             window.lastActiveTool = window.currentTool;
         }
         window.applyCurrentToolSessionIntensity();
+        if (window.isColorTool(window.currentTool)) {
+            window.activeColorSlotIndex = -1;
+            window.currentColor = window.sessionToolColor(window.currentTool);
+        }
         if (window.currentTool !== "select" && window.selectedStroke) {
             window.deselectStrokeForEditing(true);
             window.requestActiveCanvasPaint();
@@ -925,6 +985,9 @@ Item {
 
     property color currentColor: Theme.primary
     onCurrentColorChanged: {
+        if (window.isColorTool(window.currentTool) && window.currentTool !== "select" && !window.selectedStroke) {
+            window.updateSessionToolColor(window.currentTool, window.currentColor);
+        }
         if (window.updatePastePreviewColor(window.currentColor)) {
             return;
         }
@@ -3472,6 +3535,7 @@ Item {
         let startColor = Theme.primary;
 
         window.resetSessionToolIntensities();
+        window.resetSessionToolColors();
 
         const defaultToolMode = config.pluginData.defaultToolMode || "preset";
         if (defaultToolMode === "preset") {
@@ -3486,10 +3550,12 @@ Item {
             } else {
                 startTool = config.pluginData.defaultTool || "pen";
                 startThickness = window.sessionToolIntensity(startTool);
+                startColor = window.sessionToolColor(startTool);
             }
         } else {
             startTool = config.pluginData.defaultTool || "pen";
             startThickness = window.sessionToolIntensity(startTool);
+            startColor = window.sessionToolColor(startTool);
         }
 
         window.resetEditorSessionState();
@@ -3499,6 +3565,7 @@ Item {
         window.applyToolIntensity(startTool, startThickness);
         window.updateSessionToolIntensity(startTool, startThickness);
         window.currentColor = startColor;
+        window.updateSessionToolColor(startTool, startColor);
         window.recordPresetUsage({ tool: startTool, color: startColor, thickness: startThickness });
 
         window.stampCounter = 1;
