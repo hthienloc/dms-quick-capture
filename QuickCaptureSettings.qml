@@ -1533,6 +1533,11 @@ PluginSettings {
                     defaultValue: "preset"
                 }
 
+                InfoText {
+                    text: I18n.tr("Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.")
+                    opacity: 0.85
+                }
+
                 Separator {}
 
                 SelectionSettingPlus {
