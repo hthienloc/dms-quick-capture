@@ -126,8 +126,8 @@ Item {
 
             StyledText {
                 anchors.centerIn: parent
-                text: root.previewIndex >= 0 ? I18n.tr("Preview") : 
-                     (root.daemon && root.daemon.pluginData ? root.daemon.pluginData.saveDirectory || "~/Pictures/Screenshots" : I18n.tr("Recent Edits"))
+                text: root.previewIndex >= 0 ? I18n.trFor("quickCapture", "Preview") : 
+                     (root.daemon && root.daemon.pluginData ? root.daemon.pluginData.saveDirectory || "~/Pictures/Screenshots" : I18n.trFor("quickCapture", "Recent Edits"))
                 font.pixelSize: Theme.fontSizeNormal
                 font.bold: true
                 color: Theme.surfaceText
@@ -139,7 +139,7 @@ Item {
             width: parent.width
             height: parent.height - 44
             visible: root.entries.length === 0
-            text: I18n.tr("No saved images yet")
+            text: I18n.trFor("quickCapture", "No saved images yet")
             font.pixelSize: Theme.fontSizeNormal
             color: Theme.surfaceVariantText
             horizontalAlignment: Text.AlignHCenter
@@ -252,7 +252,7 @@ Item {
                                     radius: height / 2
                                     opacity: cardHover.hovered ? 1 : 0
                                     enabled: cardHover.hovered
-                                    tooltipText: I18n.tr("Open")
+                                    tooltipText: I18n.trFor("quickCapture", "Open")
                                     onClicked: Proc.runCommand("open-card", ["xdg-open", modelData.savedPath])
 
                                     property bool _ovHovered: false
@@ -277,11 +277,11 @@ Item {
                                     radius: height / 2
                                     opacity: cardHover.hovered ? 1 : 0
                                     enabled: cardHover.hovered
-                                    tooltipText: parent._copied ? I18n.tr("Copied") : I18n.tr("Copy")
+                                    tooltipText: parent._copied ? I18n.trFor("quickCapture", "Copied") : I18n.trFor("quickCapture", "Copy")
                                     onClicked: {
                                         parent._copied = true
                                         DMSService.sendRequest("clipboard.copyFile", { "filePath": modelData.savedPath })
-                                        ToastService.showInfo(I18n.tr("Image copied to clipboard"))
+                                        ToastService.showInfo(I18n.trFor("quickCapture", "Image copied to clipboard"))
                                     }
 
                                     property bool _ovHovered: false
@@ -306,7 +306,7 @@ Item {
                                     radius: height / 2
                                     opacity: cardHover.hovered ? 1 : 0
                                     enabled: cardHover.hovered
-                                    tooltipText: I18n.tr("Delete")
+                                    tooltipText: I18n.trFor("quickCapture", "Delete")
                                     backgroundColor: Qt.rgba(1, 0, 0, 0.25)
                                     iconColor: "#ff6b6b"
                                     onClicked: {
@@ -413,7 +413,7 @@ Item {
 
                 DankButton {
                     iconName: "open_in_new"
-                    text: I18n.tr("Open")
+                    text: I18n.trFor("quickCapture", "Open")
                     buttonHeight: 36
                     horizontalPadding: 16
                     backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, 0.9)
@@ -426,7 +426,7 @@ Item {
 
                 DankButton {
                     iconName: previewArea._previewCopied ? "check" : "content_copy"
-                    text: previewArea._previewCopied ? I18n.tr("Copied") : I18n.tr("Copy")
+                    text: previewArea._previewCopied ? I18n.trFor("quickCapture", "Copied") : I18n.trFor("quickCapture", "Copy")
                     buttonHeight: 36
                     horizontalPadding: 16
                     backgroundColor: previewArea._previewCopied
@@ -437,7 +437,7 @@ Item {
                         if (root.previewEntry) {
                             previewArea._previewCopied = true
                             DMSService.sendRequest("clipboard.copyFile", { "filePath": root.previewEntry.savedPath })
-                            ToastService.showInfo(I18n.tr("Image copied to clipboard"))
+                            ToastService.showInfo(I18n.trFor("quickCapture", "Image copied to clipboard"))
                         }
                     }
                 }
@@ -453,7 +453,7 @@ Item {
                 radius: height / 2
                 backgroundColor: Qt.rgba(1, 0, 0, 0.25)
                 iconColor: "#ff6b6b"
-                tooltipText: I18n.tr("Delete")
+                tooltipText: I18n.trFor("quickCapture", "Delete")
                 onClicked: {
                     if (root.previewEntry) {
                         var delPath = root.previewEntry.savedPath

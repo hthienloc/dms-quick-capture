@@ -20,9 +20,9 @@ OptionToolbarPopup {
         // Group: Line Styles (Solid, Dashed, Dotted)
         Repeater {
             model: [
-                { icon: "line_weight", style: "solid", tooltip: I18n.tr("Solid Line") },
-                { icon: "border_style", style: "dashed", tooltip: I18n.tr("Dashed Line") },
-                { icon: "more_horiz", style: "dotted", tooltip: I18n.tr("Dotted Line") }
+                { icon: "line_weight", style: "solid", tooltip: I18n.trFor("quickCapture", "Solid Line") },
+                { icon: "border_style", style: "dashed", tooltip: I18n.trFor("quickCapture", "Dashed Line") },
+                { icon: "more_horiz", style: "dotted", tooltip: I18n.trFor("quickCapture", "Dotted Line") }
             ]
 
             delegate: OptionToolbarButton {

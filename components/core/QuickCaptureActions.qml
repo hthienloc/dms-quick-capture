@@ -144,7 +144,7 @@ QtObject {
         
         const mode = root.getPluginData().postNotification || "notification";
         if (mode === "notification" || mode === "both") {
-            Proc.runCommand("system-notify-error", ["notify-send", "-u", "critical", "-a", "Quick Capture", "-i", "error", I18n.tr("Quick Capture Error"), fullMsg]);
+            Proc.runCommand("system-notify-error", ["notify-send", "-u", "critical", "-a", "Quick Capture", "-i", "error", I18n.trFor("quickCapture", "Quick Capture Error"), fullMsg]);
         }
     }
 
@@ -279,12 +279,12 @@ QtObject {
                 if (exitCode === 0) {
                     const notifyPath = Paths.expandTilde(targetPath);
                     const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && originalPng) ? originalPng : notifyPath;
-                    root.sendNotification(I18n.tr("Screenshot Saved"), I18n.tr("Screenshot saved to %1/%2").arg(saveDir).arg(filename), iconPath, notifyPath);
+                    root.sendNotification(I18n.trFor("quickCapture", "Screenshot Saved"), I18n.trFor("quickCapture", "Screenshot saved to %1/%2").arg(saveDir).arg(filename), iconPath, notifyPath);
                     root.closeRequested();
                 } else {
                     const errDetail = commandOutputOrFallback(stdout, "Save command failed with exit code " + exitCode);
                     console.error("[QuickCapture] Save failed:", errDetail);
-                    notifyError(I18n.tr("Failed to save screenshot file."), errDetail);
+                    notifyError(I18n.trFor("quickCapture", "Failed to save screenshot file."), errDetail);
                 }
                 cleanupConvertedFiles(finalPath, originalPng);
             });
@@ -300,12 +300,12 @@ QtObject {
                 if (exitCode === 0) {
                     const notifyPath = Paths.expandTilde(targetPath);
                     const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && originalPng) ? originalPng : notifyPath;
-                    root.sendNotification(I18n.tr("Screenshot Saved"), I18n.tr("Screenshot saved to %1").arg(notifyPath), iconPath, notifyPath);
+                    root.sendNotification(I18n.trFor("quickCapture", "Screenshot Saved"), I18n.trFor("quickCapture", "Screenshot saved to %1").arg(notifyPath), iconPath, notifyPath);
                     root.closeRequested();
                 } else {
                     const errDetail = commandOutputOrFallback(stdout, "Save As command failed with exit code " + exitCode);
                     console.error("[QuickCapture] Save As failed:", errDetail);
-                    notifyError(I18n.tr("Failed to save screenshot file."), errDetail);
+                    notifyError(I18n.trFor("quickCapture", "Failed to save screenshot file."), errDetail);
                 }
                 cleanupConvertedFiles(finalPath, originalPng);
             });
@@ -316,12 +316,12 @@ QtObject {
         withConvertedExport((finalPath, originalPng) => {
             const clipSource = originalPng || finalPath;
             copyExportedFile(clipSource, () => {
-                root.sendNotification(I18n.tr("Screenshot Copied"), I18n.tr("Screenshot copied to clipboard."), clipSource);
+                root.sendNotification(I18n.trFor("quickCapture", "Screenshot Copied"), I18n.trFor("quickCapture", "Screenshot copied to clipboard."), clipSource);
                 root.closeRequested();
                 cleanupConvertedFiles(finalPath, originalPng);
             }, (errDetail) => {
                 console.error("[QuickCapture] Copy failed:", errDetail);
-                notifyError(I18n.tr("Failed to copy screenshot to clipboard."), errDetail);
+                notifyError(I18n.trFor("quickCapture", "Failed to copy screenshot to clipboard."), errDetail);
                 root.closeRequested();
                 cleanupConvertedFiles(finalPath, originalPng);
             });
@@ -348,14 +348,14 @@ QtObject {
                 const doCopy = (sourceFile, isStripped) => {
                     copyExportedFile(sourceFile, () => {
                         const msg = isStripped
-                            ? I18n.tr("Screenshot copied anonymously with randomized name and stripped metadata.")
-                            : I18n.tr("Screenshot copied with randomized name.");
-                        root.sendNotification(I18n.tr("Copied Anonymously"), msg, sourceFile);
+                            ? I18n.trFor("quickCapture", "Screenshot copied anonymously with randomized name and stripped metadata.")
+                            : I18n.trFor("quickCapture", "Screenshot copied with randomized name.");
+                        root.sendNotification(I18n.trFor("quickCapture", "Copied Anonymously"), msg, sourceFile);
                         root.closeRequested();
                         cleanupTemp(pngPath);
                         if (sourceFile !== pngPath) cleanupTemp(sourceFile);
                     }, (errDetail) => {
-                        notifyError(I18n.tr("Failed to copy screenshot to clipboard."), errDetail);
+                        notifyError(I18n.trFor("quickCapture", "Failed to copy screenshot to clipboard."), errDetail);
                         root.closeRequested();
                         cleanupTemp(pngPath);
                         if (sourceFile !== pngPath) cleanupTemp(sourceFile);
@@ -383,17 +383,17 @@ QtObject {
                     if (saveCode === 0) {
                         const notifyPath = Paths.expandTilde(targetPath);
                         const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && originalPng) ? originalPng : notifyPath;
-                        root.sendNotification(I18n.tr("Screenshot Saved"), I18n.tr("Screenshot copied to clipboard and saved to %1").arg(saveDir), iconPath, notifyPath);
+                        root.sendNotification(I18n.trFor("quickCapture", "Screenshot Saved"), I18n.trFor("quickCapture", "Screenshot copied to clipboard and saved to %1").arg(saveDir), iconPath, notifyPath);
                     } else {
                         const errDetail = commandOutputOrFallback(saveOut, "Save exit code " + saveCode);
-                        notifyWarning(I18n.tr("Screenshot copied to clipboard but failed to save file: %1").arg(errDetail));
+                        notifyWarning(I18n.trFor("quickCapture", "Screenshot copied to clipboard but failed to save file: %1").arg(errDetail));
                     }
                     root.closeRequested();
                     cleanupConvertedFiles(finalPath, originalPng);
                 });
             }, (errDetail) => {
                 console.error("[QuickCapture] Copy&Save failed on copy step:", errDetail);
-                notifyError(I18n.tr("Failed to copy screenshot to clipboard."), errDetail);
+                notifyError(I18n.trFor("quickCapture", "Failed to copy screenshot to clipboard."), errDetail);
                 root.closeRequested();
                 cleanupConvertedFiles(finalPath, originalPng);
             });

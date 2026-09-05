@@ -85,7 +85,7 @@ PopoverSurface {
 
                 StyledText {
                     id: ratioText
-                    text: I18n.tr("Ratio")
+                    text: I18n.trFor("quickCapture", "Ratio")
                     font.pixelSize: Constants.fontSizeCompact
                     color: Theme.surfaceVariantText
                     anchors.left: parent.left

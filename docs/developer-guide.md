@@ -47,7 +47,7 @@ dms-quick-capture/
 | Shared layout/sizing constants | `components/core/Constants.js` |
 | Add a toolbar button | `components/toolbar/QuickCaptureToolbar.qml` |
 | Per-tool sub-toolbar (options) | `components/toolbar/options/*OptionsToolbar.qml` |
-| i18n string | `CaptureConfig.qml` or component → wrap with `I18n.tr(...)` |
+| i18n string | `CaptureConfig.qml` or component → wrap with `I18n.trFor("quickCapture", ...)` |
 
 ---
 
@@ -109,7 +109,7 @@ Add an entry to the `toolButtons` array. The `id` is the string used everywhere 
 
 ```qml
 // CaptureConfig.qml — toolButtons array
-{ id: "double_arrow", icon: "sync_alt", shortcut: "X", tooltip: I18n.tr("Double Arrow (X)") }
+{ id: "double_arrow", icon: "sync_alt", shortcut: "X", tooltip: I18n.trFor("quickCapture", "Double Arrow (X)") }
 ```
 
 ### Step 2 — Define slider metadata in `Constants.js`

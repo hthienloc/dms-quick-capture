@@ -36,7 +36,7 @@ Popup {
             spacing: Theme.spacingM
 
             StyledText {
-                text: I18n.tr("Edit Color Palette")
+                text: I18n.trFor("quickCapture", "Edit Color Palette")
                 font.bold: true
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceText
@@ -44,7 +44,7 @@ Popup {
 
             StyledText {
                 width: parent.width
-                text: I18n.tr("This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:")
+                text: I18n.trFor("quickCapture", "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:")
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceTextMedium
                 wrapMode: Text.Wrap
@@ -71,7 +71,7 @@ Popup {
                         spacing: Theme.spacingS
 
                         StyledText {
-                            text: I18n.tr("Copy Current Palette")
+                            text: I18n.trFor("quickCapture", "Copy Current Palette")
                             font.bold: true
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceText
@@ -79,7 +79,7 @@ Popup {
                         }
 
                         StyledText {
-                            text: I18n.tr("Copy and customize this preset")
+                            text: I18n.trFor("quickCapture", "Copy and customize this preset")
                             font.pixelSize: Theme.fontSizeSmall - 1
                             color: Theme.surfaceTextMedium
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -132,7 +132,7 @@ Popup {
                         spacing: Theme.spacingS
 
                         StyledText {
-                            text: I18n.tr("Use Existing Custom")
+                            text: I18n.trFor("quickCapture", "Use Existing Custom")
                             font.bold: true
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceText
@@ -140,7 +140,7 @@ Popup {
                         }
 
                         StyledText {
-                            text: I18n.tr("Switch to your custom preset")
+                            text: I18n.trFor("quickCapture", "Switch to your custom preset")
                             font.pixelSize: Theme.fontSizeSmall - 1
                             color: Theme.surfaceTextMedium
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -183,7 +183,7 @@ Popup {
                 height: 28
 
                 DankButton {
-                    text: I18n.tr("Cancel")
+                    text: I18n.trFor("quickCapture", "Cancel")
                     backgroundColor: "transparent"
                     textColor: Theme.surfaceTextMedium
                     height: 28

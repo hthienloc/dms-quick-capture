@@ -25,8 +25,8 @@ OptionToolbarPopup {
             spacing: Theme.spacingS
             Repeater {
                 model: [
-                    { icon: "crop_square", shape: "rect", tooltip: I18n.tr("Rectangle") },
-                    { icon: "circle", shape: "ellipse", tooltip: I18n.tr("Ellipse") }
+                    { icon: "crop_square", shape: "rect", tooltip: I18n.trFor("quickCapture", "Rectangle") },
+                    { icon: "circle", shape: "ellipse", tooltip: I18n.trFor("quickCapture", "Ellipse") }
                 ]
                 delegate: OptionToolbarButton {
                     iconName: modelData.icon
@@ -45,8 +45,8 @@ OptionToolbarPopup {
             spacing: Theme.spacingS
             Repeater {
                 model: [
-                    { icon: "remove", count: 1, tooltip: I18n.tr("1 Connecting Line") },
-                    { icon: "density_medium", count: 2, tooltip: I18n.tr("2 Connecting Lines") }
+                    { icon: "remove", count: 1, tooltip: I18n.trFor("quickCapture", "1 Connecting Line") },
+                    { icon: "density_medium", count: 2, tooltip: I18n.trFor("quickCapture", "2 Connecting Lines") }
                 ]
                 delegate: OptionToolbarButton {
                     iconName: modelData.icon

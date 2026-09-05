@@ -19,18 +19,18 @@ PluginSettings {
     readonly property var daemon: (pluginService && pluginService.pluginInstances && pluginService.pluginInstances[pluginId]) ? pluginService.pluginInstances[pluginId] : null
     property var audioInputsList: daemon && daemon.audioInputsList && daemon.audioInputsList.length > 0
         ? daemon.audioInputsList
-        : [{"label": I18n.tr("Default Microphone"), "value": "default_input"}]
+        : [{"label": I18n.trFor("quickCapture", "Default Microphone"), "value": "default_input"}]
     property var audioOutputsList: daemon && daemon.audioOutputsList && daemon.audioOutputsList.length > 0
         ? daemon.audioOutputsList
-        : [{"label": I18n.tr("Default Output"), "value": "default_output"}]
+        : [{"label": I18n.trFor("quickCapture", "Default Output"), "value": "default_output"}]
 
     function refreshAudioDevices() {
         if (daemon && typeof daemon.refreshAudioDevices === "function") {
             daemon.refreshAudioDevices();
         }
         Proc.runCommand("quickCapture.listAudioDevices", ["gpu-screen-recorder", "--list-audio-devices"], (stdout, exitCode) => {
-            const inputs = [{"label": I18n.tr("Default Microphone"), "value": "default_input"}];
-            const outputs = [{"label": I18n.tr("Default Output"), "value": "default_output"}];
+            const inputs = [{"label": I18n.trFor("quickCapture", "Default Microphone"), "value": "default_input"}];
+            const outputs = [{"label": I18n.trFor("quickCapture", "Default Output"), "value": "default_output"}];
 
             if (exitCode === 0 && stdout) {
                 const lines = stdout.trim().split("\n");
@@ -253,7 +253,7 @@ PluginSettings {
                     onEntered: {
                         let tooltipText = swatchRoot.overrideColor !== null
                             ? swatchRoot.overrideColor.toString().toUpperCase()
-                            : (swatchRoot.value === "primary" ? I18n.tr("Theme Primary Color") : swatchRoot.value.toString().toUpperCase());
+                            : (swatchRoot.value === "primary" ? I18n.trFor("quickCapture", "Theme Primary Color") : swatchRoot.value.toString().toUpperCase());
                         sharedTooltip.show(tooltipText, parent);
                     }
                     onExited: {
@@ -266,7 +266,7 @@ PluginSettings {
                                 : swatchRoot.value.toString();
                             Proc.runCommand("copy-color", ["dms", "cl", "copy", colorStr], function() {
                                 if (typeof ToastService !== "undefined" && ToastService) {
-                                    ToastService.showInfo(I18n.tr("Copied:") + " " + colorStr.toUpperCase());
+                                    ToastService.showInfo(I18n.trFor("quickCapture", "Copied:") + " " + colorStr.toUpperCase());
                                 }
                             });
                             return;
@@ -349,8 +349,8 @@ PluginSettings {
             settingKey: bcsRoot.settingKey + "Mode"
             label: bcsRoot.label
             options: [
-                { label: I18n.tr("Custom"), value: "custom" },
-                { label: I18n.tr("Adaptive"), value: "adaptive" }
+                { label: I18n.trFor("quickCapture", "Custom"), value: "custom" },
+                { label: I18n.trFor("quickCapture", "Adaptive"), value: "adaptive" }
             ]
             defaultValue: "custom"
         }
@@ -366,7 +366,7 @@ PluginSettings {
                     c2.resolvedColor, c3.resolvedColor, c4.resolvedColor, c5.resolvedColor, c6.resolvedColor]
                 value: bcsRoot.value
                 customColor: captureConfig.resolveColor(bcsRoot.value)
-                customLabel: bcsRoot.value === "primary" ? I18n.tr("PRIMARY") : bcsRoot.value.toString().toUpperCase()
+                customLabel: bcsRoot.value === "primary" ? I18n.trFor("quickCapture", "PRIMARY") : bcsRoot.value.toString().toUpperCase()
                 onValueSelected: selectedValue => bcsRoot.value = selectedValue
                 onCustomRequested: {
                     if (typeof PopoutService !== "undefined" && PopoutService && PopoutService.colorPickerModal) {
@@ -403,22 +403,22 @@ PluginSettings {
 
             Repeater {
                 model: [
-                    { label: I18n.tr("Capture"),       icon: "camera"             },
-                    { label: I18n.tr("Recording"),     icon: "videocam"           },
-                    { label: I18n.tr("Saving"),        icon: "save"               },
-                    { label: I18n.tr("Notifications"), icon: "notifications"      },
-                    { label: I18n.tr("Toolbar"),       icon: "dock"               },
-                    { label: I18n.tr("Color Palette"),  icon: "palette"            },
-                    { label: I18n.tr("Editor"),        icon: "aspect_ratio"       },
-                    { label: I18n.tr("Tool Defaults"), icon: "tune"               },
-                    { label: I18n.tr("Text"),          icon: "format_size"        },
-                    { label: I18n.tr("Shapes"),        icon: "category"           },
-                    { label: I18n.tr("Background"),      icon: "wallpaper"          },
-                    { label: I18n.tr("Watermark"),     icon: "branding_watermark" },
-                    { label: I18n.tr("Float Window"),  icon: "open_in_new"        },
-                    { label: I18n.tr("Radial Menu"),   icon: "mouse"              },
-                    { label: I18n.tr("Shortcuts"),     icon: "keyboard"           },
-                    { label: I18n.tr("Help"),          icon: "menu_book"          }
+                    { label: I18n.trFor("quickCapture", "Capture"),       icon: "camera"             },
+                    { label: I18n.trFor("quickCapture", "Recording"),     icon: "videocam"           },
+                    { label: I18n.trFor("quickCapture", "Saving"),        icon: "save"               },
+                    { label: I18n.trFor("quickCapture", "Notifications"), icon: "notifications"      },
+                    { label: I18n.trFor("quickCapture", "Toolbar"),       icon: "dock"               },
+                    { label: I18n.trFor("quickCapture", "Color Palette"),  icon: "palette"            },
+                    { label: I18n.trFor("quickCapture", "Editor"),        icon: "aspect_ratio"       },
+                    { label: I18n.trFor("quickCapture", "Tool Defaults"), icon: "tune"               },
+                    { label: I18n.trFor("quickCapture", "Text"),          icon: "format_size"        },
+                    { label: I18n.trFor("quickCapture", "Shapes"),        icon: "category"           },
+                    { label: I18n.trFor("quickCapture", "Background"),      icon: "wallpaper"          },
+                    { label: I18n.trFor("quickCapture", "Watermark"),     icon: "branding_watermark" },
+                    { label: I18n.trFor("quickCapture", "Float Window"),  icon: "open_in_new"        },
+                    { label: I18n.trFor("quickCapture", "Radial Menu"),   icon: "mouse"              },
+                    { label: I18n.trFor("quickCapture", "Shortcuts"),     icon: "keyboard"           },
+                    { label: I18n.trFor("quickCapture", "Help"),          icon: "menu_book"          }
                 ]
 
                 delegate: Rectangle {
@@ -489,7 +489,7 @@ PluginSettings {
     SettingsCard {
         id: captureActionsCard
         SectionTitle {
-            text: I18n.tr("Capture Actions")
+            text: I18n.trFor("quickCapture", "Capture Actions")
             icon: "mouse"
             showReset: middleClickAction.isDirty || rightClickAction.isDirty || menuRightClickAction.isDirty
             onResetClicked: {
@@ -502,17 +502,17 @@ PluginSettings {
         SelectionSettingPlus {
             id: middleClickAction
             settingKey: "middleClickAction"
-            label: I18n.tr("Middle Click Action")
+            label: I18n.trFor("quickCapture", "Middle Click Action")
             options: [
-                { label: I18n.tr("Interactive Region"), value: "region" },
-                { label: I18n.tr("Full Screen"), value: "full" },
-                { label: I18n.tr("All Combined Outputs"), value: "all" },
-                { label: I18n.tr("Specific Output"), value: "output" },
-                { label: I18n.tr("Focused Window"), value: "window" },
-                { label: I18n.tr("Last Selected Region"), value: "last" },
-                { label: I18n.tr("Scrolling Capture"), value: "scroll" },
-                { label: I18n.tr("From Clipboard"), value: "clipboard" },
-                { label: I18n.tr("From File"), value: "selectFile" }
+                { label: I18n.trFor("quickCapture", "Interactive Region"), value: "region" },
+                { label: I18n.trFor("quickCapture", "Full Screen"), value: "full" },
+                { label: I18n.trFor("quickCapture", "All Combined Outputs"), value: "all" },
+                { label: I18n.trFor("quickCapture", "Specific Output"), value: "output" },
+                { label: I18n.trFor("quickCapture", "Focused Window"), value: "window" },
+                { label: I18n.trFor("quickCapture", "Last Selected Region"), value: "last" },
+                { label: I18n.trFor("quickCapture", "Scrolling Capture"), value: "scroll" },
+                { label: I18n.trFor("quickCapture", "From Clipboard"), value: "clipboard" },
+                { label: I18n.trFor("quickCapture", "From File"), value: "selectFile" }
             ]
             defaultValue: "region"
         }
@@ -520,17 +520,17 @@ PluginSettings {
         SelectionSettingPlus {
             id: rightClickAction
             settingKey: "rightClickAction"
-            label: I18n.tr("Right Click Action")
+            label: I18n.trFor("quickCapture", "Right Click Action")
             options: [
-                { label: I18n.tr("From Clipboard"), value: "clipboard" },
-                { label: I18n.tr("From File"), value: "selectFile" },
-                { label: I18n.tr("Interactive Region"), value: "region" },
-                { label: I18n.tr("Full Screen"), value: "full" },
-                { label: I18n.tr("All Combined Outputs"), value: "all" },
-                { label: I18n.tr("Specific Output"), value: "output" },
-                { label: I18n.tr("Focused Window"), value: "window" },
-                { label: I18n.tr("Last Selected Region"), value: "last" },
-                { label: I18n.tr("Scrolling Capture"), value: "scroll" }
+                { label: I18n.trFor("quickCapture", "From Clipboard"), value: "clipboard" },
+                { label: I18n.trFor("quickCapture", "From File"), value: "selectFile" },
+                { label: I18n.trFor("quickCapture", "Interactive Region"), value: "region" },
+                { label: I18n.trFor("quickCapture", "Full Screen"), value: "full" },
+                { label: I18n.trFor("quickCapture", "All Combined Outputs"), value: "all" },
+                { label: I18n.trFor("quickCapture", "Specific Output"), value: "output" },
+                { label: I18n.trFor("quickCapture", "Focused Window"), value: "window" },
+                { label: I18n.trFor("quickCapture", "Last Selected Region"), value: "last" },
+                { label: I18n.trFor("quickCapture", "Scrolling Capture"), value: "scroll" }
             ]
             defaultValue: "clipboard"
         }
@@ -538,12 +538,12 @@ PluginSettings {
         SelectionSettingPlus {
             id: menuRightClickAction
             settingKey: "menuRightClickAction"
-            label: I18n.tr("Menu Item Right Click")
+            label: I18n.trFor("quickCapture", "Menu Item Right Click")
             options: [
-                { label: I18n.tr("Copy"), value: "copy" },
-                { label: I18n.tr("Save"), value: "save" },
-                { label: I18n.tr("Copy & Save"), value: "copyAndSave" },
-                { label: I18n.tr("Float"), value: "float" }
+                { label: I18n.trFor("quickCapture", "Copy"), value: "copy" },
+                { label: I18n.trFor("quickCapture", "Save"), value: "save" },
+                { label: I18n.trFor("quickCapture", "Copy & Save"), value: "copyAndSave" },
+                { label: I18n.trFor("quickCapture", "Float"), value: "float" }
             ]
             defaultValue: "copy"
         }
@@ -552,7 +552,7 @@ PluginSettings {
     SettingsCard {
         id: captureOptionsCard
         SectionTitle {
-            text: I18n.tr("Capture Options")
+            text: I18n.trFor("quickCapture", "Capture Options")
             icon: "settings"
             showReset: outputTargetName.isDirty || defaultHideControlCenter.isDirty || skipConfirm.isDirty || includeCursor.isDirty || resetLastRegion.isDirty
             onResetClicked: {
@@ -567,7 +567,7 @@ PluginSettings {
         StringSettingPlus {
             id: outputTargetName
             settingKey: "outputTargetName"
-            label: I18n.tr("Target Output Name")
+            label: I18n.trFor("quickCapture", "Target Output Name")
             placeholder: "e.g. eDP-1"
             defaultValue: ""
         }
@@ -577,7 +577,7 @@ PluginSettings {
         ToggleSettingPlus {
             id: skipConfirm
             settingKey: "skipConfirm"
-            label: I18n.tr("Skip Confirmation")
+            label: I18n.trFor("quickCapture", "Skip Confirmation")
             defaultValue: false
         }
 
@@ -586,7 +586,7 @@ PluginSettings {
         ToggleSettingPlus {
             id: includeCursor
             settingKey: "includeCursor"
-            label: I18n.tr("Include Cursor")
+            label: I18n.trFor("quickCapture", "Include Cursor")
             defaultValue: false
         }
 
@@ -595,8 +595,8 @@ PluginSettings {
         ToggleSettingPlus {
             id: defaultHideControlCenter
             settingKey: "defaultHideControlCenter"
-            label: I18n.tr("Hide Control Center by Default")
-            description: I18n.tr("Initial state for the Control Center toggle.")
+            label: I18n.trFor("quickCapture", "Hide Control Center by Default")
+            description: I18n.trFor("quickCapture", "Initial state for the Control Center toggle.")
             defaultValue: true
         }
 
@@ -605,8 +605,8 @@ PluginSettings {
         ToggleSettingPlus {
             id: resetLastRegion
             settingKey: "resetLastRegion"
-            label: I18n.tr("Reset Last Region")
-            description: I18n.tr("Clear saved region selection before each capture")
+            label: I18n.trFor("quickCapture", "Reset Last Region")
+            description: I18n.trFor("quickCapture", "Clear saved region selection before each capture")
             defaultValue: false
         }
 
@@ -632,7 +632,7 @@ PluginSettings {
 
                 StyledText {
                     width: parent.width - scrollCaptureInfoIcon.width - warningScrollRow.spacing
-                    text: I18n.tr("Scroll capture: select a region, scroll content, then press Enter to finish.")
+                    text: I18n.trFor("quickCapture", "Scroll capture: select a region, scroll content, then press Enter to finish.")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceText
                     wrapMode: Text.Wrap
@@ -643,7 +643,7 @@ PluginSettings {
         SliderSettingPlus {
             id: scrollInterval
             settingKey: "scrollInterval"
-            label: I18n.tr("Scroll Interval")
+            label: I18n.trFor("quickCapture", "Scroll Interval")
             defaultValue: 500
             minimum: 200
             maximum: 2000
@@ -670,7 +670,7 @@ PluginSettings {
             SettingsCard {
                 id: recordingVideoCard
                 SectionTitle {
-                    text: I18n.tr("Video Settings")
+                    text: I18n.trFor("quickCapture", "Video Settings")
                     icon: "videocam"
                     showReset: recordingDirectory.isDirty || recordingFormat.isDirty || recordingGifFramerate.isDirty || recordingFramerate.isDirty || recordingQuality.isDirty || recordingCodec.isDirty || recordCursor.isDirty
                     onResetClicked: {
@@ -687,7 +687,7 @@ PluginSettings {
                 StringSettingPlus {
                     id: recordingDirectory
                     settingKey: "recordingDirectory"
-                    label: I18n.tr("Recordings Directory")
+                    label: I18n.trFor("quickCapture", "Recordings Directory")
                     placeholder: "~/Videos/Recordings"
                     defaultValue: "~/Videos/Recordings"
                     isDirectory: true
@@ -698,7 +698,7 @@ PluginSettings {
                 ButtonGroupSettingPlus {
                     id: recordingFormat
                     settingKey: "recordingFormat"
-                    label: I18n.tr("Container Format")
+                    label: I18n.trFor("quickCapture", "Container Format")
                     options: [
                         { label: "MP4", value: "mp4" },
                         { label: "MKV", value: "mkv" },
@@ -716,7 +716,7 @@ PluginSettings {
                 ButtonGroupSettingPlus {
                     id: recordingGifFramerate
                     settingKey: "recordingGifFramerate"
-                    label: I18n.tr("GIF Framerate")
+                    label: I18n.trFor("quickCapture", "GIF Framerate")
                     visible: recordingFormat.value === "gif"
                     options: [
                         { label: "10 FPS", value: "10" },
@@ -732,7 +732,7 @@ PluginSettings {
                 ButtonGroupSettingPlus {
                     id: recordingFramerate
                     settingKey: "recordingFramerate"
-                    label: I18n.tr("Framerate")
+                    label: I18n.trFor("quickCapture", "Framerate")
                     options: [
                         { label: "30 FPS", value: "30" },
                         { label: "60 FPS", value: "60" },
@@ -746,12 +746,12 @@ PluginSettings {
                 SelectionSettingPlus {
                     id: recordingQuality
                     settingKey: "recordingQuality"
-                    label: I18n.tr("Video Quality")
+                    label: I18n.trFor("quickCapture", "Video Quality")
                     options: [
-                        { label: I18n.tr("Very High"), value: "very_high" },
-                        { label: I18n.tr("High"), value: "high" },
-                        { label: I18n.tr("Medium"), value: "medium" },
-                        { label: I18n.tr("Low"), value: "low" }
+                        { label: I18n.trFor("quickCapture", "Very High"), value: "very_high" },
+                        { label: I18n.trFor("quickCapture", "High"), value: "high" },
+                        { label: I18n.trFor("quickCapture", "Medium"), value: "medium" },
+                        { label: I18n.trFor("quickCapture", "Low"), value: "low" }
                     ]
                     defaultValue: "medium"
                 }
@@ -761,9 +761,9 @@ PluginSettings {
                 SelectionSettingPlus {
                     id: recordingCodec
                     settingKey: "recordingCodec"
-                    label: I18n.tr("Video Codec")
+                    label: I18n.trFor("quickCapture", "Video Codec")
                     options: [
-                        { label: I18n.tr("Auto Detect"), value: "auto" },
+                        { label: I18n.trFor("quickCapture", "Auto Detect"), value: "auto" },
                         { label: "H.264", value: "h264" },
                         { label: "HEVC (H.265)", value: "hevc" },
                         { label: "AV1", value: "av1" },
@@ -778,7 +778,7 @@ PluginSettings {
                 ToggleSettingPlus {
                     id: recordCursor
                     settingKey: "recordCursor"
-                    label: I18n.tr("Record Mouse Cursor")
+                    label: I18n.trFor("quickCapture", "Record Mouse Cursor")
                     defaultValue: true
                 }
             }
@@ -786,7 +786,7 @@ PluginSettings {
             SettingsCard {
                 id: recordingAudioCard
                 SectionTitle {
-                    text: I18n.tr("Audio & Overlay")
+                    text: I18n.trFor("quickCapture", "Audio & Overlay")
                     icon: "graphic_eq"
                     showReset: recordSystemAudio.isDirty || systemAudioDevice.isDirty || recordMic.isDirty || micDevice.isDirty || audioCodec.isDirty || showPillBorder.isDirty || blinkRecordDot.isDirty
                     onResetClicked: {
@@ -803,14 +803,14 @@ PluginSettings {
                 ToggleSettingPlus {
                     id: recordSystemAudio
                     settingKey: "recordSystemAudio"
-                    label: I18n.tr("Record System Audio")
+                    label: I18n.trFor("quickCapture", "Record System Audio")
                     defaultValue: true
                 }
 
                 SelectionSettingPlus {
                     id: systemAudioDevice
                     settingKey: "systemAudioDevice"
-                    label: I18n.tr("System Audio Device")
+                    label: I18n.trFor("quickCapture", "System Audio Device")
                     options: root.audioOutputsList
                     defaultValue: "default_output"
                     visible: recordSystemAudio.value === true
@@ -823,14 +823,14 @@ PluginSettings {
                 ToggleSettingPlus {
                     id: recordMic
                     settingKey: "recordMic"
-                    label: I18n.tr("Record Microphone")
+                    label: I18n.trFor("quickCapture", "Record Microphone")
                     defaultValue: false
                 }
 
                 SelectionSettingPlus {
                     id: micDevice
                     settingKey: "micDevice"
-                    label: I18n.tr("Microphone Device")
+                    label: I18n.trFor("quickCapture", "Microphone Device")
                     options: root.audioInputsList
                     defaultValue: "default_input"
                     visible: recordMic.value === true
@@ -843,7 +843,7 @@ PluginSettings {
                 ButtonGroupSettingPlus {
                     id: audioCodec
                     settingKey: "audioCodec"
-                    label: I18n.tr("Audio Codec")
+                    label: I18n.trFor("quickCapture", "Audio Codec")
                     options: [
                         { label: "Opus", value: "opus" },
                         { label: "AAC", value: "aac" },
@@ -857,7 +857,7 @@ PluginSettings {
                 ToggleSettingPlus {
                     id: showPillBorder
                     settingKey: "showPillBorder"
-                    label: I18n.tr("Show Pill Border")
+                    label: I18n.trFor("quickCapture", "Show Pill Border")
                     defaultValue: false
                 }
 
@@ -866,7 +866,7 @@ PluginSettings {
                 ToggleSettingPlus {
                     id: blinkRecordDot
                     settingKey: "blinkRecordDot"
-                    label: I18n.tr("Blink Recording Dot")
+                    label: I18n.trFor("quickCapture", "Blink Recording Dot")
                     defaultValue: true
                 }
 
@@ -887,7 +887,7 @@ PluginSettings {
     SettingsCard {
         id: saveOptionsCard
         SectionTitle {
-            text: I18n.tr("Saving")
+            text: I18n.trFor("quickCapture", "Saving")
             icon: "save"
             showReset: doneAction.isDirty || saveDirectory.isDirty || saveFilenamePattern.isDirty || outputFormat.isDirty || jpegQuality.isDirty
             onResetClicked: {
@@ -902,11 +902,11 @@ PluginSettings {
         ButtonGroupSettingPlus {
             id: doneAction
             settingKey: "doneAction"
-            label: I18n.tr("Action when Enter")
+            label: I18n.trFor("quickCapture", "Action when Enter")
             options: [
-                { label: I18n.tr("Copy"), value: "clipboard" },
-                { label: I18n.tr("Save"), value: "file" },
-                { label: I18n.tr("Copy & Save"), value: "both" }
+                { label: I18n.trFor("quickCapture", "Copy"), value: "clipboard" },
+                { label: I18n.trFor("quickCapture", "Save"), value: "file" },
+                { label: I18n.trFor("quickCapture", "Copy & Save"), value: "both" }
             ]
             defaultValue: "both"
         }
@@ -916,7 +916,7 @@ PluginSettings {
         StringSettingPlus {
             id: saveDirectory
             settingKey: "saveDirectory"
-            label: I18n.tr("Save Directory")
+            label: I18n.trFor("quickCapture", "Save Directory")
             placeholder: "~/Pictures/Screenshots"
             defaultValue: "~/Pictures/Screenshots"
             isDirectory: true
@@ -927,13 +927,13 @@ PluginSettings {
         StringSettingPlus {
             id: saveFilenamePattern
             settingKey: "saveFilenamePattern"
-            label: I18n.tr("Save Filename Pattern")
+            label: I18n.trFor("quickCapture", "Save Filename Pattern")
             placeholder: "Screenshot-%Y-%m-%d_%H-%M-%S"
             defaultValue: "Screenshot-%Y-%m-%d_%H-%M-%S"
         }
 
         InfoText {
-            text: I18n.tr("Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)")
+            text: I18n.trFor("quickCapture", "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)")
             opacity: 0.85
         }
 
@@ -942,7 +942,7 @@ PluginSettings {
         ButtonGroupSettingPlus {
             id: outputFormat
             settingKey: "outputFormat"
-            label: I18n.tr("Output Format")
+            label: I18n.trFor("quickCapture", "Output Format")
             options: [
                 { label: "PNG", value: "png" },
                 { label: "JPEG", value: "jpg" },
@@ -954,7 +954,7 @@ PluginSettings {
         }
 
         InfoText {
-            text: I18n.tr("Output format applies only to disk saves. Clipboard copies are always PNG.")
+            text: I18n.trFor("quickCapture", "Output format applies only to disk saves. Clipboard copies are always PNG.")
             opacity: 0.85
         }
 
@@ -966,7 +966,7 @@ PluginSettings {
         SliderSettingPlus {
             id: jpegQuality
             settingKey: "jpegQuality"
-            label: I18n.tr("JPEG Quality")
+            label: I18n.trFor("quickCapture", "JPEG Quality")
             defaultValue: 90
             minimum: 1
             maximum: 100
@@ -980,7 +980,7 @@ PluginSettings {
         SliderSettingPlus {
             id: webpQuality
             settingKey: "webpQuality"
-            label: I18n.tr("WebP Quality")
+            label: I18n.trFor("quickCapture", "WebP Quality")
             defaultValue: 80
             minimum: 1
             maximum: 100
@@ -1007,7 +1007,7 @@ PluginSettings {
             SettingsCard {
                 id: notificationsCard
                 SectionTitle {
-                    text: I18n.tr("Notifications")
+                    text: I18n.trFor("quickCapture", "Notifications")
                     icon: "notifications"
                     showReset: postNotification.isDirty
                     onResetClicked: {
@@ -1018,14 +1018,14 @@ PluginSettings {
                 ButtonGroupSettingPlus {
                     id: postNotification
                     settingKey: "postNotification"
-                    label: I18n.tr("Post-Capture Notification")
-                    description: I18n.tr("Choose notifications shown after copy or save.")
+                    label: I18n.trFor("quickCapture", "Post-Capture Notification")
+                    description: I18n.trFor("quickCapture", "Choose notifications shown after copy or save.")
                     defaultValue: "notification"
                     options: [
-                        { label: I18n.tr("Notification"), value: "notification" },
-                        { label: I18n.tr("Toast"), value: "toast" },
-                        { label: I18n.tr("Both"), value: "both" },
-                        { label: I18n.tr("None"), value: "none" }
+                        { label: I18n.trFor("quickCapture", "Notification"), value: "notification" },
+                        { label: I18n.trFor("quickCapture", "Toast"), value: "toast" },
+                        { label: I18n.trFor("quickCapture", "Both"), value: "both" },
+                        { label: I18n.trFor("quickCapture", "None"), value: "none" }
                     ]
                 }
             }
@@ -1045,7 +1045,7 @@ PluginSettings {
     SettingsCard {
         id: toolbarCard
         SectionTitle {
-            text: I18n.tr("Toolbar")
+            text: I18n.trFor("quickCapture", "Toolbar")
             icon: "dock"
             showReset: showToolbar.isDirty || toolbarPosition.isDirty || showToolbarBorder.isDirty
             onResetClicked: {
@@ -1058,7 +1058,7 @@ PluginSettings {
         ToggleSettingPlus {
             id: showToolbar
             settingKey: "showToolbar"
-            label: I18n.tr("Show Toolbar")
+            label: I18n.trFor("quickCapture", "Show Toolbar")
             defaultValue: true
         }
 
@@ -1070,12 +1070,12 @@ PluginSettings {
         ButtonGroupSettingPlus {
             id: toolbarPosition
             settingKey: "toolbarPosition"
-            label: I18n.tr("Toolbar Position")
+            label: I18n.trFor("quickCapture", "Toolbar Position")
             options: [
-                { label: I18n.tr("Top"), value: "top" },
-                { label: I18n.tr("Bottom"), value: "bottom" },
-                { label: I18n.tr("Left"), value: "left" },
-                { label: I18n.tr("Right"), value: "right" }
+                { label: I18n.trFor("quickCapture", "Top"), value: "top" },
+                { label: I18n.trFor("quickCapture", "Bottom"), value: "bottom" },
+                { label: I18n.trFor("quickCapture", "Left"), value: "left" },
+                { label: I18n.trFor("quickCapture", "Right"), value: "right" }
             ]
             defaultValue: "bottom"
             visible: showToolbar.value
@@ -1090,7 +1090,7 @@ PluginSettings {
         ToggleSettingPlus {
             id: showToolbarBorder
             settingKey: "showToolbarBorder"
-            label: I18n.tr("Show Toolbar Border")
+            label: I18n.trFor("quickCapture", "Show Toolbar Border")
             defaultValue: false
             visible: showToolbar.value
             height: visible ? 36 : 0
@@ -1104,7 +1104,7 @@ PluginSettings {
         ToggleSettingPlus {
             id: showShortcutHints
             settingKey: "show_shortcut_hints"
-            label: I18n.tr("Show Keyboard Shortcut Hints")
+            label: I18n.trFor("quickCapture", "Show Keyboard Shortcut Hints")
             defaultValue: false
             visible: showToolbar.value
             height: visible ? 36 : 0
@@ -1126,7 +1126,7 @@ PluginSettings {
             SettingsCard {
                 id: toolbarPaletteSection
         SectionTitle {
-            text: I18n.tr("Toolbar Palette")
+            text: I18n.trFor("quickCapture", "Toolbar Palette")
             icon: "palette"
             showReset: toolbar_primary.isDirty || c0.isDirty || c1.isDirty || c2.isDirty || c3.isDirty || c4.isDirty || c5.isDirty || c6.isDirty
             onResetClicked: {
@@ -1138,7 +1138,7 @@ PluginSettings {
         }
 
         InfoText {
-            text: I18n.tr("Pick a palette preset or customize individual color slots.")
+            text: I18n.trFor("quickCapture", "Pick a palette preset or customize individual color slots.")
         }
 
         Item { width: 1; height: Theme.spacingS }
@@ -1171,22 +1171,22 @@ PluginSettings {
                 SelectionSettingPlus {
                     id: palettePresetSetting
                     settingKey: "color_palette_preset"
-                    label: I18n.tr("Palette Preset")
+                    label: I18n.trFor("quickCapture", "Palette Preset")
                     defaultValue: "adaptive"
                     options: [
-                        { "label": I18n.tr("Adaptive (DMS Theme)"), "value": "adaptive" },
-                        { "label": I18n.tr("Classic (Tailwind)"), "value": "classic" },
-                        { "label": I18n.tr("Nord"), "value": "nord" },
-                        { "label": I18n.tr("Dracula"), "value": "dracula" },
-                        { "label": I18n.tr("Gruvbox Material"), "value": "gruvbox" },
-                        { "label": I18n.tr("Catppuccin"), "value": "catppuccin" },
-                        { "label": I18n.tr("Everforest"), "value": "everforest" },
-                        { "label": I18n.tr("Rosé Pine"), "value": "rosePine" },
-                        { "label": I18n.tr("Kanagawa"), "value": "kanagawaWl" },
-                        { "label": I18n.tr("Tokyo Night"), "value": "tokyoNight" },
-                        { "label": I18n.tr("Synthwave Electric"), "value": "synthwaveElectric" },
-                        { "label": I18n.tr("Dank Violet"), "value": "dankViolet" },
-                        { "label": I18n.tr("Custom Colors"), "value": "custom" }
+                        { "label": I18n.trFor("quickCapture", "Adaptive (DMS Theme)"), "value": "adaptive" },
+                        { "label": I18n.trFor("quickCapture", "Classic (Tailwind)"), "value": "classic" },
+                        { "label": I18n.trFor("quickCapture", "Nord"), "value": "nord" },
+                        { "label": I18n.trFor("quickCapture", "Dracula"), "value": "dracula" },
+                        { "label": I18n.trFor("quickCapture", "Gruvbox Material"), "value": "gruvbox" },
+                        { "label": I18n.trFor("quickCapture", "Catppuccin"), "value": "catppuccin" },
+                        { "label": I18n.trFor("quickCapture", "Everforest"), "value": "everforest" },
+                        { "label": I18n.trFor("quickCapture", "Rosé Pine"), "value": "rosePine" },
+                        { "label": I18n.trFor("quickCapture", "Kanagawa"), "value": "kanagawaWl" },
+                        { "label": I18n.trFor("quickCapture", "Tokyo Night"), "value": "tokyoNight" },
+                        { "label": I18n.trFor("quickCapture", "Synthwave Electric"), "value": "synthwaveElectric" },
+                        { "label": I18n.trFor("quickCapture", "Dank Violet"), "value": "dankViolet" },
+                        { "label": I18n.trFor("quickCapture", "Custom Colors"), "value": "custom" }
                     ]
                     Component.onCompleted: {
                         for (var i = 0; i < children.length; i++) {
@@ -1203,8 +1203,8 @@ PluginSettings {
                     label: ""
                     defaultValue: "dark"
                     options: [
-                        { "label": I18n.tr("Dark"), "value": "dark" },
-                        { "label": I18n.tr("Light"), "value": "light" }
+                        { "label": I18n.trFor("quickCapture", "Dark"), "value": "dark" },
+                        { "label": I18n.trFor("quickCapture", "Light"), "value": "light" }
                     ]
                     visible: {
                         const p = palettePresetSetting.value;
@@ -1263,7 +1263,7 @@ PluginSettings {
             CompactColorSetting {
                 id: toolbar_primary
                 settingKey: "toolbar_color_primary"
-                label: I18n.tr("Slot 1")
+                label: I18n.trFor("quickCapture", "Slot 1")
                 defaultValue: "primary"
                 readOnly: palettePresetSetting.value !== "custom"
                 overrideColor: palettePresetSetting.value !== "custom" ? (palettePresetSetting.value === "adaptive" ? Theme.primary : captureConfig.defaultAccentColors[0]) : null
@@ -1272,7 +1272,7 @@ PluginSettings {
             CompactColorSetting {
                 id: c0
                 settingKey: "toolbar_color_0"
-                label: I18n.tr("Slot 2")
+                label: I18n.trFor("quickCapture", "Slot 2")
                 defaultValue: captureConfig.adaptiveColors[0]
                 readOnly: palettePresetSetting.value !== "custom"
                 overrideColor: palettePresetSetting.value !== "custom" ? (palettePresetSetting.value === "adaptive" ? captureConfig.adaptiveColors[0] : captureConfig.defaultAccentColors[1]) : null
@@ -1281,7 +1281,7 @@ PluginSettings {
             CompactColorSetting {
                 id: c1
                 settingKey: "toolbar_color_1"
-                label: I18n.tr("Slot 3")
+                label: I18n.trFor("quickCapture", "Slot 3")
                 defaultValue: captureConfig.adaptiveColors[1]
                 readOnly: palettePresetSetting.value !== "custom"
                 overrideColor: palettePresetSetting.value !== "custom" ? (palettePresetSetting.value === "adaptive" ? captureConfig.adaptiveColors[1] : captureConfig.defaultAccentColors[2]) : null
@@ -1290,7 +1290,7 @@ PluginSettings {
             CompactColorSetting {
                 id: c2
                 settingKey: "toolbar_color_2"
-                label: I18n.tr("Slot 4")
+                label: I18n.trFor("quickCapture", "Slot 4")
                 defaultValue: captureConfig.adaptiveColors[2]
                 readOnly: palettePresetSetting.value !== "custom"
                 overrideColor: palettePresetSetting.value !== "custom" ? (palettePresetSetting.value === "adaptive" ? captureConfig.adaptiveColors[2] : captureConfig.defaultAccentColors[3]) : null
@@ -1299,7 +1299,7 @@ PluginSettings {
             CompactColorSetting {
                 id: c3
                 settingKey: "toolbar_color_3"
-                label: I18n.tr("Slot 5")
+                label: I18n.trFor("quickCapture", "Slot 5")
                 defaultValue: captureConfig.adaptiveColors[3]
                 readOnly: palettePresetSetting.value !== "custom"
                 overrideColor: palettePresetSetting.value !== "custom" ? (palettePresetSetting.value === "adaptive" ? captureConfig.adaptiveColors[3] : captureConfig.defaultAccentColors[4]) : null
@@ -1308,7 +1308,7 @@ PluginSettings {
             CompactColorSetting {
                 id: c4
                 settingKey: "toolbar_color_4"
-                label: I18n.tr("Slot 6")
+                label: I18n.trFor("quickCapture", "Slot 6")
                 defaultValue: captureConfig.adaptiveColors[4]
                 readOnly: palettePresetSetting.value !== "custom"
                 overrideColor: palettePresetSetting.value !== "custom" ? (palettePresetSetting.value === "adaptive" ? captureConfig.adaptiveColors[4] : captureConfig.defaultAccentColors[5]) : null
@@ -1317,7 +1317,7 @@ PluginSettings {
             CompactColorSetting {
                 id: c5
                 settingKey: "toolbar_color_5"
-                label: I18n.tr("Slot 7")
+                label: I18n.trFor("quickCapture", "Slot 7")
                 defaultValue: captureConfig.adaptiveColors[5]
                 readOnly: palettePresetSetting.value !== "custom"
                 overrideColor: palettePresetSetting.value !== "custom" ? (palettePresetSetting.value === "adaptive" ? captureConfig.adaptiveColors[5] : captureConfig.defaultAccentColors[6]) : null
@@ -1326,7 +1326,7 @@ PluginSettings {
             CompactColorSetting {
                 id: c6
                 settingKey: "toolbar_color_6"
-                label: I18n.tr("Slot 8")
+                label: I18n.trFor("quickCapture", "Slot 8")
                 defaultValue: captureConfig.adaptiveColors[6]
                 readOnly: palettePresetSetting.value !== "custom"
                 overrideColor: palettePresetSetting.value !== "custom" ? (palettePresetSetting.value === "adaptive" ? captureConfig.adaptiveColors[6] : captureConfig.defaultAccentColors[7]) : null
@@ -1349,7 +1349,7 @@ PluginSettings {
             SettingsCard {
                 id: backgroundStylesCard
         SectionTitle {
-            text: I18n.tr("Editor")
+            text: I18n.trFor("quickCapture", "Editor")
             icon: "aspect_ratio"
             showReset: overlayOpacity.isDirty || showCanvasBorder.isDirty || editQuality.isDirty || modalDisplayMode.isDirty || modalDisplayTarget.isDirty || modalAspectRatio.isDirty || scaleToContent.isDirty
             onResetClicked: {
@@ -1366,17 +1366,17 @@ PluginSettings {
         SelectionSettingPlus {
             id: modalDisplayTarget
             settingKey: "modalDisplayTarget"
-            label: I18n.tr("Editor Display Screen")
+            label: I18n.trFor("quickCapture", "Editor Display Screen")
             options: {
                 const list = [
-                    { label: I18n.tr("Focused Screen"), value: "focused" }
+                    { label: I18n.trFor("quickCapture", "Focused Screen"), value: "focused" }
                 ];
                 if (Quickshell.screens) {
                     for (let i = 0; i < Quickshell.screens.length; i++) {
                         const scr = Quickshell.screens[i];
                         if (scr) {
                             list.push({
-                                label: I18n.tr("Screen: %1 (%2x%3)").arg(scr.name).arg(scr.width).arg(scr.height),
+                                label: I18n.trFor("quickCapture", "Screen: %1 (%2x%3)").arg(scr.name).arg(scr.width).arg(scr.height),
                                 value: scr.name
                             });
                         }
@@ -1390,11 +1390,11 @@ PluginSettings {
         ButtonGroupSettingPlus {
             id: modalDisplayMode
             settingKey: "modalDisplayMode"
-            label: I18n.tr("Editor Display Mode")
-            description: I18n.tr("Choose whether the editor opens as a modal overlay or a movable floating window.")
+            label: I18n.trFor("quickCapture", "Editor Display Mode")
+            description: I18n.trFor("quickCapture", "Choose whether the editor opens as a modal overlay or a movable floating window.")
             options: [
-                { label: I18n.tr("Modal"), value: "modal" },
-                { label: I18n.tr("Floating"), value: "floating" }
+                { label: I18n.trFor("quickCapture", "Modal"), value: "modal" },
+                { label: I18n.trFor("quickCapture", "Floating"), value: "floating" }
             ]
             defaultValue: "floating"
         }
@@ -1402,11 +1402,11 @@ PluginSettings {
         ButtonGroupSettingPlus {
             id: modalAspectRatio
             settingKey: "modalAspectRatio"
-            label: I18n.tr("Editor Aspect Ratio")
-            description: I18n.tr("Choose the editor shape for portrait or landscape screens.")
+            label: I18n.trFor("quickCapture", "Editor Aspect Ratio")
+            description: I18n.trFor("quickCapture", "Choose the editor shape for portrait or landscape screens.")
             options: [
-                { label: I18n.tr("Landscape"), value: "landscape" },
-                { label: I18n.tr("Portrait"), value: "portrait" }
+                { label: I18n.trFor("quickCapture", "Landscape"), value: "landscape" },
+                { label: I18n.trFor("quickCapture", "Portrait"), value: "portrait" }
             ]
             defaultValue: "landscape"
         }
@@ -1416,7 +1416,7 @@ PluginSettings {
         SliderSettingPlus {
             id: overlayOpacity
             settingKey: "overlayOpacity"
-            label: I18n.tr("Overlay Opacity")
+            label: I18n.trFor("quickCapture", "Overlay Opacity")
             defaultValue: 60
             minimum: 0
             maximum: 100
@@ -1431,7 +1431,7 @@ PluginSettings {
         ToggleSettingPlus {
             id: showCanvasBorder
             settingKey: "showCanvasBorder"
-            label: I18n.tr("Show Screenshot Border")
+            label: I18n.trFor("quickCapture", "Show Screenshot Border")
             defaultValue: true
         }
 
@@ -1440,18 +1440,18 @@ PluginSettings {
         ButtonGroupSettingPlus {
             id: editQuality
             settingKey: "editQuality"
-            label: I18n.tr("Editor Preview Quality")
+            label: I18n.trFor("quickCapture", "Editor Preview Quality")
             options: [
-                { label: I18n.tr("Low"), value: "150000" },
-                { label: I18n.tr("Balanced"), value: "300000" },
-                { label: I18n.tr("High"), value: "450000" },
-                { label: I18n.tr("Very High"), value: "600000" }
+                { label: I18n.trFor("quickCapture", "Low"), value: "150000" },
+                { label: I18n.trFor("quickCapture", "Balanced"), value: "300000" },
+                { label: I18n.trFor("quickCapture", "High"), value: "450000" },
+                { label: I18n.trFor("quickCapture", "Very High"), value: "600000" }
             ]
             defaultValue: "300000"
         }
 
         InfoText {
-            text: I18n.tr("Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.")
+            text: I18n.trFor("quickCapture", "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.")
             opacity: 0.8
         }
 
@@ -1460,8 +1460,8 @@ PluginSettings {
         ToggleSettingPlus {
             id: scaleToContent
             settingKey: "modalScaleToContent"
-            label: I18n.tr("Scale Editor to Screenshot Size")
-            description: I18n.tr("When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.")
+            label: I18n.trFor("quickCapture", "Scale Editor to Screenshot Size")
+            description: I18n.trFor("quickCapture", "When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.")
             defaultValue: false
         }
     }
@@ -1483,7 +1483,7 @@ PluginSettings {
             SettingsCard {
                 id: toolDefaultsCard
                 SectionTitle {
-                    text: I18n.tr("Tool Defaults")
+                    text: I18n.trFor("quickCapture", "Tool Defaults")
                     icon: "tune"
                     showReset: defaultToolMode.isDirty || defaultPresetIndex.isDirty || defaultTool.isDirty
                         || defaultPenThickness.isDirty || defaultPenColor.isDirty
@@ -1525,16 +1525,16 @@ PluginSettings {
                 ButtonGroupSettingPlus {
                     id: defaultToolMode
                     settingKey: "defaultToolMode"
-                    label: I18n.tr("Starting Tool Mode")
+                    label: I18n.trFor("quickCapture", "Starting Tool Mode")
                     options: [
-                        { label: I18n.tr("Radial Preset"), value: "preset" },
-                        { label: I18n.tr("Custom Tool"), value: "custom" }
+                        { label: I18n.trFor("quickCapture", "Radial Preset"), value: "preset" },
+                        { label: I18n.trFor("quickCapture", "Custom Tool"), value: "custom" }
                     ]
                     defaultValue: "preset"
                 }
 
                 InfoText {
-                    text: I18n.tr("Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.")
+                    text: I18n.trFor("quickCapture", "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.")
                     opacity: 0.85
                 }
 
@@ -1543,16 +1543,16 @@ PluginSettings {
                 SelectionSettingPlus {
                     id: defaultPresetIndex
                     settingKey: "defaultPresetIndex"
-                    label: I18n.tr("Starting Preset")
+                    label: I18n.trFor("quickCapture", "Starting Preset")
                     options: [
-                        { "label": I18n.tr("Preset 1"), "value": "0" },
-                        { "label": I18n.tr("Preset 2"), "value": "1" },
-                        { "label": I18n.tr("Preset 3"), "value": "2" },
-                        { "label": I18n.tr("Preset 4"), "value": "3" },
-                        { "label": I18n.tr("Preset 5"), "value": "4" },
-                        { "label": I18n.tr("Preset 6"), "value": "5" },
-                        { "label": I18n.tr("Preset 7"), "value": "6" },
-                        { "label": I18n.tr("Preset 8"), "value": "7" }
+                        { "label": I18n.trFor("quickCapture", "Preset 1"), "value": "0" },
+                        { "label": I18n.trFor("quickCapture", "Preset 2"), "value": "1" },
+                        { "label": I18n.trFor("quickCapture", "Preset 3"), "value": "2" },
+                        { "label": I18n.trFor("quickCapture", "Preset 4"), "value": "3" },
+                        { "label": I18n.trFor("quickCapture", "Preset 5"), "value": "4" },
+                        { "label": I18n.trFor("quickCapture", "Preset 6"), "value": "5" },
+                        { "label": I18n.trFor("quickCapture", "Preset 7"), "value": "6" },
+                        { "label": I18n.trFor("quickCapture", "Preset 8"), "value": "7" }
                     ]
                     defaultValue: "0"
                     visible: defaultToolMode.value === "preset"
@@ -1565,42 +1565,42 @@ PluginSettings {
                 SelectionSettingPlus {
                     id: defaultTool
                     settingKey: "defaultTool"
-                    label: I18n.tr("Starting Tool")
+                    label: I18n.trFor("quickCapture", "Starting Tool")
                     options: [{
-                        "label": I18n.tr("Freehand Pen"),
+                        "label": I18n.trFor("quickCapture", "Freehand Pen"),
                         "value": "pen"
                     }, {
-                        "label": I18n.tr("Straight Line"),
+                        "label": I18n.trFor("quickCapture", "Straight Line"),
                         "value": "line"
                     }, {
-                        "label": I18n.tr("Arrow Vector"),
+                        "label": I18n.trFor("quickCapture", "Arrow Vector"),
                         "value": "arrow"
                     }, {
-                        "label": I18n.tr("Rectangle Outline"),
+                        "label": I18n.trFor("quickCapture", "Rectangle Outline"),
                         "value": "rect"
                     }, {
-                        "label": I18n.tr("Ellipse / Circle"),
+                        "label": I18n.trFor("quickCapture", "Ellipse / Circle"),
                         "value": "ellipse"
                     }, {
-                        "label": I18n.tr("Text Note"),
+                        "label": I18n.trFor("quickCapture", "Text Note"),
                         "value": "text"
                     }, {
-                        "label": I18n.tr("Pixelate"),
+                        "label": I18n.trFor("quickCapture", "Pixelate"),
                         "value": "pixelate"
                     }, {
-                        "label": I18n.tr("Redact"),
+                        "label": I18n.trFor("quickCapture", "Redact"),
                         "value": "redact"
                     }, {
-                        "label": I18n.tr("Number Stamp"),
+                        "label": I18n.trFor("quickCapture", "Number Stamp"),
                         "value": "stamp"
                     }, {
-                        "label": I18n.tr("Highlighter"),
+                        "label": I18n.trFor("quickCapture", "Highlighter"),
                         "value": "highlighter"
                     }, {
-                        "label": I18n.tr("Eraser"),
+                        "label": I18n.trFor("quickCapture", "Eraser"),
                         "value": "eraser"
                     }, {
-                        "label": I18n.tr("Crop / Resize"),
+                        "label": I18n.trFor("quickCapture", "Crop / Resize"),
                         "value": "crop"
                     }]
                     defaultValue: "pen"
@@ -1615,7 +1615,7 @@ PluginSettings {
 
                 SliderSettingPlus {
                     id: defaultPenThickness
-                    label: I18n.tr("Pen Thickness")
+                    label: I18n.trFor("quickCapture", "Pen Thickness")
                     settingKey: "defaultPenThickness"
                     defaultValue: Constants.getToolMeta("pen").defaultValue
                     minimum: Constants.getToolMeta("pen").min
@@ -1627,7 +1627,7 @@ PluginSettings {
 
                 ColorSettingPlus {
                     id: defaultPenColor
-                    label: I18n.tr("Pen Color")
+                    label: I18n.trFor("quickCapture", "Pen Color")
                     settingKey: "defaultPenColor"
                     defaultValue: "primary"
                 }
@@ -1636,7 +1636,7 @@ PluginSettings {
 
                 SliderSettingPlus {
                     id: defaultLineThickness
-                    label: I18n.tr("Line Thickness")
+                    label: I18n.trFor("quickCapture", "Line Thickness")
                     settingKey: "defaultLineThickness"
                     defaultValue: Constants.getToolMeta("line").defaultValue
                     minimum: Constants.getToolMeta("line").min
@@ -1648,7 +1648,7 @@ PluginSettings {
 
                 ColorSettingPlus {
                     id: defaultLineColor
-                    label: I18n.tr("Line Color")
+                    label: I18n.trFor("quickCapture", "Line Color")
                     settingKey: "defaultLineColor"
                     defaultValue: "primary"
                 }
@@ -1657,7 +1657,7 @@ PluginSettings {
 
                 SliderSettingPlus {
                     id: defaultArrowThickness
-                    label: I18n.tr("Arrow Thickness")
+                    label: I18n.trFor("quickCapture", "Arrow Thickness")
                     settingKey: "defaultArrowThickness"
                     defaultValue: Constants.getToolMeta("arrow").defaultValue
                     minimum: Constants.getToolMeta("arrow").min
@@ -1669,7 +1669,7 @@ PluginSettings {
 
                 ColorSettingPlus {
                     id: defaultArrowColor
-                    label: I18n.tr("Arrow Color")
+                    label: I18n.trFor("quickCapture", "Arrow Color")
                     settingKey: "defaultArrowColor"
                     defaultValue: "primary"
                 }
@@ -1678,7 +1678,7 @@ PluginSettings {
 
                 SliderSettingPlus {
                     id: defaultRectThickness
-                    label: I18n.tr("Rectangle Thickness")
+                    label: I18n.trFor("quickCapture", "Rectangle Thickness")
                     settingKey: "defaultRectThickness"
                     defaultValue: Constants.getToolMeta("rect").defaultValue
                     minimum: Constants.getToolMeta("rect").min
@@ -1690,7 +1690,7 @@ PluginSettings {
 
                 ColorSettingPlus {
                     id: defaultRectColor
-                    label: I18n.tr("Rectangle Color")
+                    label: I18n.trFor("quickCapture", "Rectangle Color")
                     settingKey: "defaultRectColor"
                     defaultValue: "primary"
                 }
@@ -1699,7 +1699,7 @@ PluginSettings {
 
                 SliderSettingPlus {
                     id: defaultEllipseThickness
-                    label: I18n.tr("Ellipse Thickness")
+                    label: I18n.trFor("quickCapture", "Ellipse Thickness")
                     settingKey: "defaultEllipseThickness"
                     defaultValue: Constants.getToolMeta("ellipse").defaultValue
                     minimum: Constants.getToolMeta("ellipse").min
@@ -1711,7 +1711,7 @@ PluginSettings {
 
                 ColorSettingPlus {
                     id: defaultEllipseColor
-                    label: I18n.tr("Ellipse Color")
+                    label: I18n.trFor("quickCapture", "Ellipse Color")
                     settingKey: "defaultEllipseColor"
                     defaultValue: "primary"
                 }
@@ -1720,7 +1720,7 @@ PluginSettings {
 
                 SliderSettingPlus {
                     id: defaultHighlighterThickness
-                    label: I18n.tr("Highlighter Thickness")
+                    label: I18n.trFor("quickCapture", "Highlighter Thickness")
                     settingKey: "defaultHighlighterThickness"
                     defaultValue: Constants.getToolMeta("highlighter").defaultValue
                     minimum: Constants.getToolMeta("highlighter").min
@@ -1732,7 +1732,7 @@ PluginSettings {
 
                 ColorSettingPlus {
                     id: defaultHighlighterColor
-                    label: I18n.tr("Highlighter Color")
+                    label: I18n.trFor("quickCapture", "Highlighter Color")
                     settingKey: "defaultHighlighterColor"
                     defaultValue: "primary"
                 }
@@ -1741,7 +1741,7 @@ PluginSettings {
 
                 ColorSettingPlus {
                     id: defaultTextColor
-                    label: I18n.tr("Text Color")
+                    label: I18n.trFor("quickCapture", "Text Color")
                     settingKey: "defaultTextColor"
                     defaultValue: "primary"
                 }
@@ -1750,7 +1750,7 @@ PluginSettings {
 
                 SliderSettingPlus {
                     id: defaultStampSize
-                    label: I18n.tr("Stamp Size")
+                    label: I18n.trFor("quickCapture", "Stamp Size")
                     settingKey: "defaultStampSize"
                     defaultValue: Constants.getToolMeta("stamp").defaultValue
                     minimum: Constants.getToolMeta("stamp").min
@@ -1762,7 +1762,7 @@ PluginSettings {
 
                 ColorSettingPlus {
                     id: defaultStampColor
-                    label: I18n.tr("Stamp Color")
+                    label: I18n.trFor("quickCapture", "Stamp Color")
                     settingKey: "defaultStampColor"
                     defaultValue: "primary"
                 }
@@ -1771,7 +1771,7 @@ PluginSettings {
 
                 SliderSettingPlus {
                     id: defaultRedactThickness
-                    label: I18n.tr("Redact Thickness")
+                    label: I18n.trFor("quickCapture", "Redact Thickness")
                     settingKey: "defaultRedactThickness"
                     defaultValue: Constants.getToolMeta("redact").defaultValue
                     minimum: Constants.getToolMeta("redact").min
@@ -1785,7 +1785,7 @@ PluginSettings {
 
                 SliderSettingPlus {
                     id: defaultPixelateIntensity
-                    label: I18n.tr("Pixelate Intensity")
+                    label: I18n.trFor("quickCapture", "Pixelate Intensity")
                     settingKey: "defaultPixelateIntensity"
                     defaultValue: Constants.getToolMeta("pixelate").defaultValue
                     minimum: Constants.getToolMeta("pixelate").min
@@ -1799,7 +1799,7 @@ PluginSettings {
 
                 SliderSettingPlus {
                     id: defaultSpotlightIntensity
-                    label: I18n.tr("Spotlight Opacity")
+                    label: I18n.trFor("quickCapture", "Spotlight Opacity")
                     settingKey: "defaultSpotlightIntensity"
                     defaultValue: Constants.getToolMeta("spotlight").defaultValue
                     minimum: Constants.getToolMeta("spotlight").min
@@ -1813,7 +1813,7 @@ PluginSettings {
 
                 SliderSettingPlus {
                     id: defaultCalloutZoom
-                    label: I18n.tr("Callout Zoom")
+                    label: I18n.trFor("quickCapture", "Callout Zoom")
                     settingKey: "defaultCalloutZoom"
                     defaultValue: Constants.getToolMeta("callout").defaultValue
                     minimum: Constants.getToolMeta("callout").min
@@ -1839,7 +1839,7 @@ PluginSettings {
             SettingsCard {
                 id: textSettingsCard
         SectionTitle {
-            text: I18n.tr("Text")
+            text: I18n.trFor("quickCapture", "Text")
             icon: "format_size"
             showReset: textFontSize.isDirty || textFontFamily.isDirty || stampFontFamily.isDirty || textBold.isDirty || textItalic.isDirty || textUnderline.isDirty || textBackground.isDirty || textInputMode.isDirty
             onResetClicked: {
@@ -1856,7 +1856,7 @@ PluginSettings {
 
         SliderSettingPlus {
             id: textFontSize
-            label: I18n.tr("Default Text Font Size")
+            label: I18n.trFor("quickCapture", "Default Text Font Size")
             settingKey: "textFontSize"
             defaultValue: Constants.getToolMeta("text").defaultValue
             minimum: Constants.getToolMeta("text").min
@@ -1871,7 +1871,7 @@ PluginSettings {
         FontSelectionSettingPlus {
             id: textFontFamily
             settingKey: "textFontFamily"
-            label: I18n.tr("Text Font")
+            label: I18n.trFor("quickCapture", "Text Font")
             defaultValue: "system"
         }
 
@@ -1880,8 +1880,8 @@ PluginSettings {
         FontSelectionSettingPlus {
             id: stampFontFamily
             settingKey: "stampFontFamily"
-            label: I18n.tr("Stamp Number Font")
-            description: I18n.tr("Font family used for number stamp labels")
+            label: I18n.trFor("quickCapture", "Stamp Number Font")
+            description: I18n.trFor("quickCapture", "Font family used for number stamp labels")
             defaultValue: "system"
         }
 
@@ -1890,7 +1890,7 @@ PluginSettings {
         ToggleSettingPlus {
             id: textBold
             settingKey: "textBold"
-            label: I18n.tr("Default Bold Text")
+            label: I18n.trFor("quickCapture", "Default Bold Text")
             defaultValue: false
         }
 
@@ -1899,7 +1899,7 @@ PluginSettings {
         ToggleSettingPlus {
             id: textItalic
             settingKey: "textItalic"
-            label: I18n.tr("Default Italic Text")
+            label: I18n.trFor("quickCapture", "Default Italic Text")
             defaultValue: false
         }
 
@@ -1908,7 +1908,7 @@ PluginSettings {
         ToggleSettingPlus {
             id: textUnderline
             settingKey: "textUnderline"
-            label: I18n.tr("Default Underline Text")
+            label: I18n.trFor("quickCapture", "Default Underline Text")
             defaultValue: false
         }
 
@@ -1917,7 +1917,7 @@ PluginSettings {
         ToggleSettingPlus {
             id: textBackground
             settingKey: "textBackground"
-            label: I18n.tr("Default Text Background")
+            label: I18n.trFor("quickCapture", "Default Text Background")
             defaultValue: false
         }
 
@@ -1926,10 +1926,10 @@ PluginSettings {
         ButtonGroupSettingPlus {
             id: textInputMode
             settingKey: "textInputMode"
-            label: I18n.tr("Input Mode")
+            label: I18n.trFor("quickCapture", "Input Mode")
             options: [
-                { label: I18n.tr("Direct"), value: "inline" },
-                { label: I18n.tr("Popup Input"), value: "popup" }
+                { label: I18n.trFor("quickCapture", "Direct"), value: "inline" },
+                { label: I18n.trFor("quickCapture", "Popup Input"), value: "popup" }
             ]
             defaultValue: "inline"
         }
@@ -1951,7 +1951,7 @@ PluginSettings {
             SettingsCard {
                 id: shapesCard
         SectionTitle {
-            text: I18n.tr("Shapes")
+            text: I18n.trFor("quickCapture", "Shapes")
             icon: "category"
             showReset: roundRect.isDirty || textCornerRadius.isDirty || roundHighlighter.isDirty || stampOuterRing.isDirty || penAutoClose.isDirty
             onResetClicked: {
@@ -1966,7 +1966,7 @@ PluginSettings {
         ToggleSettingPlus {
             id: roundRect
             settingKey: "roundRect"
-            label: I18n.tr("Round Rectangle Corners")
+            label: I18n.trFor("quickCapture", "Round Rectangle Corners")
             defaultValue: true
         }
 
@@ -1975,7 +1975,7 @@ PluginSettings {
         SliderSettingPlus {
             id: textCornerRadius
             settingKey: "textCornerRadius"
-            label: I18n.tr("Text Background Roundness")
+            label: I18n.trFor("quickCapture", "Text Background Roundness")
             defaultValue: 12
             minimum: 0
             maximum: 20
@@ -1989,7 +1989,7 @@ PluginSettings {
         ToggleSettingPlus {
             id: roundHighlighter
             settingKey: "roundHighlighter"
-            label: I18n.tr("Round Highlighter Tips")
+            label: I18n.trFor("quickCapture", "Round Highlighter Tips")
             defaultValue: false
         }
 
@@ -1998,8 +1998,8 @@ PluginSettings {
         ToggleSettingPlus {
             id: stampOuterRing
             settingKey: "stampOuterRing"
-            label: I18n.tr("Stamp Contrast Ring")
-            description: I18n.tr("Draw an outer ring using the stamp number color")
+            label: I18n.trFor("quickCapture", "Stamp Contrast Ring")
+            description: I18n.trFor("quickCapture", "Draw an outer ring using the stamp number color")
             defaultValue: false
         }
 
@@ -2008,8 +2008,8 @@ PluginSettings {
         ToggleSettingPlus {
             id: penAutoClose
             settingKey: "penAutoClose"
-            label: I18n.tr("Pen Auto-Close")
-            description: I18n.tr("Auto-close the loop when ending near the start point.")
+            label: I18n.trFor("quickCapture", "Pen Auto-Close")
+            description: I18n.trFor("quickCapture", "Auto-close the loop when ending near the start point.")
             defaultValue: true
         }
     }
@@ -2029,7 +2029,7 @@ PluginSettings {
             spacing: Theme.spacingM
     SettingsCard {
         SectionTitle {
-            text: I18n.tr("Background Defaults")
+            text: I18n.trFor("quickCapture", "Background Defaults")
             icon: "wallpaper"
             showReset: backgroundAutoApply.isDirty || backgroundDefaultMode.isDirty || backgroundImageFolderSetting.isDirty || backgroundDefaultImageSetting.isDirty || backgroundImageBlurSetting.isDirty || backgroundImageDimSetting.isDirty || backgroundImageDimStrengthSetting.isDirty || backgroundDefaultPadding.isDirty || backgroundDefaultRadius.isDirty || backgroundDefaultShadow.isDirty || backgroundDefaultAngle.isDirty || backgroundDefaultAspectRatio.isDirty || backgroundDefaultAlignment.isDirty || backgroundDefaultSolidColor.isDirty || backgroundDefaultGradientStart.isDirty || backgroundDefaultGradientEnd.isDirty
             onResetClicked: {
@@ -2055,8 +2055,8 @@ PluginSettings {
         ToggleSettingPlus {
             id: backgroundAutoApply
             settingKey: "backgroundAutoApply"
-            label: I18n.tr("Auto-apply background defaults")
-            description: I18n.tr("Enable background automatically when opening the editor")
+            label: I18n.trFor("quickCapture", "Auto-apply background defaults")
+            description: I18n.trFor("quickCapture", "Enable background automatically when opening the editor")
             defaultValue: false
         }
 
@@ -2065,13 +2065,13 @@ PluginSettings {
         SelectionSettingPlus {
             id: backgroundDefaultMode
             settingKey: "backgroundDefaultMode"
-            label: I18n.tr("Default Background Mode")
+            label: I18n.trFor("quickCapture", "Default Background Mode")
             options: [
-                { label: I18n.tr("Solid Color"), value: "solid" },
-                { label: I18n.tr("Linear Gradient"), value: "gradient" },
-                { label: I18n.tr("Radial Gradient"), value: "radial" },
-                { label: I18n.tr("Conic Gradient"), value: "conic" },
-                { label: I18n.tr("Image"), value: "image" }
+                { label: I18n.trFor("quickCapture", "Solid Color"), value: "solid" },
+                { label: I18n.trFor("quickCapture", "Linear Gradient"), value: "gradient" },
+                { label: I18n.trFor("quickCapture", "Radial Gradient"), value: "radial" },
+                { label: I18n.trFor("quickCapture", "Conic Gradient"), value: "conic" },
+                { label: I18n.trFor("quickCapture", "Image"), value: "image" }
             ]
             defaultValue: "solid"
         }
@@ -2083,7 +2083,7 @@ PluginSettings {
         StringSettingPlus {
             id: backgroundImageFolderSetting
             settingKey: "backgroundImageFolder"
-            label: I18n.tr("Background Image Folder")
+            label: I18n.trFor("quickCapture", "Background Image Folder")
             placeholder: "~/Pictures/Wallpaper"
             defaultValue: "~/Pictures/Wallpaper"
             isDirectory: true
@@ -2098,8 +2098,8 @@ PluginSettings {
         StringSettingPlus {
             id: backgroundDefaultImageSetting
             settingKey: "backgroundDefaultImagePath"
-            label: I18n.tr("Default Background Image")
-            description: I18n.tr("Image selected automatically when using Image Background mode")
+            label: I18n.trFor("quickCapture", "Default Background Image")
+            description: I18n.trFor("quickCapture", "Image selected automatically when using Image Background mode")
             placeholder: "~/Pictures/Wallpaper/image.jpg"
             defaultValue: ""
             isFile: true
@@ -2115,8 +2115,8 @@ PluginSettings {
         ToggleSettingPlus {
             id: backgroundImageBlurSetting
             settingKey: "backgroundImageBlur"
-            label: I18n.tr("Blur Background Image")
-            description: I18n.tr("Soften image details so screenshot content stands out")
+            label: I18n.trFor("quickCapture", "Blur Background Image")
+            description: I18n.trFor("quickCapture", "Soften image details so screenshot content stands out")
             defaultValue: false
             visible: backgroundDefaultMode.value === "image"
             height: visible ? 36 : 0
@@ -2129,8 +2129,8 @@ PluginSettings {
         ToggleSettingPlus {
             id: backgroundImageDimSetting
             settingKey: "backgroundImageDim"
-            label: I18n.tr("Dim Background Image")
-            description: I18n.tr("Darken the image to improve foreground contrast")
+            label: I18n.trFor("quickCapture", "Dim Background Image")
+            description: I18n.trFor("quickCapture", "Darken the image to improve foreground contrast")
             defaultValue: false
             visible: backgroundDefaultMode.value === "image"
             height: visible ? 36 : 0
@@ -2143,7 +2143,7 @@ PluginSettings {
         SliderSettingPlus {
             id: backgroundImageDimStrengthSetting
             settingKey: "backgroundImageDimStrength"
-            label: I18n.tr("Dim Intensity")
+            label: I18n.trFor("quickCapture", "Dim Intensity")
             defaultValue: 28
             minimum: 0
             maximum: 80
@@ -2161,7 +2161,7 @@ PluginSettings {
         BackgroundColorSetting {
             id: backgroundDefaultSolidColor
             settingKey: "backgroundDefaultSolidColor"
-            label: I18n.tr("Default Solid Color")
+            label: I18n.trFor("quickCapture", "Default Solid Color")
             defaultValue: "slot_1"
             visible: backgroundDefaultMode.value === "solid"
         }
@@ -2173,7 +2173,7 @@ PluginSettings {
         BackgroundColorSetting {
             id: backgroundDefaultGradientStart
             settingKey: "backgroundDefaultGradientStart"
-            label: I18n.tr("Default Gradient Start")
+            label: I18n.trFor("quickCapture", "Default Gradient Start")
             defaultValue: "slot_1"
             visible: backgroundDefaultMode.value === "gradient" || backgroundDefaultMode.value === "radial" || backgroundDefaultMode.value === "conic"
         }
@@ -2185,7 +2185,7 @@ PluginSettings {
         BackgroundColorSetting {
             id: backgroundDefaultGradientEnd
             settingKey: "backgroundDefaultGradientEnd"
-            label: I18n.tr("Default Gradient End")
+            label: I18n.trFor("quickCapture", "Default Gradient End")
             defaultValue: "slot_2"
             visible: backgroundDefaultMode.value === "gradient" || backgroundDefaultMode.value === "radial" || backgroundDefaultMode.value === "conic"
         }
@@ -2195,7 +2195,7 @@ PluginSettings {
         SliderSettingPlus {
             id: backgroundDefaultPadding
             settingKey: "backgroundDefaultPadding"
-            label: I18n.tr("Default Padding")
+            label: I18n.trFor("quickCapture", "Default Padding")
             defaultValue: 40
             minimum: 0
             maximum: 150
@@ -2209,7 +2209,7 @@ PluginSettings {
         SliderSettingPlus {
             id: backgroundDefaultRadius
             settingKey: "backgroundDefaultRadius"
-            label: I18n.tr("Default Corner Radius")
+            label: I18n.trFor("quickCapture", "Default Corner Radius")
             defaultValue: 12
             minimum: 0
             maximum: 60
@@ -2223,7 +2223,7 @@ PluginSettings {
         SliderSettingPlus {
             id: backgroundDefaultShadow
             settingKey: "backgroundDefaultShadow"
-            label: I18n.tr("Default Shadow Strength")
+            label: I18n.trFor("quickCapture", "Default Shadow Strength")
             defaultValue: 0
             minimum: 0
             maximum: 100
@@ -2237,7 +2237,7 @@ PluginSettings {
         SliderSettingPlus {
             id: backgroundDefaultAngle
             settingKey: "backgroundDefaultAngle"
-            label: I18n.tr("Default Gradient Angle")
+            label: I18n.trFor("quickCapture", "Default Gradient Angle")
             defaultValue: 45
             minimum: 0
             maximum: 360
@@ -2251,9 +2251,9 @@ PluginSettings {
             SelectionSettingPlus {
                 id: backgroundDefaultAspectRatio
                 settingKey: "backgroundDefaultAspectRatio"
-                label: I18n.tr("Default Aspect Ratio")
+                label: I18n.trFor("quickCapture", "Default Aspect Ratio")
                 options: [
-                    { label: I18n.tr("Auto"), value: "auto" },
+                    { label: I18n.trFor("quickCapture", "Auto"), value: "auto" },
                     { label: "1:1", value: "1:1" },
                     { label: "16:9", value: "16:9" },
                     { label: "9:16", value: "9:16" },
@@ -2269,17 +2269,17 @@ PluginSettings {
             SelectionSettingPlus {
                 id: backgroundDefaultAlignment
                 settingKey: "backgroundDefaultAlignment"
-                label: I18n.tr("Default Alignment")
+                label: I18n.trFor("quickCapture", "Default Alignment")
                 options: [
-                    { label: I18n.tr("Top Left"), value: "top-left" },
-                    { label: I18n.tr("Top Center"), value: "top-center" },
-                    { label: I18n.tr("Top Right"), value: "top-right" },
-                    { label: I18n.tr("Center Left"), value: "center-left" },
-                    { label: I18n.tr("Center"), value: "center" },
-                    { label: I18n.tr("Center Right"), value: "center-right" },
-                    { label: I18n.tr("Bottom Left"), value: "bottom-left" },
-                    { label: I18n.tr("Bottom Center"), value: "bottom-center" },
-                    { label: I18n.tr("Bottom Right"), value: "bottom-right" }
+                    { label: I18n.trFor("quickCapture", "Top Left"), value: "top-left" },
+                    { label: I18n.trFor("quickCapture", "Top Center"), value: "top-center" },
+                    { label: I18n.trFor("quickCapture", "Top Right"), value: "top-right" },
+                    { label: I18n.trFor("quickCapture", "Center Left"), value: "center-left" },
+                    { label: I18n.trFor("quickCapture", "Center"), value: "center" },
+                    { label: I18n.trFor("quickCapture", "Center Right"), value: "center-right" },
+                    { label: I18n.trFor("quickCapture", "Bottom Left"), value: "bottom-left" },
+                    { label: I18n.trFor("quickCapture", "Bottom Center"), value: "bottom-center" },
+                    { label: I18n.trFor("quickCapture", "Bottom Right"), value: "bottom-right" }
                 ]
                 defaultValue: "center"
             }
@@ -2300,7 +2300,7 @@ PluginSettings {
             SettingsCard {
                 id: watermarkCard
         SectionTitle {
-            text: I18n.tr("Watermark")
+            text: I18n.trFor("quickCapture", "Watermark")
             icon: "branding_watermark"
             showReset: defaultWatermark.isDirty || watermarkType.isDirty || watermarkText.isDirty || watermarkImage.isDirty || watermarkPosition.isDirty || watermarkOpacity.isDirty || watermarkSize.isDirty || watermarkTextSize.isDirty
             onResetClicked: {
@@ -2318,7 +2318,7 @@ PluginSettings {
         ToggleSettingPlus {
             id: defaultWatermark
             settingKey: "defaultWatermark"
-            label: I18n.tr("Default Watermark")
+            label: I18n.trFor("quickCapture", "Default Watermark")
             defaultValue: false
         }
 
@@ -2330,11 +2330,11 @@ PluginSettings {
         ButtonGroupSettingPlus {
             id: watermarkType
             settingKey: "watermarkType"
-            label: I18n.tr("Watermark Type")
+            label: I18n.trFor("quickCapture", "Watermark Type")
             options: [
-                { label: I18n.tr("Text"), value: "text" },
-                { label: I18n.tr("Image"), value: "image" },
-                { label: I18n.tr("Image + Text"), value: "hybrid" }
+                { label: I18n.trFor("quickCapture", "Text"), value: "text" },
+                { label: I18n.trFor("quickCapture", "Image"), value: "image" },
+                { label: I18n.trFor("quickCapture", "Image + Text"), value: "hybrid" }
             ]
             defaultValue: "text"
             visible: true
@@ -2349,17 +2349,17 @@ PluginSettings {
         SelectionSettingPlus {
             id: watermarkPosition
             settingKey: "watermarkPosition"
-            label: I18n.tr("Position")
+            label: I18n.trFor("quickCapture", "Position")
             options: [
-                { label: I18n.tr("Top Left"), value: "top_left" },
-                { label: I18n.tr("Top Right"), value: "top_right" },
-                { label: I18n.tr("Bottom Left"), value: "bottom_left" },
-                { label: I18n.tr("Bottom Right"), value: "bottom_right" },
-                { label: I18n.tr("Center"), value: "center" },
-                { label: I18n.tr("Top"), value: "top" },
-                { label: I18n.tr("Bottom"), value: "bottom" },
-                { label: I18n.tr("Left"), value: "left" },
-                { label: I18n.tr("Right"), value: "right" }
+                { label: I18n.trFor("quickCapture", "Top Left"), value: "top_left" },
+                { label: I18n.trFor("quickCapture", "Top Right"), value: "top_right" },
+                { label: I18n.trFor("quickCapture", "Bottom Left"), value: "bottom_left" },
+                { label: I18n.trFor("quickCapture", "Bottom Right"), value: "bottom_right" },
+                { label: I18n.trFor("quickCapture", "Center"), value: "center" },
+                { label: I18n.trFor("quickCapture", "Top"), value: "top" },
+                { label: I18n.trFor("quickCapture", "Bottom"), value: "bottom" },
+                { label: I18n.trFor("quickCapture", "Left"), value: "left" },
+                { label: I18n.trFor("quickCapture", "Right"), value: "right" }
             ]
             defaultValue: "bottom_right"
             visible: true
@@ -2374,7 +2374,7 @@ PluginSettings {
         SliderSettingPlus {
             id: watermarkOpacity
             settingKey: "watermarkOpacity"
-            label: I18n.tr("Opacity")
+            label: I18n.trFor("quickCapture", "Opacity")
             defaultValue: 20
             minimum: 5
             maximum: 100
@@ -2393,7 +2393,7 @@ PluginSettings {
         StringSettingPlus {
             id: watermarkText
             settingKey: "watermarkText"
-            label: I18n.tr("Watermark Text")
+            label: I18n.trFor("quickCapture", "Watermark Text")
             placeholder: "© {user}"
             defaultValue: "© {user}"
             visible: watermarkType.value === "text" || watermarkType.value === "hybrid"
@@ -2401,7 +2401,7 @@ PluginSettings {
         }
 
         InfoText {
-            text: I18n.tr("Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)")
+            text: I18n.trFor("quickCapture", "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)")
             opacity: 0.85
             visible: watermarkType.value === "text" || watermarkType.value === "hybrid"
             height: visible ? implicitHeight : 0
@@ -2415,7 +2415,7 @@ PluginSettings {
         SliderSettingPlus {
             id: watermarkTextSize
             settingKey: "watermarkTextSize"
-            label: I18n.tr("Text Size")
+            label: I18n.trFor("quickCapture", "Text Size")
             defaultValue: 5
             minimum: 1
             maximum: 50
@@ -2434,7 +2434,7 @@ PluginSettings {
         StringSettingPlus {
             id: watermarkImage
             settingKey: "watermarkImage"
-            label: I18n.tr("Watermark Image")
+            label: I18n.trFor("quickCapture", "Watermark Image")
             placeholder: "~/Pictures/watermark.png"
             defaultValue: ""
             isFile: true
@@ -2451,7 +2451,7 @@ PluginSettings {
         SliderSettingPlus {
             id: watermarkSize
             settingKey: "watermarkSize"
-            label: I18n.tr("Image Size")
+            label: I18n.trFor("quickCapture", "Image Size")
             defaultValue: 5
             minimum: 5
             maximum: 50
@@ -2475,7 +2475,7 @@ PluginSettings {
             height: visible ? implicitHeight : 0
 
             StyledText {
-                text: I18n.tr("Live Preview")
+                text: I18n.trFor("quickCapture", "Live Preview")
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceVariantText
                 font.bold: true
@@ -2729,7 +2729,7 @@ PluginSettings {
 
                         StyledText {
                             visible: (watermarkType.value === "image" || watermarkType.value === "hybrid") && previewWatermarkImageLoader.status !== Image.Ready
-                            text: watermarkImage.value ? I18n.tr("Image Error") : I18n.tr("No Image Specified")
+                            text: watermarkImage.value ? I18n.trFor("quickCapture", "Image Error") : I18n.trFor("quickCapture", "No Image Specified")
                             font.pixelSize: Theme.fontSizeSmall
                             color: "#ff6b6b"
                             font.italic: true
@@ -2769,7 +2769,7 @@ PluginSettings {
             SettingsCard {
                 id: floatCard
                 SectionTitle {
-                    text: I18n.tr("Float Window")
+                    text: I18n.trFor("quickCapture", "Float Window")
                     icon: "open_in_new"
                     showReset: autoMinimize.isDirty || minimizeDelay.isDirty || initialWidth.isDirty || maxHeight.isDirty || borderWidth.isDirty || borderColor.isDirty || transparentBg.isDirty || spawnPosition.isDirty || edgeSpacing.isDirty || autoTiling.isDirty
                     onResetClicked: {
@@ -2789,15 +2789,15 @@ PluginSettings {
                 ToggleSettingPlus {
                     id: autoMinimize
                     settingKey: "autoMinimize"
-                    label: I18n.tr("Auto-minimize")
-                    description: I18n.tr("Automatically minimize the float window after a delay")
+                    label: I18n.trFor("quickCapture", "Auto-minimize")
+                    description: I18n.trFor("quickCapture", "Automatically minimize the float window after a delay")
                     defaultValue: false
                 }
 
                 SliderSettingPlus {
                     id: minimizeDelay
                     settingKey: "minimizeDelay"
-                    label: I18n.tr("Minimize Delay")
+                    label: I18n.trFor("quickCapture", "Minimize Delay")
                     defaultValue: 3000
                     minimum: 500
                     maximum: 10000
@@ -2813,7 +2813,7 @@ PluginSettings {
                 SliderSettingPlus {
                     id: initialWidth
                     settingKey: "initialWidth"
-                    label: I18n.tr("Initial Width")
+                    label: I18n.trFor("quickCapture", "Initial Width")
                     defaultValue: 400
                     minimum: 100
                     maximum: 2000
@@ -2825,7 +2825,7 @@ PluginSettings {
                 SliderSettingPlus {
                     id: maxHeight
                     settingKey: "maxHeight"
-                    label: I18n.tr("Max Height (0 = no limit)")
+                    label: I18n.trFor("quickCapture", "Max Height (0 = no limit)")
                     defaultValue: 0
                     minimum: 0
                     maximum: 2000
@@ -2839,7 +2839,7 @@ PluginSettings {
                 SliderSettingPlus {
                     id: borderWidth
                     settingKey: "borderWidth"
-                    label: I18n.tr("Border Width")
+                    label: I18n.trFor("quickCapture", "Border Width")
                     defaultValue: 2
                     minimum: 0
                     maximum: 20
@@ -2851,12 +2851,12 @@ PluginSettings {
                 SelectionSettingPlus {
                     id: borderColor
                     settingKey: "borderColor"
-                    label: I18n.tr("Border Color")
+                    label: I18n.trFor("quickCapture", "Border Color")
                     options: [
-                        { label: I18n.tr("Outline Variant"), value: "outlineVariant" },
-                        { label: I18n.tr("Primary"), value: "primary" },
-                        { label: I18n.tr("Surface Container Highest"), value: "surfaceContainerHighest" },
-                        { label: I18n.tr("Transparent"), value: "transparent" }
+                        { label: I18n.trFor("quickCapture", "Outline Variant"), value: "outlineVariant" },
+                        { label: I18n.trFor("quickCapture", "Primary"), value: "primary" },
+                        { label: I18n.trFor("quickCapture", "Surface Container Highest"), value: "surfaceContainerHighest" },
+                        { label: I18n.trFor("quickCapture", "Transparent"), value: "transparent" }
                     ]
                     defaultValue: "outlineVariant"
                 }
@@ -2866,8 +2866,8 @@ PluginSettings {
                 ToggleSettingPlus {
                     id: transparentBg
                     settingKey: "transparentBg"
-                    label: I18n.tr("Transparent Background")
-                    description: I18n.tr("Show only the image on a transparent background")
+                    label: I18n.trFor("quickCapture", "Transparent Background")
+                    description: I18n.trFor("quickCapture", "Show only the image on a transparent background")
                     defaultValue: true
                 }
 
@@ -2876,17 +2876,17 @@ PluginSettings {
                 SelectionSettingPlus {
                     id: spawnPosition
                     settingKey: "spawnPosition"
-                    label: I18n.tr("Spawn Position")
+                    label: I18n.trFor("quickCapture", "Spawn Position")
                     options: [
-                        { label: I18n.tr("Bottom Left"), value: "bottom-left" },
-                        { label: I18n.tr("Bottom Right"), value: "bottom-right" },
-                        { label: I18n.tr("Top Left"), value: "top-left" },
-                        { label: I18n.tr("Top Right"), value: "top-right" },
-                        { label: I18n.tr("Bottom"), value: "bottom" },
-                        { label: I18n.tr("Top"), value: "top" },
-                        { label: I18n.tr("Left"), value: "left" },
-                        { label: I18n.tr("Right"), value: "right" },
-                        { label: I18n.tr("Center"), value: "center" }
+                        { label: I18n.trFor("quickCapture", "Bottom Left"), value: "bottom-left" },
+                        { label: I18n.trFor("quickCapture", "Bottom Right"), value: "bottom-right" },
+                        { label: I18n.trFor("quickCapture", "Top Left"), value: "top-left" },
+                        { label: I18n.trFor("quickCapture", "Top Right"), value: "top-right" },
+                        { label: I18n.trFor("quickCapture", "Bottom"), value: "bottom" },
+                        { label: I18n.trFor("quickCapture", "Top"), value: "top" },
+                        { label: I18n.trFor("quickCapture", "Left"), value: "left" },
+                        { label: I18n.trFor("quickCapture", "Right"), value: "right" },
+                        { label: I18n.trFor("quickCapture", "Center"), value: "center" }
                     ]
                     defaultValue: "bottom-left"
                 }
@@ -2894,7 +2894,7 @@ PluginSettings {
                 SliderSettingPlus {
                     id: edgeSpacing
                     settingKey: "edgeSpacing"
-                    label: I18n.tr("Edge Spacing")
+                    label: I18n.trFor("quickCapture", "Edge Spacing")
                     defaultValue: 8
                     minimum: 0
                     maximum: 100
@@ -2908,8 +2908,8 @@ PluginSettings {
                 ToggleSettingPlus {
                     id: autoTiling
                     settingKey: "autoTiling"
-                    label: I18n.tr("Auto-tiling")
-                    description: I18n.tr("Automatically stack windows to avoid overlap")
+                    label: I18n.trFor("quickCapture", "Auto-tiling")
+                    description: I18n.trFor("quickCapture", "Automatically stack windows to avoid overlap")
                     defaultValue: true
                 }
             }
@@ -2947,12 +2947,12 @@ PluginSettings {
         }
 
         SectionTitle {
-            text: I18n.tr("Radial Menu")
+            text: I18n.trFor("quickCapture", "Radial Menu")
             icon: "settings"
         }
 
         InfoText {
-            text: I18n.tr("Configure up to 8 quick-access tool presets. Right-click during capture to open the radial menu.")
+            text: I18n.trFor("quickCapture", "Configure up to 8 quick-access tool presets. Right-click during capture to open the radial menu.")
         }
 
         Item { width: 1; height: Theme.spacingXS }
@@ -3111,7 +3111,7 @@ PluginSettings {
                     }
 
                     StyledText {
-                        text: I18n.tr("Preset %1").arg(radialMenuCard.presetActiveIndex + 1)
+                        text: I18n.trFor("quickCapture", "Preset %1").arg(radialMenuCard.presetActiveIndex + 1)
                         font.pixelSize: 8
                         font.bold: true
                         color: Theme.surfaceVariantText
@@ -3186,51 +3186,51 @@ PluginSettings {
                 SelectionSettingPlus {
                     id: presetToolSetting
                     settingKey: "preset_" + index + "_tool"
-                    label: I18n.tr("Preset Tool")
+                    label: I18n.trFor("quickCapture", "Preset Tool")
                     options: [{
-                        "label": I18n.tr("None / Disabled"),
+                        "label": I18n.trFor("quickCapture", "None / Disabled"),
                         "value": "none"
                     }, {
-                        "label": I18n.tr("Freehand Pen"),
+                        "label": I18n.trFor("quickCapture", "Freehand Pen"),
                         "value": "pen"
                     }, {
-                        "label": I18n.tr("Straight Line"),
+                        "label": I18n.trFor("quickCapture", "Straight Line"),
                         "value": "line"
                     }, {
-                        "label": I18n.tr("Arrow Vector"),
+                        "label": I18n.trFor("quickCapture", "Arrow Vector"),
                         "value": "arrow"
                     }, {
-                        "label": I18n.tr("Rectangle Outline"),
+                        "label": I18n.trFor("quickCapture", "Rectangle Outline"),
                         "value": "rect"
                     }, {
-                        "label": I18n.tr("Ellipse / Circle"),
+                        "label": I18n.trFor("quickCapture", "Ellipse / Circle"),
                         "value": "ellipse"
                     }, {
-                        "label": I18n.tr("Text Note"),
+                        "label": I18n.trFor("quickCapture", "Text Note"),
                         "value": "text"
                     }, {
-                        "label": I18n.tr("Pixelate"),
+                        "label": I18n.trFor("quickCapture", "Pixelate"),
                         "value": "pixelate"
                     }, {
-                        "label": I18n.tr("Redact"),
+                        "label": I18n.trFor("quickCapture", "Redact"),
                         "value": "redact"
                     }, {
-                        "label": I18n.tr("Number Stamp"),
+                        "label": I18n.trFor("quickCapture", "Number Stamp"),
                         "value": "stamp"
                     }, {
-                        "label": I18n.tr("Highlighter"),
+                        "label": I18n.trFor("quickCapture", "Highlighter"),
                         "value": "highlighter"
                     }, {
-                        "label": I18n.tr("Eraser"),
+                        "label": I18n.trFor("quickCapture", "Eraser"),
                         "value": "eraser"
                     }, {
-                        "label": I18n.tr("Crop / Resize"),
+                        "label": I18n.trFor("quickCapture", "Crop / Resize"),
                         "value": "crop"
                     }, {
-                        "label": I18n.tr("Spotlight"),
+                        "label": I18n.trFor("quickCapture", "Spotlight"),
                         "value": "spotlight"
                     }, {
-                        "label": I18n.tr("Callout"),
+                        "label": I18n.trFor("quickCapture", "Callout"),
                         "value": "callout"
                     }]
                     defaultValue: {
@@ -3261,7 +3261,7 @@ PluginSettings {
                     spacing: Theme.spacingS
 
                     StyledText {
-                        text: I18n.tr("Preset Color")
+                        text: I18n.trFor("quickCapture", "Preset Color")
                         font.pixelSize: Theme.fontSizeLarge
                         font.weight: Font.Medium
                         color: Theme.surfaceText
@@ -3272,7 +3272,7 @@ PluginSettings {
                             c2.resolvedColor, c3.resolvedColor, c4.resolvedColor, c5.resolvedColor, c6.resolvedColor]
                         value: presetColorSetting.value
                         customColor: captureConfig.resolveColor(presetColorSetting.value)
-                        customLabel: presetColorSetting.value === "primary" ? I18n.tr("PRIMARY") : presetColorSetting.value.toString().toUpperCase()
+                        customLabel: presetColorSetting.value === "primary" ? I18n.trFor("quickCapture", "PRIMARY") : presetColorSetting.value.toString().toUpperCase()
                         onValueSelected: selectedValue => {
                             presetColorSetting.value = selectedValue;
                             radialMenuCard.activePresetColors[presetIndex] = selectedValue;
@@ -3281,7 +3281,7 @@ PluginSettings {
                         onCustomRequested: {
                             if (typeof PopoutService !== "undefined" && PopoutService && PopoutService.colorPickerModal) {
                                 PopoutService.colorPickerModal.selectedColor = captureConfig.resolveColor(presetColorSetting.value);
-                                PopoutService.colorPickerModal.pickerTitle = I18n.tr("Preset Color");
+                                PopoutService.colorPickerModal.pickerTitle = I18n.trFor("quickCapture", "Preset Color");
                                 PopoutService.colorPickerModal.onColorSelectedCallback = selectedColor => {
                                     presetColorSetting.value = selectedColor.toString();
                                     radialMenuCard.activePresetColors[presetIndex] = presetColorSetting.value;
@@ -3323,7 +3323,7 @@ PluginSettings {
                 SliderSettingPlus {
                     id: presetThicknessSetting
                     settingKey: "preset_" + index + "_thickness"
-                    label: I18n.tr("Preset Thickness")
+                    label: I18n.trFor("quickCapture", "Preset Thickness")
                     defaultValue: Constants.getToolMeta("pen").defaultValue
                     minimum: Constants.getToolMeta("pen").min
                     maximum: Constants.getToolMeta("pen").max
@@ -3337,17 +3337,17 @@ PluginSettings {
                 function refreshThicknessConstraints() {
                     const t = presetToolSetting.value;
                     const meta = Constants.getToolMeta(t);
-                    // Localized labels map - required because I18n.tr() needs string literals for extraction tools.
+                    // Localized labels map - required because I18n.trFor("quickCapture", ) needs string literals for extraction tools.
                     // Keys must match ToolMetadata.label values for consistency.
                     const toolLabels = {
-                        pen: I18n.tr("Thickness"), line: I18n.tr("Thickness"),
-                        arrow: I18n.tr("Thickness"), rect: I18n.tr("Thickness"),
-                        ellipse: I18n.tr("Thickness"), highlighter: I18n.tr("Thickness"),
-                        redact: I18n.tr("Thickness"), stamp: I18n.tr("Stamp Size"),
-                        text: I18n.tr("Font Size"), pixelate: I18n.tr("Pixel Intensity"),
-                        spotlight: I18n.tr("Dimming Opacity"), callout: I18n.tr("Zoom Level")
+                        pen: I18n.trFor("quickCapture", "Thickness"), line: I18n.trFor("quickCapture", "Thickness"),
+                        arrow: I18n.trFor("quickCapture", "Thickness"), rect: I18n.trFor("quickCapture", "Thickness"),
+                        ellipse: I18n.trFor("quickCapture", "Thickness"), highlighter: I18n.trFor("quickCapture", "Thickness"),
+                        redact: I18n.trFor("quickCapture", "Thickness"), stamp: I18n.trFor("quickCapture", "Stamp Size"),
+                        text: I18n.trFor("quickCapture", "Font Size"), pixelate: I18n.trFor("quickCapture", "Pixel Intensity"),
+                        spotlight: I18n.trFor("quickCapture", "Dimming Opacity"), callout: I18n.trFor("quickCapture", "Zoom Level")
                     };
-                    presetThicknessSetting.label = toolLabels[t] || I18n.tr("Preset Thickness");
+                    presetThicknessSetting.label = toolLabels[t] || I18n.trFor("quickCapture", "Preset Thickness");
                     presetThicknessSetting.minimum = meta.min;
                     presetThicknessSetting.maximum = meta.max;
                     presetThicknessSetting.unit = meta.unit;
@@ -3396,7 +3396,7 @@ PluginSettings {
         Separator {}
 
         SectionTitle {
-            text: I18n.tr("Radial Menu Settings")
+            text: I18n.trFor("quickCapture", "Radial Menu Settings")
             icon: "mouse"
             showReset: radialHoverTrigger.isDirty || radialHoverDelay.isDirty || radialMenuOpacity.isDirty
             onResetClicked: {
@@ -3409,8 +3409,8 @@ PluginSettings {
         ToggleSettingPlus {
             id: radialHoverTrigger
             settingKey: "radialHoverTrigger"
-            label: I18n.tr("Trigger on Hover")
-            description: I18n.tr("Auto-select a tool preset on hover, without releasing the mouse.")
+            label: I18n.trFor("quickCapture", "Trigger on Hover")
+            description: I18n.trFor("quickCapture", "Auto-select a tool preset on hover, without releasing the mouse.")
             defaultValue: true
         }
 
@@ -3422,7 +3422,7 @@ PluginSettings {
         SliderSettingPlus {
             id: radialHoverDelay
             settingKey: "radialHoverDelay"
-            label: I18n.tr("Hover Trigger Delay")
+            label: I18n.trFor("quickCapture", "Hover Trigger Delay")
             defaultValue: 200
             minimum: 100
             maximum: 500
@@ -3438,7 +3438,7 @@ PluginSettings {
         SliderSettingPlus {
             id: radialMenuOpacity
             settingKey: "radialMenuOpacity"
-            label: I18n.tr("Radial Menu Opacity")
+            label: I18n.trFor("quickCapture", "Radial Menu Opacity")
             defaultValue: 100
             minimum: 0
             maximum: 100
@@ -3469,7 +3469,7 @@ PluginSettings {
             SettingsCard {
                 SectionTitle { 
                     id: usageTitle
-                    text: I18n.tr("Usage Guide")
+                    text: I18n.trFor("quickCapture", "Usage Guide")
                     icon: "menu_book" 
                     collapsible: true
                     settingKey: "usageGuideExpanded"
@@ -3481,7 +3481,7 @@ PluginSettings {
                     visible: usageTitle.isExpanded
 
                     StyledText {
-                        text: I18n.tr("Bar Interactions")
+                        text: I18n.trFor("quickCapture", "Bar Interactions")
                         font.pixelSize: Theme.fontSizeLarge
                         font.bold: true
                         color: Theme.primary
@@ -3491,17 +3491,17 @@ PluginSettings {
                         width: parent.width
                         spacing: 2
 
-                        ShortcutRow { keyText: I18n.tr("Action"); actionText: I18n.tr("Interaction / Result"); isHeader: true }
-                        ShortcutRow { keyText: I18n.tr("Left Click"); actionText: I18n.tr("Open Quick Capture menu (Popout)") }
-                        ShortcutRow { keyText: I18n.tr("Middle Click"); actionText: I18n.tr("Trigger Middle-Click Action (Default: Interactive Region)") }
-                        ShortcutRow { keyText: I18n.tr("Right Click"); actionText: I18n.tr("Trigger Right-Click Action (Default: Clipboard Annotate)") }
-                        ShortcutRow { keyText: I18n.tr("Drag Image"); actionText: I18n.tr("Drop image onto bar icon to annotate it") }
+                        ShortcutRow { keyText: I18n.trFor("quickCapture", "Action"); actionText: I18n.trFor("quickCapture", "Interaction / Result"); isHeader: true }
+                        ShortcutRow { keyText: I18n.trFor("quickCapture", "Left Click"); actionText: I18n.trFor("quickCapture", "Open Quick Capture menu (Popout)") }
+                        ShortcutRow { keyText: I18n.trFor("quickCapture", "Middle Click"); actionText: I18n.trFor("quickCapture", "Trigger Middle-Click Action (Default: Interactive Region)") }
+                        ShortcutRow { keyText: I18n.trFor("quickCapture", "Right Click"); actionText: I18n.trFor("quickCapture", "Trigger Right-Click Action (Default: Clipboard Annotate)") }
+                        ShortcutRow { keyText: I18n.trFor("quickCapture", "Drag Image"); actionText: I18n.trFor("quickCapture", "Drop image onto bar icon to annotate it") }
                     }
 
                     Separator { opacity: 0.1 }
 
                     StyledText {
-                        text: I18n.tr("Annotation Tools")
+                        text: I18n.trFor("quickCapture", "Annotation Tools")
                         font.pixelSize: Theme.fontSizeLarge
                         font.bold: true
                         color: Theme.primary
@@ -3511,19 +3511,19 @@ PluginSettings {
                         width: parent.width
                         spacing: 2
 
-                        ShortcutRow { keyText: I18n.tr("Key"); actionText: I18n.tr("Selected Tool / Action"); isHeader: true }
-                        ShortcutRow { keyText: "V"; actionText: I18n.tr("Select / Move stroke") }
-                        ShortcutRow { keyText: "1 - 4"; actionText: I18n.tr("Pen, Line, Arrow, Rect") }
-                        ShortcutRow { keyText: "Q - R"; actionText: I18n.tr("Ellipse, Text, Pixelate, Redact (Q, W, E, R)") }
-                        ShortcutRow { keyText: "A - D"; actionText: I18n.tr("Stamp, Highlighter, Spotlight (A, S, D)") }
-                        ShortcutRow { keyText: "Z / B"; actionText: I18n.tr("Callout, Background (Z, B)") }
-                        ShortcutRow { keyText: "F / T"; actionText: I18n.tr("Color Picker, Eraser (F, T)") }
+                        ShortcutRow { keyText: I18n.trFor("quickCapture", "Key"); actionText: I18n.trFor("quickCapture", "Selected Tool / Action"); isHeader: true }
+                        ShortcutRow { keyText: "V"; actionText: I18n.trFor("quickCapture", "Select / Move stroke") }
+                        ShortcutRow { keyText: "1 - 4"; actionText: I18n.trFor("quickCapture", "Pen, Line, Arrow, Rect") }
+                        ShortcutRow { keyText: "Q - R"; actionText: I18n.trFor("quickCapture", "Ellipse, Text, Pixelate, Redact (Q, W, E, R)") }
+                        ShortcutRow { keyText: "A - D"; actionText: I18n.trFor("quickCapture", "Stamp, Highlighter, Spotlight (A, S, D)") }
+                        ShortcutRow { keyText: "Z / B"; actionText: I18n.trFor("quickCapture", "Callout, Background (Z, B)") }
+                        ShortcutRow { keyText: "F / T"; actionText: I18n.trFor("quickCapture", "Color Picker, Eraser (F, T)") }
                     }
 
                     Separator { opacity: 0.1 }
 
                     StyledText {
-                        text: I18n.tr("General Shortcuts")
+                        text: I18n.trFor("quickCapture", "General Shortcuts")
                         font.pixelSize: Theme.fontSizeLarge
                         font.bold: true
                         color: Theme.primary
@@ -3533,26 +3533,26 @@ PluginSettings {
                         width: parent.width
                         spacing: 2
 
-                        ShortcutRow { keyText: I18n.tr("Key"); actionText: I18n.tr("Shortcut Action"); isHeader: true }
-                        ShortcutRow { keyText: "Enter"; actionText: I18n.tr("Done (Action based on settings)") }
-                        ShortcutRow { keyText: "Esc"; actionText: I18n.tr("Discard & Close") }
-                        ShortcutRow { keyText: "Tab"; actionText: I18n.tr("Toggle between 2 latest presets") }
-                        ShortcutRow { keyText: "V"; actionText: I18n.tr("Switch to Select Tool") }
-                        ShortcutRow { keyText: "C"; actionText: I18n.tr("Copy vector / Paste / Duplicate") }
-                        ShortcutRow { keyText: "G (Hold)"; actionText: I18n.tr("Magnifier Loupe") }
-                        ShortcutRow { keyText: "O"; actionText: I18n.tr("OCR Text Recognition") }
-                        ShortcutRow { keyText: "X"; actionText: I18n.tr("Toggle Hide/Show Annotations") }
-                        ShortcutRow { keyText: "Ctrl + Z"; actionText: I18n.tr("Undo last stroke") }
-                        ShortcutRow { keyText: "Ctrl + Y"; actionText: I18n.tr("Redo last undone stroke") }
-                        ShortcutRow { keyText: "Ctrl + Shift + Z"; actionText: I18n.tr("Redo last undone stroke") }
-                        ShortcutRow { keyText: "Ctrl + S"; actionText: I18n.tr("Force Save to File") }
-                        ShortcutRow { keyText: "Ctrl + C"; actionText: I18n.tr("Force Copy to Clipboard") }
-                        ShortcutRow { keyText: "Ctrl + Shift + C"; actionText: I18n.tr("Anonymous Copy (stripped metadata)") }
-                        ShortcutRow { keyText: "Ctrl + A"; actionText: I18n.tr("Force Copy & Save") }
-                        ShortcutRow { keyText: "Ctrl + F"; actionText: I18n.tr("Float Image") }
-                        ShortcutRow { keyText: "Ctrl + X"; actionText: I18n.tr("Crop / Resize Area") }
-                        ShortcutRow { keyText: "Ctrl + 1..4"; actionText: I18n.tr("Select Color Slots 1 - 4") }
-                        ShortcutRow { keyText: "Ctrl + Q..R"; actionText: I18n.tr("Select Color Slots 5 - 8 (Q, W, E, R)") }
+                        ShortcutRow { keyText: I18n.trFor("quickCapture", "Key"); actionText: I18n.trFor("quickCapture", "Shortcut Action"); isHeader: true }
+                        ShortcutRow { keyText: "Enter"; actionText: I18n.trFor("quickCapture", "Done (Action based on settings)") }
+                        ShortcutRow { keyText: "Esc"; actionText: I18n.trFor("quickCapture", "Discard & Close") }
+                        ShortcutRow { keyText: "Tab"; actionText: I18n.trFor("quickCapture", "Toggle between 2 latest presets") }
+                        ShortcutRow { keyText: "V"; actionText: I18n.trFor("quickCapture", "Switch to Select Tool") }
+                        ShortcutRow { keyText: "C"; actionText: I18n.trFor("quickCapture", "Copy vector / Paste / Duplicate") }
+                        ShortcutRow { keyText: "G (Hold)"; actionText: I18n.trFor("quickCapture", "Magnifier Loupe") }
+                        ShortcutRow { keyText: "O"; actionText: I18n.trFor("quickCapture", "OCR Text Recognition") }
+                        ShortcutRow { keyText: "X"; actionText: I18n.trFor("quickCapture", "Toggle Hide/Show Annotations") }
+                        ShortcutRow { keyText: "Ctrl + Z"; actionText: I18n.trFor("quickCapture", "Undo last stroke") }
+                        ShortcutRow { keyText: "Ctrl + Y"; actionText: I18n.trFor("quickCapture", "Redo last undone stroke") }
+                        ShortcutRow { keyText: "Ctrl + Shift + Z"; actionText: I18n.trFor("quickCapture", "Redo last undone stroke") }
+                        ShortcutRow { keyText: "Ctrl + S"; actionText: I18n.trFor("quickCapture", "Force Save to File") }
+                        ShortcutRow { keyText: "Ctrl + C"; actionText: I18n.trFor("quickCapture", "Force Copy to Clipboard") }
+                        ShortcutRow { keyText: "Ctrl + Shift + C"; actionText: I18n.trFor("quickCapture", "Anonymous Copy (stripped metadata)") }
+                        ShortcutRow { keyText: "Ctrl + A"; actionText: I18n.trFor("quickCapture", "Force Copy & Save") }
+                        ShortcutRow { keyText: "Ctrl + F"; actionText: I18n.trFor("quickCapture", "Float Image") }
+                        ShortcutRow { keyText: "Ctrl + X"; actionText: I18n.trFor("quickCapture", "Crop / Resize Area") }
+                        ShortcutRow { keyText: "Ctrl + 1..4"; actionText: I18n.trFor("quickCapture", "Select Color Slots 1 - 4") }
+                        ShortcutRow { keyText: "Ctrl + Q..R"; actionText: I18n.trFor("quickCapture", "Select Color Slots 5 - 8 (Q, W, E, R)") }
                     }
                 }
             }
@@ -3572,7 +3572,7 @@ PluginSettings {
             SettingsCard {
                 SectionTitle {
                     id: ipcTitle
-                    text: I18n.tr("IPC Commands")
+                    text: I18n.trFor("quickCapture", "IPC Commands")
                     icon: "terminal"
                     collapsible: true
                     isExpanded: false
@@ -3586,7 +3586,7 @@ PluginSettings {
 
                     StyledText {
                         width: parent.width
-                        text: I18n.tr("Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).")
+                        text: I18n.trFor("quickCapture", "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).")
                         wrapMode: Text.WordWrap
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceVariantText
@@ -3594,138 +3594,138 @@ PluginSettings {
                     }
 
                     CopyBox {
-                        label: I18n.tr("Screenshot (Interactive Region) — Edit")
+                        label: I18n.trFor("quickCapture", "Screenshot (Interactive Region) — Edit")
                         text: "dms ipc call quickCapture screenshot region edit"
                     }
                     CopyBox {
-                        label: I18n.tr("Screenshot (Interactive Region) — Float")
+                        label: I18n.trFor("quickCapture", "Screenshot (Interactive Region) — Float")
                         text: "dms ipc call quickCapture screenshot region float"
                     }
 
                     CopyBox {
-                        label: I18n.tr("Screenshot (Full Screen) — Edit")
+                        label: I18n.trFor("quickCapture", "Screenshot (Full Screen) — Edit")
                         text: "dms ipc call quickCapture screenshot full edit"
                     }
                     CopyBox {
-                        label: I18n.tr("Screenshot (Full Screen) — Float")
+                        label: I18n.trFor("quickCapture", "Screenshot (Full Screen) — Float")
                         text: "dms ipc call quickCapture screenshot full float"
                     }
 
                     CopyBox {
-                        label: I18n.tr("Screenshot (All Combined Outputs) — Edit")
+                        label: I18n.trFor("quickCapture", "Screenshot (All Combined Outputs) — Edit")
                         text: "dms ipc call quickCapture screenshot all edit"
                     }
                     CopyBox {
-                        label: I18n.tr("Screenshot (All Combined Outputs) — Float")
+                        label: I18n.trFor("quickCapture", "Screenshot (All Combined Outputs) — Float")
                         text: "dms ipc call quickCapture screenshot all float"
                     }
 
                     CopyBox {
-                        label: I18n.tr("Screenshot (Specific Output) — Edit")
+                        label: I18n.trFor("quickCapture", "Screenshot (Specific Output) — Edit")
                         text: "dms ipc call quickCapture screenshot output edit"
                     }
                     CopyBox {
-                        label: I18n.tr("Screenshot (Specific Output) — Float")
+                        label: I18n.trFor("quickCapture", "Screenshot (Specific Output) — Float")
                         text: "dms ipc call quickCapture screenshot output float"
                     }
 
                     CopyBox {
-                        label: I18n.tr("Screenshot (Focused Window) — Edit")
+                        label: I18n.trFor("quickCapture", "Screenshot (Focused Window) — Edit")
                         text: "dms ipc call quickCapture screenshot window edit"
                     }
                     CopyBox {
-                        label: I18n.tr("Screenshot (Focused Window) — Float")
+                        label: I18n.trFor("quickCapture", "Screenshot (Focused Window) — Float")
                         text: "dms ipc call quickCapture screenshot window float"
                     }
 
                     CopyBox {
-                        label: I18n.tr("Screenshot (Last Selected Region) — Edit")
+                        label: I18n.trFor("quickCapture", "Screenshot (Last Selected Region) — Edit")
                         text: "dms ipc call quickCapture screenshot last edit"
                     }
                     CopyBox {
-                        label: I18n.tr("Screenshot (Last Selected Region) — Float")
+                        label: I18n.trFor("quickCapture", "Screenshot (Last Selected Region) — Float")
                         text: "dms ipc call quickCapture screenshot last float"
                     }
 
                     CopyBox {
-                        label: I18n.tr("Screenshot (Scrolling Capture) — Edit")
+                        label: I18n.trFor("quickCapture", "Screenshot (Scrolling Capture) — Edit")
                         text: "dms ipc call quickCapture screenshot scroll edit"
                     }
                     CopyBox {
-                        label: I18n.tr("Screenshot (Scrolling Capture) — Float")
+                        label: I18n.trFor("quickCapture", "Screenshot (Scrolling Capture) — Float")
                         text: "dms ipc call quickCapture screenshot scroll float"
                     }
 
                     CopyBox {
-                        label: I18n.tr("Select Image File — Edit")
+                        label: I18n.trFor("quickCapture", "Select Image File — Edit")
                         text: "dms ipc call quickCapture selectFile edit"
                     }
                     CopyBox {
-                        label: I18n.tr("Select Image File — Float")
+                        label: I18n.trFor("quickCapture", "Select Image File — Float")
                         text: "dms ipc call quickCapture selectFile float"
                     }
 
                     CopyBox {
-                        label: I18n.tr("Edit Image from Clipboard — Edit")
+                        label: I18n.trFor("quickCapture", "Edit Image from Clipboard — Edit")
                         text: "dms ipc call quickCapture fromClipboard edit"
                     }
                     CopyBox {
-                        label: I18n.tr("Edit Image from Clipboard — Float")
+                        label: I18n.trFor("quickCapture", "Edit Image from Clipboard — Float")
                         text: "dms ipc call quickCapture fromClipboard float"
                     }
 
                     CopyBox {
-                        label: I18n.tr("Open Specific Image Path — Edit")
+                        label: I18n.trFor("quickCapture", "Open Specific Image Path — Edit")
                         text: "dms ipc call quickCapture openImage /path/to/image.png edit"
                     }
                     CopyBox {
-                        label: I18n.tr("Open Specific Image Path — Float")
+                        label: I18n.trFor("quickCapture", "Open Specific Image Path — Float")
                         text: "dms ipc call quickCapture openImage /path/to/image.png float"
                     }
 
                     CopyBox {
-                        label: I18n.tr("Close Annotator")
+                        label: I18n.trFor("quickCapture", "Close Annotator")
                         text: "dms ipc call quickCapture close"
                     }
 
                     CopyBox {
-                        label: I18n.tr("Show Recent Edits History")
+                        label: I18n.trFor("quickCapture", "Show Recent Edits History")
                         text: "dms ipc call quickCapture showHistory"
                     }
 
                     CopyBox {
-                        label: I18n.tr("Screen Recording (Interactive Region)")
+                        label: I18n.trFor("quickCapture", "Screen Recording (Interactive Region)")
                         text: "dms ipc call quickCapture recordStart region"
                     }
                     CopyBox {
-                        label: I18n.tr("Screen Recording (Full Screen)")
+                        label: I18n.trFor("quickCapture", "Screen Recording (Full Screen)")
                         text: "dms ipc call quickCapture recordStart screen"
                     }
                     CopyBox {
-                        label: I18n.tr("Screen Recording (Window / Portal)")
+                        label: I18n.trFor("quickCapture", "Screen Recording (Window / Portal)")
                         text: "dms ipc call quickCapture recordStart portal"
                     }
                     CopyBox {
-                        label: I18n.tr("Screen Recording (Stop & Save)")
+                        label: I18n.trFor("quickCapture", "Screen Recording (Stop & Save)")
                         text: "dms ipc call quickCapture recordStop"
                     }
                     CopyBox {
-                        label: I18n.tr("Screen Recording (Pause / Resume)")
+                        label: I18n.trFor("quickCapture", "Screen Recording (Pause / Resume)")
                         text: "dms ipc call quickCapture recordPause"
                     }
                     CopyBox {
-                        label: I18n.tr("Screen Recording (Cancel)")
+                        label: I18n.trFor("quickCapture", "Screen Recording (Cancel)")
                         text: "dms ipc call quickCapture recordCancel"
                     }
                     CopyBox {
-                        label: I18n.tr("Screen Recording (Toggle Start / Stop)")
+                        label: I18n.trFor("quickCapture", "Screen Recording (Toggle Start / Stop)")
                         text: "dms ipc call quickCapture recordToggle"
                     }
 
                     Separator { opacity: 0.1 }
 
                     CopyBox {
-                        label: I18n.tr("Niri Binding Example")
+                        label: I18n.trFor("quickCapture", "Niri Binding Example")
                         text: "binds {\n    Print { spawn \"dms\" \"ipc\" \"call\" \"quickCapture\" \"screenshot\" \"region\" \"edit\"; }\n}"
                     }
                 }

@@ -44,7 +44,7 @@ PopoverSurface {
             height: 24
 
             StyledText {
-                text: I18n.tr("Background Presets")
+                text: I18n.trFor("quickCapture", "Background Presets")
                 font.pixelSize: Theme.fontSizeSmall
                 font.bold: true
                 color: Theme.surfaceText
@@ -106,7 +106,7 @@ PopoverSurface {
                         }
 
                         StyledText {
-                            text: I18n.tr("Save")
+                            text: I18n.trFor("quickCapture", "Save")
                             font.pixelSize: Theme.fontSizeSmall - 2
                             color: Theme.primary
                             font.bold: true

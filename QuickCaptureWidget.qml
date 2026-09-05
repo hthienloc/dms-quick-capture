@@ -43,10 +43,10 @@ PluginComponent {
 
     readonly property var audioInputsList: daemon && daemon.audioInputsList && daemon.audioInputsList.length > 0
         ? daemon.audioInputsList
-        : [{"label": I18n.tr("Default Microphone"), "value": "default_input"}]
+        : [{"label": I18n.trFor("quickCapture", "Default Microphone"), "value": "default_input"}]
     readonly property var audioOutputsList: daemon && daemon.audioOutputsList && daemon.audioOutputsList.length > 0
         ? daemon.audioOutputsList
-        : [{"label": I18n.tr("Default Output"), "value": "default_output"}]
+        : [{"label": I18n.trFor("quickCapture", "Default Output"), "value": "default_output"}]
 
     readonly property string currentMicLabel: {
         const list = root.audioInputsList;
@@ -54,7 +54,7 @@ PluginComponent {
         for (let i = 0; i < list.length; i++) {
             if (list[i].value === val) return list[i].label;
         }
-        return val === "default_input" ? I18n.tr("Default Microphone") : val;
+        return val === "default_input" ? I18n.trFor("quickCapture", "Default Microphone") : val;
     }
 
     readonly property string currentAudioLabel: {
@@ -63,7 +63,7 @@ PluginComponent {
         for (let i = 0; i < list.length; i++) {
             if (list[i].value === val) return list[i].label;
         }
-        return val === "default_output" ? I18n.tr("Default Output") : val;
+        return val === "default_output" ? I18n.trFor("quickCapture", "Default Output") : val;
     }
 
     function savePluginData(key, value) {
@@ -144,7 +144,7 @@ PluginComponent {
     popoutContent: Component {
         PopoutComponent {
             width: root.popoutWidth
-            headerText: I18n.tr("Quick Capture")
+            headerText: I18n.trFor("quickCapture", "Quick Capture")
             showCloseButton: false
             closePopout: () => root.closePopout()
 
@@ -377,9 +377,9 @@ PluginComponent {
 
                 Repeater {
                     model: [
-                        { icon: "screenshot_region", text: I18n.tr("Region"), modeKey: "region", isDefault: true },
-                        { icon: "fullscreen", text: I18n.tr("Full Screen"), modeKey: "full", isDefault: false },
-                        { icon: "crop_square", text: I18n.tr("Active Window"), modeKey: "window", isDefault: false },
+                        { icon: "screenshot_region", text: I18n.trFor("quickCapture", "Region"), modeKey: "region", isDefault: true },
+                        { icon: "fullscreen", text: I18n.trFor("quickCapture", "Full Screen"), modeKey: "full", isDefault: false },
+                        { icon: "crop_square", text: I18n.trFor("quickCapture", "Active Window"), modeKey: "window", isDefault: false },
                     ]
 
                     delegate: menuItemComp
@@ -400,9 +400,9 @@ PluginComponent {
 
                 Repeater {
                     model: [
-                        { icon: "restart_alt", text: I18n.tr("Last Region"), modeKey: "last" },
-                        { icon: "unfold_more", text: I18n.tr("Scrolling"), modeKey: "scroll" },
-                        { icon: "grid_view", text: I18n.tr("All Outputs"), modeKey: "all" },
+                        { icon: "restart_alt", text: I18n.trFor("quickCapture", "Last Region"), modeKey: "last" },
+                        { icon: "unfold_more", text: I18n.trFor("quickCapture", "Scrolling"), modeKey: "scroll" },
+                        { icon: "grid_view", text: I18n.trFor("quickCapture", "All Outputs"), modeKey: "all" },
                     ]
                     delegate: menuItemComp
                 }
@@ -429,7 +429,7 @@ PluginComponent {
                         anchors.right: parent.right; anchors.rightMargin: Theme.spacingS + 24
                         anchors.verticalCenter: parent.verticalCenter; spacing: Theme.spacingS
                         DankIcon { name: "display_settings"; size: 18; anchors.verticalCenter: parent.verticalCenter; color: Theme.surfaceText }
-                        StyledText { text: I18n.tr("Specific Output"); font.pixelSize: Theme.fontSizeNormal; color: Theme.surfaceText; anchors.verticalCenter: parent.verticalCenter }
+                        StyledText { text: I18n.trFor("quickCapture", "Specific Output"); font.pixelSize: Theme.fontSizeNormal; color: Theme.surfaceText; anchors.verticalCenter: parent.verticalCenter }
                     }
                     DankIcon {
                         anchors.right: parent.right; anchors.rightMargin: Theme.spacingS
@@ -568,7 +568,7 @@ PluginComponent {
                     height: root.outputExpanded && root.outputList.length === 0 ? 32 : 0
                     visible: root.outputExpanded && root.outputList.length === 0
                     padding: Theme.spacingM + 20
-                    text: I18n.tr("No output available")
+                    text: I18n.trFor("quickCapture", "No output available")
                     font.pixelSize: Theme.fontSizeNormal - 2
                     font.italic: true
                     color: Theme.surfaceVariantText
@@ -590,8 +590,8 @@ PluginComponent {
 
                 Repeater {
                     model: [
-                        { icon: "content_paste", text: I18n.tr("From Clipboard"), modeKey: "clipboard" },
-                        { icon: "folder_open", text: I18n.tr("From File"), modeKey: "selectFile" },
+                        { icon: "content_paste", text: I18n.trFor("quickCapture", "From Clipboard"), modeKey: "clipboard" },
+                        { icon: "folder_open", text: I18n.trFor("quickCapture", "From File"), modeKey: "selectFile" },
                     ]
 
                     delegate: menuItemComp
@@ -644,7 +644,7 @@ PluginComponent {
                             }
 
                             StyledText {
-                                text: (root.daemon && root.daemon.recordingController && root.daemon.recordingController.isPaused) ? I18n.tr("PAUSED") : I18n.tr("RECORDING")
+                                text: (root.daemon && root.daemon.recordingController && root.daemon.recordingController.isPaused) ? I18n.trFor("quickCapture", "PAUSED") : I18n.trFor("quickCapture", "RECORDING")
                                 font.pixelSize: Theme.fontSizeSmall
                                 font.weight: Font.Bold
                                 color: (root.daemon && root.daemon.recordingController && root.daemon.recordingController.isPaused) ? Theme.warning : Theme.error
@@ -670,7 +670,7 @@ PluginComponent {
                                 buttonSize: 34
                                 iconSize: 18
                                 iconColor: Theme.primary
-                                tooltipText: (root.daemon && root.daemon.recordingController && root.daemon.recordingController.isPaused) ? I18n.tr("Resume") : I18n.tr("Pause")
+                                tooltipText: (root.daemon && root.daemon.recordingController && root.daemon.recordingController.isPaused) ? I18n.trFor("quickCapture", "Resume") : I18n.trFor("quickCapture", "Pause")
                                 onClicked: {
                                     if (root.daemon) root.daemon.pauseRecording();
                                 }
@@ -681,7 +681,7 @@ PluginComponent {
                                 buttonSize: 34
                                 iconSize: 18
                                 iconColor: Theme.error
-                                tooltipText: I18n.tr("Stop & Save")
+                                tooltipText: I18n.trFor("quickCapture", "Stop & Save")
                                 onClicked: {
                                     root.closePopout();
                                     if (root.daemon) root.daemon.stopRecording();
@@ -693,7 +693,7 @@ PluginComponent {
                                 buttonSize: 34
                                 iconSize: 18
                                 iconColor: Theme.surfaceVariantText
-                                tooltipText: I18n.tr("Cancel")
+                                tooltipText: I18n.trFor("quickCapture", "Cancel")
                                 onClicked: {
                                     root.closePopout();
                                     if (root.daemon) root.daemon.cancelRecording();
@@ -711,9 +711,9 @@ PluginComponent {
 
                     Repeater {
                         model: [
-                            { icon: "screenshot_region", text: I18n.tr("Region"), modeKey: "region", isDefault: true },
-                            { icon: "fullscreen", text: I18n.tr("Full Screen"), modeKey: "screen", isDefault: false },
-                            { icon: "crop_square", text: I18n.tr("Window"), modeKey: "portal", isDefault: false }
+                            { icon: "screenshot_region", text: I18n.trFor("quickCapture", "Region"), modeKey: "region", isDefault: true },
+                            { icon: "fullscreen", text: I18n.trFor("quickCapture", "Full Screen"), modeKey: "screen", isDefault: false },
+                            { icon: "crop_square", text: I18n.trFor("quickCapture", "Window"), modeKey: "portal", isDefault: false }
                         ]
 
                         delegate: Rectangle {
@@ -1334,10 +1334,10 @@ PluginComponent {
 
     // ── Control Center integration ────────────────────────────────────────────
     ccWidgetIcon: (root.daemon && root.daemon.isRecording) ? "videocam" : "screenshot_region"
-    ccWidgetPrimaryText: (root.daemon && root.daemon.isRecording) ? I18n.tr("Recording...") : (root.widgetMode === "video" ? I18n.tr("Screen Recorder") : I18n.tr("Quick Capture"))
+    ccWidgetPrimaryText: (root.daemon && root.daemon.isRecording) ? I18n.trFor("quickCapture", "Recording...") : (root.widgetMode === "video" ? I18n.trFor("quickCapture", "Screen Recorder") : I18n.trFor("quickCapture", "Quick Capture"))
     ccWidgetSecondaryText: (root.daemon && root.daemon.isRecording)
         ? (root.daemon.recordingController ? root.daemon.recordingController.formatDuration(root.daemon.recordingController.recordingSeconds) : "")
-        : (root.isActive ? (daemon.isCapturing ? I18n.tr("Capturing...") : I18n.tr("Annotating")) : I18n.tr("Ready"))
+        : (root.isActive ? (daemon.isCapturing ? I18n.trFor("quickCapture", "Capturing...") : I18n.trFor("quickCapture", "Annotating")) : I18n.trFor("quickCapture", "Ready"))
     ccWidgetIsActive: root.isActive || (root.daemon && root.daemon.isRecording)
     onCcWidgetToggled: {
         if (root.daemon && root.daemon.isRecording) {
@@ -1367,7 +1367,7 @@ PluginComponent {
 
                 StyledText {
                     id: headerLabel
-                    text: root.widgetMode === "video" ? I18n.tr("Screen Recorder") : I18n.tr("Quick Capture")
+                    text: root.widgetMode === "video" ? I18n.trFor("quickCapture", "Screen Recorder") : I18n.trFor("quickCapture", "Quick Capture")
                     font.pixelSize: Theme.fontSizeLarge
                     font.weight: Font.Medium
                     color: Theme.surfaceText
@@ -1388,7 +1388,7 @@ PluginComponent {
                         buttonSize: 28
                         iconSize: 16
                         iconColor: root.widgetMode === "video" ? Theme.primary : Theme.surfaceVariantText
-                        tooltipText: root.widgetMode === "photo" ? I18n.tr("Screen Recorder") : I18n.tr("Quick Capture")
+                        tooltipText: root.widgetMode === "photo" ? I18n.trFor("quickCapture", "Screen Recorder") : I18n.trFor("quickCapture", "Quick Capture")
                         tooltipSide: "bottom"
                         onClicked: {
                             root.switchWidgetMode();
@@ -1400,7 +1400,7 @@ PluginComponent {
                         buttonSize: 28
                         iconSize: 16
                         iconColor: Theme.surfaceVariantText
-                        tooltipText: I18n.tr("Settings")
+                        tooltipText: I18n.trFor("quickCapture", "Settings")
                         tooltipSide: "bottom"
                         onClicked: PopoutService.openSettingsWithTab("plugins")
                     }
@@ -1410,7 +1410,7 @@ PluginComponent {
                         buttonSize: 28
                         iconSize: 16
                         iconColor: Theme.surfaceVariantText
-                        tooltipText: root.widgetMode === "video" ? I18n.tr("Recording Folder") : I18n.tr("Screenshot Folder")
+                        tooltipText: root.widgetMode === "video" ? I18n.trFor("quickCapture", "Recording Folder") : I18n.trFor("quickCapture", "Screenshot Folder")
                         tooltipSide: "bottom"
                         onClicked: {
                             const dir = root.widgetMode === "video"
@@ -1425,7 +1425,7 @@ PluginComponent {
                         buttonSize: 28
                         iconSize: 16
                         iconColor: Theme.surfaceVariantText
-                        tooltipText: I18n.tr("History")
+                        tooltipText: I18n.trFor("quickCapture", "History")
                         tooltipSide: "bottom"
                         onClicked: {
                             if (root.daemon) root.daemon.showHistoryCarousel();
@@ -1438,8 +1438,8 @@ PluginComponent {
                         iconSize: 16
                         iconColor: root.daemon && root.daemon.hideControlCenter ? Theme.surfaceVariantText : Theme.primary
                         tooltipText: root.daemon && root.daemon.hideControlCenter
-                            ? I18n.tr("Hide Control Center")
-                            : I18n.tr("Show Control Center")
+                            ? I18n.trFor("quickCapture", "Hide Control Center")
+                            : I18n.trFor("quickCapture", "Show Control Center")
                         tooltipSide: "bottom"
                         onClicked: {
                             if (root.daemon) root.daemon.toggleHideControlCenter();
@@ -1461,14 +1461,14 @@ PluginComponent {
 
                 Repeater {
                     model: [
-                        { icon: "screenshot_region", text: I18n.tr("Region"), modeKey: "region" },
-                        { icon: "fullscreen", text: I18n.tr("Full Screen"), modeKey: "full" },
-                        { icon: "crop_square", text: I18n.tr("Window"), modeKey: "window" },
-                        { icon: "restart_alt", text: I18n.tr("Last Reg"), modeKey: "last" },
-                        { icon: "unfold_more", text: I18n.tr("Scroll"), modeKey: "scroll" },
-                        { icon: "grid_view", text: I18n.tr("Outputs"), modeKey: "all" },
-                        { icon: "content_paste", text: I18n.tr("Clipboard"), modeKey: "clipboard" },
-                        { icon: "folder_open", text: I18n.tr("From File"), modeKey: "selectFile" }
+                        { icon: "screenshot_region", text: I18n.trFor("quickCapture", "Region"), modeKey: "region" },
+                        { icon: "fullscreen", text: I18n.trFor("quickCapture", "Full Screen"), modeKey: "full" },
+                        { icon: "crop_square", text: I18n.trFor("quickCapture", "Window"), modeKey: "window" },
+                        { icon: "restart_alt", text: I18n.trFor("quickCapture", "Last Reg"), modeKey: "last" },
+                        { icon: "unfold_more", text: I18n.trFor("quickCapture", "Scroll"), modeKey: "scroll" },
+                        { icon: "grid_view", text: I18n.trFor("quickCapture", "Outputs"), modeKey: "all" },
+                        { icon: "content_paste", text: I18n.trFor("quickCapture", "Clipboard"), modeKey: "clipboard" },
+                        { icon: "folder_open", text: I18n.trFor("quickCapture", "From File"), modeKey: "selectFile" }
                     ]
 
                     delegate: Rectangle {
@@ -1593,7 +1593,7 @@ PluginComponent {
                             buttonSize: 36
                             iconSize: 20
                             iconColor: Theme.primary
-                            tooltipText: (root.daemon && root.daemon.recordingController && root.daemon.recordingController.isPaused) ? I18n.tr("Resume") : I18n.tr("Pause")
+                            tooltipText: (root.daemon && root.daemon.recordingController && root.daemon.recordingController.isPaused) ? I18n.trFor("quickCapture", "Resume") : I18n.trFor("quickCapture", "Pause")
                             onClicked: if (root.daemon) root.daemon.pauseRecording()
                         }
 
@@ -1602,7 +1602,7 @@ PluginComponent {
                             buttonSize: 36
                             iconSize: 20
                             iconColor: Theme.error
-                            tooltipText: I18n.tr("Stop & Save")
+                            tooltipText: I18n.trFor("quickCapture", "Stop & Save")
                             onClicked: if (root.daemon) root.daemon.stopRecording()
                         }
 
@@ -1611,7 +1611,7 @@ PluginComponent {
                             buttonSize: 36
                             iconSize: 20
                             iconColor: Theme.surfaceVariantText
-                            tooltipText: I18n.tr("Cancel")
+                            tooltipText: I18n.trFor("quickCapture", "Cancel")
                             onClicked: if (root.daemon) root.daemon.cancelRecording()
                         }
                     }
@@ -1632,9 +1632,9 @@ PluginComponent {
 
                 Repeater {
                     model: [
-                        { icon: "screenshot_region", text: I18n.tr("Region"), modeKey: "region" },
-                        { icon: "fullscreen", text: I18n.tr("Screen"), modeKey: "screen" },
-                        { icon: "crop_square", text: I18n.tr("Window"), modeKey: "portal" }
+                        { icon: "screenshot_region", text: I18n.trFor("quickCapture", "Region"), modeKey: "region" },
+                        { icon: "fullscreen", text: I18n.trFor("quickCapture", "Screen"), modeKey: "screen" },
+                        { icon: "crop_square", text: I18n.trFor("quickCapture", "Window"), modeKey: "portal" }
                     ]
 
                     delegate: Rectangle {

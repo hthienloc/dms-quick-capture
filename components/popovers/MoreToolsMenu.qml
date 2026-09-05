@@ -101,7 +101,7 @@ Rectangle {
                         }
 
                         StyledText {
-                            text: I18n.tr("Rotate L")
+                            text: I18n.trFor("quickCapture", "Rotate L")
                             font.pixelSize: Theme.fontSizeSmall - 2
                             color: Theme.surfaceText
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -138,7 +138,7 @@ Rectangle {
                         }
 
                         StyledText {
-                            text: I18n.tr("Rotate R")
+                            text: I18n.trFor("quickCapture", "Rotate R")
                             font.pixelSize: Theme.fontSizeSmall - 2
                             color: Theme.surfaceText
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -182,7 +182,7 @@ Rectangle {
                         }
 
                         StyledText {
-                            text: I18n.tr("Flip Horiz")
+                            text: I18n.trFor("quickCapture", "Flip Horiz")
                             font.pixelSize: Theme.fontSizeSmall - 2
                             color: Theme.surfaceText
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -219,7 +219,7 @@ Rectangle {
                         }
 
                         StyledText {
-                            text: I18n.tr("Flip Vert")
+                            text: I18n.trFor("quickCapture", "Flip Vert")
                             font.pixelSize: Theme.fontSizeSmall - 2
                             color: Theme.surfaceText
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -267,7 +267,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.leftMargin: Theme.spacingS + 16 + Theme.spacingS
                 anchors.verticalCenter: parent.verticalCenter
-                text: I18n.tr("Watermark")
+                text: I18n.trFor("quickCapture", "Watermark")
                 font.pixelSize: Theme.fontSizeSmall
                 font.weight: menuRoot.watermarkEnabled ? Font.Bold : Font.Normal
                 color: menuRoot.watermarkEnabled ? Theme.primary : Theme.surfaceText
@@ -312,7 +312,7 @@ Rectangle {
 
         MenuActionItem {
             iconName: menuRoot.floatingMode ? "picture_in_picture_alt" : "open_in_new"
-            text: menuRoot.floatingMode ? I18n.tr("Use Modal Editor") : I18n.tr("Use Floating Editor")
+            text: menuRoot.floatingMode ? I18n.trFor("quickCapture", "Use Modal Editor") : I18n.trFor("quickCapture", "Use Floating Editor")
             onActivated: {
                 menuRoot.close();
                 menuRoot.editorPresentationToggled();
@@ -327,7 +327,7 @@ Rectangle {
 
         MenuActionItem {
             iconName: "add_photo_alternate"
-            text: I18n.tr("Insert Image")
+            text: I18n.trFor("quickCapture", "Insert Image")
             shortcut: "I"
             onActivated: {
                 menuRoot.close();
@@ -337,7 +337,7 @@ Rectangle {
 
         MenuActionItem {
             iconName: "document_scanner"
-            text: I18n.tr("OCR")
+            text: I18n.trFor("quickCapture", "OCR")
             shortcut: "O"
             onActivated: {
                 menuRoot.close();
@@ -347,7 +347,7 @@ Rectangle {
 
         MenuActionItem {
             iconName: "qr_code"
-            text: I18n.tr("Scan QR")
+            text: I18n.trFor("quickCapture", "Scan QR")
             onActivated: {
                 menuRoot.close();
                 menuRoot.qrScanRequested();
@@ -356,7 +356,7 @@ Rectangle {
 
         MenuActionItem {
             iconName: "auto_fix_normal"
-            text: I18n.tr("Eraser")
+            text: I18n.trFor("quickCapture", "Eraser")
             shortcut: "T"
             onActivated: {
                 menuRoot.close();
@@ -366,7 +366,7 @@ Rectangle {
 
         MenuActionItem {
             iconName: "colorize"
-            text: I18n.tr("Copy Color")
+            text: I18n.trFor("quickCapture", "Copy Color")
             onActivated: {
                 menuRoot.close();
                 menuRoot.copyColorRequested();

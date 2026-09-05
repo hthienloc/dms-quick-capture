@@ -72,7 +72,7 @@ Grid {
             iconSize: controlRoot.iconSize
             backgroundColor: controlRoot.imageBlurEnabled ? Theme.withAlpha(Theme.primary, 0.18) : "transparent"
             iconColor: controlRoot.imageBlurEnabled ? Theme.primary : Theme.surfaceText
-            tooltipText: I18n.tr("Blur Background Image")
+            tooltipText: I18n.trFor("quickCapture", "Blur Background Image")
             onClicked: controlRoot.imageBlurToggled(!controlRoot.imageBlurEnabled)
         }
     }
@@ -211,7 +211,7 @@ Grid {
             iconSize: controlRoot.iconSize
             backgroundColor: "transparent"
             iconColor: Theme.surfaceText
-            tooltipText: I18n.tr("Pick Color")
+            tooltipText: I18n.trFor("quickCapture", "Pick Color")
         }
 
         MouseArea {
@@ -242,7 +242,7 @@ Grid {
             iconSize: controlRoot.iconSize
             backgroundColor: "transparent"
             iconColor: Theme.surfaceText
-            tooltipText: I18n.tr("Auto Balance")
+            tooltipText: I18n.trFor("quickCapture", "Auto Balance")
             anchors.centerIn: parent
             onClicked: controlRoot.autoColorBalanceRequested()
         }

@@ -16,7 +16,7 @@ Item {
         iconName: "bookmarks"
         buttonSize: Constants.btnSize
         iconSize: Constants.iconSize
-        tooltipText: I18n.tr("Background Presets")
+        tooltipText: I18n.trFor("quickCapture", "Background Presets")
         anchors.centerIn: parent
         onClicked: control.hovered(control)
     }

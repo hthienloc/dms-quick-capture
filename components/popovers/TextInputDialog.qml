@@ -67,7 +67,7 @@ Popup {
             spacing: Theme.spacingM
 
             StyledText {
-                text: window && window.editingStroke ? I18n.tr("Edit Text Note") : I18n.tr("Add Text Note")
+                text: window && window.editingStroke ? I18n.trFor("quickCapture", "Edit Text Note") : I18n.trFor("quickCapture", "Add Text Note")
                 font.bold: true
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceText
@@ -87,7 +87,7 @@ Popup {
                     id: textInputField
                     anchors.fill: parent
                     anchors.margins: 1
-                    placeholderText: I18n.tr("Type note...")
+                    placeholderText: I18n.trFor("quickCapture", "Type note...")
                     wrapMode: TextEdit.Wrap
                     focus: true
                     font.pixelSize: Theme.fontSizeNormal
@@ -171,7 +171,7 @@ Popup {
                 DankButton {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
-                    text: window && window.editingStroke ? I18n.tr("Save") : I18n.tr("Add")
+                    text: window && window.editingStroke ? I18n.trFor("quickCapture", "Save") : I18n.trFor("quickCapture", "Add")
                     backgroundColor: Theme.primary
                     textColor: Theme.primaryText
                     onClicked: {

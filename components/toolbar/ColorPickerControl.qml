@@ -19,7 +19,7 @@ Item {
         iconName: "colorize"
         buttonSize: Constants.btnSize
         iconSize: Constants.iconSize
-        tooltipText: I18n.tr("Color Picker (F for RGB | Eyedropper)")
+        tooltipText: I18n.trFor("quickCapture", "Color Picker (F for RGB | Eyedropper)")
         backgroundColor: control.currentTool === "colorpicker" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
         iconColor: control.currentTool === "colorpicker" ? Theme.primary : Theme.surfaceText
     }

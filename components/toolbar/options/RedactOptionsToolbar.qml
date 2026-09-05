@@ -24,8 +24,8 @@ OptionToolbarPopup {
 
             Repeater {
                 model: [
-                    { icon: "square", mode: "solid", tooltip: I18n.tr("Solid Fill") },
-                    { icon: "auto_fix_high", mode: "clean", tooltip: I18n.tr("Clean Text Eraser") }
+                    { icon: "square", mode: "solid", tooltip: I18n.trFor("quickCapture", "Solid Fill") },
+                    { icon: "auto_fix_high", mode: "clean", tooltip: I18n.trFor("quickCapture", "Clean Text Eraser") }
                 ]
 
                 delegate: OptionToolbarButton {
@@ -45,9 +45,9 @@ OptionToolbarPopup {
 
             Repeater {
                 model: [
-                    { icon: "crop_square", shape: "rect", tooltip: I18n.tr("Rectangle") },
-                    { icon: "rounded_corner", shape: "roundRect", tooltip: I18n.tr("Rounded Rectangle") },
-                    { icon: "circle", shape: "ellipse", tooltip: I18n.tr("Ellipse") }
+                    { icon: "crop_square", shape: "rect", tooltip: I18n.trFor("quickCapture", "Rectangle") },
+                    { icon: "rounded_corner", shape: "roundRect", tooltip: I18n.trFor("quickCapture", "Rounded Rectangle") },
+                    { icon: "circle", shape: "ellipse", tooltip: I18n.trFor("quickCapture", "Ellipse") }
                 ]
 
                 delegate: OptionToolbarButton {

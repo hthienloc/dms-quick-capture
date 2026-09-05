@@ -16,12 +16,12 @@ Grid {
     spacing: Theme.spacingXS
 
     readonly property var modes: [
-        { mode: "none", icon: "blur_off", tooltip: I18n.tr("No Background") },
-        { mode: "solid", icon: "format_color_fill", tooltip: I18n.tr("Solid Color") },
-        { mode: "radial", icon: "filter_tilt_shift", tooltip: I18n.tr("Radial Gradient") },
-        { mode: "gradient", icon: "gradient", tooltip: I18n.tr("Linear Gradient") },
-        { mode: "conic", icon: "timelapse", tooltip: I18n.tr("Conic Gradient") },
-        { mode: "image", icon: "image", tooltip: I18n.tr("Image Background") }
+        { mode: "none", icon: "blur_off", tooltip: I18n.trFor("quickCapture", "No Background") },
+        { mode: "solid", icon: "format_color_fill", tooltip: I18n.trFor("quickCapture", "Solid Color") },
+        { mode: "radial", icon: "filter_tilt_shift", tooltip: I18n.trFor("quickCapture", "Radial Gradient") },
+        { mode: "gradient", icon: "gradient", tooltip: I18n.trFor("quickCapture", "Linear Gradient") },
+        { mode: "conic", icon: "timelapse", tooltip: I18n.trFor("quickCapture", "Conic Gradient") },
+        { mode: "image", icon: "image", tooltip: I18n.trFor("quickCapture", "Image Background") }
     ]
 
     Repeater {

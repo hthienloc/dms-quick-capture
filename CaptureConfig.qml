@@ -7,19 +7,19 @@ QtObject {
     property var pluginData: ({})
 
     readonly property var toolButtons: [
-        { id: "pen", icon: "edit", shortcut: "1", tooltip: I18n.tr("Freehand Pen (1)") },
-        { id: "line", icon: "horizontal_rule", shortcut: "2", tooltip: I18n.tr("Straight Line (2)") },
-        { id: "arrow", icon: "trending_flat", shortcut: "3", tooltip: I18n.tr("Arrow (3)") },
-        { id: "rect", icon: "crop_square", shortcut: "4", tooltip: I18n.tr("Rectangle Outline (4)") },
-        { id: "ellipse", icon: "radio_button_unchecked", shortcut: "Q", tooltip: I18n.tr("Ellipse / Circle (Q)") },
-        { id: "text", icon: "text_fields", shortcut: "W", tooltip: I18n.tr("Text (W)") },
-        { id: "pixelate", icon: "blur_on", shortcut: "E", tooltip: I18n.tr("Pixelate (E)") },
-        { id: "redact", icon: "ad_off", shortcut: "R", tooltip: I18n.tr("Redact (R)") },
-        { id: "stamp", icon: "looks_one", shortcut: "A", tooltip: I18n.tr("Stamp (A)") },
-        { id: "highlighter", icon: "border_color", shortcut: "S", tooltip: I18n.tr("Highlighter (S)") },
-        { id: "spotlight", icon: "highlight", shortcut: "D", tooltip: I18n.tr("Spotlight (D)") },
-        { id: "callout", icon: "zoom_in", shortcut: "Z", tooltip: I18n.tr("Callout (Z) | Hold G for Loupe") },
-        { id: "background", icon: "wallpaper", shortcut: "B", tooltip: I18n.tr("Background (B)") }
+        { id: "pen", icon: "edit", shortcut: "1", tooltip: I18n.trFor("quickCapture", "Freehand Pen (1)") },
+        { id: "line", icon: "horizontal_rule", shortcut: "2", tooltip: I18n.trFor("quickCapture", "Straight Line (2)") },
+        { id: "arrow", icon: "trending_flat", shortcut: "3", tooltip: I18n.trFor("quickCapture", "Arrow (3)") },
+        { id: "rect", icon: "crop_square", shortcut: "4", tooltip: I18n.trFor("quickCapture", "Rectangle Outline (4)") },
+        { id: "ellipse", icon: "radio_button_unchecked", shortcut: "Q", tooltip: I18n.trFor("quickCapture", "Ellipse / Circle (Q)") },
+        { id: "text", icon: "text_fields", shortcut: "W", tooltip: I18n.trFor("quickCapture", "Text (W)") },
+        { id: "pixelate", icon: "blur_on", shortcut: "E", tooltip: I18n.trFor("quickCapture", "Pixelate (E)") },
+        { id: "redact", icon: "ad_off", shortcut: "R", tooltip: I18n.trFor("quickCapture", "Redact (R)") },
+        { id: "stamp", icon: "looks_one", shortcut: "A", tooltip: I18n.trFor("quickCapture", "Stamp (A)") },
+        { id: "highlighter", icon: "border_color", shortcut: "S", tooltip: I18n.trFor("quickCapture", "Highlighter (S)") },
+        { id: "spotlight", icon: "highlight", shortcut: "D", tooltip: I18n.trFor("quickCapture", "Spotlight (D)") },
+        { id: "callout", icon: "zoom_in", shortcut: "Z", tooltip: I18n.trFor("quickCapture", "Callout (Z) | Hold G for Loupe") },
+        { id: "background", icon: "wallpaper", shortcut: "B", tooltip: I18n.trFor("quickCapture", "Background (B)") }
     ]
 
     function getToolIcon(toolId) {
@@ -37,9 +37,9 @@ QtObject {
         const tool = toolButtons.find(t => t.id === toolId);
         if (tool) return tool.tooltip.split(" (")[0];
         
-        if (toolId === "eraser") return I18n.tr("Eraser");
-        if (toolId === "crop") return I18n.tr("Crop / Resize");
-        if (toolId === "select") return I18n.tr("Select");
+        if (toolId === "eraser") return I18n.trFor("quickCapture", "Eraser");
+        if (toolId === "crop") return I18n.trFor("quickCapture", "Crop / Resize");
+        if (toolId === "select") return I18n.trFor("quickCapture", "Select");
         
         return "";
     }

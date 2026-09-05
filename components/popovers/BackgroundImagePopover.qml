@@ -35,7 +35,7 @@ PopoverSurface {
                 spacing: 1
 
                 StyledText {
-                    text: I18n.tr("Background Images")
+                    text: I18n.trFor("quickCapture", "Background Images")
                     font.pixelSize: Theme.fontSizeSmall
                     font.bold: true
                     color: Theme.surfaceText
@@ -60,7 +60,7 @@ PopoverSurface {
                     iconName: "refresh"
                     buttonSize: 28
                     iconSize: 16
-                    tooltipText: I18n.tr("Refresh")
+                    tooltipText: I18n.trFor("quickCapture", "Refresh")
                     onClicked: popoverRoot.refreshRequested()
                 }
 
@@ -68,7 +68,7 @@ PopoverSurface {
                     iconName: "close"
                     buttonSize: 28
                     iconSize: 16
-                    tooltipText: I18n.tr("Close")
+                    tooltipText: I18n.trFor("quickCapture", "Close")
                     onClicked: popoverRoot.close()
                 }
             }
@@ -97,7 +97,7 @@ PopoverSurface {
                 }
 
                 StyledText {
-                    text: I18n.tr("No supported images found")
+                    text: I18n.trFor("quickCapture", "No supported images found")
                     color: Theme.surfaceVariantText
                     font.pixelSize: Theme.fontSizeSmall
                 }

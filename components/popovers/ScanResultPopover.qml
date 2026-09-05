@@ -12,7 +12,7 @@ Rectangle {
     property string resultText: ""
     property bool opened: false
     readonly property bool isUrl: /^https?:\/\//i.test(resultText.trim())
-    readonly property string titleText: resultType === "qr" ? I18n.tr("QR Result") : I18n.tr("OCR Result")
+    readonly property string titleText: resultType === "qr" ? I18n.trFor("quickCapture", "QR Result") : I18n.trFor("quickCapture", "OCR Result")
 
     signal closeRequested()
 
@@ -94,7 +94,7 @@ Rectangle {
                 iconName: "close"
                 buttonSize: 28
                 iconSize: 16
-                tooltipText: I18n.tr("Close")
+                tooltipText: I18n.trFor("quickCapture", "Close")
                 onClicked: root.close()
             }
         }
@@ -141,7 +141,7 @@ Rectangle {
             spacing: Theme.spacingS
 
             DankButton {
-                text: I18n.tr("Open")
+                text: I18n.trFor("quickCapture", "Open")
                 iconName: "open_in_new"
                 visible: root.isUrl
                 buttonHeight: 32
@@ -149,14 +149,14 @@ Rectangle {
             }
 
             DankButton {
-                text: I18n.tr("Copy")
+                text: I18n.trFor("quickCapture", "Copy")
                 iconName: "content_copy"
                 buttonHeight: 32
                 onClicked: {
                     const textToCopy = resultPreview.text;
                     DMSService.sendRequest("clipboard.copy", { "text": textToCopy }, function(response) {
                         if (typeof ToastService !== "undefined" && ToastService) {
-                            ToastService.showInfo(I18n.tr("Copied to clipboard"));
+                            ToastService.showInfo(I18n.trFor("quickCapture", "Copied to clipboard"));
                         }
                         root.close();
                     });

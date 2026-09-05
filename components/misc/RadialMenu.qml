@@ -282,11 +282,11 @@ Item {
 
             StyledText {
                 text: {
-                    if (root.selectedIndex === -2) return I18n.tr("Select");
+                    if (root.selectedIndex === -2) return I18n.trFor("quickCapture", "Select");
                     if (root.selectedIndex >= 0 && root.selectedIndex < root.presets.length) {
                         return config.getToolLabel(root.presets[root.selectedIndex].tool);
                     }
-                    return I18n.tr("Select");
+                    return I18n.trFor("quickCapture", "Select");
                 }
                 font.pixelSize: 8
                 font.bold: true

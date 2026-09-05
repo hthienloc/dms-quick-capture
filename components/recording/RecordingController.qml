@@ -41,8 +41,8 @@ Item {
     readonly property string micDevice: pluginData.micDevice || "default_input"
     readonly property string audioCodec: pluginData.audioCodec || "opus"
 
-    property var audioInputsList: [{"label": I18n.tr("Default Microphone"), "value": "default_input"}]
-    property var audioOutputsList: [{"label": I18n.tr("Default Output"), "value": "default_output"}]
+    property var audioInputsList: [{"label": I18n.trFor("quickCapture", "Default Microphone"), "value": "default_input"}]
+    property var audioOutputsList: [{"label": I18n.trFor("quickCapture", "Default Output"), "value": "default_output"}]
 
     property bool gpuScreenRecorderMissing: false
 
@@ -174,7 +174,7 @@ Item {
         onTriggered: {
             if (root.recordingState === "starting") {
                 root.cancelRecording();
-                root.sendNotification(I18n.tr("Screen recording timed out or was cancelled."), true);
+                root.sendNotification(I18n.trFor("quickCapture", "Screen recording timed out or was cancelled."), true);
             }
         }
     }
@@ -215,7 +215,7 @@ Item {
             if (exitCode === 0 || exitCode === 130) {
                 root.finalizeRecording(finishedPath, gifTarget);
             } else {
-                root.sendNotification(I18n.tr("Recording ended with error code %1.").arg(exitCode), true);
+                root.sendNotification(I18n.trFor("quickCapture", "Recording ended with error code %1.").arg(exitCode), true);
                 if (finishedPath) {
                     Proc.runCommand("cleanup-failed-recording", ["rm", "-f", finishedPath]);
                 }
@@ -228,7 +228,7 @@ Item {
         if (root.isRecording || root.recordingState !== "idle") return;
 
         if (root.gpuScreenRecorderMissing) {
-            root.sendNotification(I18n.tr("gpu-screen-recorder is not installed. Please install it first."), true);
+            root.sendNotification(I18n.trFor("quickCapture", "gpu-screen-recorder is not installed. Please install it first."), true);
             return;
         }
 
@@ -354,7 +354,7 @@ Item {
         root.isProcessing = true;
         root.recordingState = "processing";
         if (typeof ToastService !== "undefined" && ToastService) {
-            ToastService.showInfo(I18n.tr("Merging audio tracks..."));
+            ToastService.showInfo(I18n.trFor("quickCapture", "Merging audio tracks..."));
         }
         const ext = root.videoFormat;
         const tempOut = videoPath + ".audio_merged." + ext;
@@ -389,7 +389,7 @@ Item {
             root.isProcessing = true;
             root.recordingState = "processing";
             if (typeof ToastService !== "undefined" && ToastService) {
-                ToastService.showInfo(I18n.tr("Converting recording to GIF..."));
+                ToastService.showInfo(I18n.trFor("quickCapture", "Converting recording to GIF..."));
             }
 
             const gifFps = root.gifFramerate;
@@ -402,7 +402,7 @@ Item {
                 root.recordingState = "idle";
 
                 if (convCode !== 0) {
-                    root.sendNotification(I18n.tr("Failed to convert recording to GIF."), true);
+                    root.sendNotification(I18n.trFor("quickCapture", "Failed to convert recording to GIF."), true);
                     return;
                 }
 
@@ -433,13 +433,13 @@ Item {
             const icon = (exitCode === 0) ? thumbPath : "video-x-generic";
             const durationStr = root.formatDuration(durationSecs);
             const filename = targetPath.split("/").pop();
-            const msg = I18n.tr("Saved %1 (%2)").arg(filename).arg(durationStr);
+            const msg = I18n.trFor("quickCapture", "Saved %1 (%2)").arg(filename).arg(durationStr);
             root.sendNotification(msg, false, icon, targetPath);
         });
     }
 
     function sendNotification(message, isError, iconPath, videoPath) {
-        const title = isError ? I18n.tr("Screen Recording Error") : I18n.tr("Screen Recording Saved");
+        const title = isError ? I18n.trFor("quickCapture", "Screen Recording Error") : I18n.trFor("quickCapture", "Screen Recording Saved");
         if (isError || !videoPath) {
             const errIcon = iconPath || (isError ? "error" : "video-x-generic");
             const args = ["notify-send", "-a", "Quick Capture", "-i", errIcon, title, message];
@@ -454,8 +454,8 @@ Item {
             args.push("-h", "string:image-path:file://" + iconPath);
         }
         args.push(
-            "-A", "open=" + I18n.tr("Open"),
-            "-A", "folder=" + I18n.tr("Open Folder"),
+            "-A", "open=" + I18n.trFor("quickCapture", "Open"),
+            "-A", "folder=" + I18n.trFor("quickCapture", "Open Folder"),
             "-t", "5000",
             title,
             message
@@ -474,8 +474,8 @@ Item {
 
     function refreshAudioDevices() {
         Proc.runCommand("screenRecorder.listAudioDevices", ["gpu-screen-recorder", "--list-audio-devices"], (stdout, exitCode) => {
-            const inputs = [{"label": I18n.tr("Default Microphone"), "value": "default_input"}];
-            const outputs = [{"label": I18n.tr("Default Output"), "value": "default_output"}];
+            const inputs = [{"label": I18n.trFor("quickCapture", "Default Microphone"), "value": "default_input"}];
+            const outputs = [{"label": I18n.trFor("quickCapture", "Default Output"), "value": "default_output"}];
 
             if (exitCode === 0 && stdout) {
                 const lines = stdout.trim().split("\n");

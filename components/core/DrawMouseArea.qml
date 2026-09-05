@@ -733,7 +733,7 @@ MouseArea {
                       if (window.colorPickerMode === "copy") {
                           Quickshell.execDetached(["dms", "cl", "copy", hexStr]);
                           if (typeof ToastService !== "undefined" && ToastService) {
-                              ToastService.showInfo(I18n.tr("Color copied to clipboard: %1").arg(hexStr));
+                              ToastService.showInfo(I18n.trFor("quickCapture", "Color copied to clipboard: %1").arg(hexStr));
                           }
                       } else {
                            window.updateColorSlot(window.activeColorSlotIndex, pickedColor);

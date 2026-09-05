@@ -18,8 +18,8 @@ PluginComponent {
 
     readonly property alias recordingController: recordingControllerItem
     readonly property bool isRecording: recordingControllerItem ? recordingControllerItem.isRecording : false
-    readonly property var audioInputsList: recordingControllerItem ? recordingControllerItem.audioInputsList : [{"label": I18n.tr("Default Microphone"), "value": "default_input"}]
-    readonly property var audioOutputsList: recordingControllerItem ? recordingControllerItem.audioOutputsList : [{"label": I18n.tr("Default Output"), "value": "default_output"}]
+    readonly property var audioInputsList: recordingControllerItem ? recordingControllerItem.audioInputsList : [{"label": I18n.trFor("quickCapture", "Default Microphone"), "value": "default_input"}]
+    readonly property var audioOutputsList: recordingControllerItem ? recordingControllerItem.audioOutputsList : [{"label": I18n.trFor("quickCapture", "Default Output"), "value": "default_output"}]
     readonly property string systemAudioDevice: pluginData.systemAudioDevice || "default_output"
     readonly property string micDevice: pluginData.micDevice || "default_input"
 
@@ -156,10 +156,10 @@ PluginComponent {
                     root.currentCapturePath = meta.path;
                     root.openCapturedImageWithDimensions(meta.path, action, meta.width, meta.height);
                 } else if (meta.status !== "aborted") {
-                    root.toastError(meta.message || meta.error || I18n.tr("Screenshot failed (mode: %1).").arg(mode));
+                    root.toastError(meta.message || meta.error || I18n.trFor("quickCapture", "Screenshot failed (mode: %1).").arg(mode));
                 }
             } catch (e) {
-                root.toastError((stdout && stdout.trim()) || I18n.tr("Screenshot failed (mode: %1).").arg(mode));
+                root.toastError((stdout && stdout.trim()) || I18n.trFor("quickCapture", "Screenshot failed (mode: %1).").arg(mode));
             }
         }, 0, timeout);
     }
@@ -232,7 +232,7 @@ PluginComponent {
             floatServiceItem.spawnWindow("file://" + path, pluginData, null, [path]);
         } else if (action === "copy") {
             DMSService.sendRequest("clipboard.copyFile", { "filePath": path });
-            root.toastInfo(I18n.tr("Copied to clipboard"));
+            root.toastInfo(I18n.trFor("quickCapture", "Copied to clipboard"));
         } else if (action === "save") {
             const dir = pluginData.saveDirectory || "~/Pictures/Screenshots";
             const escapedDir = dir.startsWith("~/") ? "$HOME/" + root.escShell(dir.slice(2)) : root.escShell(dir);
@@ -240,9 +240,9 @@ PluginComponent {
             const cmd = "mkdir -p -- " + escapedDir + " && cp -- " + escapedPath + " " + escapedDir + "/Screenshot-$(date '+%Y-%m-%d_%H-%M-%S').png";
             Proc.runCommand("capture-save", ["sh", "-c", cmd], (stdout, exitCode) => {
                 if (exitCode === 0)
-                    root.toastInfo(I18n.tr("Screenshot saved"));
+                    root.toastInfo(I18n.trFor("quickCapture", "Screenshot saved"));
                 else
-                    root.toastError(I18n.tr("Failed to save screenshot"));
+                    root.toastError(I18n.trFor("quickCapture", "Failed to save screenshot"));
                 if (path.startsWith("/tmp/dms_capture_"))
                     Proc.runCommand("cleanup-temp-save", ["rm", "-f", path]);
             });
@@ -254,9 +254,9 @@ PluginComponent {
             DMSService.sendRequest("clipboard.copyFile", { "filePath": path });
             Proc.runCommand("capture-copy-save", ["sh", "-c", cmd], (stdout, exitCode) => {
                 if (exitCode === 0)
-                    root.toastInfo(I18n.tr("Copied & saved"));
+                    root.toastInfo(I18n.trFor("quickCapture", "Copied & saved"));
                 else
-                    root.toastError(I18n.tr("Failed to save screenshot"));
+                    root.toastError(I18n.trFor("quickCapture", "Failed to save screenshot"));
             });
         } else {
             root.closeControlCenter();
@@ -434,7 +434,7 @@ PluginComponent {
     FileBrowserModal {
         id: fileBrowserModal
         property string captureAction: "edit"
-        browserTitle: I18n.tr("Select Image to Annotate")
+        browserTitle: I18n.trFor("quickCapture", "Select Image to Annotate")
         browserIcon: "image"
         fileExtensions: ["*.png", "*.jpg", "*.jpeg", "*.webp", "*.bmp"]
         onFileSelected: path => {

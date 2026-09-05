@@ -108,7 +108,7 @@ Item {
 
     DankFloatingWindow {
         id: floatingSurface
-        title: I18n.tr("Quick Capture")
+        title: I18n.trFor("quickCapture", "Quick Capture")
         objectName: "quickCaptureEditor"
         visible: false
         implicitWidth: window.modalWidth
@@ -680,14 +680,14 @@ Item {
     readonly property real customRatioMin: 0.50
     readonly property real customRatioMax: 2.50
     readonly property var aspectPresets: [
-        { value: "auto", label: I18n.tr("AUTO") },
+        { value: "auto", label: I18n.trFor("quickCapture", "AUTO") },
         { value: "1:1", label: "1:1" },
         { value: "16:9", label: "16:9" },
         { value: "9:16", label: "9:16" },
         { value: "4:3", label: "4:3" },
         { value: "3:2", label: "3:2" },
         { value: "21:9", label: "21:9" },
-        { value: "custom", label: I18n.tr("CUST") }
+        { value: "custom", label: I18n.trFor("quickCapture", "CUST") }
     ]
     property bool hasUserCustomizedBackground: false
     property color autoBackgroundGradientStart: Theme.primary
@@ -822,7 +822,7 @@ Item {
                 window.backgroundImageBlur = false;
                 window.savePluginData("backgroundImageBlur", false);
                 if (typeof ToastService !== "undefined" && ToastService) {
-                    ToastService.showError(I18n.tr("Failed to generate blurred background image"));
+                    ToastService.showError(I18n.trFor("quickCapture", "Failed to generate blurred background image"));
                 }
             }
             window.requestPaintAll();
@@ -1686,7 +1686,7 @@ Item {
             }
             if (exitCode1 !== 0) {
                 if (typeof ToastService !== "undefined" && ToastService) {
-                    ToastService.showError(I18n.tr(scanConfig.cropErrorMessage));
+                    ToastService.showError(I18n.trFor("quickCapture", scanConfig.cropErrorMessage));
                 }
                 window.finishRegionScanTool();
                 return;
@@ -1704,14 +1704,14 @@ Item {
                     if (result) {
                         window.showScanResult(type, result);
                     } else if (typeof ToastService !== "undefined" && ToastService) {
-                        ToastService.showInfo(I18n.tr(scanConfig.noResultMessage));
+                        ToastService.showInfo(I18n.trFor("quickCapture", scanConfig.noResultMessage));
                     }
                 } else if (isQr && exitCode2 === 4) {
                     if (typeof ToastService !== "undefined" && ToastService) {
-                        ToastService.showInfo(I18n.tr(scanConfig.noResultMessage));
+                        ToastService.showInfo(I18n.trFor("quickCapture", scanConfig.noResultMessage));
                     }
                 } else if (typeof ToastService !== "undefined" && ToastService) {
-                    ToastService.showError(I18n.tr(scanConfig.scanErrorMessage));
+                    ToastService.showError(I18n.trFor("quickCapture", scanConfig.scanErrorMessage));
                 }
                 window.finishRegionScanTool();
             });
@@ -2556,7 +2556,7 @@ Item {
 
     FileBrowserSurfaceModal {
         id: saveAsDialog
-        browserTitle: I18n.tr("Save Screenshot As")
+        browserTitle: I18n.trFor("quickCapture", "Save Screenshot As")
         browserIcon: "save"
         browserType: "quick_capture_save"
         saveMode: true
@@ -2575,7 +2575,7 @@ Item {
 
     FileBrowserSurfaceModal {
         id: insertImageDialog
-        browserTitle: I18n.tr("Insert Image")
+        browserTitle: I18n.trFor("quickCapture", "Insert Image")
         browserIcon: "add_photo_alternate"
         browserType: "quick_capture_insert_image"
         saveMode: false
@@ -2838,7 +2838,7 @@ Item {
             const picker = PopoutService.colorPickerModal;
             picker.useOverlayLayer = true;
             picker.selectedColor = window.currentColor;
-            picker.pickerTitle = I18n.tr("Choose Color");
+            picker.pickerTitle = I18n.trFor("quickCapture", "Choose Color");
             picker.onColorSelectedCallback = function (selectedColor) {
                 window.updateColorSlot(window.activeColorSlotIndex, selectedColor);
             };
@@ -4189,7 +4189,7 @@ Item {
                             const picker = PopoutService.colorPickerModal;
                             picker.useOverlayLayer = true;
                             picker.selectedColor = currentColor;
-                            picker.pickerTitle = I18n.tr("Choose Color");
+                            picker.pickerTitle = I18n.trFor("quickCapture", "Choose Color");
                             picker.onColorSelectedCallback = function (selectedColor) {
                                 if (window.backgroundMode === "solid") {
                                     window.backgroundSolidColor = selectedColor;

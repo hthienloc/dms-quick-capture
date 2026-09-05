@@ -41,6 +41,35 @@ Or manually:
 git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialShell/plugins/quickCapture
 ```
 
+## Translations
+
+Quick Capture supports native DMS 1.6+ sideload translations located in `translations/<locale>.json`. Contributions and improvements to translations are welcome!
+
+<!-- TRANSLATIONS_TABLE_START -->
+| Language | Locale | Progress | Coverage | Status |
+| :--- | :--- | :---: | :---: | :---: |
+| Vietnamese | `vi` | 17/493 | 3.4% | 🟡 In Progress |
+| Japanese | `ja` | 17/493 | 3.4% | 🟡 In Progress |
+| Chinese (Simplified) | `zh-CN` | 17/493 | 3.4% | 🟡 In Progress |
+| Korean | `ko` | 17/493 | 3.4% | 🟡 In Progress |
+| French | `fr` | 17/493 | 3.4% | 🟡 In Progress |
+| German | `de` | 17/493 | 3.4% | 🟡 In Progress |
+| Spanish | `es` | 17/493 | 3.4% | 🟡 In Progress |
+| Russian | `ru` | 17/493 | 3.4% | 🟡 In Progress |
+<!-- TRANSLATIONS_TABLE_END -->
+
+### Contributing Translations
+
+1. Extract the latest translatable strings:
+   ```bash
+   python3 scripts/i18n.py extract
+   ```
+2. Edit your language file under `translations/<locale>.json` (or add a new language with `python3 scripts/i18n.py add-lang <locale>`).
+3. Check translation coverage and update the table:
+   ```bash
+   python3 scripts/i18n.py status --readme
+   ```
+
 ## Credits
 
 - **[Gradia Capture](https://github.com/AlexanderVanhee/gradia-capture)** — Inspiration for the toolbar layout and background algorithms

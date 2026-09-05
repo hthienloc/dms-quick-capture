@@ -254,8 +254,8 @@ Rectangle {
             // History Actions (Undo & Redo)
             Row {
                 spacing: Theme.spacingXS; anchors.verticalCenter: parent.verticalCenter
-                DankActionButton { iconName: "undo"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; enabled: root.canUndo; opacity: enabled ? 1.0 : 0.4; tooltipText: I18n.tr("Undo (Ctrl+Z)"); onClicked: root.undoRequested() }
-                DankActionButton { iconName: "redo"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; enabled: root.canRedo; opacity: enabled ? 1.0 : 0.4; tooltipText: I18n.tr("Redo (Ctrl+Y / Ctrl+Shift+Z)"); onClicked: root.redoRequested() }
+                DankActionButton { iconName: "undo"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; enabled: root.canUndo; opacity: enabled ? 1.0 : 0.4; tooltipText: I18n.trFor("quickCapture", "Undo (Ctrl+Z)"); onClicked: root.undoRequested() }
+                DankActionButton { iconName: "redo"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; enabled: root.canRedo; opacity: enabled ? 1.0 : 0.4; tooltipText: I18n.trFor("quickCapture", "Redo (Ctrl+Y / Ctrl+Shift+Z)"); onClicked: root.redoRequested() }
             }
 
             ToolbarSeparator { vertical: true; anchors.verticalCenter: parent.verticalCenter }
@@ -273,7 +273,7 @@ Rectangle {
                         iconName: "save"
                         buttonSize: Constants.btnSize
                         iconSize: Constants.iconSize
-                        tooltipText: I18n.tr("Save (Ctrl+S) | Save As (Ctrl+Shift+S)")
+                        tooltipText: I18n.trFor("quickCapture", "Save (Ctrl+S) | Save As (Ctrl+Shift+S)")
                     }
                     MouseArea {
                         anchors.fill: parent
@@ -298,7 +298,7 @@ Rectangle {
                         iconName: "content_copy"
                         buttonSize: Constants.btnSize
                         iconSize: Constants.iconSize
-                        tooltipText: I18n.tr("Copy (Ctrl+C) | Anonymous Copy (Ctrl+Shift+C)")
+                        tooltipText: I18n.trFor("quickCapture", "Copy (Ctrl+C) | Anonymous Copy (Ctrl+Shift+C)")
                     }
                     MouseArea {
                         anchors.fill: parent
@@ -318,7 +318,7 @@ Rectangle {
 
             ToolbarSeparator { vertical: true; anchors.verticalCenter: parent.verticalCenter }
 
-            DankActionButton { iconName: "close"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; iconColor: Theme.error; tooltipText: I18n.tr("Discard & Close (Esc)"); anchors.verticalCenter: parent.verticalCenter; onClicked: root.closeRequested() }
+            DankActionButton { iconName: "close"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; iconColor: Theme.error; tooltipText: I18n.trFor("quickCapture", "Discard & Close (Esc)"); anchors.verticalCenter: parent.verticalCenter; onClicked: root.closeRequested() }
         }
     }
 
@@ -383,7 +383,7 @@ Rectangle {
                 buttonSize: Constants.btnSize
                 iconSize: Constants.iconSize
                 anchors.verticalCenter: parent.verticalCenter
-                tooltipText: I18n.tr("Back to Annotation (B)")
+                tooltipText: I18n.trFor("quickCapture", "Back to Annotation (B)")
                 onClicked: root.toolSelected("back")
             }
             
@@ -548,7 +548,7 @@ Rectangle {
                 buttonSize: Constants.btnSize
                 iconSize: Constants.iconSize
                 anchors.horizontalCenter: parent.horizontalCenter
-                tooltipText: I18n.tr("Back to Annotation (B)")
+                tooltipText: I18n.trFor("quickCapture", "Back to Annotation (B)")
                 onClicked: root.toolSelected("back")
             }
             

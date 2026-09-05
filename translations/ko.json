@@ -1,0 +1,1481 @@
+{
+  "1 Connecting Line": {
+    "1 Connecting Line": ""
+  },
+  "2 Connecting Lines": {
+    "2 Connecting Lines": ""
+  },
+  "AUTO": {
+    "AUTO": ""
+  },
+  "Action": {
+    "Action": ""
+  },
+  "Action when Enter": {
+    "Action when Enter": "입력 시 작업"
+  },
+  "Active Window": {
+    "Active Window": ""
+  },
+  "Adaptive": {
+    "Adaptive": ""
+  },
+  "Adaptive (DMS Theme)": {
+    "Adaptive (DMS Theme)": ""
+  },
+  "Add": {
+    "Add": ""
+  },
+  "Add Text Note": {
+    "Add Text Note": ""
+  },
+  "All Combined Outputs": {
+    "All Combined Outputs": ""
+  },
+  "All Outputs": {
+    "All Outputs": ""
+  },
+  "Annotating": {
+    "Annotating": ""
+  },
+  "Annotation Tools": {
+    "Annotation Tools": ""
+  },
+  "Anonymous Copy (stripped metadata)": {
+    "Anonymous Copy (stripped metadata)": ""
+  },
+  "Arrow (3)": {
+    "Arrow (3)": ""
+  },
+  "Arrow Color": {
+    "Arrow Color": ""
+  },
+  "Arrow Thickness": {
+    "Arrow Thickness": ""
+  },
+  "Arrow Vector": {
+    "Arrow Vector": "화살표 벡터"
+  },
+  "Audio & Overlay": {
+    "Audio & Overlay": ""
+  },
+  "Audio Codec": {
+    "Audio Codec": ""
+  },
+  "Auto": {
+    "Auto": ""
+  },
+  "Auto Balance": {
+    "Auto Balance": ""
+  },
+  "Auto Detect": {
+    "Auto Detect": ""
+  },
+  "Auto-apply background defaults": {
+    "Auto-apply background defaults": ""
+  },
+  "Auto-close the loop when ending near the start point.": {
+    "Auto-close the loop when ending near the start point.": ""
+  },
+  "Auto-minimize": {
+    "Auto-minimize": ""
+  },
+  "Auto-select a tool preset on hover, without releasing the mouse.": {
+    "Auto-select a tool preset on hover, without releasing the mouse.": ""
+  },
+  "Auto-tiling": {
+    "Auto-tiling": ""
+  },
+  "Automatically minimize the float window after a delay": {
+    "Automatically minimize the float window after a delay": ""
+  },
+  "Automatically stack windows to avoid overlap": {
+    "Automatically stack windows to avoid overlap": ""
+  },
+  "Back to Annotation (B)": {
+    "Back to Annotation (B)": ""
+  },
+  "Background": {
+    "Background": ""
+  },
+  "Background (B)": {
+    "Background (B)": ""
+  },
+  "Background Defaults": {
+    "Background Defaults": ""
+  },
+  "Background Image Folder": {
+    "Background Image Folder": ""
+  },
+  "Background Images": {
+    "Background Images": ""
+  },
+  "Background Presets": {
+    "Background Presets": ""
+  },
+  "Balanced": {
+    "Balanced": ""
+  },
+  "Bar Interactions": {
+    "Bar Interactions": ""
+  },
+  "Blink Recording Dot": {
+    "Blink Recording Dot": ""
+  },
+  "Blur Background Image": {
+    "Blur Background Image": ""
+  },
+  "Border Color": {
+    "Border Color": ""
+  },
+  "Border Width": {
+    "Border Width": ""
+  },
+  "Both": {
+    "Both": ""
+  },
+  "Bottom": {
+    "Bottom": ""
+  },
+  "Bottom Center": {
+    "Bottom Center": ""
+  },
+  "Bottom Left": {
+    "Bottom Left": ""
+  },
+  "Bottom Right": {
+    "Bottom Right": ""
+  },
+  "CUST": {
+    "CUST": ""
+  },
+  "Callout": {
+    "Callout": ""
+  },
+  "Callout (Z) | Hold G for Loupe": {
+    "Callout (Z) | Hold G for Loupe": ""
+  },
+  "Callout Zoom": {
+    "Callout Zoom": ""
+  },
+  "Callout, Background (Z, B)": {
+    "Callout, Background (Z, B)": ""
+  },
+  "Cancel": {
+    "Cancel": ""
+  },
+  "Capture": {
+    "Capture": ""
+  },
+  "Capture Actions": {
+    "Capture Actions": ""
+  },
+  "Capture Options": {
+    "Capture Options": ""
+  },
+  "Capturing...": {
+    "Capturing...": ""
+  },
+  "Catppuccin": {
+    "Catppuccin": ""
+  },
+  "Center": {
+    "Center": ""
+  },
+  "Center Left": {
+    "Center Left": ""
+  },
+  "Center Right": {
+    "Center Right": ""
+  },
+  "Choose Color": {
+    "Choose Color": ""
+  },
+  "Choose notifications shown after copy or save.": {
+    "Choose notifications shown after copy or save.": ""
+  },
+  "Choose the editor shape for portrait or landscape screens.": {
+    "Choose the editor shape for portrait or landscape screens.": ""
+  },
+  "Choose whether the editor opens as a modal overlay or a movable floating window.": {
+    "Choose whether the editor opens as a modal overlay or a movable floating window.": ""
+  },
+  "Classic (Tailwind)": {
+    "Classic (Tailwind)": ""
+  },
+  "Clean Text Eraser": {
+    "Clean Text Eraser": ""
+  },
+  "Clear saved region selection before each capture": {
+    "Clear saved region selection before each capture": ""
+  },
+  "Clipboard": {
+    "Clipboard": ""
+  },
+  "Close": {
+    "Close": ""
+  },
+  "Close Annotator": {
+    "Close Annotator": ""
+  },
+  "Color Palette": {
+    "Color Palette": ""
+  },
+  "Color Picker (F for RGB | Eyedropper)": {
+    "Color Picker (F for RGB | Eyedropper)": ""
+  },
+  "Color Picker, Eraser (F, T)": {
+    "Color Picker, Eraser (F, T)": ""
+  },
+  "Color copied to clipboard: %1": {
+    "Color copied to clipboard: %1": ""
+  },
+  "Configure up to 8 quick-access tool presets. Right-click during capture to open the radial menu.": {
+    "Configure up to 8 quick-access tool presets. Right-click during capture to open the radial menu.": ""
+  },
+  "Conic Gradient": {
+    "Conic Gradient": ""
+  },
+  "Container Format": {
+    "Container Format": ""
+  },
+  "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": {
+    "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": ""
+  },
+  "Converting recording to GIF...": {
+    "Converting recording to GIF...": ""
+  },
+  "Copied": {
+    "Copied": ""
+  },
+  "Copied & saved": {
+    "Copied & saved": ""
+  },
+  "Copied Anonymously": {
+    "Copied Anonymously": ""
+  },
+  "Copied to clipboard": {
+    "Copied to clipboard": ""
+  },
+  "Copied:": {
+    "Copied:": ""
+  },
+  "Copy": {
+    "Copy": ""
+  },
+  "Copy & Save": {
+    "Copy & Save": ""
+  },
+  "Copy (Ctrl+C) | Anonymous Copy (Ctrl+Shift+C)": {
+    "Copy (Ctrl+C) | Anonymous Copy (Ctrl+Shift+C)": ""
+  },
+  "Copy Color": {
+    "Copy Color": ""
+  },
+  "Copy Current Palette": {
+    "Copy Current Palette": ""
+  },
+  "Copy and customize this preset": {
+    "Copy and customize this preset": ""
+  },
+  "Copy vector / Paste / Duplicate": {
+    "Copy vector / Paste / Duplicate": ""
+  },
+  "Crop / Resize": {
+    "Crop / Resize": "자르기/크기 조정"
+  },
+  "Crop / Resize Area": {
+    "Crop / Resize Area": ""
+  },
+  "Custom": {
+    "Custom": ""
+  },
+  "Custom Colors": {
+    "Custom Colors": ""
+  },
+  "Custom Tool": {
+    "Custom Tool": ""
+  },
+  "Dank Violet": {
+    "Dank Violet": ""
+  },
+  "Dark": {
+    "Dark": ""
+  },
+  "Darken the image to improve foreground contrast": {
+    "Darken the image to improve foreground contrast": ""
+  },
+  "Dashed Line": {
+    "Dashed Line": ""
+  },
+  "Default Alignment": {
+    "Default Alignment": ""
+  },
+  "Default Aspect Ratio": {
+    "Default Aspect Ratio": ""
+  },
+  "Default Background Image": {
+    "Default Background Image": ""
+  },
+  "Default Background Mode": {
+    "Default Background Mode": ""
+  },
+  "Default Bold Text": {
+    "Default Bold Text": ""
+  },
+  "Default Corner Radius": {
+    "Default Corner Radius": ""
+  },
+  "Default Gradient Angle": {
+    "Default Gradient Angle": ""
+  },
+  "Default Gradient End": {
+    "Default Gradient End": ""
+  },
+  "Default Gradient Start": {
+    "Default Gradient Start": ""
+  },
+  "Default Italic Text": {
+    "Default Italic Text": ""
+  },
+  "Default Microphone": {
+    "Default Microphone": ""
+  },
+  "Default Output": {
+    "Default Output": ""
+  },
+  "Default Padding": {
+    "Default Padding": ""
+  },
+  "Default Shadow Strength": {
+    "Default Shadow Strength": ""
+  },
+  "Default Solid Color": {
+    "Default Solid Color": ""
+  },
+  "Default Text Background": {
+    "Default Text Background": ""
+  },
+  "Default Text Font Size": {
+    "Default Text Font Size": ""
+  },
+  "Default Underline Text": {
+    "Default Underline Text": ""
+  },
+  "Default Watermark": {
+    "Default Watermark": ""
+  },
+  "Delete": {
+    "Delete": ""
+  },
+  "Dim Background Image": {
+    "Dim Background Image": ""
+  },
+  "Dim Intensity": {
+    "Dim Intensity": ""
+  },
+  "Dimming Opacity": {
+    "Dimming Opacity": ""
+  },
+  "Direct": {
+    "Direct": ""
+  },
+  "Discard & Close": {
+    "Discard & Close": ""
+  },
+  "Discard & Close (Esc)": {
+    "Discard & Close (Esc)": ""
+  },
+  "Done (Action based on settings)": {
+    "Done (Action based on settings)": ""
+  },
+  "Dotted Line": {
+    "Dotted Line": ""
+  },
+  "Dracula": {
+    "Dracula": ""
+  },
+  "Drag Image": {
+    "Drag Image": ""
+  },
+  "Draw an outer ring using the stamp number color": {
+    "Draw an outer ring using the stamp number color": ""
+  },
+  "Drop image onto bar icon to annotate it": {
+    "Drop image onto bar icon to annotate it": ""
+  },
+  "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": {
+    "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": ""
+  },
+  "Edge Spacing": {
+    "Edge Spacing": ""
+  },
+  "Edit Color Palette": {
+    "Edit Color Palette": ""
+  },
+  "Edit Image from Clipboard — Edit": {
+    "Edit Image from Clipboard — Edit": ""
+  },
+  "Edit Image from Clipboard — Float": {
+    "Edit Image from Clipboard — Float": ""
+  },
+  "Edit Text Note": {
+    "Edit Text Note": ""
+  },
+  "Editor": {
+    "Editor": ""
+  },
+  "Editor Aspect Ratio": {
+    "Editor Aspect Ratio": ""
+  },
+  "Editor Display Mode": {
+    "Editor Display Mode": ""
+  },
+  "Editor Display Screen": {
+    "Editor Display Screen": ""
+  },
+  "Editor Preview Quality": {
+    "Editor Preview Quality": ""
+  },
+  "Ellipse": {
+    "Ellipse": ""
+  },
+  "Ellipse / Circle": {
+    "Ellipse / Circle": "타원/원"
+  },
+  "Ellipse / Circle (Q)": {
+    "Ellipse / Circle (Q)": ""
+  },
+  "Ellipse Color": {
+    "Ellipse Color": ""
+  },
+  "Ellipse Thickness": {
+    "Ellipse Thickness": ""
+  },
+  "Ellipse, Text, Pixelate, Redact (Q, W, E, R)": {
+    "Ellipse, Text, Pixelate, Redact (Q, W, E, R)": ""
+  },
+  "Enable background automatically when opening the editor": {
+    "Enable background automatically when opening the editor": ""
+  },
+  "Eraser": {
+    "Eraser": "지우개"
+  },
+  "Everforest": {
+    "Everforest": ""
+  },
+  "Failed to convert recording to GIF.": {
+    "Failed to convert recording to GIF.": ""
+  },
+  "Failed to copy screenshot to clipboard.": {
+    "Failed to copy screenshot to clipboard.": ""
+  },
+  "Failed to generate blurred background image": {
+    "Failed to generate blurred background image": ""
+  },
+  "Failed to save screenshot": {
+    "Failed to save screenshot": ""
+  },
+  "Failed to save screenshot file.": {
+    "Failed to save screenshot file.": ""
+  },
+  "Flip Horiz": {
+    "Flip Horiz": ""
+  },
+  "Flip Vert": {
+    "Flip Vert": ""
+  },
+  "Float": {
+    "Float": ""
+  },
+  "Float Image": {
+    "Float Image": ""
+  },
+  "Float Window": {
+    "Float Window": ""
+  },
+  "Floating": {
+    "Floating": ""
+  },
+  "Focused Screen": {
+    "Focused Screen": ""
+  },
+  "Focused Window": {
+    "Focused Window": ""
+  },
+  "Font Size": {
+    "Font Size": ""
+  },
+  "Font family used for number stamp labels": {
+    "Font family used for number stamp labels": ""
+  },
+  "Force Copy & Save": {
+    "Force Copy & Save": ""
+  },
+  "Force Copy to Clipboard": {
+    "Force Copy to Clipboard": ""
+  },
+  "Force Save to File": {
+    "Force Save to File": ""
+  },
+  "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
+    "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": ""
+  },
+  "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
+    "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
+  },
+  "Framerate": {
+    "Framerate": ""
+  },
+  "Freehand Pen": {
+    "Freehand Pen": "프리핸드 펜"
+  },
+  "Freehand Pen (1)": {
+    "Freehand Pen (1)": ""
+  },
+  "From Clipboard": {
+    "From Clipboard": ""
+  },
+  "From File": {
+    "From File": ""
+  },
+  "Full Screen": {
+    "Full Screen": "전체 화면"
+  },
+  "GIF Framerate": {
+    "GIF Framerate": ""
+  },
+  "General Shortcuts": {
+    "General Shortcuts": ""
+  },
+  "Gruvbox Material": {
+    "Gruvbox Material": ""
+  },
+  "Help": {
+    "Help": ""
+  },
+  "Hide Control Center": {
+    "Hide Control Center": ""
+  },
+  "Hide Control Center by Default": {
+    "Hide Control Center by Default": ""
+  },
+  "High": {
+    "High": ""
+  },
+  "Highlighter": {
+    "Highlighter": "형광펜"
+  },
+  "Highlighter (S)": {
+    "Highlighter (S)": ""
+  },
+  "Highlighter Color": {
+    "Highlighter Color": ""
+  },
+  "Highlighter Thickness": {
+    "Highlighter Thickness": ""
+  },
+  "History": {
+    "History": ""
+  },
+  "Hover Trigger Delay": {
+    "Hover Trigger Delay": ""
+  },
+  "IPC Commands": {
+    "IPC Commands": ""
+  },
+  "Image": {
+    "Image": ""
+  },
+  "Image + Text": {
+    "Image + Text": ""
+  },
+  "Image Background": {
+    "Image Background": ""
+  },
+  "Image Error": {
+    "Image Error": ""
+  },
+  "Image Size": {
+    "Image Size": ""
+  },
+  "Image copied to clipboard": {
+    "Image copied to clipboard": ""
+  },
+  "Image selected automatically when using Image Background mode": {
+    "Image selected automatically when using Image Background mode": ""
+  },
+  "Include Cursor": {
+    "Include Cursor": ""
+  },
+  "Initial Width": {
+    "Initial Width": ""
+  },
+  "Initial state for the Control Center toggle.": {
+    "Initial state for the Control Center toggle.": ""
+  },
+  "Input Mode": {
+    "Input Mode": ""
+  },
+  "Insert Image": {
+    "Insert Image": ""
+  },
+  "Interaction / Result": {
+    "Interaction / Result": ""
+  },
+  "Interactive Region": {
+    "Interactive Region": ""
+  },
+  "JPEG Quality": {
+    "JPEG Quality": ""
+  },
+  "Kanagawa": {
+    "Kanagawa": ""
+  },
+  "Key": {
+    "Key": ""
+  },
+  "Landscape": {
+    "Landscape": ""
+  },
+  "Last Reg": {
+    "Last Reg": ""
+  },
+  "Last Region": {
+    "Last Region": ""
+  },
+  "Last Selected Region": {
+    "Last Selected Region": ""
+  },
+  "Left": {
+    "Left": ""
+  },
+  "Left Click": {
+    "Left Click": ""
+  },
+  "Light": {
+    "Light": ""
+  },
+  "Line Color": {
+    "Line Color": ""
+  },
+  "Line Thickness": {
+    "Line Thickness": ""
+  },
+  "Linear Gradient": {
+    "Linear Gradient": ""
+  },
+  "Live Preview": {
+    "Live Preview": ""
+  },
+  "Low": {
+    "Low": ""
+  },
+  "Magnifier Loupe": {
+    "Magnifier Loupe": ""
+  },
+  "Max Height (0 = no limit)": {
+    "Max Height (0 = no limit)": ""
+  },
+  "Medium": {
+    "Medium": ""
+  },
+  "Menu Item Right Click": {
+    "Menu Item Right Click": ""
+  },
+  "Merging audio tracks...": {
+    "Merging audio tracks...": ""
+  },
+  "Microphone Device": {
+    "Microphone Device": ""
+  },
+  "Middle Click": {
+    "Middle Click": ""
+  },
+  "Middle Click Action": {
+    "Middle Click Action": ""
+  },
+  "Minimize Delay": {
+    "Minimize Delay": ""
+  },
+  "Modal": {
+    "Modal": ""
+  },
+  "More Tools": {
+    "More Tools": ""
+  },
+  "Niri Binding Example": {
+    "Niri Binding Example": ""
+  },
+  "No Background": {
+    "No Background": ""
+  },
+  "No Image Specified": {
+    "No Image Specified": ""
+  },
+  "No output available": {
+    "No output available": ""
+  },
+  "No saved images yet": {
+    "No saved images yet": ""
+  },
+  "No supported images found": {
+    "No supported images found": ""
+  },
+  "None": {
+    "None": ""
+  },
+  "None / Disabled": {
+    "None / Disabled": "없음 / 비활성화"
+  },
+  "Nord": {
+    "Nord": ""
+  },
+  "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": {
+    "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": ""
+  },
+  "Notification": {
+    "Notification": ""
+  },
+  "Notifications": {
+    "Notifications": ""
+  },
+  "Number Stamp": {
+    "Number Stamp": "번호 스탬프"
+  },
+  "OCR": {
+    "OCR": ""
+  },
+  "OCR Result": {
+    "OCR Result": ""
+  },
+  "OCR Text Recognition": {
+    "OCR Text Recognition": ""
+  },
+  "Opacity": {
+    "Opacity": ""
+  },
+  "Open": {
+    "Open": ""
+  },
+  "Open Folder": {
+    "Open Folder": ""
+  },
+  "Open Quick Capture menu (Popout)": {
+    "Open Quick Capture menu (Popout)": ""
+  },
+  "Open Specific Image Path — Edit": {
+    "Open Specific Image Path — Edit": ""
+  },
+  "Open Specific Image Path — Float": {
+    "Open Specific Image Path — Float": ""
+  },
+  "Outline Variant": {
+    "Outline Variant": ""
+  },
+  "Output Format": {
+    "Output Format": ""
+  },
+  "Output format applies only to disk saves. Clipboard copies are always PNG.": {
+    "Output format applies only to disk saves. Clipboard copies are always PNG.": ""
+  },
+  "Outputs": {
+    "Outputs": ""
+  },
+  "Overlay Opacity": {
+    "Overlay Opacity": ""
+  },
+  "PAUSED": {
+    "PAUSED": ""
+  },
+  "PRIMARY": {
+    "PRIMARY": ""
+  },
+  "Palette Preset": {
+    "Palette Preset": ""
+  },
+  "Pause": {
+    "Pause": ""
+  },
+  "Pen Auto-Close": {
+    "Pen Auto-Close": ""
+  },
+  "Pen Color": {
+    "Pen Color": ""
+  },
+  "Pen Thickness": {
+    "Pen Thickness": ""
+  },
+  "Pen, Line, Arrow, Rect": {
+    "Pen, Line, Arrow, Rect": ""
+  },
+  "Pick Color": {
+    "Pick Color": ""
+  },
+  "Pick a palette preset or customize individual color slots.": {
+    "Pick a palette preset or customize individual color slots.": ""
+  },
+  "Pixel Intensity": {
+    "Pixel Intensity": ""
+  },
+  "Pixelate": {
+    "Pixelate": "픽셀화"
+  },
+  "Pixelate (E)": {
+    "Pixelate (E)": ""
+  },
+  "Pixelate Intensity": {
+    "Pixelate Intensity": ""
+  },
+  "Popup Input": {
+    "Popup Input": ""
+  },
+  "Portrait": {
+    "Portrait": ""
+  },
+  "Position": {
+    "Position": ""
+  },
+  "Post-Capture Notification": {
+    "Post-Capture Notification": ""
+  },
+  "Preset %1": {
+    "Preset %1": ""
+  },
+  "Preset 1": {
+    "Preset 1": ""
+  },
+  "Preset 2": {
+    "Preset 2": ""
+  },
+  "Preset 3": {
+    "Preset 3": ""
+  },
+  "Preset 4": {
+    "Preset 4": ""
+  },
+  "Preset 5": {
+    "Preset 5": ""
+  },
+  "Preset 6": {
+    "Preset 6": ""
+  },
+  "Preset 7": {
+    "Preset 7": ""
+  },
+  "Preset 8": {
+    "Preset 8": ""
+  },
+  "Preset Color": {
+    "Preset Color": ""
+  },
+  "Preset Thickness": {
+    "Preset Thickness": ""
+  },
+  "Preset Tool": {
+    "Preset Tool": ""
+  },
+  "Preview": {
+    "Preview": ""
+  },
+  "Primary": {
+    "Primary": ""
+  },
+  "QR Result": {
+    "QR Result": ""
+  },
+  "Quick Capture": {
+    "Quick Capture": ""
+  },
+  "Quick Capture Error": {
+    "Quick Capture Error": ""
+  },
+  "RECORDING": {
+    "RECORDING": ""
+  },
+  "Radial Gradient": {
+    "Radial Gradient": ""
+  },
+  "Radial Menu": {
+    "Radial Menu": ""
+  },
+  "Radial Menu Opacity": {
+    "Radial Menu Opacity": ""
+  },
+  "Radial Menu Settings": {
+    "Radial Menu Settings": ""
+  },
+  "Radial Preset": {
+    "Radial Preset": ""
+  },
+  "Ratio": {
+    "Ratio": ""
+  },
+  "Ready": {
+    "Ready": ""
+  },
+  "Recent Edits": {
+    "Recent Edits": ""
+  },
+  "Record Microphone": {
+    "Record Microphone": ""
+  },
+  "Record Mouse Cursor": {
+    "Record Mouse Cursor": ""
+  },
+  "Record System Audio": {
+    "Record System Audio": ""
+  },
+  "Recording": {
+    "Recording": ""
+  },
+  "Recording Folder": {
+    "Recording Folder": ""
+  },
+  "Recording ended with error code %1.": {
+    "Recording ended with error code %1.": ""
+  },
+  "Recording...": {
+    "Recording...": ""
+  },
+  "Recordings Directory": {
+    "Recordings Directory": ""
+  },
+  "Rectangle": {
+    "Rectangle": ""
+  },
+  "Rectangle Color": {
+    "Rectangle Color": ""
+  },
+  "Rectangle Outline": {
+    "Rectangle Outline": "직사각형 윤곽선"
+  },
+  "Rectangle Outline (4)": {
+    "Rectangle Outline (4)": ""
+  },
+  "Rectangle Thickness": {
+    "Rectangle Thickness": ""
+  },
+  "Redact": {
+    "Redact": ""
+  },
+  "Redact (R)": {
+    "Redact (R)": ""
+  },
+  "Redact Thickness": {
+    "Redact Thickness": ""
+  },
+  "Redo (Ctrl+Y / Ctrl+Shift+Z)": {
+    "Redo (Ctrl+Y / Ctrl+Shift+Z)": ""
+  },
+  "Redo last undone stroke": {
+    "Redo last undone stroke": ""
+  },
+  "Refresh": {
+    "Refresh": ""
+  },
+  "Region": {
+    "Region": ""
+  },
+  "Reset Last Region": {
+    "Reset Last Region": ""
+  },
+  "Resume": {
+    "Resume": ""
+  },
+  "Right": {
+    "Right": ""
+  },
+  "Right Click": {
+    "Right Click": ""
+  },
+  "Right Click Action": {
+    "Right Click Action": ""
+  },
+  "Rosé Pine": {
+    "Rosé Pine": ""
+  },
+  "Rotate L": {
+    "Rotate L": ""
+  },
+  "Rotate R": {
+    "Rotate R": ""
+  },
+  "Round Highlighter Tips": {
+    "Round Highlighter Tips": ""
+  },
+  "Round Rectangle Corners": {
+    "Round Rectangle Corners": ""
+  },
+  "Rounded Rectangle": {
+    "Rounded Rectangle": ""
+  },
+  "Save": {
+    "Save": ""
+  },
+  "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": {
+    "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": ""
+  },
+  "Save Directory": {
+    "Save Directory": "디렉토리 저장"
+  },
+  "Save Filename Pattern": {
+    "Save Filename Pattern": ""
+  },
+  "Save Screenshot As": {
+    "Save Screenshot As": ""
+  },
+  "Saved %1 (%2)": {
+    "Saved %1 (%2)": ""
+  },
+  "Saving": {
+    "Saving": ""
+  },
+  "Scale Editor to Screenshot Size": {
+    "Scale Editor to Screenshot Size": ""
+  },
+  "Scan QR": {
+    "Scan QR": ""
+  },
+  "Screen": {
+    "Screen": ""
+  },
+  "Screen Recorder": {
+    "Screen Recorder": ""
+  },
+  "Screen Recording (Cancel)": {
+    "Screen Recording (Cancel)": ""
+  },
+  "Screen Recording (Full Screen)": {
+    "Screen Recording (Full Screen)": ""
+  },
+  "Screen Recording (Interactive Region)": {
+    "Screen Recording (Interactive Region)": ""
+  },
+  "Screen Recording (Pause / Resume)": {
+    "Screen Recording (Pause / Resume)": ""
+  },
+  "Screen Recording (Stop & Save)": {
+    "Screen Recording (Stop & Save)": ""
+  },
+  "Screen Recording (Toggle Start / Stop)": {
+    "Screen Recording (Toggle Start / Stop)": ""
+  },
+  "Screen Recording (Window / Portal)": {
+    "Screen Recording (Window / Portal)": ""
+  },
+  "Screen Recording Error": {
+    "Screen Recording Error": ""
+  },
+  "Screen Recording Saved": {
+    "Screen Recording Saved": ""
+  },
+  "Screen recording timed out or was cancelled.": {
+    "Screen recording timed out or was cancelled.": ""
+  },
+  "Screen: %1 (%2x%3)": {
+    "Screen: %1 (%2x%3)": ""
+  },
+  "Screenshot (All Combined Outputs) — Edit": {
+    "Screenshot (All Combined Outputs) — Edit": ""
+  },
+  "Screenshot (All Combined Outputs) — Float": {
+    "Screenshot (All Combined Outputs) — Float": ""
+  },
+  "Screenshot (Focused Window) — Edit": {
+    "Screenshot (Focused Window) — Edit": ""
+  },
+  "Screenshot (Focused Window) — Float": {
+    "Screenshot (Focused Window) — Float": ""
+  },
+  "Screenshot (Full Screen) — Edit": {
+    "Screenshot (Full Screen) — Edit": ""
+  },
+  "Screenshot (Full Screen) — Float": {
+    "Screenshot (Full Screen) — Float": ""
+  },
+  "Screenshot (Interactive Region) — Edit": {
+    "Screenshot (Interactive Region) — Edit": ""
+  },
+  "Screenshot (Interactive Region) — Float": {
+    "Screenshot (Interactive Region) — Float": ""
+  },
+  "Screenshot (Last Selected Region) — Edit": {
+    "Screenshot (Last Selected Region) — Edit": ""
+  },
+  "Screenshot (Last Selected Region) — Float": {
+    "Screenshot (Last Selected Region) — Float": ""
+  },
+  "Screenshot (Scrolling Capture) — Edit": {
+    "Screenshot (Scrolling Capture) — Edit": ""
+  },
+  "Screenshot (Scrolling Capture) — Float": {
+    "Screenshot (Scrolling Capture) — Float": ""
+  },
+  "Screenshot (Specific Output) — Edit": {
+    "Screenshot (Specific Output) — Edit": ""
+  },
+  "Screenshot (Specific Output) — Float": {
+    "Screenshot (Specific Output) — Float": ""
+  },
+  "Screenshot Copied": {
+    "Screenshot Copied": ""
+  },
+  "Screenshot Folder": {
+    "Screenshot Folder": ""
+  },
+  "Screenshot Saved": {
+    "Screenshot Saved": ""
+  },
+  "Screenshot copied anonymously with randomized name and stripped metadata.": {
+    "Screenshot copied anonymously with randomized name and stripped metadata.": ""
+  },
+  "Screenshot copied to clipboard and saved to %1": {
+    "Screenshot copied to clipboard and saved to %1": ""
+  },
+  "Screenshot copied to clipboard but failed to save file: %1": {
+    "Screenshot copied to clipboard but failed to save file: %1": ""
+  },
+  "Screenshot copied to clipboard.": {
+    "Screenshot copied to clipboard.": ""
+  },
+  "Screenshot copied with randomized name.": {
+    "Screenshot copied with randomized name.": ""
+  },
+  "Screenshot failed (mode: %1).": {
+    "Screenshot failed (mode: %1).": ""
+  },
+  "Screenshot saved": {
+    "Screenshot saved": ""
+  },
+  "Screenshot saved to %1": {
+    "Screenshot saved to %1": ""
+  },
+  "Screenshot saved to %1/%2": {
+    "Screenshot saved to %1/%2": ""
+  },
+  "Scroll": {
+    "Scroll": ""
+  },
+  "Scroll Interval": {
+    "Scroll Interval": ""
+  },
+  "Scroll capture: select a region, scroll content, then press Enter to finish.": {
+    "Scroll capture: select a region, scroll content, then press Enter to finish.": ""
+  },
+  "Scrolling": {
+    "Scrolling": ""
+  },
+  "Scrolling Capture": {
+    "Scrolling Capture": ""
+  },
+  "Select": {
+    "Select": ""
+  },
+  "Select / Move stroke": {
+    "Select / Move stroke": ""
+  },
+  "Select Color Slots 1 - 4": {
+    "Select Color Slots 1 - 4": ""
+  },
+  "Select Color Slots 5 - 8 (Q, W, E, R)": {
+    "Select Color Slots 5 - 8 (Q, W, E, R)": ""
+  },
+  "Select Image File — Edit": {
+    "Select Image File — Edit": ""
+  },
+  "Select Image File — Float": {
+    "Select Image File — Float": ""
+  },
+  "Select Image to Annotate": {
+    "Select Image to Annotate": ""
+  },
+  "Selected Tool / Action": {
+    "Selected Tool / Action": ""
+  },
+  "Settings": {
+    "Settings": ""
+  },
+  "Shapes": {
+    "Shapes": ""
+  },
+  "Shortcut Action": {
+    "Shortcut Action": ""
+  },
+  "Shortcuts": {
+    "Shortcuts": ""
+  },
+  "Show Control Center": {
+    "Show Control Center": ""
+  },
+  "Show Keyboard Shortcut Hints": {
+    "Show Keyboard Shortcut Hints": ""
+  },
+  "Show Pill Border": {
+    "Show Pill Border": ""
+  },
+  "Show Recent Edits History": {
+    "Show Recent Edits History": ""
+  },
+  "Show Screenshot Border": {
+    "Show Screenshot Border": ""
+  },
+  "Show Toolbar": {
+    "Show Toolbar": ""
+  },
+  "Show Toolbar Border": {
+    "Show Toolbar Border": ""
+  },
+  "Show only the image on a transparent background": {
+    "Show only the image on a transparent background": ""
+  },
+  "Skip Confirmation": {
+    "Skip Confirmation": ""
+  },
+  "Slot 1": {
+    "Slot 1": ""
+  },
+  "Slot 2": {
+    "Slot 2": ""
+  },
+  "Slot 3": {
+    "Slot 3": ""
+  },
+  "Slot 4": {
+    "Slot 4": ""
+  },
+  "Slot 5": {
+    "Slot 5": ""
+  },
+  "Slot 6": {
+    "Slot 6": ""
+  },
+  "Slot 7": {
+    "Slot 7": ""
+  },
+  "Slot 8": {
+    "Slot 8": ""
+  },
+  "Soften image details so screenshot content stands out": {
+    "Soften image details so screenshot content stands out": ""
+  },
+  "Solid Color": {
+    "Solid Color": ""
+  },
+  "Solid Fill": {
+    "Solid Fill": ""
+  },
+  "Solid Line": {
+    "Solid Line": ""
+  },
+  "Spawn Position": {
+    "Spawn Position": ""
+  },
+  "Specific Output": {
+    "Specific Output": ""
+  },
+  "Spotlight": {
+    "Spotlight": ""
+  },
+  "Spotlight (D)": {
+    "Spotlight (D)": ""
+  },
+  "Spotlight Opacity": {
+    "Spotlight Opacity": ""
+  },
+  "Stamp (A)": {
+    "Stamp (A)": ""
+  },
+  "Stamp Color": {
+    "Stamp Color": ""
+  },
+  "Stamp Contrast Ring": {
+    "Stamp Contrast Ring": ""
+  },
+  "Stamp Number Font": {
+    "Stamp Number Font": ""
+  },
+  "Stamp Size": {
+    "Stamp Size": ""
+  },
+  "Stamp, Highlighter, Spotlight (A, S, D)": {
+    "Stamp, Highlighter, Spotlight (A, S, D)": ""
+  },
+  "Starting Preset": {
+    "Starting Preset": ""
+  },
+  "Starting Tool": {
+    "Starting Tool": "시작 도구"
+  },
+  "Starting Tool Mode": {
+    "Starting Tool Mode": ""
+  },
+  "Stop & Save": {
+    "Stop & Save": ""
+  },
+  "Straight Line": {
+    "Straight Line": "일직선"
+  },
+  "Straight Line (2)": {
+    "Straight Line (2)": ""
+  },
+  "Surface Container Highest": {
+    "Surface Container Highest": ""
+  },
+  "Switch to Select Tool": {
+    "Switch to Select Tool": ""
+  },
+  "Switch to your custom preset": {
+    "Switch to your custom preset": ""
+  },
+  "Synthwave Electric": {
+    "Synthwave Electric": ""
+  },
+  "System Audio Device": {
+    "System Audio Device": ""
+  },
+  "Target Output Name": {
+    "Target Output Name": ""
+  },
+  "Text": {
+    "Text": ""
+  },
+  "Text (W)": {
+    "Text (W)": ""
+  },
+  "Text Background Roundness": {
+    "Text Background Roundness": ""
+  },
+  "Text Color": {
+    "Text Color": ""
+  },
+  "Text Font": {
+    "Text Font": ""
+  },
+  "Text Note": {
+    "Text Note": "문자 참고"
+  },
+  "Text Size": {
+    "Text Size": ""
+  },
+  "Theme Primary Color": {
+    "Theme Primary Color": ""
+  },
+  "Thickness": {
+    "Thickness": "두께"
+  },
+  "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": {
+    "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": ""
+  },
+  "Toast": {
+    "Toast": ""
+  },
+  "Toggle Hide/Show Annotations": {
+    "Toggle Hide/Show Annotations": ""
+  },
+  "Toggle between 2 latest presets": {
+    "Toggle between 2 latest presets": ""
+  },
+  "Tokyo Night": {
+    "Tokyo Night": ""
+  },
+  "Tool Defaults": {
+    "Tool Defaults": ""
+  },
+  "Toolbar": {
+    "Toolbar": ""
+  },
+  "Toolbar Palette": {
+    "Toolbar Palette": ""
+  },
+  "Toolbar Position": {
+    "Toolbar Position": ""
+  },
+  "Top": {
+    "Top": ""
+  },
+  "Top Center": {
+    "Top Center": ""
+  },
+  "Top Left": {
+    "Top Left": ""
+  },
+  "Top Right": {
+    "Top Right": ""
+  },
+  "Transparent": {
+    "Transparent": ""
+  },
+  "Transparent Background": {
+    "Transparent Background": ""
+  },
+  "Trigger Middle-Click Action (Default: Interactive Region)": {
+    "Trigger Middle-Click Action (Default: Interactive Region)": ""
+  },
+  "Trigger Right-Click Action (Default: Clipboard Annotate)": {
+    "Trigger Right-Click Action (Default: Clipboard Annotate)": ""
+  },
+  "Trigger on Hover": {
+    "Trigger on Hover": ""
+  },
+  "Type note...": {
+    "Type note...": ""
+  },
+  "Undo (Ctrl+Z)": {
+    "Undo (Ctrl+Z)": ""
+  },
+  "Undo last stroke": {
+    "Undo last stroke": ""
+  },
+  "Usage Guide": {
+    "Usage Guide": ""
+  },
+  "Use Existing Custom": {
+    "Use Existing Custom": ""
+  },
+  "Use Floating Editor": {
+    "Use Floating Editor": ""
+  },
+  "Use Modal Editor": {
+    "Use Modal Editor": ""
+  },
+  "Very High": {
+    "Very High": ""
+  },
+  "Video Codec": {
+    "Video Codec": ""
+  },
+  "Video Quality": {
+    "Video Quality": ""
+  },
+  "Video Settings": {
+    "Video Settings": ""
+  },
+  "Watermark": {
+    "Watermark": ""
+  },
+  "Watermark Image": {
+    "Watermark Image": ""
+  },
+  "Watermark Text": {
+    "Watermark Text": ""
+  },
+  "Watermark Type": {
+    "Watermark Type": ""
+  },
+  "WebP Quality": {
+    "WebP Quality": ""
+  },
+  "When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.": {
+    "When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.": ""
+  },
+  "Window": {
+    "Window": ""
+  },
+  "Zoom Level": {
+    "Zoom Level": ""
+  },
+  "gpu-screen-recorder is not installed. Please install it first.": {
+    "gpu-screen-recorder is not installed. Please install it first.": ""
+  }
+}
