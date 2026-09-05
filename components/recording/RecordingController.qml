@@ -322,14 +322,13 @@ Item {
         if (!root.isRecording) return;
         root.isPaused = !root.isPaused;
         root.recordingState = root.isPaused ? "paused" : "recording";
-        const signal = root.isPaused ? "-STOP" : "-CONT";
-        Proc.runCommand("screenRecorder.signal", ["killall", signal, "gpu-screen-recorder"]);
+        Proc.runCommand("screenRecorder.signal", ["killall", "-SIGUSR2", "gpu-screen-recorder"]);
     }
 
     function stopRecording() {
         if (!root.isRecording && root.recordingState !== "starting") return;
         root.recordingState = "stopping";
-        Proc.runCommand("screenRecorder.stop", ["sh", "-c", "killall -CONT gpu-screen-recorder; killall -INT gpu-screen-recorder"]);
+        Proc.runCommand("screenRecorder.stop", ["killall", "-INT", "gpu-screen-recorder"]);
         safetyTimer.restart();
     }
 
