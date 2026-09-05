@@ -788,7 +788,7 @@ PluginSettings {
                 SectionTitle {
                     text: I18n.trFor("quickCapture", "Audio & Overlay")
                     icon: "graphic_eq"
-                    showReset: recordSystemAudio.isDirty || systemAudioDevice.isDirty || recordMic.isDirty || micDevice.isDirty || audioCodec.isDirty || showPillBorder.isDirty || blinkRecordDot.isDirty
+                    showReset: recordSystemAudio.isDirty || systemAudioDevice.isDirty || recordMic.isDirty || micDevice.isDirty || audioCodec.isDirty || showPillBorder.isDirty || blinkRecordDot.isDirty || showRegionBorder.isDirty
                     onResetClicked: {
                         recordSystemAudio.resetToDefault();
                         systemAudioDevice.resetToDefault();
@@ -797,6 +797,7 @@ PluginSettings {
                         audioCodec.resetToDefault();
                         showPillBorder.resetToDefault();
                         blinkRecordDot.resetToDefault();
+                        showRegionBorder.resetToDefault();
                     }
                 }
 
@@ -867,6 +868,15 @@ PluginSettings {
                     id: blinkRecordDot
                     settingKey: "blinkRecordDot"
                     label: I18n.trFor("quickCapture", "Blink Recording Dot")
+                    defaultValue: true
+                }
+
+                Separator {}
+
+                ToggleSettingPlus {
+                    id: showRegionBorder
+                    settingKey: "showRegionBorder"
+                    label: I18n.trFor("quickCapture", "Show Region Border")
                     defaultValue: true
                 }
 

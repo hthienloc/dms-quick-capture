@@ -40,6 +40,8 @@ Item {
     readonly property string systemAudioDevice: pluginData.systemAudioDevice || "default_output"
     readonly property string micDevice: pluginData.micDevice || "default_input"
     readonly property string audioCodec: pluginData.audioCodec || "opus"
+    readonly property bool showRegionBorder: pluginData.showRegionBorder !== false
+    property var screenLayouts: ({})
 
     property var audioInputsList: [{"label": I18n.trFor("quickCapture", "Default Microphone"), "value": "default_input"}]
     property var audioOutputsList: [{"label": I18n.trFor("quickCapture", "Default Output"), "value": "default_output"}]
@@ -235,19 +237,25 @@ Item {
         const targetMode = mode || "screen";
 
         if (targetMode === "region" && !customGeometry) {
-            Proc.runCommand("dms-region-geom", ["dms", "screenshot", "-g", "--no-confirm"], (stdout, exitCode) => {
-                if (exitCode === 0 && stdout && stdout.trim()) {
-                    root.setRegionFromOutput(stdout);
-                    if (root.regionGeometry) {
-                        root.executeRecordingProcess("region", root.regionGeometry);
+            root.refreshScreenLayouts(() => {
+                Proc.runCommand("dms-region-geom", ["dms", "screenshot", "-g", "--no-confirm"], (stdout, exitCode) => {
+                    if (exitCode === 0 && stdout && stdout.trim()) {
+                        root.setRegionFromOutput(stdout);
+                        if (root.regionGeometry) {
+                            root.executeRecordingProcess("region", root.regionGeometry);
+                        }
                     }
-                }
+                });
             });
             return;
         }
 
         if (targetMode === "region" && customGeometry) {
-            root.setRegionFromCustom(customGeometry);
+            root.refreshScreenLayouts(() => {
+                root.setRegionFromCustom(customGeometry);
+                root.executeRecordingProcess(targetMode, root.regionGeometry || customGeometry || "");
+            });
+            return;
         }
 
         root.executeRecordingProcess(targetMode, root.regionGeometry || customGeometry || "");
@@ -503,7 +511,42 @@ Item {
         });
     }
 
+    function refreshScreenLayouts(callback) {
+        Proc.runCommand("dms-screen-list", ["dms", "screenshot", "list"], (stdout, exitCode) => {
+            if (exitCode === 0 && stdout) {
+                const layouts = {};
+                const lines = stdout.trim().split("\n");
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+                    const m = line.match(/^([^:]+):\s+(\d+)x(\d+)\+(-?\d+)\+(-?\d+)(?:\s+scale=([0-9.]+))?/);
+                    if (m) {
+                        const name = m[1].trim();
+                        layouts[name] = {
+                            name: name,
+                            physW: parseInt(m[2], 10),
+                            physH: parseInt(m[3], 10),
+                            x: parseInt(m[4], 10),
+                            y: parseInt(m[5], 10),
+                            scale: m[6] ? parseFloat(m[6]) : 1.0
+                        };
+                    }
+                }
+                root.screenLayouts = layouts;
+            }
+            if (callback) callback();
+        });
+    }
+
+    Connections {
+        target: Quickshell
+        function onScreensChanged() {
+            root.refreshScreenLayouts();
+        }
+    }
+
     Component.onCompleted: {
         root.refreshAudioDevices();
+        root.refreshScreenLayouts();
     }
 }
