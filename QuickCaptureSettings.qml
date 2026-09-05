@@ -410,7 +410,6 @@ PluginSettings {
                     { label: I18n.tr("Toolbar"),       icon: "dock"               },
                     { label: I18n.tr("Color Palette"),  icon: "palette"            },
                     { label: I18n.tr("Editor"),        icon: "aspect_ratio"       },
-                    { label: I18n.tr("Drawing"),       icon: "brush"              },
                     { label: I18n.tr("Tool Defaults"), icon: "tune"               },
                     { label: I18n.tr("Text"),          icon: "format_size"        },
                     { label: I18n.tr("Shapes"),        icon: "category"           },
@@ -1470,130 +1469,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 7: Drawing ───────────────────────────────────────────────────────────
+    // ── Tab 7: Tool Defaults ───────────────────────────────────────────────────────
     Item {
         visible: tabBar.currentIndex === 7
-        width: parent.width
-        height: visible ? implicitHeight : 0
-        implicitHeight: drawingTabCol.implicitHeight
-        Column {
-            id: drawingTabCol
-            width: parent.width
-            spacing: Theme.spacingM
-    SettingsCard {
-        id: drawingCard
-        SectionTitle {
-            text: I18n.tr("Drawing")
-            icon: "brush"
-            showReset: defaultToolMode.isDirty || defaultPresetIndex.isDirty || defaultTool.isDirty || penAutoClose.isDirty
-            onResetClicked: {
-                defaultToolMode.resetToDefault();
-                defaultPresetIndex.resetToDefault();
-                defaultTool.resetToDefault();
-                penAutoClose.resetToDefault();
-            }
-        }
-
-        ButtonGroupSettingPlus {
-            id: defaultToolMode
-            settingKey: "defaultToolMode"
-            label: I18n.tr("Starting Tool Mode")
-            options: [
-                { label: I18n.tr("Radial Preset"), value: "preset" },
-                { label: I18n.tr("Custom Tool"), value: "custom" }
-            ]
-            defaultValue: "preset"
-        }
-
-        Separator {}
-
-        SelectionSettingPlus {
-            id: defaultPresetIndex
-            settingKey: "defaultPresetIndex"
-            label: I18n.tr("Starting Preset")
-            options: [
-                { "label": I18n.tr("Preset 1"), "value": "0" },
-                { "label": I18n.tr("Preset 2"), "value": "1" },
-                { "label": I18n.tr("Preset 3"), "value": "2" },
-                { "label": I18n.tr("Preset 4"), "value": "3" },
-                { "label": I18n.tr("Preset 5"), "value": "4" },
-                { "label": I18n.tr("Preset 6"), "value": "5" },
-                { "label": I18n.tr("Preset 7"), "value": "6" },
-                { "label": I18n.tr("Preset 8"), "value": "7" }
-            ]
-            defaultValue: "0"
-            visible: defaultToolMode.value === "preset"
-        }
-
-        Separator {
-            visible: defaultToolMode.value === "preset"
-        }
-
-
-
-        SelectionSettingPlus {
-            id: defaultTool
-            settingKey: "defaultTool"
-            label: I18n.tr("Starting Tool")
-            options: [{
-                "label": I18n.tr("Freehand Pen"),
-                "value": "pen"
-            }, {
-                "label": I18n.tr("Straight Line"),
-                "value": "line"
-            }, {
-                "label": I18n.tr("Arrow Vector"),
-                "value": "arrow"
-            }, {
-                "label": I18n.tr("Rectangle Outline"),
-                "value": "rect"
-            }, {
-                "label": I18n.tr("Ellipse / Circle"),
-                "value": "ellipse"
-            }, {
-                "label": I18n.tr("Text Note"),
-                "value": "text"
-            }, {
-                "label": I18n.tr("Pixelate"),
-                "value": "pixelate"
-            }, {
-                "label": I18n.tr("Redact"),
-                "value": "redact"
-            }, {
-                "label": I18n.tr("Number Stamp"),
-                "value": "stamp"
-            }, {
-                "label": I18n.tr("Highlighter"),
-                "value": "highlighter"
-            }, {
-                "label": I18n.tr("Eraser"),
-                "value": "eraser"
-            }, {
-                "label": I18n.tr("Crop / Resize"),
-                "value": "crop"
-            }]
-            defaultValue: "pen"
-            visible: defaultToolMode.value === "custom"
-        }
-
-        Separator {
-            visible: defaultToolMode.value === "custom"
-        }
-
-            ToggleSettingPlus {
-                id: penAutoClose
-                settingKey: "penAutoClose"
-                label: I18n.tr("Pen Auto-Close")
-                description: I18n.tr("Auto-close the loop when ending near the start point.")
-                defaultValue: true
-            }
-        }
-    }
-}
-
-    // ── Tab 8: Tool Defaults ───────────────────────────────────────────────────────
-    Item {
-        visible: tabBar.currentIndex === 8
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: toolDefaultsTabCol.implicitHeight
@@ -1607,7 +1485,8 @@ PluginSettings {
                 SectionTitle {
                     text: I18n.tr("Tool Defaults")
                     icon: "tune"
-                    showReset: defaultPenThickness.isDirty || defaultPenColor.isDirty
+                    showReset: defaultToolMode.isDirty || defaultPresetIndex.isDirty || defaultTool.isDirty
+                        || defaultPenThickness.isDirty || defaultPenColor.isDirty
                         || defaultLineThickness.isDirty || defaultLineColor.isDirty
                         || defaultArrowThickness.isDirty || defaultArrowColor.isDirty
                         || defaultRectThickness.isDirty || defaultRectColor.isDirty
@@ -1618,6 +1497,9 @@ PluginSettings {
                         || defaultRedactThickness.isDirty || defaultPixelateIntensity.isDirty
                         || defaultSpotlightIntensity.isDirty || defaultCalloutZoom.isDirty
                     onResetClicked: {
+                        defaultToolMode.resetToDefault();
+                        defaultPresetIndex.resetToDefault();
+                        defaultTool.resetToDefault();
                         defaultPenThickness.resetToDefault();
                         defaultPenColor.resetToDefault();
                         defaultLineThickness.resetToDefault();
@@ -1639,6 +1521,92 @@ PluginSettings {
                         defaultCalloutZoom.resetToDefault();
                     }
                 }
+
+                ButtonGroupSettingPlus {
+                    id: defaultToolMode
+                    settingKey: "defaultToolMode"
+                    label: I18n.tr("Starting Tool Mode")
+                    options: [
+                        { label: I18n.tr("Radial Preset"), value: "preset" },
+                        { label: I18n.tr("Custom Tool"), value: "custom" }
+                    ]
+                    defaultValue: "preset"
+                }
+
+                Separator {}
+
+                SelectionSettingPlus {
+                    id: defaultPresetIndex
+                    settingKey: "defaultPresetIndex"
+                    label: I18n.tr("Starting Preset")
+                    options: [
+                        { "label": I18n.tr("Preset 1"), "value": "0" },
+                        { "label": I18n.tr("Preset 2"), "value": "1" },
+                        { "label": I18n.tr("Preset 3"), "value": "2" },
+                        { "label": I18n.tr("Preset 4"), "value": "3" },
+                        { "label": I18n.tr("Preset 5"), "value": "4" },
+                        { "label": I18n.tr("Preset 6"), "value": "5" },
+                        { "label": I18n.tr("Preset 7"), "value": "6" },
+                        { "label": I18n.tr("Preset 8"), "value": "7" }
+                    ]
+                    defaultValue: "0"
+                    visible: defaultToolMode.value === "preset"
+                }
+
+                Separator {
+                    visible: defaultToolMode.value === "preset"
+                }
+
+                SelectionSettingPlus {
+                    id: defaultTool
+                    settingKey: "defaultTool"
+                    label: I18n.tr("Starting Tool")
+                    options: [{
+                        "label": I18n.tr("Freehand Pen"),
+                        "value": "pen"
+                    }, {
+                        "label": I18n.tr("Straight Line"),
+                        "value": "line"
+                    }, {
+                        "label": I18n.tr("Arrow Vector"),
+                        "value": "arrow"
+                    }, {
+                        "label": I18n.tr("Rectangle Outline"),
+                        "value": "rect"
+                    }, {
+                        "label": I18n.tr("Ellipse / Circle"),
+                        "value": "ellipse"
+                    }, {
+                        "label": I18n.tr("Text Note"),
+                        "value": "text"
+                    }, {
+                        "label": I18n.tr("Pixelate"),
+                        "value": "pixelate"
+                    }, {
+                        "label": I18n.tr("Redact"),
+                        "value": "redact"
+                    }, {
+                        "label": I18n.tr("Number Stamp"),
+                        "value": "stamp"
+                    }, {
+                        "label": I18n.tr("Highlighter"),
+                        "value": "highlighter"
+                    }, {
+                        "label": I18n.tr("Eraser"),
+                        "value": "eraser"
+                    }, {
+                        "label": I18n.tr("Crop / Resize"),
+                        "value": "crop"
+                    }]
+                    defaultValue: "pen"
+                    visible: defaultToolMode.value === "custom"
+                }
+
+                Separator {
+                    visible: defaultToolMode.value === "custom"
+                }
+
+                Separator {}
 
                 SliderSettingPlus {
                     id: defaultPenThickness
@@ -1853,9 +1821,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 9: Text ──────────────────────────────────────────────────────────────
+    // ── Tab 8: Text ──────────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 9
+        visible: tabBar.currentIndex === 8
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: textTabCol.implicitHeight
@@ -1965,9 +1933,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 10: Shapes ────────────────────────────────────────────────────────────
+    // ── Tab 9: Shapes ────────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 10
+        visible: tabBar.currentIndex === 9
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: shapesTabCol.implicitHeight
@@ -1980,12 +1948,13 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Shapes")
             icon: "category"
-            showReset: roundRect.isDirty || textCornerRadius.isDirty || roundHighlighter.isDirty || stampOuterRing.isDirty
+            showReset: roundRect.isDirty || textCornerRadius.isDirty || roundHighlighter.isDirty || stampOuterRing.isDirty || penAutoClose.isDirty
             onResetClicked: {
                 roundRect.resetToDefault();
                 textCornerRadius.resetToDefault();
                 roundHighlighter.resetToDefault();
                 stampOuterRing.resetToDefault();
+                penAutoClose.resetToDefault();
             }
         }
 
@@ -2028,14 +1997,24 @@ PluginSettings {
             description: I18n.tr("Draw an outer ring using the stamp number color")
             defaultValue: false
         }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            id: penAutoClose
+            settingKey: "penAutoClose"
+            label: I18n.tr("Pen Auto-Close")
+            description: I18n.tr("Auto-close the loop when ending near the start point.")
+            defaultValue: true
+        }
     }
 
         }
     }
 
-    // ── Tab 11: Background ──────────────────────────────────────────────────────────
+    // ── Tab 10: Background ──────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 11
+        visible: tabBar.currentIndex === 10
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: backgroundTabCol.implicitHeight
@@ -2303,9 +2282,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 12: Watermark ────────────────────────────────────────────────────────
+    // ── Tab 11: Watermark ────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 12
+        visible: tabBar.currentIndex === 11
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: watermarkTabCol.implicitHeight
@@ -2772,9 +2751,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 13: Float Window ─────────────────────────────────────────────────────
+    // ── Tab 12: Float Window ─────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 13
+        visible: tabBar.currentIndex === 12
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: floatTabCol.implicitHeight
@@ -2932,9 +2911,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 14: Radial Menu ───────────────────────────────────────────────────────
+    // ── Tab 13: Radial Menu ───────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 14
+        visible: tabBar.currentIndex === 13
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: presetsTabCol.implicitHeight
@@ -3472,9 +3451,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 15: Shortcuts ────────────────────────────────────────────────────────
+    // ── Tab 14: Shortcuts ────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 15
+        visible: tabBar.currentIndex === 14
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: shortcutsTabCol.implicitHeight
@@ -3575,9 +3554,9 @@ PluginSettings {
         }
     }
 
-    // ── Tab 16: Help ─────────────────────────────────────────────────────────────
+    // ── Tab 15: Help ─────────────────────────────────────────────────────────────
     Item {
-        visible: tabBar.currentIndex === 16
+        visible: tabBar.currentIndex === 15
         width: parent.width
         height: visible ? implicitHeight : 0
         implicitHeight: helpTabCol.implicitHeight
