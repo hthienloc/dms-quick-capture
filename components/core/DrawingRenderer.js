@@ -1691,22 +1691,62 @@ function drawSelectionOverlay(ctx, options, Theme) {
                 ctx.lineTo(x2, y2 - arm);
             });
 
-            // 4 Edge centers — short line segments
-            drawHandlePath(() => {
-                // Top
+            // Helper: draw a pill (rounded rectangle)
+            function drawPill(px, py, pw, ph, pr) {
                 ctx.beginPath();
-                ctx.moveTo(cx - edgeLen / 2, y1);
-                ctx.lineTo(cx + edgeLen / 2, y1);
-                // Bottom
-                ctx.moveTo(cx - edgeLen / 2, y2);
-                ctx.lineTo(cx + edgeLen / 2, y2);
-                // Left
-                ctx.moveTo(x1, cy - edgeLen / 2);
-                ctx.lineTo(x1, cy + edgeLen / 2);
-                // Right
-                ctx.moveTo(x2, cy - edgeLen / 2);
-                ctx.lineTo(x2, cy + edgeLen / 2);
-            });
+                ctx.moveTo(px + pr, py);
+                ctx.lineTo(px + pw - pr, py);
+                ctx.arc(px + pw - pr, py + pr, pr, -Math.PI / 2, Math.PI / 2);
+                ctx.lineTo(px + pr, py + ph);
+                ctx.arc(px + pr, py + pr, pr, Math.PI / 2, -Math.PI / 2);
+                ctx.closePath();
+            }
+
+            // 4 Edge handles — pill bars (N, S, E, W)
+            function drawEdgePill(px, py, pw, ph) {
+                ctx.save();
+                ctx.fillStyle = "#ffffff";
+                ctx.strokeStyle = "rgba(0, 0, 0, 0.45)";
+                ctx.lineWidth = 1;
+                const pr = Math.min(pw, ph) / 2;
+                drawPill(px, py, pw, ph, pr);
+                ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // Top (tc)
+            drawEdgePill(cx - 12, y1 - 3, 24, 6);
+            // Bottom (bc)
+            drawEdgePill(cx - 12, y2 - 3, 24, 6);
+            // Left (lc)
+            drawEdgePill(x1 - 3, cy - 12, 6, 24);
+            // Right (rc)
+            drawEdgePill(x2 - 3, cy - 12, 6, 24);
+
+            // Live dimension badge floating near the crop rect
+            const badgeRatioText = options.cropAspectRatio ? (" • " + options.cropAspectRatio) : "";
+            const badgeText = Math.round(cr.width) + " × " + Math.round(cr.height) + " px" + badgeRatioText;
+            ctx.save();
+            ctx.font = "bold 11px sans-serif";
+            const badgeMetrics = ctx.measureText(badgeText);
+            const badgeW = badgeMetrics.width + 16;
+            const badgeH = 22;
+            const badgeX = Math.max(8, Math.min(cw - badgeW - 8, cx - badgeW / 2));
+            const badgeY = (y1 - badgeH - 8 >= 8) ? (y1 - badgeH - 8) : (y2 + 8);
+
+            ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+            ctx.lineWidth = 1;
+            drawPill(badgeX, badgeY, badgeW, badgeH, badgeH / 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = "#ffffff";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(badgeText, badgeX + badgeW / 2, badgeY + badgeH / 2);
+            ctx.restore();
         }
     } else {
         // Dim full canvas slightly before selection

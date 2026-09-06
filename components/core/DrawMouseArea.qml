@@ -32,6 +32,8 @@ MouseArea {
     property real rotationStartAngle: 0
     property point cropMoveStart: Qt.point(0, 0)
     property rect cropMoveOrigin: Qt.rect(0, 0, 0, 0)
+    property rect cropResizeOrigin: Qt.rect(0, 0, 0, 0)
+    property point cropResizeOffset: Qt.point(0, 0)
 
     // Pen real-time smoothing state (exponential moving average)
     property real penSmoothX: 0
@@ -47,6 +49,8 @@ MouseArea {
         rotationStartAngle = 0;
         cropMoveStart = Qt.point(0, 0);
         cropMoveOrigin = Qt.rect(0, 0, 0, 0);
+        cropResizeOrigin = Qt.rect(0, 0, 0, 0);
+        cropResizeOffset = Qt.point(0, 0);
         penSmoothX = 0;
         penSmoothY = 0;
     }
@@ -200,7 +204,7 @@ MouseArea {
             drawingCanvas.requestPaint();
         }
         if (window.activeHandle === "new") {
-            const end = keepSquare
+            const end = (keepSquare || window.cropAspectRatio === "1:1")
                 ? constrainCropSquarePoint(window.selectStart, Qt.point(ox, oy))
                 : Qt.point(ox, oy);
             const rect = getDragRect(window.selectStart, end.x, end.y);
@@ -212,58 +216,25 @@ MouseArea {
         if (window.activeHandle === "move") {
             const dx = ox - cropMoveStart.x;
             const dy = oy - cropMoveStart.y;
-            window.cropRect = window.clampCropRect(
-                cropMoveOrigin.x + dx,
-                cropMoveOrigin.y + dy,
-                cropMoveOrigin.width,
-                cropMoveOrigin.height);
+            const bw = window.screenshotWidth;
+            const bh = window.screenshotHeight;
+            const newX = Math.max(0, Math.min(cropMoveOrigin.x + dx, bw - cropMoveOrigin.width));
+            const newY = Math.max(0, Math.min(cropMoveOrigin.y + dy, bh - cropMoveOrigin.height));
+            window.cropRect = Qt.rect(newX, newY, cropMoveOrigin.width, cropMoveOrigin.height);
             drawingCanvas.requestPaint();
             return;
         }
 
-        if (window.activeHandle !== "none" && window.activeHandle !== "new") {
-            const cr = window.cropRect;
-            let newX = cr.x;
-            let newY = cr.y;
-            let newW = cr.width;
-            let newH = cr.height;
-            if (["tl", "tr", "bl", "br"].indexOf(window.activeHandle) !== -1) {
-                const point = keepSquare
-                    ? constrainCropSquarePoint(
-                        Qt.point(cr.x + (window.activeHandle.indexOf("l") !== -1 ? cr.width : 0),
-                            cr.y + (window.activeHandle.indexOf("t") !== -1 ? cr.height : 0)),
-                        Qt.point(ox, oy))
-                    : Qt.point(ox, oy);
-                if (window.activeHandle === "tl") {
-                    newX = Math.min(point.x, cr.x + cr.width - 10);
-                    newY = Math.min(point.y, cr.y + cr.height - 10);
-                    newW = cr.x + cr.width - newX;
-                    newH = cr.y + cr.height - newY;
-                } else if (window.activeHandle === "tr") {
-                    newY = Math.min(point.y, cr.y + cr.height - 10);
-                    newW = Math.max(10, point.x - cr.x);
-                    newH = cr.y + cr.height - newY;
-                } else if (window.activeHandle === "bl") {
-                    newX = Math.min(point.x, cr.x + cr.width - 10);
-                    newW = cr.x + cr.width - newX;
-                    newH = Math.max(10, point.y - cr.y);
-                } else {
-                    newW = Math.max(10, point.x - cr.x);
-                    newH = Math.max(10, point.y - cr.y);
-                }
-            } else if (window.activeHandle === "tc") {
-                newY = Math.min(oy, cr.y + cr.height - 10);
-                newH = cr.y + cr.height - newY;
-            } else if (window.activeHandle === "bc") {
-                newH = Math.max(10, oy - cr.y);
-            } else if (window.activeHandle === "lc") {
-                newX = Math.min(ox, cr.x + cr.width - 10);
-                newW = cr.x + cr.width - newX;
-            } else if (window.activeHandle === "rc") {
-                newW = Math.max(10, ox - cr.x);
-            }
-            window.cropRect = window.clampCropRect(newX, newY, newW, newH);
+        if (["tl", "tr", "bl", "br"].indexOf(window.activeHandle) !== -1) {
+            window.cropRect = window.resizeCropFromCorner(window.activeHandle, ox, oy, cropResizeOrigin, cropResizeOffset);
             drawingCanvas.requestPaint();
+            return;
+        }
+
+        if (["tc", "bc", "lc", "rc"].indexOf(window.activeHandle) !== -1) {
+            window.cropRect = window.resizeCropFromEdge(window.activeHandle, ox, oy, cropResizeOrigin, cropResizeOffset);
+            drawingCanvas.requestPaint();
+            return;
         }
     }
 
@@ -549,8 +520,11 @@ MouseArea {
         if (window.lastPanMouse.x !== 0 || window.lastPanMouse.y !== 0) {
             return Qt.ClosedHandCursor;
         }
-        if (window.currentTool === "crop" && window.isCtrlPressed) {
-            return pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor;
+        if (window.currentTool === "crop") {
+            const ch = (window.activeHandle !== "none" && window.activeHandle !== "new") ? window.activeHandle : hoveredHandle;
+            if (ch === "none" && window.hasSelection && Helpers.isInsideCropRect(window.cursorX, window.cursorY, window.hasSelection, window.cropRect)) {
+                return pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor;
+            }
         }
         if (window.pastePreviewActive) {
             return Qt.ClosedHandCursor;
@@ -752,10 +726,18 @@ MouseArea {
             const handle = window.getHoveredHandle(ox, oy);
             if (handle !== "none") {
                 window.activeHandle = handle;
+                cropResizeOrigin = window.cropRect;
+                let hx = window.cropRect.x;
+                let hy = window.cropRect.y;
+                if (handle === "tr" || handle === "br" || handle === "rc") hx += window.cropRect.width;
+                else if (handle === "tc" || handle === "bc") hx += window.cropRect.width / 2;
+                if (handle === "bl" || handle === "br" || handle === "bc") hy += window.cropRect.height;
+                else if (handle === "lc" || handle === "rc") hy += window.cropRect.height / 2;
+                cropResizeOffset = Qt.point(ox - hx, oy - hy);
                 return;
             }
 
-            if ((mouse.modifiers & Qt.ControlModifier) && window.hasSelection) {
+            if (window.hasSelection && Helpers.isInsideCropRect(ox, oy, window.hasSelection, window.cropRect)) {
                 window.activeHandle = "move";
                 cropMoveStart = Qt.point(ox, oy);
                 cropMoveOrigin = window.cropRect;
@@ -917,15 +899,12 @@ MouseArea {
                      return;
                  }
                  window.cropRect = window.clampCropRect(window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height);
-                 if (Math.min(window.cropRect.width, window.cropRect.height) >= 16) {
-                     window.hasSelection = true;
-                      if (window.activeHandle === "new") {
-                         window.currentTool = window.lastActiveTool;
-                     }
-                 } else {
-                     window.hasSelection = false;
-                     window.cropRect = Qt.rect(0, 0, 0, 0);
-                 }
+                  if (Math.min(window.cropRect.width, window.cropRect.height) >= 16) {
+                      window.hasSelection = true;
+                  } else {
+                      window.hasSelection = false;
+                      window.cropRect = Qt.rect(0, 0, 0, 0);
+                  }
               }
               window.activeHandle = "none";
               drawingCanvas.requestPaint();

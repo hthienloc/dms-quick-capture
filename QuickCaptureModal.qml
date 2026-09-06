@@ -596,6 +596,11 @@ Item {
         if (window.currentTool === "background") {
             window.enterBackgroundTool();
         }
+        if (window.currentTool === "crop") {
+            if (!window.hasSelection || window.cropRect.width <= 0 || window.cropRect.height <= 0) {
+                window.resetCropRect();
+            }
+        }
         if (window.currentTool === "select") {
             window.enterSelectTool();
             window.activeHandle = "none";
@@ -2510,6 +2515,7 @@ Item {
     // Crop Selection State
     property rect cropRect: Qt.rect(0, 0, 0, 0)
     property bool hasSelection: false
+    property string cropAspectRatio: "" // "" = Free, "1:1", "4:3", "16:9", "3:2"
     readonly property bool roundRect: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.roundRect !== undefined ? window.parentWidget.pluginData.roundRect : true
     readonly property bool roundHighlighter: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.roundHighlighter !== undefined ? window.parentWidget.pluginData.roundHighlighter : false
     readonly property bool penAutoClose: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.penAutoClose !== undefined ? window.parentWidget.pluginData.penAutoClose : false
@@ -2665,11 +2671,13 @@ Item {
 
     function getHoveredHandle(mx, my) {
         if (!hasSelection || currentTool !== "crop") return "none";
-        const threshold = 15;
+        const threshold = 16;
         const x1 = cropRect.x;
         const y1 = cropRect.y;
         const x2 = cropRect.x + cropRect.width;
         const y2 = cropRect.y + cropRect.height;
+        const cx = (x1 + x2) / 2;
+        const cy = (y1 + y2) / 2;
 
         // Check corners first
         if (Math.abs(mx - x1) <= threshold && Math.abs(my - y1) <= threshold) return "tl";
@@ -2677,7 +2685,14 @@ Item {
         if (Math.abs(mx - x1) <= threshold && Math.abs(my - y2) <= threshold) return "bl";
         if (Math.abs(mx - x2) <= threshold && Math.abs(my - y2) <= threshold) return "br";
 
-        // Check full edges
+        // Check edge pill handles near center
+        const edgeThreshold = 14;
+        if (Math.abs(my - y1) <= edgeThreshold && Math.abs(mx - cx) <= 20) return "tc";
+        if (Math.abs(my - y2) <= edgeThreshold && Math.abs(mx - cx) <= 20) return "bc";
+        if (Math.abs(mx - x1) <= edgeThreshold && Math.abs(my - cy) <= 20) return "lc";
+        if (Math.abs(mx - x2) <= edgeThreshold && Math.abs(my - cy) <= 20) return "rc";
+
+        // Check full edges as fallback for easy dragging
         if (Math.abs(my - y1) <= threshold && mx >= x1 && mx <= x2) return "tc";
         if (Math.abs(my - y2) <= threshold && mx >= x1 && mx <= x2) return "bc";
         if (Math.abs(mx - x1) <= threshold && my >= y1 && my <= y2) return "lc";
@@ -2689,12 +2704,291 @@ Item {
     function clampCropRect(x, y, w, h) {
         const bw = window.screenshotWidth;
         const bh = window.screenshotHeight;
-        const minSize = 10;
+        const minSize = 20;
         const cx = Helpers.clamp(x, 0, Math.max(0, bw - minSize));
         const cy = Helpers.clamp(y, 0, Math.max(0, bh - minSize));
         const cw = Helpers.clamp(w, minSize, bw - cx);
         const ch = Helpers.clamp(h, minSize, bh - cy);
         return Qt.rect(cx, cy, cw, ch);
+    }
+
+    function applyCropAspectRatio(ratio) {
+        window.cropAspectRatio = ratio;
+        if (!window.hasSelection || window.cropRect.width <= 0 || window.cropRect.height <= 0) {
+            window.resetCropRect();
+            return;
+        }
+        if (ratio === "") {
+            window.repaintActiveCanvas();
+            return;
+        }
+
+        const parts = ratio.split(":");
+        const ar = parseFloat(parts[0]) / parseFloat(parts[1]);
+        if (!ar || ar <= 0) return;
+
+        const bw = window.screenshotWidth;
+        const bh = window.screenshotHeight;
+        const centerX = window.cropRect.x + window.cropRect.width / 2;
+        const centerY = window.cropRect.y + window.cropRect.height / 2;
+
+        let w = window.cropRect.width;
+        let h = w / ar;
+        if (h > bh) {
+            h = bh;
+            w = h * ar;
+        }
+        if (w > bw) {
+            w = bw;
+            h = w / ar;
+        }
+
+        w = Math.max(20, w);
+        h = Math.max(20, h);
+        let newX = Math.max(0, Math.min(centerX - w / 2, bw - w));
+        let newY = Math.max(0, Math.min(centerY - h / 2, bh - h));
+        window.cropRect = Qt.rect(newX, newY, w, h);
+        window.hasSelection = true;
+        window.repaintActiveCanvas();
+    }
+
+    function resetCropRect() {
+        const bw = window.screenshotWidth;
+        const bh = window.screenshotHeight;
+        let w = bw * 0.8;
+        let h = bh * 0.8;
+
+        if (window.cropAspectRatio !== "") {
+            const parts = window.cropAspectRatio.split(":");
+            const ar = parseFloat(parts[0]) / parseFloat(parts[1]);
+            if (ar > 0) {
+                if (w / h > ar) {
+                    h = w / ar;
+                } else {
+                    h = w / ar;
+                }
+            }
+        }
+
+        w = Math.max(20, Math.min(w, bw));
+        h = Math.max(20, Math.min(h, bh));
+        const x = (bw - w) / 2;
+        const y = (bh - h) / 2;
+        window.cropRect = Qt.rect(x, y, w, h);
+        window.hasSelection = true;
+        window.repaintActiveCanvas();
+    }
+
+    function cancelCrop() {
+        window.hasSelection = false;
+        window.cropRect = Qt.rect(0, 0, 0, 0);
+        window.activeHandle = "none";
+        window.currentTool = window.lastActiveTool;
+        window.repaintActiveCanvas();
+    }
+
+    function applyCrop() {
+        if (window.cropRect.width >= 16 && window.cropRect.height >= 16) {
+            window.hasSelection = true;
+        } else {
+            window.hasSelection = false;
+            window.cropRect = Qt.rect(0, 0, 0, 0);
+        }
+        window.currentTool = window.lastActiveTool;
+        window.repaintActiveCanvas();
+    }
+
+    function resizeCropFromCorner(corner, mouseX, mouseY, origRect, offsetPt) {
+        const origX = origRect.x;
+        const origY = origRect.y;
+        const origW = origRect.width;
+        const origH = origRect.height;
+        const offX = offsetPt ? offsetPt.x : 0;
+        const offY = offsetPt ? offsetPt.y : 0;
+
+        const maxW = window.screenshotWidth;
+        const maxH = window.screenshotHeight;
+        const minSize = 20;
+
+        let anchorX = 0;
+        let anchorY = 0;
+        let sx = 1;
+        let sy = 1;
+
+        if (corner === "tl") {
+            anchorX = origX + origW;
+            anchorY = origY + origH;
+            sx = -1;
+            sy = -1;
+        } else if (corner === "tr") {
+            anchorX = origX;
+            anchorY = origY + origH;
+            sx = 1;
+            sy = -1;
+        } else if (corner === "bl") {
+            anchorX = origX + origW;
+            anchorY = origY;
+            sx = -1;
+            sy = 1;
+        } else if (corner === "br") {
+            anchorX = origX;
+            anchorY = origY;
+            sx = 1;
+            sy = 1;
+        }
+
+        let targetX = mouseX - offX;
+        let targetY = mouseY - offY;
+
+        targetX = Math.max(0, Math.min(targetX, maxW));
+        targetY = Math.max(0, Math.min(targetY, maxH));
+
+        let rawW = sx * (targetX - anchorX);
+        let rawH = sy * (targetY - anchorY);
+
+        const boundW = sx < 0 ? anchorX : (maxW - anchorX);
+        const boundH = sy < 0 ? anchorY : (maxH - anchorY);
+
+        let w = Math.max(minSize, Math.min(rawW, boundW));
+        let h = Math.max(minSize, Math.min(rawH, boundH));
+
+        if (window.cropAspectRatio !== "") {
+            const parts = window.cropAspectRatio.split(":");
+            const ar = parseFloat(parts[0]) / parseFloat(parts[1]);
+            if (ar > 0) {
+                if (w / h > ar) {
+                    h = w / ar;
+                } else {
+                    w = h * ar;
+                }
+
+                if (w > boundW) {
+                    w = boundW;
+                    h = w / ar;
+                }
+                if (h > boundH) {
+                    h = boundH;
+                    w = h * ar;
+                }
+
+                w = Math.max(minSize, w);
+                h = Math.max(minSize / ar, h);
+            }
+        }
+
+        const newX = sx < 0 ? (anchorX - w) : anchorX;
+        const newY = sy < 0 ? (anchorY - h) : anchorY;
+        return Qt.rect(newX, newY, w, h);
+    }
+
+    function resizeCropFromEdge(edge, mouseX, mouseY, origRect, offsetPt) {
+        const origX = origRect.x;
+        const origY = origRect.y;
+        const origW = origRect.width;
+        const origH = origRect.height;
+        const offX = offsetPt ? offsetPt.x : 0;
+        const offY = offsetPt ? offsetPt.y : 0;
+
+        const maxW = window.screenshotWidth;
+        const maxH = window.screenshotHeight;
+        const minSize = 20;
+
+        if (edge === "tc") {
+            const anchorY = origY + origH;
+            let targetY = mouseY - offY;
+            targetY = Math.max(0, Math.min(targetY, anchorY - minSize));
+            let newH = anchorY - targetY;
+            let newW = origW;
+            let newX = origX;
+
+            if (window.cropAspectRatio !== "") {
+                const parts = window.cropAspectRatio.split(":");
+                const ar = parseFloat(parts[0]) / parseFloat(parts[1]);
+                if (ar > 0) {
+                    newW = newH * ar;
+                    if (newW > maxW) {
+                        newW = maxW;
+                        newH = newW / ar;
+                        targetY = anchorY - newH;
+                    }
+                    const centerX = origX + origW / 2;
+                    newX = Math.max(0, Math.min(centerX - newW / 2, maxW - newW));
+                }
+            }
+
+            return Qt.rect(newX, targetY, newW, newH);
+        } else if (edge === "bc") {
+            const anchorY = origY;
+            let targetY = mouseY - offY;
+            targetY = Math.min(maxH, Math.max(targetY, anchorY + minSize));
+            let newH = targetY - anchorY;
+            let newW = origW;
+            let newX = origX;
+
+            if (window.cropAspectRatio !== "") {
+                const parts = window.cropAspectRatio.split(":");
+                const ar = parseFloat(parts[0]) / parseFloat(parts[1]);
+                if (ar > 0) {
+                    newW = newH * ar;
+                    if (newW > maxW) {
+                        newW = maxW;
+                        newH = newW / ar;
+                    }
+                    const centerX = origX + origW / 2;
+                    newX = Math.max(0, Math.min(centerX - newW / 2, maxW - newW));
+                }
+            }
+
+            return Qt.rect(newX, origY, newW, newH);
+        } else if (edge === "lc") {
+            const anchorX = origX + origW;
+            let targetX = mouseX - offX;
+            targetX = Math.max(0, Math.min(targetX, anchorX - minSize));
+            let newW = anchorX - targetX;
+            let newH = origH;
+            let newY = origY;
+
+            if (window.cropAspectRatio !== "") {
+                const parts = window.cropAspectRatio.split(":");
+                const ar = parseFloat(parts[0]) / parseFloat(parts[1]);
+                if (ar > 0) {
+                    newH = newW / ar;
+                    if (newH > maxH) {
+                        newH = maxH;
+                        newW = newH * ar;
+                        targetX = anchorX - newW;
+                    }
+                    const centerY = origY + origH / 2;
+                    newY = Math.max(0, Math.min(centerY - newH / 2, maxH - newH));
+                }
+            }
+
+            return Qt.rect(targetX, newY, newW, newH);
+        } else if (edge === "rc") {
+            const anchorX = origX;
+            let targetX = mouseX - offX;
+            targetX = Math.min(maxW, Math.max(targetX, anchorX + minSize));
+            let newW = targetX - anchorX;
+            let newH = origH;
+            let newY = origY;
+
+            if (window.cropAspectRatio !== "") {
+                const parts = window.cropAspectRatio.split(":");
+                const ar = parseFloat(parts[0]) / parseFloat(parts[1]);
+                if (ar > 0) {
+                    newH = newW / ar;
+                    if (newH > maxH) {
+                        newH = maxH;
+                        newW = newH * ar;
+                    }
+                    const centerY = origY + origH / 2;
+                    newY = Math.max(0, Math.min(centerY - newH / 2, maxH - newH));
+                }
+            }
+
+            return Qt.rect(origX, newY, newW, newH);
+        }
+        return origRect;
     }
 
     function backgroundConfigValue(key, defaultValue, numeric) {
@@ -4321,6 +4615,22 @@ Item {
                     }
                 }
 
+                CropToolbar {
+                    id: cropToolbar
+                    visible: window.currentTool === "crop"
+                    z: 110
+
+                    currentRatio: window.cropAspectRatio
+                    onRatioSelected: (ratio) => window.applyCropAspectRatio(ratio)
+                    onResetRequested: window.resetCropRect()
+                    onCancelRequested: window.cancelCrop()
+                    onDoneRequested: window.applyCrop()
+
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: (window.toolbarVisible && window.toolbarPosition === "bottom") ? toolbarCard.top : parent.bottom
+                    anchors.bottomMargin: (window.toolbarVisible && window.toolbarPosition === "bottom") ? 10 : (Theme.spacingM + (window.floatingMode ? window._floatingTooltipPadding : 0))
+                }
+
                 // 2. Centered Canvas Board
                 Item {
                     id: boardContainer
@@ -4546,7 +4856,8 @@ Item {
                                 cropRect: window.cropRect,
                                 ocrRect: window.ocrRect,
                                 canvasWidth: window.canvasWidth,
-                                canvasHeight: window.canvasHeight
+                                canvasHeight: window.canvasHeight,
+                                cropAspectRatio: window.cropAspectRatio
                             }, Theme);
 
                             // 2. Draw active/selected annotations (translated in edit mode, or clipped in crop mode)
