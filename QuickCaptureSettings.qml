@@ -3633,92 +3633,92 @@ PluginSettings {
                     }
 
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screenshot (Interactive Region) — Edit")
+                        label: I18n.trFor("quickCapture", "Screenshot (%1) — %2").arg(I18n.trFor("quickCapture", "Interactive Region")).arg(I18n.trFor("quickCapture", "Edit"))
                         text: "dms ipc call quickCapture screenshot region edit"
                     }
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screenshot (Interactive Region) — Float")
+                        label: I18n.trFor("quickCapture", "Screenshot (%1) — %2").arg(I18n.trFor("quickCapture", "Interactive Region")).arg(I18n.trFor("quickCapture", "Float"))
                         text: "dms ipc call quickCapture screenshot region float"
                     }
 
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screenshot (Full Screen) — Edit")
+                        label: I18n.trFor("quickCapture", "Screenshot (%1) — %2").arg(I18n.trFor("quickCapture", "Full Screen")).arg(I18n.trFor("quickCapture", "Edit"))
                         text: "dms ipc call quickCapture screenshot full edit"
                     }
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screenshot (Full Screen) — Float")
+                        label: I18n.trFor("quickCapture", "Screenshot (%1) — %2").arg(I18n.trFor("quickCapture", "Full Screen")).arg(I18n.trFor("quickCapture", "Float"))
                         text: "dms ipc call quickCapture screenshot full float"
                     }
 
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screenshot (All Combined Outputs) — Edit")
+                        label: I18n.trFor("quickCapture", "Screenshot (%1) — %2").arg(I18n.trFor("quickCapture", "All Combined Outputs")).arg(I18n.trFor("quickCapture", "Edit"))
                         text: "dms ipc call quickCapture screenshot all edit"
                     }
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screenshot (All Combined Outputs) — Float")
+                        label: I18n.trFor("quickCapture", "Screenshot (%1) — %2").arg(I18n.trFor("quickCapture", "All Combined Outputs")).arg(I18n.trFor("quickCapture", "Float"))
                         text: "dms ipc call quickCapture screenshot all float"
                     }
 
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screenshot (Specific Output) — Edit")
+                        label: I18n.trFor("quickCapture", "Screenshot (%1) — %2").arg(I18n.trFor("quickCapture", "Specific Output")).arg(I18n.trFor("quickCapture", "Edit"))
                         text: "dms ipc call quickCapture screenshot output edit"
                     }
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screenshot (Specific Output) — Float")
+                        label: I18n.trFor("quickCapture", "Screenshot (%1) — %2").arg(I18n.trFor("quickCapture", "Specific Output")).arg(I18n.trFor("quickCapture", "Float"))
                         text: "dms ipc call quickCapture screenshot output float"
                     }
 
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screenshot (Focused Window) — Edit")
+                        label: I18n.trFor("quickCapture", "Screenshot (%1) — %2").arg(I18n.trFor("quickCapture", "Focused Window")).arg(I18n.trFor("quickCapture", "Edit"))
                         text: "dms ipc call quickCapture screenshot window edit"
                     }
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screenshot (Focused Window) — Float")
+                        label: I18n.trFor("quickCapture", "Screenshot (%1) — %2").arg(I18n.trFor("quickCapture", "Focused Window")).arg(I18n.trFor("quickCapture", "Float"))
                         text: "dms ipc call quickCapture screenshot window float"
                     }
 
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screenshot (Last Selected Region) — Edit")
+                        label: I18n.trFor("quickCapture", "Screenshot (%1) — %2").arg(I18n.trFor("quickCapture", "Last Selected Region")).arg(I18n.trFor("quickCapture", "Edit"))
                         text: "dms ipc call quickCapture screenshot last edit"
                     }
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screenshot (Last Selected Region) — Float")
+                        label: I18n.trFor("quickCapture", "Screenshot (%1) — %2").arg(I18n.trFor("quickCapture", "Last Selected Region")).arg(I18n.trFor("quickCapture", "Float"))
                         text: "dms ipc call quickCapture screenshot last float"
                     }
 
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screenshot (Scrolling Capture) — Edit")
+                        label: I18n.trFor("quickCapture", "Screenshot (%1) — %2").arg(I18n.trFor("quickCapture", "Scrolling Capture")).arg(I18n.trFor("quickCapture", "Edit"))
                         text: "dms ipc call quickCapture screenshot scroll edit"
                     }
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screenshot (Scrolling Capture) — Float")
+                        label: I18n.trFor("quickCapture", "Screenshot (%1) — %2").arg(I18n.trFor("quickCapture", "Scrolling Capture")).arg(I18n.trFor("quickCapture", "Float"))
                         text: "dms ipc call quickCapture screenshot scroll float"
                     }
 
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Select Image File — Edit")
+                        label: I18n.trFor("quickCapture", "%1 — %2").arg(I18n.trFor("quickCapture", "Select Image File")).arg(I18n.trFor("quickCapture", "Edit"))
                         text: "dms ipc call quickCapture selectFile edit"
                     }
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Select Image File — Float")
+                        label: I18n.trFor("quickCapture", "%1 — %2").arg(I18n.trFor("quickCapture", "Select Image File")).arg(I18n.trFor("quickCapture", "Float"))
                         text: "dms ipc call quickCapture selectFile float"
                     }
 
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Edit Image from Clipboard — Edit")
+                        label: I18n.trFor("quickCapture", "%1 — %2").arg(I18n.trFor("quickCapture", "Edit Image from Clipboard")).arg(I18n.trFor("quickCapture", "Edit"))
                         text: "dms ipc call quickCapture fromClipboard edit"
                     }
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Edit Image from Clipboard — Float")
+                        label: I18n.trFor("quickCapture", "%1 — %2").arg(I18n.trFor("quickCapture", "Edit Image from Clipboard")).arg(I18n.trFor("quickCapture", "Float"))
                         text: "dms ipc call quickCapture fromClipboard float"
                     }
 
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Open Specific Image Path — Edit")
+                        label: I18n.trFor("quickCapture", "%1 — %2").arg(I18n.trFor("quickCapture", "Open Specific Image Path")).arg(I18n.trFor("quickCapture", "Edit"))
                         text: "dms ipc call quickCapture openImage /path/to/image.png edit"
                     }
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Open Specific Image Path — Float")
+                        label: I18n.trFor("quickCapture", "%1 — %2").arg(I18n.trFor("quickCapture", "Open Specific Image Path")).arg(I18n.trFor("quickCapture", "Float"))
                         text: "dms ipc call quickCapture openImage /path/to/image.png float"
                     }
 
@@ -3733,31 +3733,31 @@ PluginSettings {
                     }
 
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screen Recording (Interactive Region)")
+                        label: I18n.trFor("quickCapture", "Screen Recording (%1)").arg(I18n.trFor("quickCapture", "Interactive Region"))
                         text: "dms ipc call quickCapture recordStart region"
                     }
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screen Recording (Full Screen)")
+                        label: I18n.trFor("quickCapture", "Screen Recording (%1)").arg(I18n.trFor("quickCapture", "Full Screen"))
                         text: "dms ipc call quickCapture recordStart screen"
                     }
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screen Recording (Window / Portal)")
+                        label: I18n.trFor("quickCapture", "Screen Recording (%1)").arg(I18n.trFor("quickCapture", "Window / Portal"))
                         text: "dms ipc call quickCapture recordStart portal"
                     }
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screen Recording (Stop & Save)")
+                        label: I18n.trFor("quickCapture", "Screen Recording (%1)").arg(I18n.trFor("quickCapture", "Stop & Save"))
                         text: "dms ipc call quickCapture recordStop"
                     }
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screen Recording (Pause / Resume)")
+                        label: I18n.trFor("quickCapture", "Screen Recording (%1)").arg(I18n.trFor("quickCapture", "Pause / Resume"))
                         text: "dms ipc call quickCapture recordPause"
                     }
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screen Recording (Cancel)")
+                        label: I18n.trFor("quickCapture", "Screen Recording (%1)").arg(I18n.trFor("quickCapture", "Cancel"))
                         text: "dms ipc call quickCapture recordCancel"
                     }
                     CopyBox {
-                        label: I18n.trFor("quickCapture", "Screen Recording (Toggle Start / Stop)")
+                        label: I18n.trFor("quickCapture", "Screen Recording (%1)").arg(I18n.trFor("quickCapture", "Toggle Start / Stop"))
                         text: "dms ipc call quickCapture recordToggle"
                     }
 

@@ -48,14 +48,14 @@ Quick Capture supports native DMS 1.6+ sideload translations located in `transla
 <!-- TRANSLATIONS_TABLE_START -->
 | Language | Locale | Progress | Coverage | Status |
 | :--- | :--- | :---: | :---: | :---: |
-| German | `de` | 17/497 | 3.4% | 🟡 In Progress |
-| Spanish | `es` | 17/497 | 3.4% | 🟡 In Progress |
-| French | `fr` | 17/497 | 3.4% | 🟡 In Progress |
-| Japanese | `ja` | 17/497 | 3.4% | 🟡 In Progress |
-| Korean | `ko` | 17/497 | 3.4% | 🟡 In Progress |
-| Russian | `ru` | 17/497 | 3.4% | 🟡 In Progress |
-| Vietnamese | `vi` | 17/497 | 3.4% | 🟡 In Progress |
-| Chinese (Simplified) | `zh-CN` | 17/497 | 3.4% | 🟡 In Progress |
+| German | `de` | 82/483 | 17.0% | 🟡 In Progress |
+| Spanish | `es` | 82/483 | 17.0% | 🟡 In Progress |
+| French | `fr` | 70/483 | 14.5% | 🟡 In Progress |
+| Japanese | `ja` | 80/483 | 16.6% | 🟡 In Progress |
+| Korean | `ko` | 80/483 | 16.6% | 🟡 In Progress |
+| Russian | `ru` | 82/483 | 17.0% | 🟡 In Progress |
+| Vietnamese | `vi` | 82/483 | 17.0% | 🟡 In Progress |
+| Chinese (Simplified) | `zh-CN` | 82/483 | 17.0% | 🟡 In Progress |
 <!-- TRANSLATIONS_TABLE_END -->
 
 ### Contributing Translations

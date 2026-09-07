@@ -1,4 +1,7 @@
 {
+  "%1 — %2": {
+    "%1 — %2": ""
+  },
   "1 Connecting Line": {
     "1 Connecting Line": ""
   },
@@ -9,7 +12,7 @@
     "AUTO": ""
   },
   "Action": {
-    "Action": ""
+    "Action": "Действие"
   },
   "Action when Enter": {
     "Action when Enter": "Действие при вводе"
@@ -18,13 +21,13 @@
     "Active Window": ""
   },
   "Adaptive": {
-    "Adaptive": ""
+    "Adaptive": "Адаптивный"
   },
   "Adaptive (DMS Theme)": {
     "Adaptive (DMS Theme)": ""
   },
   "Add": {
-    "Add": ""
+    "Add": "Добавить"
   },
   "Add Text Note": {
     "Add Text Note": ""
@@ -60,10 +63,10 @@
     "Audio & Overlay": ""
   },
   "Audio Codec": {
-    "Audio Codec": ""
+    "Audio Codec": "Аудио кодек"
   },
   "Auto": {
-    "Auto": ""
+    "Auto": "Авто"
   },
   "Auto Balance": {
     "Auto Balance": ""
@@ -96,7 +99,7 @@
     "Back to Annotation (B)": ""
   },
   "Background": {
-    "Background": ""
+    "Background": "Фон"
   },
   "Background (B)": {
     "Background (B)": ""
@@ -114,7 +117,7 @@
     "Background Presets": ""
   },
   "Balanced": {
-    "Balanced": ""
+    "Balanced": "Сбалансированный"
   },
   "Bar Interactions": {
     "Bar Interactions": ""
@@ -126,25 +129,25 @@
     "Blur Background Image": ""
   },
   "Border Color": {
-    "Border Color": ""
+    "Border Color": "Цвет рамки"
   },
   "Border Width": {
-    "Border Width": ""
+    "Border Width": "Ширина рамки"
   },
   "Both": {
     "Both": ""
   },
   "Bottom": {
-    "Bottom": ""
+    "Bottom": "Снизу"
   },
   "Bottom Center": {
-    "Bottom Center": ""
+    "Bottom Center": "Снизу по центру"
   },
   "Bottom Left": {
-    "Bottom Left": ""
+    "Bottom Left": "Внизу слева"
   },
   "Bottom Right": {
-    "Bottom Right": ""
+    "Bottom Right": "Внизу справа"
   },
   "CUST": {
     "CUST": ""
@@ -189,7 +192,7 @@
     "Center Right": ""
   },
   "Choose Color": {
-    "Choose Color": ""
+    "Choose Color": "Выбрать Цвет"
   },
   "Choose notifications shown after copy or save.": {
     "Choose notifications shown after copy or save.": ""
@@ -213,10 +216,10 @@
     "Clear saved region selection before each capture": ""
   },
   "Clipboard": {
-    "Clipboard": ""
+    "Clipboard": "Буфер обмена"
   },
   "Close": {
-    "Close": ""
+    "Close": "Закрыть"
   },
   "Close Annotator": {
     "Close Annotator": ""
@@ -258,13 +261,13 @@
     "Copied Anonymously": ""
   },
   "Copied to clipboard": {
-    "Copied to clipboard": ""
+    "Copied to clipboard": "Скопировано в буфер обмена"
   },
   "Copied:": {
     "Copied:": ""
   },
   "Copy": {
-    "Copy": ""
+    "Copy": "Копировать"
   },
   "Copy & Save": {
     "Copy & Save": ""
@@ -291,7 +294,7 @@
     "Crop / Resize Area": ""
   },
   "Custom": {
-    "Custom": ""
+    "Custom": "Свой"
   },
   "Custom Colors": {
     "Custom Colors": ""
@@ -369,7 +372,7 @@
     "Default Watermark": ""
   },
   "Delete": {
-    "Delete": ""
+    "Delete": "Удалить"
   },
   "Dim Background Image": {
     "Dim Background Image": ""
@@ -388,6 +391,9 @@
   },
   "Discard & Close (Esc)": {
     "Discard & Close (Esc)": ""
+  },
+  "Done": {
+    "Done": ""
   },
   "Done (Action based on settings)": {
     "Done (Action based on settings)": ""
@@ -411,16 +417,16 @@
     "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": ""
   },
   "Edge Spacing": {
-    "Edge Spacing": ""
+    "Edge Spacing": "Отступ краёв"
+  },
+  "Edit": {
+    "Edit": "Редактировать"
   },
   "Edit Color Palette": {
     "Edit Color Palette": ""
   },
-  "Edit Image from Clipboard — Edit": {
-    "Edit Image from Clipboard — Edit": ""
-  },
-  "Edit Image from Clipboard — Float": {
-    "Edit Image from Clipboard — Float": ""
+  "Edit Image from Clipboard": {
+    "Edit Image from Clipboard": ""
   },
   "Edit Text Note": {
     "Edit Text Note": ""
@@ -489,7 +495,7 @@
     "Flip Vert": ""
   },
   "Float": {
-    "Float": ""
+    "Float": "Плавающий"
   },
   "Float Image": {
     "Float Image": ""
@@ -498,16 +504,16 @@
     "Float Window": ""
   },
   "Floating": {
-    "Floating": ""
+    "Floating": "Плавающее"
   },
   "Focused Screen": {
     "Focused Screen": ""
   },
   "Focused Window": {
-    "Focused Window": ""
+    "Focused Window": "Используемое Окно"
   },
   "Font Size": {
-    "Font Size": ""
+    "Font Size": "Размер Шрифта"
   },
   "Font family used for number stamp labels": {
     "Font family used for number stamp labels": ""
@@ -529,6 +535,9 @@
   },
   "Framerate": {
     "Framerate": ""
+  },
+  "Free": {
+    "Free": ""
   },
   "Freehand Pen": {
     "Freehand Pen": "Свободная ручка"
@@ -558,7 +567,7 @@
     "Gruvbox Material": ""
   },
   "Help": {
-    "Help": ""
+    "Help": "Помощь"
   },
   "Hide Control Center": {
     "Hide Control Center": ""
@@ -567,7 +576,7 @@
     "Hide Control Center by Default": ""
   },
   "High": {
-    "High": ""
+    "High": "Высокое"
   },
   "Highlighter": {
     "Highlighter": "Хайлайтер"
@@ -582,7 +591,7 @@
     "Highlighter Thickness": ""
   },
   "History": {
-    "History": ""
+    "History": "История"
   },
   "Hover Trigger Delay": {
     "Hover Trigger Delay": ""
@@ -591,7 +600,7 @@
     "IPC Commands": ""
   },
   "Image": {
-    "Image": ""
+    "Image": "Изображение"
   },
   "Image + Text": {
     "Image + Text": ""
@@ -606,7 +615,7 @@
     "Image Size": ""
   },
   "Image copied to clipboard": {
-    "Image copied to clipboard": ""
+    "Image copied to clipboard": "Изображение скопировано в буфера обмена"
   },
   "Image selected automatically when using Image Background mode": {
     "Image selected automatically when using Image Background mode": ""
@@ -639,7 +648,7 @@
     "Kanagawa": ""
   },
   "Key": {
-    "Key": ""
+    "Key": "Ключ"
   },
   "Landscape": {
     "Landscape": ""
@@ -654,13 +663,13 @@
     "Last Selected Region": ""
   },
   "Left": {
-    "Left": ""
+    "Left": "Слева"
   },
   "Left Click": {
     "Left Click": ""
   },
   "Light": {
-    "Light": ""
+    "Light": "Светлый"
   },
   "Line Color": {
     "Line Color": ""
@@ -675,7 +684,7 @@
     "Live Preview": ""
   },
   "Low": {
-    "Low": ""
+    "Low": "Низкое"
   },
   "Magnifier Loupe": {
     "Magnifier Loupe": ""
@@ -684,7 +693,7 @@
     "Max Height (0 = no limit)": ""
   },
   "Medium": {
-    "Medium": ""
+    "Medium": "Средний"
   },
   "Menu Item Right Click": {
     "Menu Item Right Click": ""
@@ -714,7 +723,7 @@
     "Niri Binding Example": ""
   },
   "No Background": {
-    "No Background": ""
+    "No Background": "Без Заднего Фона"
   },
   "No Image Specified": {
     "No Image Specified": ""
@@ -729,7 +738,7 @@
     "No supported images found": ""
   },
   "None": {
-    "None": ""
+    "None": "Нет"
   },
   "None / Disabled": {
     "None / Disabled": "Нет / Отключено"
@@ -741,10 +750,10 @@
     "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": ""
   },
   "Notification": {
-    "Notification": ""
+    "Notification": "Уведомление"
   },
   "Notifications": {
-    "Notifications": ""
+    "Notifications": "Уведомления"
   },
   "Number Stamp": {
     "Number Stamp": "Номер штампа"
@@ -759,10 +768,10 @@
     "OCR Text Recognition": ""
   },
   "Opacity": {
-    "Opacity": ""
+    "Opacity": "Непрозрачность"
   },
   "Open": {
-    "Open": ""
+    "Open": "Открыть"
   },
   "Open Folder": {
     "Open Folder": ""
@@ -770,11 +779,8 @@
   "Open Quick Capture menu (Popout)": {
     "Open Quick Capture menu (Popout)": ""
   },
-  "Open Specific Image Path — Edit": {
-    "Open Specific Image Path — Edit": ""
-  },
-  "Open Specific Image Path — Float": {
-    "Open Specific Image Path — Float": ""
+  "Open Specific Image Path": {
+    "Open Specific Image Path": ""
   },
   "Outline Variant": {
     "Outline Variant": ""
@@ -801,7 +807,10 @@
     "Palette Preset": ""
   },
   "Pause": {
-    "Pause": ""
+    "Pause": "Пауза"
+  },
+  "Pause / Resume": {
+    "Pause / Resume": ""
   },
   "Pen Auto-Close": {
     "Pen Auto-Close": ""
@@ -840,7 +849,7 @@
     "Portrait": ""
   },
   "Position": {
-    "Position": ""
+    "Position": "Позиция"
   },
   "Post-Capture Notification": {
     "Post-Capture Notification": ""
@@ -882,10 +891,10 @@
     "Preset Tool": ""
   },
   "Preview": {
-    "Preview": ""
+    "Preview": "Предпросмотр"
   },
   "Primary": {
-    "Primary": ""
+    "Primary": "Основной"
   },
   "Primary Screen": {
     "Primary Screen": ""
@@ -921,7 +930,7 @@
     "Ratio": ""
   },
   "Ready": {
-    "Ready": ""
+    "Ready": "Готово"
   },
   "Recent Edits": {
     "Recent Edits": ""
@@ -981,19 +990,22 @@
     "Redo last undone stroke": ""
   },
   "Refresh": {
-    "Refresh": ""
+    "Refresh": "Обновить"
   },
   "Region": {
     "Region": ""
+  },
+  "Reset": {
+    "Reset": "Сбросить"
   },
   "Reset Last Region": {
     "Reset Last Region": ""
   },
   "Resume": {
-    "Resume": ""
+    "Resume": "Продолжить"
   },
   "Right": {
-    "Right": ""
+    "Right": "Справа"
   },
   "Right Click": {
     "Right Click": ""
@@ -1052,26 +1064,8 @@
   "Screen Recorder": {
     "Screen Recorder": ""
   },
-  "Screen Recording (Cancel)": {
-    "Screen Recording (Cancel)": ""
-  },
-  "Screen Recording (Full Screen)": {
-    "Screen Recording (Full Screen)": ""
-  },
-  "Screen Recording (Interactive Region)": {
-    "Screen Recording (Interactive Region)": ""
-  },
-  "Screen Recording (Pause / Resume)": {
-    "Screen Recording (Pause / Resume)": ""
-  },
-  "Screen Recording (Stop & Save)": {
-    "Screen Recording (Stop & Save)": ""
-  },
-  "Screen Recording (Toggle Start / Stop)": {
-    "Screen Recording (Toggle Start / Stop)": ""
-  },
-  "Screen Recording (Window / Portal)": {
-    "Screen Recording (Window / Portal)": ""
+  "Screen Recording (%1)": {
+    "Screen Recording (%1)": ""
   },
   "Screen Recording Error": {
     "Screen Recording Error": ""
@@ -1085,47 +1079,8 @@
   "Screen: %1 (%2x%3)": {
     "Screen: %1 (%2x%3)": ""
   },
-  "Screenshot (All Combined Outputs) — Edit": {
-    "Screenshot (All Combined Outputs) — Edit": ""
-  },
-  "Screenshot (All Combined Outputs) — Float": {
-    "Screenshot (All Combined Outputs) — Float": ""
-  },
-  "Screenshot (Focused Window) — Edit": {
-    "Screenshot (Focused Window) — Edit": ""
-  },
-  "Screenshot (Focused Window) — Float": {
-    "Screenshot (Focused Window) — Float": ""
-  },
-  "Screenshot (Full Screen) — Edit": {
-    "Screenshot (Full Screen) — Edit": ""
-  },
-  "Screenshot (Full Screen) — Float": {
-    "Screenshot (Full Screen) — Float": ""
-  },
-  "Screenshot (Interactive Region) — Edit": {
-    "Screenshot (Interactive Region) — Edit": ""
-  },
-  "Screenshot (Interactive Region) — Float": {
-    "Screenshot (Interactive Region) — Float": ""
-  },
-  "Screenshot (Last Selected Region) — Edit": {
-    "Screenshot (Last Selected Region) — Edit": ""
-  },
-  "Screenshot (Last Selected Region) — Float": {
-    "Screenshot (Last Selected Region) — Float": ""
-  },
-  "Screenshot (Scrolling Capture) — Edit": {
-    "Screenshot (Scrolling Capture) — Edit": ""
-  },
-  "Screenshot (Scrolling Capture) — Float": {
-    "Screenshot (Scrolling Capture) — Float": ""
-  },
-  "Screenshot (Specific Output) — Edit": {
-    "Screenshot (Specific Output) — Edit": ""
-  },
-  "Screenshot (Specific Output) — Float": {
-    "Screenshot (Specific Output) — Float": ""
+  "Screenshot (%1) — %2": {
+    "Screenshot (%1) — %2": ""
   },
   "Screenshot Copied": {
     "Screenshot Copied": ""
@@ -1164,7 +1119,7 @@
     "Screenshot saved to %1/%2": ""
   },
   "Scroll": {
-    "Scroll": ""
+    "Scroll": "Прокрутка"
   },
   "Scroll Interval": {
     "Scroll Interval": ""
@@ -1173,13 +1128,13 @@
     "Scroll capture: select a region, scroll content, then press Enter to finish.": ""
   },
   "Scrolling": {
-    "Scrolling": ""
+    "Scrolling": "Прокрутка"
   },
   "Scrolling Capture": {
     "Scrolling Capture": ""
   },
   "Select": {
-    "Select": ""
+    "Select": "Выбрать"
   },
   "Select / Move stroke": {
     "Select / Move stroke": ""
@@ -1190,11 +1145,8 @@
   "Select Color Slots 5 - 8 (Q, W, E, R)": {
     "Select Color Slots 5 - 8 (Q, W, E, R)": ""
   },
-  "Select Image File — Edit": {
-    "Select Image File — Edit": ""
-  },
-  "Select Image File — Float": {
-    "Select Image File — Float": ""
+  "Select Image File": {
+    "Select Image File": ""
   },
   "Select Image to Annotate": {
     "Select Image to Annotate": ""
@@ -1203,7 +1155,7 @@
     "Selected Tool / Action": ""
   },
   "Settings": {
-    "Settings": ""
+    "Settings": "Настройки"
   },
   "Shapes": {
     "Shapes": ""
@@ -1212,7 +1164,7 @@
     "Shortcut Action": ""
   },
   "Shortcuts": {
-    "Shortcuts": ""
+    "Shortcuts": "Ярлыки"
   },
   "Show Control Center": {
     "Show Control Center": ""
@@ -1287,7 +1239,7 @@
     "Specific Output": ""
   },
   "Spotlight": {
-    "Spotlight": ""
+    "Spotlight": "Spotlight"
   },
   "Spotlight (D)": {
     "Spotlight (D)": ""
@@ -1350,7 +1302,7 @@
     "Target Output Name": ""
   },
   "Text": {
-    "Text": ""
+    "Text": "Текст"
   },
   "Text (W)": {
     "Text (W)": ""
@@ -1359,7 +1311,7 @@
     "Text Background Roundness": ""
   },
   "Text Color": {
-    "Text Color": ""
+    "Text Color": "Цвет текста"
   },
   "Text Font": {
     "Text Font": ""
@@ -1380,10 +1332,13 @@
     "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": ""
   },
   "Toast": {
-    "Toast": ""
+    "Toast": "Всплывающая плашка"
   },
   "Toggle Hide/Show Annotations": {
     "Toggle Hide/Show Annotations": ""
+  },
+  "Toggle Start / Stop": {
+    "Toggle Start / Stop": ""
   },
   "Toggle between 2 latest presets": {
     "Toggle between 2 latest presets": ""
@@ -1404,16 +1359,16 @@
     "Toolbar Position": ""
   },
   "Top": {
-    "Top": ""
+    "Top": "Сверху"
   },
   "Top Center": {
-    "Top Center": ""
+    "Top Center": "Сверху по центру"
   },
   "Top Left": {
-    "Top Left": ""
+    "Top Left": "Вверху слева"
   },
   "Top Right": {
-    "Top Right": ""
+    "Top Right": "Вверху справа"
   },
   "Transparent": {
     "Transparent": ""
@@ -1452,7 +1407,7 @@
     "Use Modal Editor": ""
   },
   "Very High": {
-    "Very High": ""
+    "Very High": "Очень высокое"
   },
   "Video Codec": {
     "Video Codec": ""
@@ -1483,6 +1438,9 @@
   },
   "Window": {
     "Window": ""
+  },
+  "Window / Portal": {
+    "Window / Portal": ""
   },
   "Zoom Level": {
     "Zoom Level": ""
