@@ -2755,18 +2755,16 @@ Item {
     function resetCropRect() {
         const bw = window.screenshotWidth;
         const bh = window.screenshotHeight;
-        let w = bw;
-        let h = bh;
+        let w = bw * 0.8;
+        let h = bh * 0.8;
 
         if (window.cropAspectRatio !== "") {
             const parts = window.cropAspectRatio.split(":");
             const ar = parseFloat(parts[0]) / parseFloat(parts[1]);
             if (ar > 0) {
-                if (bw / bh > ar) {
-                    h = bh;
+                if (w / h > ar) {
                     w = h * ar;
                 } else {
-                    w = bw;
                     h = w / ar;
                 }
             }
