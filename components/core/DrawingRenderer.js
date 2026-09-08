@@ -124,12 +124,12 @@ function getBubbleTailCenter(target, edgeStart, edgeEnd, tailBaseSize, radius) {
  * @param {string} family - Requested font family.
  * @returns {string} Canvas-safe font family.
  */
-function canvasFontFamily(family) {
-    const fallback = "sans-serif";
-    if (!family) return fallback;
+function canvasFontFamily(family, fallback) {
+    const defaultFallback = fallback || "sans-serif";
+    if (!family) return defaultFallback;
 
     const normalized = String(family).trim();
-    if (normalized === "") return fallback;
+    if (normalized === "") return defaultFallback;
 
     const lower = normalized.toLowerCase();
     if (lower === "sans-serif" || lower === "serif" || lower === "monospace" ||
@@ -1731,13 +1731,13 @@ function drawSelectionOverlay(ctx, options, Theme) {
             drawEdgePill(x2 - 3, cy - 12, 6, 24);
 
             // Live dimension badge floating near the crop rect
-            const badgeRatioText = options.cropAspectRatio ? (" • " + options.cropAspectRatio) : "";
-            const badgeText = Math.round(cr.width) + " × " + Math.round(cr.height) + " px" + badgeRatioText;
+            const badgeText = Math.round(cr.width) + " × " + Math.round(cr.height) + " px";
             ctx.save();
-            ctx.font = "bold 11px sans-serif";
+            const monoFamily = (typeof Theme !== "undefined" && Theme.monoFontFamily) ? Theme.monoFontFamily : "monospace";
+            ctx.font = `bold 15px ${canvasFontFamily(monoFamily, "monospace")}`;
             const badgeMetrics = ctx.measureText(badgeText);
-            const badgeW = badgeMetrics.width + 16;
-            const badgeH = 22;
+            const badgeW = badgeMetrics.width + 24;
+            const badgeH = 30;
             const badgeX = Math.max(8, Math.min(cw - badgeW - 8, cx - badgeW / 2));
             const badgeY = (y1 - badgeH - 8 >= 8) ? (y1 - badgeH - 8) : (y2 + 8);
 
