@@ -581,14 +581,14 @@ Item {
         if (window.currentTool !== "crop" && window.currentTool !== "background" && window.currentTool !== "select" && window.currentTool !== "colorpicker") {
             window.lastActiveTool = window.currentTool;
         }
+        if (window.currentTool !== "select" && window.selectedStroke) {
+            window.deselectStrokeForEditing(false);
+            window.requestActiveCanvasPaint();
+        }
         window.applyCurrentToolSessionIntensity();
         if (window.isColorTool(window.currentTool)) {
             window.activeColorSlotIndex = -1;
             window.currentColor = window.sessionToolColor(window.currentTool);
-        }
-        if (window.currentTool !== "select" && window.selectedStroke) {
-            window.deselectStrokeForEditing(true);
-            window.requestActiveCanvasPaint();
         }
         if (window.currentTool === "colorpicker") {
             window.enterColorPickerTool();
