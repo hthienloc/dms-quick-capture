@@ -21,8 +21,8 @@ function ellipseEdgePoint(cx, cy, rx, ry, tx, ty) {
 }
 
 /**
- * Maps canvas coordinates (x, y) to the un-transformed source image pixel coordinates (sx, sy)
- * taking into account rotation, horizontal/vertical flips, and crop selection offsets.
+ * Maps absolute canvas coordinates (x, y) to the un-transformed source image pixel coordinates (sx, sy)
+ * taking into account rotation and horizontal/vertical flips.
  */
 function getTransformedSourcePos(x, y, config) {
     if (!config || !config.bgImageItem) return { x: Math.floor(x), y: Math.floor(y) };
@@ -33,16 +33,13 @@ function getTransformedSourcePos(x, y, config) {
     const flipH = !!config.bgFlipH;
     const flipV = !!config.bgFlipV;
 
-    const cropX = (config.hasActiveCropSelection && config.cropRect) ? config.cropRect.x : (config.cropOffsetX || 0);
-    const cropY = (config.hasActiveCropSelection && config.cropRect) ? config.cropRect.y : (config.cropOffsetY || 0);
-
     const isRotated90 = (rot === 90 || rot === 270);
     const uncroppedW = isRotated90 ? rawH : rawW;
     const uncroppedH = isRotated90 ? rawW : rawH;
 
-    // 1. Shift by crop selection to get position relative to uncropped canvas center
-    let cx = (x + cropX) - uncroppedW / 2;
-    let cy = (y + cropY) - uncroppedH / 2;
+    // 1. Position relative to uncropped canvas center
+    let cx = x - uncroppedW / 2;
+    let cy = y - uncroppedH / 2;
 
     // 2. Inverse rotation transform
     let rcx = cx;
