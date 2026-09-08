@@ -66,25 +66,10 @@ QtObject {
         return filename + "." + format;
     }
 
-    function escapeDoubleQuoted(value) {
-        return String(value)
-            .replace(/\\/g, "\\\\")
-            .replace(/"/g, "\\\"")
-            .replace(/\$/g, "\\$")
-            .replace(/`/g, "\\`");
-    }
-
-    function shellPathExpression(path) {
-        const value = String(path);
-        if (value === "~") return "\"$HOME\"";
-        if (value.indexOf("~/") === 0) return "\"$HOME/" + escapeDoubleQuoted(value.slice(2)) + "\"";
-        return "\"" + escapeDoubleQuoted(value) + "\"";
-    }
-
     function cleanupTemp(path) {
         if (path && (path.startsWith("/tmp/dms_capture_") || path.startsWith("/tmp/img_"))) {
             // Delay cleanup by 10s to allow notification daemons to load the image
-            Proc.runCommand("cleanup-temp-delayed", ["sh", "-c", "sleep 10 && rm -f -- " + shellPathExpression(path)]);
+            Proc.runCommand("cleanup-temp-delayed", ["sh", "-c", 'sleep 10 && rm -f -- "$1"', "_", path]);
         }
     }
 
@@ -205,10 +190,9 @@ QtObject {
     }
 
     function copyFileToClipboard(tempOut, callback) {
-        const checkCmd = "[ -s " + shellPathExpression(tempOut) + " ] || { echo 'ERROR: Exported screenshot file is empty or missing' >&2; exit 2; }";
-        Proc.runCommand("check-copy-file", ["sh", "-c", checkCmd], (checkOut, checkCode) => {
+        Proc.runCommand("check-copy-file", ["test", "-s", tempOut], (checkOut, checkCode) => {
             if (checkCode !== 0) {
-                const errDetail = commandOutputOrFallback(checkOut, "Exported file missing or empty (" + tempOut + ")");
+                const errDetail = "Exported file missing or empty (" + tempOut + ")";
                 console.error("[QuickCapture] Copy pre-check failed:", errDetail);
                 callback(errDetail, checkCode);
                 return;
@@ -253,11 +237,10 @@ QtObject {
     function saveFileToPath(tempOut, targetPath, callback) {
         const slashIndex = targetPath.lastIndexOf("/");
         const saveDir = slashIndex > 0 ? targetPath.slice(0, slashIndex) : ".";
-        const saveCmd = "[ -s " + shellPathExpression(tempOut) + " ] || { echo 'ERROR: Exported screenshot file is empty or missing' >&2; exit 2; }; " +
-                        "mkdir -p -- " + shellPathExpression(saveDir) +
-                        " && cp -- " + shellPathExpression(tempOut) + " " + shellPathExpression(targetPath);
+        const saveCmd = '[ -s "$1" ] || { echo "ERROR: Exported screenshot file is empty or missing" >&2; exit 2; }; ' +
+                        'mkdir -p -- "$2" && cp -- "$1" "$3"';
 
-        Proc.runCommand("save-capture-file", ["sh", "-c", saveCmd], callback, 0, 5000);
+        Proc.runCommand("save-capture-file", ["sh", "-c", saveCmd, "_", tempOut, saveDir, targetPath], callback, 0, 5000);
     }
 
     function normalizeSaveAsPath(path) {
@@ -341,9 +324,7 @@ QtObject {
         withExport((pngPath) => {
             const randomStr = generateRandomString(12);
             const anonPath = "/tmp/img_" + randomStr + ".png";
-            const stripCmd = "magick convert -- " + shellPathExpression(pngPath) + " -strip " + shellPathExpression(anonPath);
-
-            Proc.runCommand("anon-copy-strip", ["sh", "-c", stripCmd], (stdout, exitCode) => {
+            Proc.runCommand("anon-copy-strip", ["magick", "convert", "--", pngPath, "-strip", anonPath], (stdout, exitCode) => {
                 const stripSuccess = (exitCode === 0);
                 const doCopy = (sourceFile, isStripped) => {
                     copyExportedFile(sourceFile, () => {
@@ -365,8 +346,7 @@ QtObject {
                 if (stripSuccess) {
                     doCopy(anonPath, true);
                 } else {
-                    const fallbackCmd = "cp -- " + shellPathExpression(pngPath) + " " + shellPathExpression(anonPath);
-                    Proc.runCommand("anon-copy-fallback", ["sh", "-c", fallbackCmd], (fbOut, fbExit) => {
+                    Proc.runCommand("anon-copy-fallback", ["cp", "--", pngPath, anonPath], (fbOut, fbExit) => {
                         const targetFile = (fbExit === 0) ? anonPath : pngPath;
                         doCopy(targetFile, false);
                     });

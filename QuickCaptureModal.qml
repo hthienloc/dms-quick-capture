@@ -1686,7 +1686,7 @@ Item {
 
         Proc.runCommand(scanConfig.cropCommandId, cropArgs, (stdout1, exitCode1) => {
             if (generation !== window.editorSessionGeneration) {
-                Proc.runCommand(scanConfig.cleanupCommandId, ["rm", "-f", tempCropPath]);
+                Proc.runCommand(scanConfig.cleanupCommandId, ["rm", "-f", "--", tempCropPath]);
                 return;
             }
             if (exitCode1 !== 0) {
@@ -1699,10 +1699,10 @@ Item {
 
             Proc.runCommand(scanConfig.scanCommandId, scanConfig.scanArgs(tempCropPath), (stdout2, exitCode2) => {
                 if (generation !== window.editorSessionGeneration) {
-                    Proc.runCommand(scanConfig.cleanupCommandId, ["rm", "-f", tempCropPath]);
+                    Proc.runCommand(scanConfig.cleanupCommandId, ["rm", "-f", "--", tempCropPath]);
                     return;
                 }
-                Proc.runCommand(scanConfig.cleanupCommandId, ["rm", "-f", tempCropPath]);
+                Proc.runCommand(scanConfig.cleanupCommandId, ["rm", "-f", "--", tempCropPath]);
 
                 if (exitCode2 === 0) {
                     const result = stdout2.trim();

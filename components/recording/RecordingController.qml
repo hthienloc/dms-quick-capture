@@ -156,7 +156,7 @@ Item {
         running: root.recordingState === "starting"
         onTriggered: {
             if (root.outputPath !== "") {
-                Proc.runCommand("check-recording-file", ["sh", "-c", `test -f "${root.outputPath}" && test $(stat -c %s "${root.outputPath}" 2>/dev/null || echo 0) -gt 0`], (stdout, exitCode) => {
+                Proc.runCommand("check-recording-file", ["sh", "-c", 'test -f "$1" && test $(stat -c %s "$1" 2>/dev/null || echo 0) -gt 0', "_", root.outputPath], (stdout, exitCode) => {
                     if (exitCode === 0 && root.recordingState === "starting") {
                         fileCheckTimer.stop();
                         safetyTimer.stop();
@@ -206,10 +206,10 @@ Item {
 
             if (wasCancelling) {
                 if (finishedPath) {
-                    Proc.runCommand("cleanup-cancelled-recording", ["rm", "-f", finishedPath]);
+                    Proc.runCommand("cleanup-cancelled-recording", ["rm", "-f", "--", finishedPath]);
                 }
                 if (gifTarget) {
-                    Proc.runCommand("cleanup-cancelled-gif", ["rm", "-f", gifTarget]);
+                    Proc.runCommand("cleanup-cancelled-gif", ["rm", "-f", "--", gifTarget]);
                 }
                 root.targetGifPath = "";
                 return;
@@ -220,7 +220,7 @@ Item {
             } else {
                 root.sendNotification(I18n.trFor("quickCapture", "Recording ended with error code %1.").arg(exitCode), true);
                 if (finishedPath) {
-                    Proc.runCommand("cleanup-failed-recording", ["rm", "-f", finishedPath]);
+                    Proc.runCommand("cleanup-failed-recording", ["rm", "-f", "--", finishedPath]);
                 }
                 root.targetGifPath = "";
             }
@@ -363,7 +363,7 @@ Item {
         root.activeRecordingMode = "";
         root.clearRegion();
         if (root.targetGifPath) {
-            Proc.runCommand("cleanup-cancelled-gif", ["rm", "-f", root.targetGifPath]);
+            Proc.runCommand("cleanup-cancelled-gif", ["rm", "-f", "--", root.targetGifPath]);
             root.targetGifPath = "";
         }
         Proc.runCommand("screenRecorder.kill", ["killall", "-KILL", "gpu-screen-recorder"]);
@@ -384,13 +384,13 @@ Item {
 
         Proc.runCommand("quickCapture.mergeAudio", ffmpegArgs, (stdout, exitCode) => {
             if (exitCode === 0) {
-                Proc.runCommand("quickCapture.replaceMerged", ["mv", "-f", tempOut, videoPath], () => {
+                Proc.runCommand("quickCapture.replaceMerged", ["mv", "-f", "--", tempOut, videoPath], () => {
                     root.isProcessing = false;
                     root.recordingState = "idle";
                     if (callback) callback();
                 });
             } else {
-                Proc.runCommand("quickCapture.cleanupTemp", ["rm", "-f", tempOut]);
+                Proc.runCommand("quickCapture.cleanupTemp", ["rm", "-f", "--", tempOut]);
                 root.isProcessing = false;
                 root.recordingState = "idle";
                 if (callback) callback();
@@ -416,7 +416,7 @@ Item {
             const gifArgs = ["ffmpeg", "-y", "-i", videoPath, "-vf", gifFilter, gifTarget];
 
             Proc.runCommand("convert-to-gif", gifArgs, (convOut, convCode) => {
-                Proc.runCommand("cleanup-temp-mp4", ["rm", "-f", videoPath]);
+                Proc.runCommand("cleanup-temp-mp4", ["rm", "-f", "--", videoPath]);
                 root.isProcessing = false;
                 root.recordingState = "idle";
 

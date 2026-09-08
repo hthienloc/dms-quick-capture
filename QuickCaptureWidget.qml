@@ -135,6 +135,13 @@ PluginComponent {
         });
     }
 
+    function openDirectory(rawDir) {
+        const targetDir = (typeof Paths !== "undefined" && Paths && Paths.expandTilde)
+            ? Paths.expandTilde(String(rawDir))
+            : String(rawDir).replace(/^~/, Quickshell.env("HOME") || "");
+        Proc.runCommand("open-target-dir", ["xdg-open", targetDir], null);
+    }
+
     // ── Popout (left-click menu) ──────────────────────────────────────────────
     popoutWidth: 260
     popoutHeight: root.widgetMode === "video"
@@ -192,7 +199,7 @@ PluginComponent {
                                 const dir = root.widgetMode === "video" ?
                                     (root.pluginData.recordingDirectory || "~/Videos/Recordings") :
                                     (root.pluginData.saveDirectory || "~/Pictures/Screenshots");
-                                Proc.runCommand("open-target-dir", ["sh", "-c", "xdg-open " + dir], null);
+                                root.openDirectory(dir);
                             }
                         }
                     }
@@ -1416,7 +1423,7 @@ PluginComponent {
                             const dir = root.widgetMode === "video"
                                 ? (root.pluginData.recordingDirectory || "~/Videos/Recordings")
                                 : (root.pluginData.saveDirectory || "~/Pictures/Screenshots");
-                            Proc.runCommand("open-target-dir", ["sh", "-c", "xdg-open " + dir], null);
+                            root.openDirectory(dir);
                         }
                     }
 

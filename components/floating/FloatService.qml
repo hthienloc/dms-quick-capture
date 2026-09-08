@@ -41,7 +41,7 @@ Item {
                     for (var i = 0; i < (tempPaths || []).length; i++) {
                         var tp = tempPaths[i];
                         if (tp && tp.indexOf("/tmp/dms_capture_") >= 0) {
-                            Proc.runCommand("float-delayed-cleanup-" + i, ["sh", "-c", "sleep 5 && rm -f -- '" + tp + "'"]);
+                            Proc.runCommand("float-delayed-cleanup-" + i, ["sh", "-c", 'sleep 5 && rm -f -- "$1"', "_", tp]);
                         }
                     }
                 });

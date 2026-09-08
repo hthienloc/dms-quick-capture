@@ -123,8 +123,22 @@ PluginComponent {
         root.startActualCapture();
     }
 
-    function escShell(s) {
-        return "'" + s.replace(/'/g, "'\\''") + "'";
+    function resolveSaveDir(rawDir) {
+        const dir = rawDir || "~/Pictures/Screenshots";
+        return (typeof Paths !== "undefined" && Paths && Paths.expandTilde)
+            ? Paths.expandTilde(String(dir))
+            : String(dir).replace(/^~/, Quickshell.env("HOME") || "");
+    }
+
+    function generateTimestampFilename() {
+        const now = new Date();
+        const pad = n => (n < 10 ? "0" : "") + n;
+        return "Screenshot-" + now.getFullYear() + "-" +
+               pad(now.getMonth() + 1) + "-" +
+               pad(now.getDate()) + "_" +
+               pad(now.getHours()) + "-" +
+               pad(now.getMinutes()) + "-" +
+               pad(now.getSeconds()) + ".png";
     }
 
     readonly property bool hasToast: typeof ToastService !== "undefined" && !!ToastService
@@ -144,8 +158,8 @@ PluginComponent {
 
         root.currentCapturePath = root.capturePath();
         const filename = root.currentCapturePath.split("/").pop();
-        const cmdStr = root.screenshotArgs(mode, filename).map(root.escShell).join(" ");
-        Proc.runCommand("screenshot-trigger", ["sh", "-c", cmdStr], (stdout, exitCode) => {
+        const args = root.screenshotArgs(mode, filename);
+        Proc.runCommand("screenshot-trigger", args, (stdout, exitCode) => {
             root.isCapturing = false;
             root.pendingCaptureMode = "";
             root.pendingCaptureAction = "edit";
@@ -176,7 +190,7 @@ PluginComponent {
         root.currentCapturePath = destPath;
 
         // Step 1: Try to paste clipboard as a file.
-        Proc.runCommand("clipboard-paste-file", ["sh", "-c", `dms cl paste > ${root.escShell(destPath)} 2>/dev/null`], (stdout, exitCode) => {
+        Proc.runCommand("clipboard-paste-file", ["sh", "-c", 'dms cl paste > "$1" 2>/dev/null', "_", destPath], (stdout, exitCode) => {
             if (exitCode === 0) {
                 // Step 2a: Confirm the pasted file is actually an image.
                 Proc.runCommand("clipboard-check-image", ["file", "-b", destPath], (fileOut, fileExit) => {
@@ -234,25 +248,23 @@ PluginComponent {
             DMSService.sendRequest("clipboard.copyFile", { "filePath": path });
             root.toastInfo(I18n.trFor("quickCapture", "Copied to clipboard"));
         } else if (action === "save") {
-            const dir = pluginData.saveDirectory || "~/Pictures/Screenshots";
-            const escapedDir = dir.startsWith("~/") ? "$HOME/" + root.escShell(dir.slice(2)) : root.escShell(dir);
-            const escapedPath = root.escShell(path);
-            const cmd = "mkdir -p -- " + escapedDir + " && cp -- " + escapedPath + " " + escapedDir + "/Screenshot-$(date '+%Y-%m-%d_%H-%M-%S').png";
-            Proc.runCommand("capture-save", ["sh", "-c", cmd], (stdout, exitCode) => {
+            const targetDir = root.resolveSaveDir(pluginData.saveDirectory);
+            const targetFilename = root.generateTimestampFilename();
+            const targetFilePath = targetDir.replace(/\/$/, "") + "/" + targetFilename;
+            Proc.runCommand("capture-save", ["sh", "-c", 'mkdir -p -- "$1" && cp -- "$2" "$3"', "_", targetDir, path, targetFilePath], (stdout, exitCode) => {
                 if (exitCode === 0)
                     root.toastInfo(I18n.trFor("quickCapture", "Screenshot saved"));
                 else
                     root.toastError(I18n.trFor("quickCapture", "Failed to save screenshot"));
                 if (path.startsWith("/tmp/dms_capture_"))
-                    Proc.runCommand("cleanup-temp-save", ["rm", "-f", path]);
+                    Proc.runCommand("cleanup-temp-save", ["rm", "-f", "--", path]);
             });
         } else if (action === "copyAndSave") {
-            const dir = pluginData.saveDirectory || "~/Pictures/Screenshots";
-            const escapedDir = dir.startsWith("~/") ? "$HOME/" + root.escShell(dir.slice(2)) : root.escShell(dir);
-            const escapedPath = root.escShell(path);
-            const cmd = "mkdir -p -- " + escapedDir + " && cp -- " + escapedPath + " " + escapedDir + "/Screenshot-$(date '+%Y-%m-%d_%H-%M-%S').png";
+            const targetDir = root.resolveSaveDir(pluginData.saveDirectory);
+            const targetFilename = root.generateTimestampFilename();
+            const targetFilePath = targetDir.replace(/\/$/, "") + "/" + targetFilename;
             DMSService.sendRequest("clipboard.copyFile", { "filePath": path });
-            Proc.runCommand("capture-copy-save", ["sh", "-c", cmd], (stdout, exitCode) => {
+            Proc.runCommand("capture-copy-save", ["sh", "-c", 'mkdir -p -- "$1" && cp -- "$2" "$3"', "_", targetDir, path, targetFilePath], (stdout, exitCode) => {
                 if (exitCode === 0)
                     root.toastInfo(I18n.trFor("quickCapture", "Copied & saved"));
                 else
@@ -282,7 +294,7 @@ PluginComponent {
             });
         } else {
             root.currentCapturePath = root.capturePath();
-            Proc.runCommand("copy-image", ["cp", "-f", uri, root.currentCapturePath], (stdout, exitCode) => {
+            Proc.runCommand("copy-image", ["cp", "-f", "--", uri, root.currentCapturePath], (stdout, exitCode) => {
                 if (exitCode === 0)
                     root.openCapturedImageUnknown(root.currentCapturePath, action);
                 else
@@ -440,7 +452,7 @@ PluginComponent {
         onFileSelected: path => {
             const action = fileBrowserModal.captureAction;
             root.currentCapturePath = root.capturePath();
-            Proc.runCommand("copy-image", ["cp", "-f", path, root.currentCapturePath], (stdout, exitCode) => {
+            Proc.runCommand("copy-image", ["cp", "-f", "--", path, root.currentCapturePath], (stdout, exitCode) => {
                 if (exitCode === 0) {
                     root.openCapturedImageUnknown(root.currentCapturePath, action);
                 } else {
