@@ -19,7 +19,10 @@ QtObject {
     }
 
     function saveDirectory() {
-        return root.getPluginData().saveDirectory || "~/Pictures/Screenshots";
+        const rawDir = root.getPluginData().saveDirectory || "~/Pictures/Screenshots";
+        return (typeof Paths !== "undefined" && Paths && Paths.expandTilde)
+            ? Paths.expandTilde(String(rawDir))
+            : String(rawDir).replace(/^~/, Quickshell.env("HOME") || "");
     }
 
     function screenshotFilename() {
@@ -69,7 +72,7 @@ QtObject {
     function cleanupTemp(path) {
         if (path && (path.startsWith("/tmp/dms_capture_") || path.startsWith("/tmp/img_"))) {
             // Delay cleanup by 10s to allow notification daemons to load the image
-            Proc.runCommand("cleanup-temp-delayed", ["sh", "-c", 'sleep 10 && rm -f -- "$1"', "_", path]);
+            Proc.runCommand(null, ["sh", "-c", 'sleep 10 && rm -f -- "$1"', "_", path]);
         }
     }
 
@@ -105,7 +108,8 @@ QtObject {
 
             const args = ["dms", "notify", "--app", "Quick Capture"];
             if (icon) args.push("--icon", icon);
-            if (openPath) args.push("--file", openPath);
+            const fileTarget = openPath || (imagePath && !imagePath.toLowerCase().endsWith(".pdf") ? imagePath : "");
+            if (fileTarget) args.push("--file", fileTarget);
             args.push("--timeout", "5000", title, message);
             Proc.runCommand("system-notify", args);
         }
@@ -235,12 +239,15 @@ QtObject {
     }
 
     function saveFileToPath(tempOut, targetPath, callback) {
-        const slashIndex = targetPath.lastIndexOf("/");
-        const saveDir = slashIndex > 0 ? targetPath.slice(0, slashIndex) : ".";
+        const resolvedTargetPath = (typeof Paths !== "undefined" && Paths && Paths.expandTilde)
+            ? Paths.expandTilde(String(targetPath))
+            : String(targetPath).replace(/^~/, Quickshell.env("HOME") || "");
+        const slashIndex = resolvedTargetPath.lastIndexOf("/");
+        const saveDir = slashIndex > 0 ? resolvedTargetPath.slice(0, slashIndex) : ".";
         const saveCmd = '[ -s "$1" ] || { echo "ERROR: Exported screenshot file is empty or missing" >&2; exit 2; }; ' +
                         'mkdir -p -- "$2" && cp -- "$1" "$3"';
 
-        Proc.runCommand("save-capture-file", ["sh", "-c", saveCmd, "_", tempOut, saveDir, targetPath], callback, 0, 5000);
+        Proc.runCommand("save-capture-file", ["sh", "-c", saveCmd, "_", tempOut, saveDir, resolvedTargetPath], callback, 0, 5000);
     }
 
     function normalizeSaveAsPath(path) {
