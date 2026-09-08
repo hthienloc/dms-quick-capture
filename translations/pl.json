@@ -12,22 +12,22 @@
     "AUTO": ""
   },
   "Action": {
-    "Action": "Acción"
+    "Action": "Działanie"
   },
   "Action when Enter": {
-    "Action when Enter": "Acción al entrar"
+    "Action when Enter": ""
   },
   "Active Window": {
     "Active Window": ""
   },
   "Adaptive": {
-    "Adaptive": "Adaptativo"
+    "Adaptive": "Adapcyjny"
   },
   "Adaptive (DMS Theme)": {
     "Adaptive (DMS Theme)": ""
   },
   "Add": {
-    "Add": "Añadir"
+    "Add": "Dodaj"
   },
   "Add Text Note": {
     "Add Text Note": ""
@@ -57,16 +57,16 @@
     "Arrow Thickness": ""
   },
   "Arrow Vector": {
-    "Arrow Vector": "Vector de flecha"
+    "Arrow Vector": ""
   },
   "Audio & Overlay": {
     "Audio & Overlay": ""
   },
   "Audio Codec": {
-    "Audio Codec": "Códec de Audio"
+    "Audio Codec": "Kodek audio"
   },
   "Auto": {
-    "Auto": "Auto"
+    "Auto": "Automatycznie"
   },
   "Auto Balance": {
     "Auto Balance": ""
@@ -99,7 +99,7 @@
     "Back to Annotation (B)": ""
   },
   "Background": {
-    "Background": "Fondo"
+    "Background": "Tło"
   },
   "Background (B)": {
     "Background (B)": ""
@@ -117,7 +117,7 @@
     "Background Presets": ""
   },
   "Balanced": {
-    "Balanced": "Equilibrado"
+    "Balanced": "Zbalansowane"
   },
   "Bar Interactions": {
     "Bar Interactions": ""
@@ -129,25 +129,25 @@
     "Blur Background Image": ""
   },
   "Border Color": {
-    "Border Color": "Color de borde"
+    "Border Color": "Kolor obramowania"
   },
   "Border Width": {
-    "Border Width": "Ancho del borde"
+    "Border Width": "Szerokość Obramowania"
   },
   "Both": {
-    "Both": ""
+    "Both": "Oba"
   },
   "Bottom": {
-    "Bottom": "Abajo"
+    "Bottom": "Dół"
   },
   "Bottom Center": {
-    "Bottom Center": "Centro inferior"
+    "Bottom Center": "Dół Środek"
   },
   "Bottom Left": {
-    "Bottom Left": "Abajo a la izquierda"
+    "Bottom Left": "Dolny Lewy"
   },
   "Bottom Right": {
-    "Bottom Right": "Abajo a la derecha"
+    "Bottom Right": "Dolny Prawy"
   },
   "CUST": {
     "CUST": ""
@@ -189,7 +189,7 @@
     "Center Right": ""
   },
   "Choose Color": {
-    "Choose Color": "Elegir color"
+    "Choose Color": "Wybierz kolor"
   },
   "Choose notifications shown after copy or save.": {
     "Choose notifications shown after copy or save.": ""
@@ -213,10 +213,10 @@
     "Clear saved region selection before each capture": ""
   },
   "Clipboard": {
-    "Clipboard": "Portapapeles"
+    "Clipboard": "Schowek"
   },
   "Close": {
-    "Close": "Cerrar"
+    "Close": "Zamknij"
   },
   "Close Annotator": {
     "Close Annotator": ""
@@ -261,13 +261,13 @@
     "Copied Anonymously": ""
   },
   "Copied to clipboard": {
-    "Copied to clipboard": "Copiado al portapapeles"
+    "Copied to clipboard": "Skopiowano do schowka"
   },
   "Copied:": {
     "Copied:": ""
   },
   "Copy": {
-    "Copy": "Copiar"
+    "Copy": "Kopiuj"
   },
   "Copy & Save": {
     "Copy & Save": ""
@@ -288,13 +288,13 @@
     "Copy vector / Paste / Duplicate": ""
   },
   "Crop / Resize": {
-    "Crop / Resize": "Recortar / Cambiar tamaño"
+    "Crop / Resize": ""
   },
   "Crop / Resize Area": {
     "Crop / Resize Area": ""
   },
   "Custom": {
-    "Custom": "Personalizado"
+    "Custom": "Niestandardowy"
   },
   "Custom Colors": {
     "Custom Colors": ""
@@ -372,7 +372,7 @@
     "Default Watermark": ""
   },
   "Delete": {
-    "Delete": "Eliminar"
+    "Delete": "Usuń"
   },
   "Dim Background Image": {
     "Dim Background Image": ""
@@ -417,10 +417,10 @@
     "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": ""
   },
   "Edge Spacing": {
-    "Edge Spacing": "Espacio entre bordes"
+    "Edge Spacing": "Odstępy między krawędziami"
   },
   "Edit": {
-    "Edit": "Editar"
+    "Edit": "Edytuj"
   },
   "Edit Color Palette": {
     "Edit Color Palette": ""
@@ -450,7 +450,7 @@
     "Ellipse": ""
   },
   "Ellipse / Circle": {
-    "Ellipse / Circle": "Elipse / Círculo"
+    "Ellipse / Circle": ""
   },
   "Ellipse / Circle (Q)": {
     "Ellipse / Circle (Q)": ""
@@ -468,7 +468,7 @@
     "Enable background automatically when opening the editor": ""
   },
   "Eraser": {
-    "Eraser": "Borrador"
+    "Eraser": ""
   },
   "Everforest": {
     "Everforest": ""
@@ -495,7 +495,7 @@
     "Flip Vert": ""
   },
   "Float": {
-    "Float": "Flotante"
+    "Float": ""
   },
   "Float Image": {
     "Float Image": ""
@@ -504,16 +504,16 @@
     "Float Window": ""
   },
   "Floating": {
-    "Floating": "Flotante"
+    "Floating": ""
   },
   "Focused Screen": {
     "Focused Screen": ""
   },
   "Focused Window": {
-    "Focused Window": "Ventana enfocada"
+    "Focused Window": "Aktywne okno"
   },
   "Font Size": {
-    "Font Size": "Tamaño de fuente"
+    "Font Size": "Rozmiar czcionki"
   },
   "Font family used for number stamp labels": {
     "Font family used for number stamp labels": ""
@@ -540,7 +540,7 @@
     "Free": ""
   },
   "Freehand Pen": {
-    "Freehand Pen": "Pluma a mano alzada"
+    "Freehand Pen": ""
   },
   "Freehand Pen (1)": {
     "Freehand Pen (1)": ""
@@ -552,7 +552,7 @@
     "From File": ""
   },
   "Full Screen": {
-    "Full Screen": "Pantalla completa"
+    "Full Screen": ""
   },
   "Full Screen Target": {
     "Full Screen Target": ""
@@ -567,7 +567,7 @@
     "Gruvbox Material": ""
   },
   "Help": {
-    "Help": "Ayuda"
+    "Help": "Pomoc"
   },
   "Hide Control Center": {
     "Hide Control Center": ""
@@ -576,10 +576,10 @@
     "Hide Control Center by Default": ""
   },
   "High": {
-    "High": "Alto"
+    "High": "Wysoka"
   },
   "Highlighter": {
-    "Highlighter": "resaltador"
+    "Highlighter": ""
   },
   "Highlighter (S)": {
     "Highlighter (S)": ""
@@ -591,7 +591,7 @@
     "Highlighter Thickness": ""
   },
   "History": {
-    "History": "Historial"
+    "History": "Historia"
   },
   "Hover Trigger Delay": {
     "Hover Trigger Delay": ""
@@ -600,7 +600,7 @@
     "IPC Commands": ""
   },
   "Image": {
-    "Image": "Imagen"
+    "Image": "Zdjęcie"
   },
   "Image + Text": {
     "Image + Text": ""
@@ -615,7 +615,7 @@
     "Image Size": ""
   },
   "Image copied to clipboard": {
-    "Image copied to clipboard": "Imagen copiada al portapapeles"
+    "Image copied to clipboard": "Obraz skopiowany do schowka"
   },
   "Image selected automatically when using Image Background mode": {
     "Image selected automatically when using Image Background mode": ""
@@ -648,7 +648,7 @@
     "Kanagawa": ""
   },
   "Key": {
-    "Key": "Tecla"
+    "Key": "Klawisz"
   },
   "Landscape": {
     "Landscape": ""
@@ -663,13 +663,13 @@
     "Last Selected Region": ""
   },
   "Left": {
-    "Left": "Izquierda"
+    "Left": "Lewa"
   },
   "Left Click": {
     "Left Click": ""
   },
   "Light": {
-    "Light": "Claro"
+    "Light": ""
   },
   "Line Color": {
     "Line Color": ""
@@ -687,7 +687,7 @@
     "Loading contributors...": ""
   },
   "Low": {
-    "Low": "Bajo"
+    "Low": "Niska"
   },
   "Magnifier Loupe": {
     "Magnifier Loupe": ""
@@ -696,7 +696,7 @@
     "Max Height (0 = no limit)": ""
   },
   "Medium": {
-    "Medium": "Medio"
+    "Medium": "Średni"
   },
   "Menu Item Right Click": {
     "Menu Item Right Click": ""
@@ -726,7 +726,7 @@
     "Niri Binding Example": ""
   },
   "No Background": {
-    "No Background": "Sin fondo"
+    "No Background": "Brak tła"
   },
   "No Image Specified": {
     "No Image Specified": ""
@@ -741,10 +741,10 @@
     "No supported images found": ""
   },
   "None": {
-    "None": "Ninguna"
+    "None": "Brak"
   },
   "None / Disabled": {
-    "None / Disabled": "Ninguno / Desactivado"
+    "None / Disabled": ""
   },
   "Nord": {
     "Nord": ""
@@ -753,13 +753,13 @@
     "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": ""
   },
   "Notification": {
-    "Notification": "Notificación"
+    "Notification": "Powiadomienie"
   },
   "Notifications": {
-    "Notifications": "Notificaciones"
+    "Notifications": "Powiadomienia"
   },
   "Number Stamp": {
-    "Number Stamp": "Sello numérico"
+    "Number Stamp": ""
   },
   "OCR": {
     "OCR": ""
@@ -771,10 +771,10 @@
     "OCR Text Recognition": ""
   },
   "Opacity": {
-    "Opacity": "Opacidad"
+    "Opacity": "Przezroczystość"
   },
   "Open": {
-    "Open": "Abrir"
+    "Open": "Otwórz"
   },
   "Open Folder": {
     "Open Folder": ""
@@ -810,7 +810,7 @@
     "Palette Preset": ""
   },
   "Pause": {
-    "Pause": "Pausar"
+    "Pause": "Wstrzymaj"
   },
   "Pause / Resume": {
     "Pause / Resume": ""
@@ -837,7 +837,7 @@
     "Pixel Intensity": ""
   },
   "Pixelate": {
-    "Pixelate": "Pixelar"
+    "Pixelate": "Pikselacja"
   },
   "Pixelate (E)": {
     "Pixelate (E)": ""
@@ -852,7 +852,7 @@
     "Portrait": ""
   },
   "Position": {
-    "Position": "Posición"
+    "Position": "Pozycja"
   },
   "Post-Capture Notification": {
     "Post-Capture Notification": ""
@@ -894,10 +894,10 @@
     "Preset Tool": ""
   },
   "Preview": {
-    "Preview": "Vista previa"
+    "Preview": "Podgląd"
   },
   "Primary": {
-    "Primary": "Primario"
+    "Primary": "Główny"
   },
   "Primary Screen": {
     "Primary Screen": ""
@@ -933,7 +933,7 @@
     "Ratio": ""
   },
   "Ready": {
-    "Ready": "Listo"
+    "Ready": "Gotowe"
   },
   "Recent Edits": {
     "Recent Edits": ""
@@ -969,7 +969,7 @@
     "Rectangle Color": ""
   },
   "Rectangle Outline": {
-    "Rectangle Outline": "Contorno del rectángulo"
+    "Rectangle Outline": ""
   },
   "Rectangle Outline (4)": {
     "Rectangle Outline (4)": ""
@@ -993,22 +993,22 @@
     "Redo last undone stroke": ""
   },
   "Refresh": {
-    "Refresh": "Recargar"
+    "Refresh": "Odśwież"
   },
   "Region": {
     "Region": ""
   },
   "Reset": {
-    "Reset": "Reiniciar"
+    "Reset": "Resetuj"
   },
   "Reset Last Region": {
     "Reset Last Region": ""
   },
   "Resume": {
-    "Resume": "Continuar"
+    "Resume": "Wznów"
   },
   "Right": {
-    "Right": "Derecha"
+    "Right": "Prawo"
   },
   "Right Click": {
     "Right Click": ""
@@ -1038,7 +1038,7 @@
     "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": ""
   },
   "Save Directory": {
-    "Save Directory": "Guardar directorio"
+    "Save Directory": ""
   },
   "Save Filename Pattern": {
     "Save Filename Pattern": ""
@@ -1119,7 +1119,7 @@
     "Screenshot saved to %1/%2": ""
   },
   "Scroll": {
-    "Scroll": "Desplazamiento"
+    "Scroll": "Przewijanie"
   },
   "Scroll Interval": {
     "Scroll Interval": ""
@@ -1128,13 +1128,13 @@
     "Scroll capture: select a region, scroll content, then press Enter to finish.": ""
   },
   "Scrolling": {
-    "Scrolling": "Desplazamiento"
+    "Scrolling": "Przewijanie"
   },
   "Scrolling Capture": {
     "Scrolling Capture": ""
   },
   "Select": {
-    "Select": "Seleccionar"
+    "Select": "Wybierz"
   },
   "Select / Move stroke": {
     "Select / Move stroke": ""
@@ -1158,7 +1158,7 @@
     "Selected Tool / Action": ""
   },
   "Settings": {
-    "Settings": "Ajustes"
+    "Settings": "Ustawienia"
   },
   "Shapes": {
     "Shapes": ""
@@ -1167,7 +1167,7 @@
     "Shortcut Action": ""
   },
   "Shortcuts": {
-    "Shortcuts": "Atajos"
+    "Shortcuts": "Skróty"
   },
   "Show Control Center": {
     "Show Control Center": ""
@@ -1272,7 +1272,7 @@
     "Starting Preset": ""
   },
   "Starting Tool": {
-    "Starting Tool": "Herramienta de inicio"
+    "Starting Tool": ""
   },
   "Starting Tool Mode": {
     "Starting Tool Mode": ""
@@ -1281,7 +1281,7 @@
     "Stop & Save": ""
   },
   "Straight Line": {
-    "Straight Line": "Línea recta"
+    "Straight Line": ""
   },
   "Straight Line (2)": {
     "Straight Line (2)": ""
@@ -1302,13 +1302,13 @@
     "System Audio Device": ""
   },
   "System Default": {
-    "System Default": "Predeterminado del sistema"
+    "System Default": "Domyślne"
   },
   "Target Output Name": {
     "Target Output Name": ""
   },
   "Text": {
-    "Text": "Texto"
+    "Text": "Tekst"
   },
   "Text (W)": {
     "Text (W)": ""
@@ -1317,13 +1317,13 @@
     "Text Background Roundness": ""
   },
   "Text Color": {
-    "Text Color": "Color de texto"
+    "Text Color": "Kolor Tekstu"
   },
   "Text Font": {
     "Text Font": ""
   },
   "Text Note": {
-    "Text Note": "Nota de texto"
+    "Text Note": ""
   },
   "Text Size": {
     "Text Size": ""
@@ -1332,13 +1332,13 @@
     "Theme Primary Color": ""
   },
   "Thickness": {
-    "Thickness": "Espesor"
+    "Thickness": "Grubość"
   },
   "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": {
     "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": ""
   },
   "Toast": {
-    "Toast": "Emergente"
+    "Toast": ""
   },
   "Toggle Hide/Show Annotations": {
     "Toggle Hide/Show Annotations": ""
@@ -1365,16 +1365,16 @@
     "Toolbar Position": ""
   },
   "Top": {
-    "Top": "Arriba"
+    "Top": "Góra"
   },
   "Top Center": {
-    "Top Center": "Centro superior"
+    "Top Center": "Góra Środek"
   },
   "Top Left": {
-    "Top Left": "Arriba a la izquierda"
+    "Top Left": "Górny Lewy"
   },
   "Top Right": {
-    "Top Right": "Arriba a la derecha"
+    "Top Right": "Górny Prawy"
   },
   "Transparent": {
     "Transparent": ""
@@ -1413,7 +1413,7 @@
     "Use Modal Editor": ""
   },
   "Very High": {
-    "Very High": "Muy alto"
+    "Very High": "Bardzo wysoka"
   },
   "Video Codec": {
     "Video Codec": ""

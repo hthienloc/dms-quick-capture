@@ -1,0 +1,1457 @@
+{
+  "%1 — %2": {
+    "%1 — %2": ""
+  },
+  "1 Connecting Line": {
+    "1 Connecting Line": "1 linea di collegamento"
+  },
+  "2 Connecting Lines": {
+    "2 Connecting Lines": "2 linee di collegamento"
+  },
+  "AUTO": {
+    "AUTO": "AUTO"
+  },
+  "Action": {
+    "Action": "Azione"
+  },
+  "Action when Enter": {
+    "Action when Enter": "Azione alla pressione di Invio"
+  },
+  "Active Window": {
+    "Active Window": "Finestra attiva"
+  },
+  "Adaptive": {
+    "Adaptive": "Adattivo"
+  },
+  "Adaptive (DMS Theme)": {
+    "Adaptive (DMS Theme)": "Adattivo (Tema DMS)"
+  },
+  "Add": {
+    "Add": "Aggiungi"
+  },
+  "Add Text Note": {
+    "Add Text Note": "Aggiungi nota di testo"
+  },
+  "All Combined Outputs": {
+    "All Combined Outputs": "Tutte le uscite combinate"
+  },
+  "All Outputs": {
+    "All Outputs": "Tutte le uscite"
+  },
+  "Annotating": {
+    "Annotating": "Annotazione in corso"
+  },
+  "Annotation Tools": {
+    "Annotation Tools": "Strumenti di annotazione"
+  },
+  "Anonymous Copy (stripped metadata)": {
+    "Anonymous Copy (stripped metadata)": "Copia anonima (metadati rimossi)"
+  },
+  "Arrow (3)": {
+    "Arrow (3)": "Freccia (3)"
+  },
+  "Arrow Color": {
+    "Arrow Color": "Colore della freccia"
+  },
+  "Arrow Thickness": {
+    "Arrow Thickness": "Spessore della freccia"
+  },
+  "Arrow Vector": {
+    "Arrow Vector": "Vettore della freccia"
+  },
+  "Audio & Overlay": {
+    "Audio & Overlay": "Audio e Overlay"
+  },
+  "Audio Codec": {
+    "Audio Codec": "Codec audio"
+  },
+  "Auto": {
+    "Auto": "Automatico"
+  },
+  "Auto Balance": {
+    "Auto Balance": "Bilanciamento automatico"
+  },
+  "Auto Detect": {
+    "Auto Detect": "Rilevamento automatico"
+  },
+  "Auto-apply background defaults": {
+    "Auto-apply background defaults": "Applica automaticamente le impostazioni predefinite dello sfondo"
+  },
+  "Auto-close the loop when ending near the start point.": {
+    "Auto-close the loop when ending near the start point.": "Chiudi automaticamente il tracciato quando termina vicino al punto di partenza."
+  },
+  "Auto-minimize": {
+    "Auto-minimize": "Riduzione automatica a icona"
+  },
+  "Auto-select a tool preset on hover, without releasing the mouse.": {
+    "Auto-select a tool preset on hover, without releasing the mouse.": "Seleziona automaticamente un preset dello strumento al passaggio del mouse, senza rilasciare il pulsante."
+  },
+  "Auto-tiling": {
+    "Auto-tiling": "Disposizione automatica a griglia"
+  },
+  "Automatically minimize the float window after a delay": {
+    "Automatically minimize the float window after a delay": "Riduce automaticamente a icona la finestra fluttuante dopo un ritardo"
+  },
+  "Automatically stack windows to avoid overlap": {
+    "Automatically stack windows to avoid overlap": "Impila automaticamente le finestre per evitare sovrapposizioni"
+  },
+  "Back to Annotation (B)": {
+    "Back to Annotation (B)": "Torna all'annotazione (B)"
+  },
+  "Background": {
+    "Background": "Sfondo"
+  },
+  "Background (B)": {
+    "Background (B)": "Sfondo (B)"
+  },
+  "Background Defaults": {
+    "Background Defaults": "Impostazioni predefinite dello sfondo"
+  },
+  "Background Image Folder": {
+    "Background Image Folder": "Cartella dell'immagini di sfondo"
+  },
+  "Background Images": {
+    "Background Images": "Immagini di sfondo"
+  },
+  "Background Presets": {
+    "Background Presets": "Preset di sfondo"
+  },
+  "Balanced": {
+    "Balanced": "Bilanciato"
+  },
+  "Bar Interactions": {
+    "Bar Interactions": "Interazioni con la barra"
+  },
+  "Blink Recording Dot": {
+    "Blink Recording Dot": "Fai lampeggiare il pallino di registrazione"
+  },
+  "Blur Background Image": {
+    "Blur Background Image": "Sfoca l'immagine di sfondo"
+  },
+  "Border Color": {
+    "Border Color": "Colore del bordo"
+  },
+  "Border Width": {
+    "Border Width": "Larghezza del bordo"
+  },
+  "Both": {
+    "Both": "Entrambi"
+  },
+  "Bottom": {
+    "Bottom": "In basso"
+  },
+  "Bottom Center": {
+    "Bottom Center": "In basso al centro"
+  },
+  "Bottom Left": {
+    "Bottom Left": "In basso a sinistra"
+  },
+  "Bottom Right": {
+    "Bottom Right": "In basso a destra"
+  },
+  "CUST": {
+    "CUST": "PERS"
+  },
+  "Callout": {
+    "Callout": "Richiamo"
+  },
+  "Callout (Z) | Hold G for Loupe": {
+    "Callout (Z) | Hold G for Loupe": "Richiamo (Z) | Tieni premuto G per la lente"
+  },
+  "Callout Zoom": {
+    "Callout Zoom": "Zoom richiamo"
+  },
+  "Callout, Background (Z, B)": {
+    "Callout, Background (Z, B)": "Richiamo, Sfondo (Z, B)"
+  },
+  "Capture": {
+    "Capture": "Cattura"
+  },
+  "Capture Actions": {
+    "Capture Actions": "Azioni di cattura"
+  },
+  "Capture Options": {
+    "Capture Options": "Opzioni di cattura"
+  },
+  "Capturing...": {
+    "Capturing...": "Cattura in corso..."
+  },
+  "Catppuccin": {
+    "Catppuccin": "Catppuccin"
+  },
+  "Center": {
+    "Center": "Centro"
+  },
+  "Center Left": {
+    "Center Left": "Centro sinistra"
+  },
+  "Center Right": {
+    "Center Right": "Centro destra"
+  },
+  "Choose Color": {
+    "Choose Color": "Scegli il colore"
+  },
+  "Choose notifications shown after copy or save.": {
+    "Choose notifications shown after copy or save.": "Scegli le notifiche mostrate dopo la copia o il salvataggio."
+  },
+  "Choose the editor shape for portrait or landscape screens.": {
+    "Choose the editor shape for portrait or landscape screens.": "Scegli la forma dell'editor per schermi verticali o orizzontali."
+  },
+  "Choose whether the editor opens as a modal overlay or a movable floating window.": {
+    "Choose whether the editor opens as a modal overlay or a movable floating window.": "Scegli se l'editor si apre come overlay modale o come finestra fluttuante spostabile."
+  },
+  "Choose which monitor to capture during full screen recording.": {
+    "Choose which monitor to capture during full screen recording.": "Scegli quale monitor catturare durante la registrazione a schermo intero."
+  },
+  "Classic (Tailwind)": {
+    "Classic (Tailwind)": "Classico (Tailwind)"
+  },
+  "Clean Text Eraser": {
+    "Clean Text Eraser": "Gomma testo pulita"
+  },
+  "Clear saved region selection before each capture": {
+    "Clear saved region selection before each capture": "Cancella la selezione della regione salvata prima di ogni cattura"
+  },
+  "Clipboard": {
+    "Clipboard": "Appunti"
+  },
+  "Close": {
+    "Close": "Chiudi"
+  },
+  "Close Annotator": {
+    "Close Annotator": "Chiudi l'annotatore"
+  },
+  "Color Palette": {
+    "Color Palette": "Palette dei colori"
+  },
+  "Color Picker (F for RGB | Eyedropper)": {
+    "Color Picker (F for RGB | Eyedropper)": "Selettore colori (F per RGB | Contagocce)"
+  },
+  "Color Picker, Eraser (F, T)": {
+    "Color Picker, Eraser (F, T)": "Selettore colori, Gomma (F, T)"
+  },
+  "Color copied to clipboard: %1": {
+    "Color copied to clipboard: %1": "Colore copiato negli appunti: %1"
+  },
+  "Configure up to 8 quick-access tool presets. Right-click during capture to open the radial menu.": {
+    "Configure up to 8 quick-access tool presets. Right-click during capture to open the radial menu.": "Configura fino a 8 preset degli strumenti ad accesso rapido. Fai clic destro durante la cattura per aprire il menu radiale."
+  },
+  "Conic Gradient": {
+    "Conic Gradient": "Gradiente conico"
+  },
+  "Container Format": {
+    "Container Format": "Formato del contenitore"
+  },
+  "Contributors": {
+    "Contributors": "Contributori"
+  },
+  "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": {
+    "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": "Controlla il budget di pixel dell'anteprima durante la modifica. Riducilo se noti rallentamenti. Non influisce sulla qualità dell'immagine salvata."
+  },
+  "Converting recording to GIF...": {
+    "Converting recording to GIF...": "Conversione della registrazione in GIF..."
+  },
+  "Copied": {
+    "Copied": "Copiato"
+  },
+  "Copied & saved": {
+    "Copied & saved": "Copiato e salvato"
+  },
+  "Copied Anonymously": {
+    "Copied Anonymously": "Copiato in modo anonimo"
+  },
+  "Copied to clipboard": {
+    "Copied to clipboard": "Copiato negli appunti"
+  },
+  "Copied:": {
+    "Copied:": "Copiato:"
+  },
+  "Copy": {
+    "Copy": "Copia"
+  },
+  "Copy & Save": {
+    "Copy & Save": "Copia e salva"
+  },
+  "Copy (Ctrl+C) | Anonymous Copy (Ctrl+Shift+C)": {
+    "Copy (Ctrl+C) | Anonymous Copy (Ctrl+Shift+C)": "Copia (Ctrl+C) | Copia anonima (Ctrl+Maiusc+C)"
+  },
+  "Copy Color": {
+    "Copy Color": "Copia il colore"
+  },
+  "Copy Current Palette": {
+    "Copy Current Palette": "Copia la palette corrente"
+  },
+  "Copy and customize this preset": {
+    "Copy and customize this preset": "Copia e personalizza questo preset"
+  },
+  "Copy vector / Paste / Duplicate": {
+    "Copy vector / Paste / Duplicate": "Copia vettore / Incolla / Duplica"
+  },
+  "Crop / Resize": {
+    "Crop / Resize": "Ritaglia / Ridimensiona"
+  },
+  "Crop / Resize Area": {
+    "Crop / Resize Area": "Area di ritaglio / ridimensionamento"
+  },
+  "Custom": {
+    "Custom": "Personalizzata"
+  },
+  "Custom Colors": {
+    "Custom Colors": "Colori personalizzati"
+  },
+  "Custom Tool": {
+    "Custom Tool": "Strumento personalizzato"
+  },
+  "Dank Violet": {
+    "Dank Violet": "Dank Violet"
+  },
+  "Dark": {
+    "Dark": "Scuro"
+  },
+  "Darken the image to improve foreground contrast": {
+    "Darken the image to improve foreground contrast": "Scurisci l'immagine per migliorare il contrasto del primo piano"
+  },
+  "Dashed Line": {
+    "Dashed Line": "Linea tratteggiata"
+  },
+  "Default Alignment": {
+    "Default Alignment": "Allineamento predefinito"
+  },
+  "Default Aspect Ratio": {
+    "Default Aspect Ratio": "Proporzioni predefinite"
+  },
+  "Default Background Image": {
+    "Default Background Image": "Immagine di sfondo predefinita"
+  },
+  "Default Background Mode": {
+    "Default Background Mode": "Modalità sfondo predefinita"
+  },
+  "Default Bold Text": {
+    "Default Bold Text": "Testo in grassetto predefinito"
+  },
+  "Default Corner Radius": {
+    "Default Corner Radius": "Raggio degli angoli predefinito"
+  },
+  "Default Gradient Angle": {
+    "Default Gradient Angle": "Gradiente dell'angolo predefinito"
+  },
+  "Default Gradient End": {
+    "Default Gradient End": "Fine gradiente predefinita"
+  },
+  "Default Gradient Start": {
+    "Default Gradient Start": "Inizio gradiente predefinito"
+  },
+  "Default Italic Text": {
+    "Default Italic Text": "Testo in corsivo predefinito"
+  },
+  "Default Microphone": {
+    "Default Microphone": "Microfono predefinito"
+  },
+  "Default Output": {
+    "Default Output": "Uscita predefinita"
+  },
+  "Default Padding": {
+    "Default Padding": "Spaziatura predefinita"
+  },
+  "Default Shadow Strength": {
+    "Default Shadow Strength": "Intensità dell'ombra predefinita"
+  },
+  "Default Solid Color": {
+    "Default Solid Color": "Colore pieno predefinito"
+  },
+  "Default Text Background": {
+    "Default Text Background": "Sfondo del testo predefinito"
+  },
+  "Default Text Font Size": {
+    "Default Text Font Size": "Dimensione del font del testo predefinita"
+  },
+  "Default Underline Text": {
+    "Default Underline Text": "Testo sottolineato predefinito"
+  },
+  "Default Watermark": {
+    "Default Watermark": "Filigrana predefinita"
+  },
+  "Delete": {
+    "Delete": "Elimina"
+  },
+  "Dim Background Image": {
+    "Dim Background Image": "Attenua l'immagine di sfondo"
+  },
+  "Dim Intensity": {
+    "Dim Intensity": "Attenua l'intensità"
+  },
+  "Dimming Opacity": {
+    "Dimming Opacity": "Opacità di attenuazione"
+  },
+  "Direct": {
+    "Direct": "Diretto"
+  },
+  "Discard & Close": {
+    "Discard & Close": "Scarta e chiudi"
+  },
+  "Discard & Close (Esc)": {
+    "Discard & Close (Esc)": "Scarta e chiudi (Esc)"
+  },
+  "Done": {
+    "Done": "Fatto"
+  },
+  "Done (Action based on settings)": {
+    "Done (Action based on settings)": "Fatto (azione basata sulle impostazioni)"
+  },
+  "Dotted Line": {
+    "Dotted Line": "Linea punteggiata"
+  },
+  "Dracula": {
+    "Dracula": "Dracula"
+  },
+  "Drag Image": {
+    "Drag Image": "Trascina immagine"
+  },
+  "Draw an outer ring using the stamp number color": {
+    "Draw an outer ring using the stamp number color": "Disegna un anello esterno usando il colore del numero del timbro"
+  },
+  "Drop image onto bar icon to annotate it": {
+    "Drop image onto bar icon to annotate it": "Trascina un'immagine sull'icona della barra per annotarla"
+  },
+  "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": {
+    "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": "Ogni comando accetta un'azione: <b>edit</b> (apre l'editor) o <b>float</b> (finestra sempre in primo piano)."
+  },
+  "Edge Spacing": {
+    "Edge Spacing": "Spaziatura dai bordi"
+  },
+  "Edit": {
+    "Edit": "Modifica"
+  },
+  "Edit Color Palette": {
+    "Edit Color Palette": "Modifica la palette dei colori"
+  },
+  "Edit Image from Clipboard": {
+    "Edit Image from Clipboard": ""
+  },
+  "Edit Text Note": {
+    "Edit Text Note": "Modifica nota di testo"
+  },
+  "Editor": {
+    "Editor": "Editor"
+  },
+  "Editor Aspect Ratio": {
+    "Editor Aspect Ratio": "Proporzioni dell'editor"
+  },
+  "Editor Display Mode": {
+    "Editor Display Mode": "Modalità di visualizzazione dell'editor"
+  },
+  "Editor Display Screen": {
+    "Editor Display Screen": "Schermo di visualizzazione dell'editor"
+  },
+  "Editor Preview Quality": {
+    "Editor Preview Quality": "Qualità dell'anteprima dell'editor"
+  },
+  "Ellipse": {
+    "Ellipse": "Ellisse"
+  },
+  "Ellipse / Circle": {
+    "Ellipse / Circle": "Ellisse / Cerchio"
+  },
+  "Ellipse / Circle (Q)": {
+    "Ellipse / Circle (Q)": "Ellisse / Cerchio (Q)"
+  },
+  "Ellipse Color": {
+    "Ellipse Color": "Colore dell'ellisse"
+  },
+  "Ellipse Thickness": {
+    "Ellipse Thickness": "Spessore dell'ellisse"
+  },
+  "Ellipse, Text, Pixelate, Redact (Q, W, E, R)": {
+    "Ellipse, Text, Pixelate, Redact (Q, W, E, R)": "Ellisse, Testo, Pixela, Oscura (Q, W, E, R)"
+  },
+  "Enable background automatically when opening the editor": {
+    "Enable background automatically when opening the editor": "Attiva automaticamente lo sfondo all'apertura dell'editor"
+  },
+  "Eraser": {
+    "Eraser": "Gomma"
+  },
+  "Everforest": {
+    "Everforest": "Everforest"
+  },
+  "Failed to convert recording to GIF.": {
+    "Failed to convert recording to GIF.": "Impossibile convertire la registrazione in GIF."
+  },
+  "Failed to copy screenshot to clipboard.": {
+    "Failed to copy screenshot to clipboard.": "Impossibile copiare lo screenshot negli appunti."
+  },
+  "Failed to generate blurred background image": {
+    "Failed to generate blurred background image": "Impossibile generare l'immagine di sfondo sfocata"
+  },
+  "Failed to save screenshot": {
+    "Failed to save screenshot": "Impossibile salvare lo screenshot"
+  },
+  "Failed to save screenshot file.": {
+    "Failed to save screenshot file.": "Impossibile salvare il file dello screenshot."
+  },
+  "Flip Horiz": {
+    "Flip Horiz": "Rifletti orizz"
+  },
+  "Flip Vert": {
+    "Flip Vert": "Rifletti vert"
+  },
+  "Float": {
+    "Float": "Fluttuante"
+  },
+  "Float Image": {
+    "Float Image": "Immagine fluttuante"
+  },
+  "Float Window": {
+    "Float Window": "Finestra fluttuante"
+  },
+  "Floating": {
+    "Floating": "Fluttuante"
+  },
+  "Focused Screen": {
+    "Focused Screen": "Schermo attivo"
+  },
+  "Focused Window": {
+    "Focused Window": "Finestra attiva"
+  },
+  "Font Size": {
+    "Font Size": "Dimensione del Font"
+  },
+  "Font family used for number stamp labels": {
+    "Font family used for number stamp labels": "Famiglia di font usata per le etichette numeriche del timbro"
+  },
+  "Force Copy & Save": {
+    "Force Copy & Save": "Forza copia e salvataggio"
+  },
+  "Force Copy to Clipboard": {
+    "Force Copy to Clipboard": "Forza la copia negli appunti"
+  },
+  "Force Save to File": {
+    "Force Save to File": "Forza il salvataggio su file"
+  },
+  "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
+    "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": "oken di formato: %Y (Anno), %y (Anno a 2 cifre), %m (Mese), %d (Giorno), %H (Ora), %M (Minuto), %S (Secondo), {zzz} (Ms)"
+  },
+  "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
+    "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": "Token di formato: {user} (Nome utente), \\n (Nuova riga), %Y (Anno), %y (Anno a 2 cifre), %m (Mese), %d (Giorno), %H (Ora), %M (Minuto), %S (Secondo)"
+  },
+  "Framerate": {
+    "Framerate": "Frequenza fotogrammi"
+  },
+  "Free": {
+    "Free": "Libero"
+  },
+  "Freehand Pen": {
+    "Freehand Pen": "Penna a mano libera"
+  },
+  "Freehand Pen (1)": {
+    "Freehand Pen (1)": "Penna a mano libera (1)"
+  },
+  "From Clipboard": {
+    "From Clipboard": "Dagli appunti"
+  },
+  "From File": {
+    "From File": "Da file"
+  },
+  "Full Screen": {
+    "Full Screen": "Schermo intero"
+  },
+  "Full Screen Target": {
+    "Full Screen Target": "Destinazione dello schermo intero"
+  },
+  "GIF Framerate": {
+    "GIF Framerate": "Frequenza fotogrammi della GIF"
+  },
+  "General Shortcuts": {
+    "General Shortcuts": "Scorciatoie generali"
+  },
+  "Gruvbox Material": {
+    "Gruvbox Material": "Gruvbox Material"
+  },
+  "Help": {
+    "Help": "Guida"
+  },
+  "Hide Control Center": {
+    "Hide Control Center": "Nascondi il centro di controllo"
+  },
+  "Hide Control Center by Default": {
+    "Hide Control Center by Default": "Nascondi il centro di controllo per impostazione predefinita"
+  },
+  "High": {
+    "High": "Alta"
+  },
+  "Highlighter": {
+    "Highlighter": "Evidenziatore"
+  },
+  "Highlighter (S)": {
+    "Highlighter (S)": "Evidenziatore (S)"
+  },
+  "Highlighter Color": {
+    "Highlighter Color": "Colore dell'evidenziatore"
+  },
+  "Highlighter Thickness": {
+    "Highlighter Thickness": "Colore dell'evidenziatore"
+  },
+  "History": {
+    "History": "Cronologia"
+  },
+  "Hover Trigger Delay": {
+    "Hover Trigger Delay": "Ritardo di attivazione al passaggio del mouse"
+  },
+  "IPC Commands": {
+    "IPC Commands": "Comandi IPC"
+  },
+  "Image": {
+    "Image": "Immagine"
+  },
+  "Image + Text": {
+    "Image + Text": "Immagine + Testo"
+  },
+  "Image Background": {
+    "Image Background": "Sfondo immagine"
+  },
+  "Image Error": {
+    "Image Error": "Errore immagine"
+  },
+  "Image Size": {
+    "Image Size": "Dimensione dell'immagine"
+  },
+  "Image copied to clipboard": {
+    "Image copied to clipboard": "Immagine copiata negli appunti"
+  },
+  "Image selected automatically when using Image Background mode": {
+    "Image selected automatically when using Image Background mode": "Immagine selezionata automaticamente quando si usa la modalità Sfondo immagine"
+  },
+  "Include Cursor": {
+    "Include Cursor": "Includi il cursore"
+  },
+  "Initial Width": {
+    "Initial Width": "Larghezza iniziale"
+  },
+  "Initial state for the Control Center toggle.": {
+    "Initial state for the Control Center toggle.": "Stato iniziale dell'interruttore del centro di controllo."
+  },
+  "Input Mode": {
+    "Input Mode": "Modalità di input"
+  },
+  "Insert Image": {
+    "Insert Image": "Inserisci l'immagine"
+  },
+  "Interaction / Result": {
+    "Interaction / Result": "Interazione / Risultato"
+  },
+  "Interactive Region": {
+    "Interactive Region": "Regione interattiva"
+  },
+  "JPEG Quality": {
+    "JPEG Quality": "Qualità JPEG"
+  },
+  "Kanagawa": {
+    "Kanagawa": "Kanagawa"
+  },
+  "Key": {
+    "Key": "Tasto"
+  },
+  "Landscape": {
+    "Landscape": "Orizzontale"
+  },
+  "Last Reg": {
+    "Last Reg": "Ultima reg."
+  },
+  "Last Region": {
+    "Last Region": "Ultima regione"
+  },
+  "Last Selected Region": {
+    "Last Selected Region": "Ultima regione selezionata"
+  },
+  "Left": {
+    "Left": "Sinistra"
+  },
+  "Left Click": {
+    "Left Click": "Clic sinistro"
+  },
+  "Light": {
+    "Light": "Chiaro"
+  },
+  "Line Color": {
+    "Line Color": "Colore della linea"
+  },
+  "Line Thickness": {
+    "Line Thickness": "Spessore della linea"
+  },
+  "Linear Gradient": {
+    "Linear Gradient": "Gradiente lineare"
+  },
+  "Live Preview": {
+    "Live Preview": "Anteprima dal vivo"
+  },
+  "Loading contributors...": {
+    "Loading contributors...": "Caricamento dei contributori..."
+  },
+  "Low": {
+    "Low": "Bassa"
+  },
+  "Magnifier Loupe": {
+    "Magnifier Loupe": "Lente d'ingrandimento"
+  },
+  "Max Height (0 = no limit)": {
+    "Max Height (0 = no limit)": "Altezza massima (0 = nessun limite)"
+  },
+  "Medium": {
+    "Medium": "Media"
+  },
+  "Menu Item Right Click": {
+    "Menu Item Right Click": "Clic destro sulla voce di menu"
+  },
+  "Merging audio tracks...": {
+    "Merging audio tracks...": "Unione delle tracce audio in corso..."
+  },
+  "Microphone Device": {
+    "Microphone Device": "Dispositivo microfono"
+  },
+  "Middle Click": {
+    "Middle Click": "Clic centrale"
+  },
+  "Middle Click Action": {
+    "Middle Click Action": "Azione del clic centrale"
+  },
+  "Minimize Delay": {
+    "Minimize Delay": "Ritardo di riduzione a icona"
+  },
+  "Modal": {
+    "Modal": "Modale"
+  },
+  "More Tools": {
+    "More Tools": "Altri strumenti"
+  },
+  "Niri Binding Example": {
+    "Niri Binding Example": "Esempio di associazione Niri"
+  },
+  "No Background": {
+    "No Background": "Nessuno sfondo"
+  },
+  "No Image Specified": {
+    "No Image Specified": "Nessuna immagine specificata"
+  },
+  "No output available": {
+    "No output available": "Nessuna uscita disponibile"
+  },
+  "No saved images yet": {
+    "No saved images yet": "Nessuna immagine salvata"
+  },
+  "No supported images found": {
+    "No supported images found": "Nessuna immagine supportata trovata"
+  },
+  "None": {
+    "None": "Nessuna"
+  },
+  "None / Disabled": {
+    "None / Disabled": "Nessuno / Disattivato"
+  },
+  "Nord": {
+    "Nord": "Nord"
+  },
+  "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": {
+    "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": "Nota: la modalità dello strumento iniziale sovrascrive lo spessore e il colore predefiniti se lo strumento iniziale corrisponde."
+  },
+  "Notification": {
+    "Notification": "Notifica"
+  },
+  "Notifications": {
+    "Notifications": "Notifiche"
+  },
+  "Number Stamp": {
+    "Number Stamp": "Timbro numerico"
+  },
+  "OCR": {
+    "OCR": "OCR"
+  },
+  "OCR Result": {
+    "OCR Result": "Risultato dell'OCR"
+  },
+  "OCR Text Recognition": {
+    "OCR Text Recognition": "Riconoscimento del testo tramite OCR"
+  },
+  "Opacity": {
+    "Opacity": "Opacità"
+  },
+  "Open": {
+    "Open": "Apri"
+  },
+  "Open Folder": {
+    "Open Folder": "Apri la cartella"
+  },
+  "Open Quick Capture menu (Popout)": {
+    "Open Quick Capture menu (Popout)": "Apri il menu Cattura rapida (Finestra a comparsa)"
+  },
+  "Open Specific Image Path": {
+    "Open Specific Image Path": ""
+  },
+  "Outline Variant": {
+    "Outline Variant": "Variante contorno"
+  },
+  "Output Format": {
+    "Output Format": "Formato di uscita"
+  },
+  "Output format applies only to disk saves. Clipboard copies are always PNG.": {
+    "Output format applies only to disk saves. Clipboard copies are always PNG.": "Il formato di uscita si applica solo ai salvataggi su disco. Le copie negli appunti sono sempre in PNG."
+  },
+  "Outputs": {
+    "Outputs": "Uscite"
+  },
+  "Overlay Opacity": {
+    "Overlay Opacity": "Opacità dell'overlay"
+  },
+  "PAUSED": {
+    "PAUSED": "IN PAUSA"
+  },
+  "PRIMARY": {
+    "PRIMARY": "PRIMARIO"
+  },
+  "Palette Preset": {
+    "Palette Preset": "Preset della palette"
+  },
+  "Pause": {
+    "Pause": "Pausa"
+  },
+  "Pause / Resume": {
+    "Pause / Resume": ""
+  },
+  "Pen Auto-Close": {
+    "Pen Auto-Close": "Chiusura automatica della penna"
+  },
+  "Pen Color": {
+    "Pen Color": "Colore della penna"
+  },
+  "Pen Thickness": {
+    "Pen Thickness": "Spessore della penna"
+  },
+  "Pen, Line, Arrow, Rect": {
+    "Pen, Line, Arrow, Rect": "Penna, Linea, Freccia, Rettangolo"
+  },
+  "Pick Color": {
+    "Pick Color": "Scegli colore"
+  },
+  "Pick a palette preset or customize individual color slots.": {
+    "Pick a palette preset or customize individual color slots.": "Scegli un preset di palette oppure personalizza i singoli slot colore."
+  },
+  "Pixel Intensity": {
+    "Pixel Intensity": "Intensità dei pixel"
+  },
+  "Pixelate": {
+    "Pixelate": "Mosaico"
+  },
+  "Pixelate (E)": {
+    "Pixelate (E)": "Pixela (E)"
+  },
+  "Pixelate Intensity": {
+    "Pixelate Intensity": "Intensità del pixela"
+  },
+  "Popup Input": {
+    "Popup Input": "Input popup"
+  },
+  "Portrait": {
+    "Portrait": "Verticale"
+  },
+  "Position": {
+    "Position": "Posizione"
+  },
+  "Post-Capture Notification": {
+    "Post-Capture Notification": "Notifica dopo la cattura"
+  },
+  "Preset %1": {
+    "Preset %1": "Preset %1"
+  },
+  "Preset 1": {
+    "Preset 1": "Preset 1"
+  },
+  "Preset 2": {
+    "Preset 2": "Preset 2"
+  },
+  "Preset 3": {
+    "Preset 3": "Preset 3"
+  },
+  "Preset 4": {
+    "Preset 4": "Preset 4"
+  },
+  "Preset 5": {
+    "Preset 5": "Preset 5"
+  },
+  "Preset 6": {
+    "Preset 6": "Preset 6"
+  },
+  "Preset 7": {
+    "Preset 7": "Preset 7"
+  },
+  "Preset 8": {
+    "Preset 8": "Preset 8"
+  },
+  "Preset Color": {
+    "Preset Color": "Colore del preset"
+  },
+  "Preset Thickness": {
+    "Preset Thickness": "Spessore del preset"
+  },
+  "Preset Tool": {
+    "Preset Tool": "Strumento preset"
+  },
+  "Preview": {
+    "Preview": "Anteprima"
+  },
+  "Primary": {
+    "Primary": "Primario"
+  },
+  "Primary Screen": {
+    "Primary Screen": "Schermo primario"
+  },
+  "QR Result": {
+    "QR Result": "Risultato QR"
+  },
+  "Quick Capture": {
+    "Quick Capture": "Cattura rapida"
+  },
+  "Quick Capture Error": {
+    "Quick Capture Error": "Errore cattura rapida"
+  },
+  "RECORDING": {
+    "RECORDING": "REGISTRAZIONE"
+  },
+  "Radial Gradient": {
+    "Radial Gradient": "Gradiente radiale"
+  },
+  "Radial Menu": {
+    "Radial Menu": "Menu radiale"
+  },
+  "Radial Menu Opacity": {
+    "Radial Menu Opacity": "Opacità del menu radiale"
+  },
+  "Radial Menu Settings": {
+    "Radial Menu Settings": "Impostazioni delmenu radiale"
+  },
+  "Radial Preset": {
+    "Radial Preset": "Preset del menu radiale"
+  },
+  "Ratio": {
+    "Ratio": "Preset radiale"
+  },
+  "Ready": {
+    "Ready": "Pronto"
+  },
+  "Recent Edits": {
+    "Recent Edits": "Modifiche recenti"
+  },
+  "Record Microphone": {
+    "Record Microphone": "Registra il microfono"
+  },
+  "Record Mouse Cursor": {
+    "Record Mouse Cursor": "Registra il cursore del mouse"
+  },
+  "Record System Audio": {
+    "Record System Audio": "Registra l'audio di sistema"
+  },
+  "Recording": {
+    "Recording": "Registrazione"
+  },
+  "Recording Folder": {
+    "Recording Folder": "Cartella delle registrazioni"
+  },
+  "Recording ended with error code %1.": {
+    "Recording ended with error code %1.": "La registrazione è terminata con codice di errore %1."
+  },
+  "Recording...": {
+    "Recording...": "Registrazione in corso..."
+  },
+  "Recordings Directory": {
+    "Recordings Directory": "Cartella delle registrazioni"
+  },
+  "Rectangle": {
+    "Rectangle": "Rettangolo"
+  },
+  "Rectangle Color": {
+    "Rectangle Color": "Colore del rettangolo"
+  },
+  "Rectangle Outline": {
+    "Rectangle Outline": "Contorno del rettangolo"
+  },
+  "Rectangle Outline (4)": {
+    "Rectangle Outline (4)": "Contorno del rettangolo (4)"
+  },
+  "Rectangle Thickness": {
+    "Rectangle Thickness": "Spessore del rettangolo"
+  },
+  "Redact": {
+    "Redact": "Oscura"
+  },
+  "Redact (R)": {
+    "Redact (R)": "Oscura (R)"
+  },
+  "Redact Thickness": {
+    "Redact Thickness": "Spessore dell'oscuramento"
+  },
+  "Redo (Ctrl+Y / Ctrl+Shift+Z)": {
+    "Redo (Ctrl+Y / Ctrl+Shift+Z)": "Ripeti (Ctrl+Y / Ctrl+Maiusc+Z)"
+  },
+  "Redo last undone stroke": {
+    "Redo last undone stroke": "Ripeti l'ultimo tratto annullato"
+  },
+  "Refresh": {
+    "Refresh": "Aggiorna"
+  },
+  "Region": {
+    "Region": "Regione"
+  },
+  "Reset": {
+    "Reset": "Reimposta"
+  },
+  "Reset Last Region": {
+    "Reset Last Region": "Reimposta l'ultima regione"
+  },
+  "Resume": {
+    "Resume": "Riprendi"
+  },
+  "Right": {
+    "Right": "Destra"
+  },
+  "Right Click": {
+    "Right Click": "Clic destro"
+  },
+  "Right Click Action": {
+    "Right Click Action": "Azione col clic destro"
+  },
+  "Rosé Pine": {
+    "Rosé Pine": "Rosé Pine"
+  },
+  "Rotate L": {
+    "Rotate L": "Ruota a sinistra"
+  },
+  "Rotate R": {
+    "Rotate R": "Ruota a destra"
+  },
+  "Round Highlighter Tips": {
+    "Round Highlighter Tips": "Punte dell'evidenziatore arrotondate"
+  },
+  "Round Rectangle Corners": {
+    "Round Rectangle Corners": "Arrotonda gli angoli del rettangolo"
+  },
+  "Rounded Rectangle": {
+    "Rounded Rectangle": "Rettangolo arrotondato"
+  },
+  "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": {
+    "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": "Salva con nome (Ctrl+Maiusc+S)"
+  },
+  "Save Directory": {
+    "Save Directory": "Cartella di salvataggio"
+  },
+  "Save Filename Pattern": {
+    "Save Filename Pattern": "Modello nome file di salvataggio"
+  },
+  "Save Screenshot As": {
+    "Save Screenshot As": "Salva screenshot con nome"
+  },
+  "Saved %1 (%2)": {
+    "Saved %1 (%2)": "Salvato %1 (%2)"
+  },
+  "Saving": {
+    "Saving": "Salvataggio in corso"
+  },
+  "Scale Editor to Screenshot Size": {
+    "Scale Editor to Screenshot Size": "Adatta l'editor alla dimensione dello screenshot"
+  },
+  "Scan QR": {
+    "Scan QR": "Scansiona QR"
+  },
+  "Screen": {
+    "Screen": "Schermo"
+  },
+  "Screen Recorder": {
+    "Screen Recorder": "Registratore schermo"
+  },
+  "Screen Recording (%1)": {
+    "Screen Recording (%1)": ""
+  },
+  "Screen Recording Error": {
+    "Screen Recording Error": "Errore registrazione dello schermo"
+  },
+  "Screen Recording Saved": {
+    "Screen Recording Saved": "Registrazione schermo salvata"
+  },
+  "Screen recording timed out or was cancelled.": {
+    "Screen recording timed out or was cancelled.": "La registrazione dello schermo è scaduta o è stata annullata."
+  },
+  "Screen: %1 (%2x%3)": {
+    "Screen: %1 (%2x%3)": "Schermo: %1 (%2x%3)"
+  },
+  "Screenshot (%1) — %2": {
+    "Screenshot (%1) — %2": ""
+  },
+  "Screenshot Copied": {
+    "Screenshot Copied": "Screenshot copiato"
+  },
+  "Screenshot Folder": {
+    "Screenshot Folder": "Cartella degli screenshot"
+  },
+  "Screenshot Saved": {
+    "Screenshot Saved": "Screenshot salvato"
+  },
+  "Screenshot copied anonymously with randomized name and stripped metadata.": {
+    "Screenshot copied anonymously with randomized name and stripped metadata.": "Screenshot copiato in modo anonimo con nome casuale e metadati rimossi."
+  },
+  "Screenshot copied to clipboard and saved to %1": {
+    "Screenshot copied to clipboard and saved to %1": "Screenshot copiato negli appunti e salvato in %1"
+  },
+  "Screenshot copied to clipboard but failed to save file: %1": {
+    "Screenshot copied to clipboard but failed to save file: %1": "Screenshot copiato negli appunti ma impossibile salvare il file: %1"
+  },
+  "Screenshot copied to clipboard.": {
+    "Screenshot copied to clipboard.": "Screenshot copiato negli appunti."
+  },
+  "Screenshot copied with randomized name.": {
+    "Screenshot copied with randomized name.": "Screenshot copiato con nome casuale."
+  },
+  "Screenshot failed (mode: %1).": {
+    "Screenshot failed (mode: %1).": "Screenshot non riuscito (modalità: %1)."
+  },
+  "Screenshot saved": {
+    "Screenshot saved": "Screenshot salvato"
+  },
+  "Screenshot saved to %1": {
+    "Screenshot saved to %1": "Screenshot salvato in %1"
+  },
+  "Screenshot saved to %1/%2": {
+    "Screenshot saved to %1/%2": "Screenshot salvato in %1/%2"
+  },
+  "Scroll": {
+    "Scroll": "Scorrimento"
+  },
+  "Scroll Interval": {
+    "Scroll Interval": "Intervallo di scorrimento"
+  },
+  "Scroll capture: select a region, scroll content, then press Enter to finish.": {
+    "Scroll capture: select a region, scroll content, then press Enter to finish.": "Cattura a scorrimento: seleziona una regione, scorri il contenuto, poi premi Invio per terminare."
+  },
+  "Scrolling": {
+    "Scrolling": "Scorrimento"
+  },
+  "Scrolling Capture": {
+    "Scrolling Capture": "Cattura a scorrimento"
+  },
+  "Select": {
+    "Select": "Seleziona"
+  },
+  "Select / Move stroke": {
+    "Select / Move stroke": "Seleziona / Sposta tratto"
+  },
+  "Select Color Slots 1 - 4": {
+    "Select Color Slots 1 - 4": "Seleziona slot colore 1 - 4"
+  },
+  "Select Color Slots 5 - 8 (Q, W, E, R)": {
+    "Select Color Slots 5 - 8 (Q, W, E, R)": "Seleziona slot colore 5 - 8 (Q, W, E, R)"
+  },
+  "Select Directory": {
+    "Select Directory": "Seleziona cartella"
+  },
+  "Select Image File": {
+    "Select Image File": ""
+  },
+  "Select Image to Annotate": {
+    "Select Image to Annotate": "Seleziona immagine da annotare"
+  },
+  "Selected Tool / Action": {
+    "Selected Tool / Action": "Strumento / Azione selezionati"
+  },
+  "Settings": {
+    "Settings": "Impostazioni"
+  },
+  "Shapes": {
+    "Shapes": "Forme"
+  },
+  "Shortcut Action": {
+    "Shortcut Action": "Azione della scorciatoia"
+  },
+  "Shortcuts": {
+    "Shortcuts": "Scorciatoie"
+  },
+  "Show Control Center": {
+    "Show Control Center": "Mostra il centro di controllo"
+  },
+  "Show Keyboard Shortcut Hints": {
+    "Show Keyboard Shortcut Hints": "Mostra suggerimenti per le scorciatoie da tastiera"
+  },
+  "Show Pill Border": {
+    "Show Pill Border": "Mostra il bordo della pillola"
+  },
+  "Show Recent Edits History": {
+    "Show Recent Edits History": "Mostra cronologia delle modifiche recenti"
+  },
+  "Show Region Border": {
+    "Show Region Border": "Mostra il bordo della regione"
+  },
+  "Show Screenshot Border": {
+    "Show Screenshot Border": "Mostra il bordo dello screenshot"
+  },
+  "Show Toolbar": {
+    "Show Toolbar": "Mostra la barra degli strumenti"
+  },
+  "Show Toolbar Border": {
+    "Show Toolbar Border": "Mostra il bordo della barra degli strumenti"
+  },
+  "Show only the image on a transparent background": {
+    "Show only the image on a transparent background": "Mostra solo l'immagine su sfondo trasparente"
+  },
+  "Skip Confirmation": {
+    "Skip Confirmation": "Salta conferma"
+  },
+  "Slot 1": {
+    "Slot 1": "Slot 1"
+  },
+  "Slot 2": {
+    "Slot 2": "Slot 2"
+  },
+  "Slot 3": {
+    "Slot 3": "Slot 3"
+  },
+  "Slot 4": {
+    "Slot 4": "Slot 4"
+  },
+  "Slot 5": {
+    "Slot 5": "Slot 5"
+  },
+  "Slot 6": {
+    "Slot 6": "Slot 6"
+  },
+  "Slot 7": {
+    "Slot 7": "Slot 7"
+  },
+  "Slot 8": {
+    "Slot 8": "Slot 8"
+  },
+  "Soften image details so screenshot content stands out": {
+    "Soften image details so screenshot content stands out": "Attenua i dettagli dell'immagine per mettere in risalto il contenuto dello screenshot"
+  },
+  "Solid Color": {
+    "Solid Color": "Colore pieno"
+  },
+  "Solid Fill": {
+    "Solid Fill": "Riempimento pieno"
+  },
+  "Solid Line": {
+    "Solid Line": "Linea piena"
+  },
+  "Spawn Position": {
+    "Spawn Position": "Posizione di apertura"
+  },
+  "Specific Output": {
+    "Specific Output": "Uscita specifica"
+  },
+  "Spotlight": {
+    "Spotlight": "Spotlight"
+  },
+  "Spotlight (D)": {
+    "Spotlight (D)": "Spotlight (D)"
+  },
+  "Spotlight Opacity": {
+    "Spotlight Opacity": "Opacità di spotlight"
+  },
+  "Stamp (A)": {
+    "Stamp (A)": "Timbro (A)"
+  },
+  "Stamp Color": {
+    "Stamp Color": "Colore del timbro"
+  },
+  "Stamp Contrast Ring": {
+    "Stamp Contrast Ring": "Anello di contrasto del timbro"
+  },
+  "Stamp Number Font": {
+    "Stamp Number Font": "Font del numero del timbro"
+  },
+  "Stamp Size": {
+    "Stamp Size": "Dimensione del timbro"
+  },
+  "Stamp, Highlighter, Spotlight (A, S, D)": {
+    "Stamp, Highlighter, Spotlight (A, S, D)": "Timbro, Evidenziatore, Riflettore (A, S, D)"
+  },
+  "Starting Preset": {
+    "Starting Preset": "Preset iniziale"
+  },
+  "Starting Tool": {
+    "Starting Tool": "Strumento iniziale"
+  },
+  "Starting Tool Mode": {
+    "Starting Tool Mode": "Modalità dello strumento iniziale"
+  },
+  "Stop & Save": {
+    "Stop & Save": "Ferma e salva"
+  },
+  "Straight Line": {
+    "Straight Line": "Linea retta"
+  },
+  "Straight Line (2)": {
+    "Straight Line (2)": "Linea retta (2)"
+  },
+  "Surface Container Highest": {
+    "Surface Container Highest": "Contenitore superficie più alto"
+  },
+  "Switch to Select Tool": {
+    "Switch to Select Tool": "Passa allo strumento di selezione"
+  },
+  "Switch to your custom preset": {
+    "Switch to your custom preset": "Passa al tuo preset personalizzato"
+  },
+  "Synthwave Electric": {
+    "Synthwave Electric": "Synthwave Electric"
+  },
+  "System Audio Device": {
+    "System Audio Device": "Dispositivo audio di sistema"
+  },
+  "System Default": {
+    "System Default": "Predefinito di sistema"
+  },
+  "Target Output Name": {
+    "Target Output Name": "Nome uscita di destinazione"
+  },
+  "Text": {
+    "Text": "Testo"
+  },
+  "Text (W)": {
+    "Text (W)": "Testo (W)"
+  },
+  "Text Background Roundness": {
+    "Text Background Roundness": "Arrotondamento dello sfondo del testo"
+  },
+  "Text Color": {
+    "Text Color": "Colore del testo"
+  },
+  "Text Font": {
+    "Text Font": "Font del testo"
+  },
+  "Text Note": {
+    "Text Note": "Nota di testo"
+  },
+  "Text Size": {
+    "Text Size": "Dimensione del testo"
+  },
+  "Theme Primary Color": {
+    "Theme Primary Color": "Colore primario del tema"
+  },
+  "Thickness": {
+    "Thickness": "Spessore"
+  },
+  "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": {
+    "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": "Questo preset di palette è di sola lettura. Seleziona una delle opzioni seguenti per passare alla palette personalizzata e modificare i colori:\nToggle Hide/Show Annotations → Attiva/disattiva nascondi/mostra annotazioni"
+  },
+  "Toast": {
+    "Toast": "Toast"
+  },
+  "Toggle Hide/Show Annotations": {
+    "Toggle Hide/Show Annotations": "Attiva/disattiva nascondi/mostra annotazioni"
+  },
+  "Toggle Start / Stop": {
+    "Toggle Start / Stop": ""
+  },
+  "Toggle between 2 latest presets": {
+    "Toggle between 2 latest presets": "Alterna tra gli ultimi 2 preset"
+  },
+  "Tokyo Night": {
+    "Tokyo Night": "Tokyo Night"
+  },
+  "Tool Defaults": {
+    "Tool Defaults": "Impostazioni predefinite dello strumento"
+  },
+  "Toolbar": {
+    "Toolbar": "Barra degli strumenti"
+  },
+  "Toolbar Palette": {
+    "Toolbar Palette": "Palette della barra degli strumenti"
+  },
+  "Toolbar Position": {
+    "Toolbar Position": "Posizione della barra degli strumenti"
+  },
+  "Top": {
+    "Top": "In alto"
+  },
+  "Top Center": {
+    "Top Center": "In alto al centro"
+  },
+  "Top Left": {
+    "Top Left": "In alto a sinistra"
+  },
+  "Top Right": {
+    "Top Right": "In alto a destra"
+  },
+  "Transparent": {
+    "Transparent": "Trasparente"
+  },
+  "Transparent Background": {
+    "Transparent Background": "Sfondo trasparente"
+  },
+  "Trigger Middle-Click Action (Default: Interactive Region)": {
+    "Trigger Middle-Click Action (Default: Interactive Region)": "Attiva azione clic centrale (predefinito: Regione interattiva)"
+  },
+  "Trigger Right-Click Action (Default: Clipboard Annotate)": {
+    "Trigger Right-Click Action (Default: Clipboard Annotate)": "Attiva azione clic destro (predefinito: Annota appunti)"
+  },
+  "Trigger on Hover": {
+    "Trigger on Hover": "Attiva al passaggio del mouse"
+  },
+  "Type note...": {
+    "Type note...": "Scrivi una nota..."
+  },
+  "Undo (Ctrl+Z)": {
+    "Undo (Ctrl+Z)": "Annulla (Ctrl+Z)"
+  },
+  "Undo last stroke": {
+    "Undo last stroke": "Annulla l'ultimo tratto"
+  },
+  "Usage Guide": {
+    "Usage Guide": "Guida all'uso"
+  },
+  "Use Existing Custom": {
+    "Use Existing Custom": "Usa personalizzato esistente"
+  },
+  "Use Floating Editor": {
+    "Use Floating Editor": "Usa l'editor fluttuante"
+  },
+  "Use Modal Editor": {
+    "Use Modal Editor": "Usa l'editor a finestra modale"
+  },
+  "Very High": {
+    "Very High": "Molto alta"
+  },
+  "Video Codec": {
+    "Video Codec": "Codec video"
+  },
+  "Video Quality": {
+    "Video Quality": "Qualità dei video"
+  },
+  "Video Settings": {
+    "Video Settings": "Impostazioni dei video"
+  },
+  "Watermark": {
+    "Watermark": "Filigrana"
+  },
+  "Watermark Image": {
+    "Watermark Image": "Immagine di filigrana"
+  },
+  "Watermark Text": {
+    "Watermark Text": "Testo della filigrana"
+  },
+  "Watermark Type": {
+    "Watermark Type": "Tipo di filigrana"
+  },
+  "WebP Quality": {
+    "WebP Quality": "Qualità WebP"
+  },
+  "When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.": {
+    "When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.": "Se attivato, l'editor si riduce per adattarsi alla regione catturata invece di riempire il 90% dello schermo."
+  },
+  "Window": {
+    "Window": "Finestra"
+  },
+  "Window / Portal": {
+    "Window / Portal": ""
+  },
+  "Zoom Level": {
+    "Zoom Level": "Livello di zoom"
+  },
+  "gpu-screen-recorder is not installed. Please install it first.": {
+    "gpu-screen-recorder is not installed. Please install it first.": "gpu-screen-recorder non è installato. Installalo prima di continuare."
+  }
+}

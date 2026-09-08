@@ -12,22 +12,22 @@
     "AUTO": ""
   },
   "Action": {
-    "Action": "Acción"
+    "Action": "Дія"
   },
   "Action when Enter": {
-    "Action when Enter": "Acción al entrar"
+    "Action when Enter": ""
   },
   "Active Window": {
     "Active Window": ""
   },
   "Adaptive": {
-    "Adaptive": "Adaptativo"
+    "Adaptive": "Адаптивний"
   },
   "Adaptive (DMS Theme)": {
     "Adaptive (DMS Theme)": ""
   },
   "Add": {
-    "Add": "Añadir"
+    "Add": "Додати"
   },
   "Add Text Note": {
     "Add Text Note": ""
@@ -57,16 +57,16 @@
     "Arrow Thickness": ""
   },
   "Arrow Vector": {
-    "Arrow Vector": "Vector de flecha"
+    "Arrow Vector": ""
   },
   "Audio & Overlay": {
     "Audio & Overlay": ""
   },
   "Audio Codec": {
-    "Audio Codec": "Códec de Audio"
+    "Audio Codec": "Аудіокодек"
   },
   "Auto": {
-    "Auto": "Auto"
+    "Auto": "Авто"
   },
   "Auto Balance": {
     "Auto Balance": ""
@@ -99,7 +99,7 @@
     "Back to Annotation (B)": ""
   },
   "Background": {
-    "Background": "Fondo"
+    "Background": "Фон"
   },
   "Background (B)": {
     "Background (B)": ""
@@ -117,7 +117,7 @@
     "Background Presets": ""
   },
   "Balanced": {
-    "Balanced": "Equilibrado"
+    "Balanced": "Збалансований"
   },
   "Bar Interactions": {
     "Bar Interactions": ""
@@ -129,25 +129,25 @@
     "Blur Background Image": ""
   },
   "Border Color": {
-    "Border Color": "Color de borde"
+    "Border Color": "Колір контуру"
   },
   "Border Width": {
-    "Border Width": "Ancho del borde"
+    "Border Width": "Ширина контуру"
   },
   "Both": {
-    "Both": ""
+    "Both": "Обидва"
   },
   "Bottom": {
-    "Bottom": "Abajo"
+    "Bottom": "Знизу"
   },
   "Bottom Center": {
-    "Bottom Center": "Centro inferior"
+    "Bottom Center": "Нижній центр"
   },
   "Bottom Left": {
-    "Bottom Left": "Abajo a la izquierda"
+    "Bottom Left": "Нижній лівий"
   },
   "Bottom Right": {
-    "Bottom Right": "Abajo a la derecha"
+    "Bottom Right": "Нижній правий"
   },
   "CUST": {
     "CUST": ""
@@ -189,7 +189,7 @@
     "Center Right": ""
   },
   "Choose Color": {
-    "Choose Color": "Elegir color"
+    "Choose Color": "Вибрати колір"
   },
   "Choose notifications shown after copy or save.": {
     "Choose notifications shown after copy or save.": ""
@@ -213,10 +213,10 @@
     "Clear saved region selection before each capture": ""
   },
   "Clipboard": {
-    "Clipboard": "Portapapeles"
+    "Clipboard": "Буфер обміну"
   },
   "Close": {
-    "Close": "Cerrar"
+    "Close": "Закрити"
   },
   "Close Annotator": {
     "Close Annotator": ""
@@ -261,13 +261,13 @@
     "Copied Anonymously": ""
   },
   "Copied to clipboard": {
-    "Copied to clipboard": "Copiado al portapapeles"
+    "Copied to clipboard": "Скопійовано до буфера обміну"
   },
   "Copied:": {
     "Copied:": ""
   },
   "Copy": {
-    "Copy": "Copiar"
+    "Copy": "Копіювати"
   },
   "Copy & Save": {
     "Copy & Save": ""
@@ -288,13 +288,13 @@
     "Copy vector / Paste / Duplicate": ""
   },
   "Crop / Resize": {
-    "Crop / Resize": "Recortar / Cambiar tamaño"
+    "Crop / Resize": ""
   },
   "Crop / Resize Area": {
     "Crop / Resize Area": ""
   },
   "Custom": {
-    "Custom": "Personalizado"
+    "Custom": "Власний"
   },
   "Custom Colors": {
     "Custom Colors": ""
@@ -372,7 +372,7 @@
     "Default Watermark": ""
   },
   "Delete": {
-    "Delete": "Eliminar"
+    "Delete": "Видалити"
   },
   "Dim Background Image": {
     "Dim Background Image": ""
@@ -417,10 +417,10 @@
     "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": ""
   },
   "Edge Spacing": {
-    "Edge Spacing": "Espacio entre bordes"
+    "Edge Spacing": "Відступи від країв"
   },
   "Edit": {
-    "Edit": "Editar"
+    "Edit": "Редагувати"
   },
   "Edit Color Palette": {
     "Edit Color Palette": ""
@@ -450,7 +450,7 @@
     "Ellipse": ""
   },
   "Ellipse / Circle": {
-    "Ellipse / Circle": "Elipse / Círculo"
+    "Ellipse / Circle": ""
   },
   "Ellipse / Circle (Q)": {
     "Ellipse / Circle (Q)": ""
@@ -468,7 +468,7 @@
     "Enable background automatically when opening the editor": ""
   },
   "Eraser": {
-    "Eraser": "Borrador"
+    "Eraser": ""
   },
   "Everforest": {
     "Everforest": ""
@@ -495,7 +495,7 @@
     "Flip Vert": ""
   },
   "Float": {
-    "Float": "Flotante"
+    "Float": "Плавання"
   },
   "Float Image": {
     "Float Image": ""
@@ -504,16 +504,16 @@
     "Float Window": ""
   },
   "Floating": {
-    "Floating": "Flotante"
+    "Floating": "Плавучий"
   },
   "Focused Screen": {
     "Focused Screen": ""
   },
   "Focused Window": {
-    "Focused Window": "Ventana enfocada"
+    "Focused Window": "Активне вікно"
   },
   "Font Size": {
-    "Font Size": "Tamaño de fuente"
+    "Font Size": "Розмір шрифту"
   },
   "Font family used for number stamp labels": {
     "Font family used for number stamp labels": ""
@@ -540,7 +540,7 @@
     "Free": ""
   },
   "Freehand Pen": {
-    "Freehand Pen": "Pluma a mano alzada"
+    "Freehand Pen": ""
   },
   "Freehand Pen (1)": {
     "Freehand Pen (1)": ""
@@ -552,7 +552,7 @@
     "From File": ""
   },
   "Full Screen": {
-    "Full Screen": "Pantalla completa"
+    "Full Screen": ""
   },
   "Full Screen Target": {
     "Full Screen Target": ""
@@ -567,7 +567,7 @@
     "Gruvbox Material": ""
   },
   "Help": {
-    "Help": "Ayuda"
+    "Help": "Допомога"
   },
   "Hide Control Center": {
     "Hide Control Center": ""
@@ -576,10 +576,10 @@
     "Hide Control Center by Default": ""
   },
   "High": {
-    "High": "Alto"
+    "High": "Високий"
   },
   "Highlighter": {
-    "Highlighter": "resaltador"
+    "Highlighter": ""
   },
   "Highlighter (S)": {
     "Highlighter (S)": ""
@@ -591,7 +591,7 @@
     "Highlighter Thickness": ""
   },
   "History": {
-    "History": "Historial"
+    "History": "Історія"
   },
   "Hover Trigger Delay": {
     "Hover Trigger Delay": ""
@@ -600,7 +600,7 @@
     "IPC Commands": ""
   },
   "Image": {
-    "Image": "Imagen"
+    "Image": "Зображення"
   },
   "Image + Text": {
     "Image + Text": ""
@@ -615,7 +615,7 @@
     "Image Size": ""
   },
   "Image copied to clipboard": {
-    "Image copied to clipboard": "Imagen copiada al portapapeles"
+    "Image copied to clipboard": "Зображення скопійовано до буфера обміну"
   },
   "Image selected automatically when using Image Background mode": {
     "Image selected automatically when using Image Background mode": ""
@@ -648,7 +648,7 @@
     "Kanagawa": ""
   },
   "Key": {
-    "Key": "Tecla"
+    "Key": "Клавіша"
   },
   "Landscape": {
     "Landscape": ""
@@ -663,13 +663,13 @@
     "Last Selected Region": ""
   },
   "Left": {
-    "Left": "Izquierda"
+    "Left": "Зліва"
   },
   "Left Click": {
     "Left Click": ""
   },
   "Light": {
-    "Light": "Claro"
+    "Light": "Світлий"
   },
   "Line Color": {
     "Line Color": ""
@@ -687,7 +687,7 @@
     "Loading contributors...": ""
   },
   "Low": {
-    "Low": "Bajo"
+    "Low": "Низький"
   },
   "Magnifier Loupe": {
     "Magnifier Loupe": ""
@@ -696,7 +696,7 @@
     "Max Height (0 = no limit)": ""
   },
   "Medium": {
-    "Medium": "Medio"
+    "Medium": "Середній"
   },
   "Menu Item Right Click": {
     "Menu Item Right Click": ""
@@ -726,7 +726,7 @@
     "Niri Binding Example": ""
   },
   "No Background": {
-    "No Background": "Sin fondo"
+    "No Background": "Без фону"
   },
   "No Image Specified": {
     "No Image Specified": ""
@@ -741,10 +741,10 @@
     "No supported images found": ""
   },
   "None": {
-    "None": "Ninguna"
+    "None": "Немає"
   },
   "None / Disabled": {
-    "None / Disabled": "Ninguno / Desactivado"
+    "None / Disabled": ""
   },
   "Nord": {
     "Nord": ""
@@ -753,13 +753,13 @@
     "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": ""
   },
   "Notification": {
-    "Notification": "Notificación"
+    "Notification": "Сповіщення"
   },
   "Notifications": {
-    "Notifications": "Notificaciones"
+    "Notifications": "Сповіщення"
   },
   "Number Stamp": {
-    "Number Stamp": "Sello numérico"
+    "Number Stamp": ""
   },
   "OCR": {
     "OCR": ""
@@ -771,10 +771,10 @@
     "OCR Text Recognition": ""
   },
   "Opacity": {
-    "Opacity": "Opacidad"
+    "Opacity": "Непрозорість"
   },
   "Open": {
-    "Open": "Abrir"
+    "Open": "Відкрити"
   },
   "Open Folder": {
     "Open Folder": ""
@@ -810,7 +810,7 @@
     "Palette Preset": ""
   },
   "Pause": {
-    "Pause": "Pausar"
+    "Pause": "Призупинити"
   },
   "Pause / Resume": {
     "Pause / Resume": ""
@@ -837,7 +837,7 @@
     "Pixel Intensity": ""
   },
   "Pixelate": {
-    "Pixelate": "Pixelar"
+    "Pixelate": "Пікселізація"
   },
   "Pixelate (E)": {
     "Pixelate (E)": ""
@@ -852,7 +852,7 @@
     "Portrait": ""
   },
   "Position": {
-    "Position": "Posición"
+    "Position": "Позиція"
   },
   "Post-Capture Notification": {
     "Post-Capture Notification": ""
@@ -894,10 +894,10 @@
     "Preset Tool": ""
   },
   "Preview": {
-    "Preview": "Vista previa"
+    "Preview": "Попередній перегляд"
   },
   "Primary": {
-    "Primary": "Primario"
+    "Primary": "Основний"
   },
   "Primary Screen": {
     "Primary Screen": ""
@@ -933,7 +933,7 @@
     "Ratio": ""
   },
   "Ready": {
-    "Ready": "Listo"
+    "Ready": "Готово"
   },
   "Recent Edits": {
     "Recent Edits": ""
@@ -969,7 +969,7 @@
     "Rectangle Color": ""
   },
   "Rectangle Outline": {
-    "Rectangle Outline": "Contorno del rectángulo"
+    "Rectangle Outline": ""
   },
   "Rectangle Outline (4)": {
     "Rectangle Outline (4)": ""
@@ -993,22 +993,22 @@
     "Redo last undone stroke": ""
   },
   "Refresh": {
-    "Refresh": "Recargar"
+    "Refresh": "Оновити"
   },
   "Region": {
     "Region": ""
   },
   "Reset": {
-    "Reset": "Reiniciar"
+    "Reset": "Скинути"
   },
   "Reset Last Region": {
     "Reset Last Region": ""
   },
   "Resume": {
-    "Resume": "Continuar"
+    "Resume": "Відновити"
   },
   "Right": {
-    "Right": "Derecha"
+    "Right": "Праворуч"
   },
   "Right Click": {
     "Right Click": ""
@@ -1038,7 +1038,7 @@
     "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": ""
   },
   "Save Directory": {
-    "Save Directory": "Guardar directorio"
+    "Save Directory": ""
   },
   "Save Filename Pattern": {
     "Save Filename Pattern": ""
@@ -1119,7 +1119,7 @@
     "Screenshot saved to %1/%2": ""
   },
   "Scroll": {
-    "Scroll": "Desplazamiento"
+    "Scroll": "Прокрутка"
   },
   "Scroll Interval": {
     "Scroll Interval": ""
@@ -1128,13 +1128,13 @@
     "Scroll capture: select a region, scroll content, then press Enter to finish.": ""
   },
   "Scrolling": {
-    "Scrolling": "Desplazamiento"
+    "Scrolling": "Прокручування"
   },
   "Scrolling Capture": {
     "Scrolling Capture": ""
   },
   "Select": {
-    "Select": "Seleccionar"
+    "Select": "Обрати"
   },
   "Select / Move stroke": {
     "Select / Move stroke": ""
@@ -1158,7 +1158,7 @@
     "Selected Tool / Action": ""
   },
   "Settings": {
-    "Settings": "Ajustes"
+    "Settings": "Налаштування"
   },
   "Shapes": {
     "Shapes": ""
@@ -1167,7 +1167,7 @@
     "Shortcut Action": ""
   },
   "Shortcuts": {
-    "Shortcuts": "Atajos"
+    "Shortcuts": "Комбінації"
   },
   "Show Control Center": {
     "Show Control Center": ""
@@ -1272,7 +1272,7 @@
     "Starting Preset": ""
   },
   "Starting Tool": {
-    "Starting Tool": "Herramienta de inicio"
+    "Starting Tool": ""
   },
   "Starting Tool Mode": {
     "Starting Tool Mode": ""
@@ -1281,7 +1281,7 @@
     "Stop & Save": ""
   },
   "Straight Line": {
-    "Straight Line": "Línea recta"
+    "Straight Line": ""
   },
   "Straight Line (2)": {
     "Straight Line (2)": ""
@@ -1302,13 +1302,13 @@
     "System Audio Device": ""
   },
   "System Default": {
-    "System Default": "Predeterminado del sistema"
+    "System Default": "Системне значення за замовчуванням"
   },
   "Target Output Name": {
     "Target Output Name": ""
   },
   "Text": {
-    "Text": "Texto"
+    "Text": "Текст"
   },
   "Text (W)": {
     "Text (W)": ""
@@ -1317,13 +1317,13 @@
     "Text Background Roundness": ""
   },
   "Text Color": {
-    "Text Color": "Color de texto"
+    "Text Color": "Колір тексту"
   },
   "Text Font": {
     "Text Font": ""
   },
   "Text Note": {
-    "Text Note": "Nota de texto"
+    "Text Note": ""
   },
   "Text Size": {
     "Text Size": ""
@@ -1332,13 +1332,13 @@
     "Theme Primary Color": ""
   },
   "Thickness": {
-    "Thickness": "Espesor"
+    "Thickness": "Товщина"
   },
   "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": {
     "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": ""
   },
   "Toast": {
-    "Toast": "Emergente"
+    "Toast": "Спливаюче повідомлення"
   },
   "Toggle Hide/Show Annotations": {
     "Toggle Hide/Show Annotations": ""
@@ -1365,16 +1365,16 @@
     "Toolbar Position": ""
   },
   "Top": {
-    "Top": "Arriba"
+    "Top": "Вгорі"
   },
   "Top Center": {
-    "Top Center": "Centro superior"
+    "Top Center": "Згори по центру"
   },
   "Top Left": {
-    "Top Left": "Arriba a la izquierda"
+    "Top Left": "Зверху зліва"
   },
   "Top Right": {
-    "Top Right": "Arriba a la derecha"
+    "Top Right": "Згори справа"
   },
   "Transparent": {
     "Transparent": ""
@@ -1413,7 +1413,7 @@
     "Use Modal Editor": ""
   },
   "Very High": {
-    "Very High": "Muy alto"
+    "Very High": "Дуже високий"
   },
   "Video Codec": {
     "Video Codec": ""
