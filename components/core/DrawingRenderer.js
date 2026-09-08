@@ -1690,12 +1690,21 @@ function drawSelectionOverlay(ctx, options, Theme) {
 
             // Helper: draw a pill (rounded rectangle)
             function drawPill(px, py, pw, ph, pr) {
+                const radius = Math.min(pr !== undefined ? pr : Math.min(pw, ph) / 2, Math.min(pw, ph) / 2);
                 ctx.beginPath();
-                ctx.moveTo(px + pr, py);
-                ctx.lineTo(px + pw - pr, py);
-                ctx.arc(px + pw - pr, py + pr, pr, -Math.PI / 2, Math.PI / 2);
-                ctx.lineTo(px + pr, py + ph);
-                ctx.arc(px + pr, py + pr, pr, Math.PI / 2, -Math.PI / 2);
+                if (radius <= 0) {
+                    ctx.rect(px, py, pw, ph);
+                    return;
+                }
+                ctx.moveTo(px + radius, py);
+                ctx.lineTo(px + pw - radius, py);
+                ctx.arcTo(px + pw, py, px + pw, py + radius, radius);
+                ctx.lineTo(px + pw, py + ph - radius);
+                ctx.arcTo(px + pw, py + ph, px + pw - radius, py + ph, radius);
+                ctx.lineTo(px + radius, py + ph);
+                ctx.arcTo(px, py + ph, px, py + ph - radius, radius);
+                ctx.lineTo(px, py + radius);
+                ctx.arcTo(px, py, px + radius, py, radius);
                 ctx.closePath();
             }
 
