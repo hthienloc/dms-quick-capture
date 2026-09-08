@@ -31,7 +31,7 @@ Item {
         }
         StyledText {
             text: {
-                if (control.backgroundAspectRatio === "auto") return I18n.trFor("quickCapture", "AUTO");
+                if (control.backgroundAspectRatio === "auto") return I18n.trFor("quickCapture", "Auto").toUpperCase();
                 if (control.backgroundAspectRatio === "custom") return control.customAspectRatio.toFixed(2);
                 return control.backgroundAspectRatio;
             }

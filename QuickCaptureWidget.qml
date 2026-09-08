@@ -644,7 +644,7 @@ PluginComponent {
                             }
 
                             StyledText {
-                                text: (root.daemon && root.daemon.recordingController && root.daemon.recordingController.isPaused) ? I18n.trFor("quickCapture", "PAUSED") : I18n.trFor("quickCapture", "RECORDING")
+                                text: ((root.daemon && root.daemon.recordingController && root.daemon.recordingController.isPaused) ? I18n.trFor("quickCapture", "Paused") : I18n.trFor("quickCapture", "Recording")).toUpperCase()
                                 font.pixelSize: Theme.fontSizeSmall
                                 font.weight: Font.Bold
                                 color: (root.daemon && root.daemon.recordingController && root.daemon.recordingController.isPaused) ? Theme.warning : Theme.error

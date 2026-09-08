@@ -685,14 +685,14 @@ Item {
     readonly property real customRatioMin: 0.50
     readonly property real customRatioMax: 2.50
     readonly property var aspectPresets: [
-        { value: "auto", label: I18n.trFor("quickCapture", "AUTO") },
+        { value: "auto", label: I18n.trFor("quickCapture", "Auto").toUpperCase() },
         { value: "1:1", label: "1:1" },
         { value: "16:9", label: "16:9" },
         { value: "9:16", label: "9:16" },
         { value: "4:3", label: "4:3" },
         { value: "3:2", label: "3:2" },
         { value: "21:9", label: "21:9" },
-        { value: "custom", label: I18n.trFor("quickCapture", "CUST") }
+        { value: "custom", label: I18n.trFor("quickCapture", "Custom").toUpperCase() }
     ]
     property bool hasUserCustomizedBackground: false
     property color autoBackgroundGradientStart: Theme.primary

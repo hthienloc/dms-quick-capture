@@ -8,9 +8,6 @@
   "2 Connecting Lines": {
     "2 Connecting Lines": "2 linee di collegamento"
   },
-  "AUTO": {
-    "AUTO": "AUTO"
-  },
   "Action": {
     "Action": "Azione"
   },
@@ -149,9 +146,6 @@
   "Bottom Right": {
     "Bottom Right": "In basso a destra"
   },
-  "CUST": {
-    "CUST": "PERS"
-  },
   "Callout": {
     "Callout": "Richiamo"
   },
@@ -163,6 +157,9 @@
   },
   "Callout, Background (Z, B)": {
     "Callout, Background (Z, B)": "Richiamo, Sfondo (Z, B)"
+  },
+  "Cancel": {
+    "Cancel": ""
   },
   "Capture": {
     "Capture": "Cattura"
@@ -241,9 +238,6 @@
   },
   "Container Format": {
     "Container Format": "Formato del contenitore"
-  },
-  "Contributors": {
-    "Contributors": "Contributori"
   },
   "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": {
     "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": "Controlla il budget di pixel dell'anteprima durante la modifica. Riducilo se noti rallentamenti. Non influisce sulla qualità dell'immagine salvata."
@@ -530,8 +524,8 @@
   "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
     "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": "oken di formato: %Y (Anno), %y (Anno a 2 cifre), %m (Mese), %d (Giorno), %H (Ora), %M (Minuto), %S (Secondo), {zzz} (Ms)"
   },
-  "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
-    "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": "Token di formato: {user} (Nome utente), \\n (Nuova riga), %Y (Anno), %y (Anno a 2 cifre), %m (Mese), %d (Giorno), %H (Ora), %M (Minuto), %S (Secondo)"
+  "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
+    "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
   },
   "Framerate": {
     "Framerate": "Frequenza fotogrammi"
@@ -683,9 +677,6 @@
   "Live Preview": {
     "Live Preview": "Anteprima dal vivo"
   },
-  "Loading contributors...": {
-    "Loading contributors...": "Caricamento dei contributori..."
-  },
   "Low": {
     "Low": "Bassa"
   },
@@ -800,12 +791,6 @@
   "Overlay Opacity": {
     "Overlay Opacity": "Opacità dell'overlay"
   },
-  "PAUSED": {
-    "PAUSED": "IN PAUSA"
-  },
-  "PRIMARY": {
-    "PRIMARY": "PRIMARIO"
-  },
   "Palette Preset": {
     "Palette Preset": "Preset della palette"
   },
@@ -814,6 +799,9 @@
   },
   "Pause / Resume": {
     "Pause / Resume": ""
+  },
+  "Paused": {
+    "Paused": ""
   },
   "Pen Auto-Close": {
     "Pen Auto-Close": "Chiusura automatica della penna"
@@ -910,9 +898,6 @@
   },
   "Quick Capture Error": {
     "Quick Capture Error": "Errore cattura rapida"
-  },
-  "RECORDING": {
-    "RECORDING": "REGISTRAZIONE"
   },
   "Radial Gradient": {
     "Radial Gradient": "Gradiente radiale"
@@ -1034,6 +1019,9 @@
   "Rounded Rectangle": {
     "Rounded Rectangle": "Rettangolo arrotondato"
   },
+  "Save": {
+    "Save": ""
+  },
   "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": {
     "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": "Salva con nome (Ctrl+Maiusc+S)"
   },
@@ -1144,9 +1132,6 @@
   },
   "Select Color Slots 5 - 8 (Q, W, E, R)": {
     "Select Color Slots 5 - 8 (Q, W, E, R)": "Seleziona slot colore 5 - 8 (Q, W, E, R)"
-  },
-  "Select Directory": {
-    "Select Directory": "Seleziona cartella"
   },
   "Select Image File": {
     "Select Image File": ""
@@ -1300,9 +1285,6 @@
   },
   "System Audio Device": {
     "System Audio Device": "Dispositivo audio di sistema"
-  },
-  "System Default": {
-    "System Default": "Predefinito di sistema"
   },
   "Target Output Name": {
     "Target Output Name": "Nome uscita di destinazione"

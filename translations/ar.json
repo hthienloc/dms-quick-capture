@@ -8,9 +8,6 @@
   "2 Connecting Lines": {
     "2 Connecting Lines": "خطا اتصال"
   },
-  "AUTO": {
-    "AUTO": "تلقائي"
-  },
   "Action": {
     "Action": "إجراء"
   },
@@ -149,9 +146,6 @@
   "Bottom Right": {
     "Bottom Right": "أسفل اليمين"
   },
-  "CUST": {
-    "CUST": "مخصص"
-  },
   "Callout": {
     "Callout": "وسيلة إيضاح"
   },
@@ -163,6 +157,9 @@
   },
   "Callout, Background (Z, B)": {
     "Callout, Background (Z, B)": "وسيلة إيضاح، خلفية (Z, B)"
+  },
+  "Cancel": {
+    "Cancel": ""
   },
   "Capture": {
     "Capture": "التقاط"
@@ -241,9 +238,6 @@
   },
   "Container Format": {
     "Container Format": "تنسيق الحاوية"
-  },
-  "Contributors": {
-    "Contributors": "المساهمون"
   },
   "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": {
     "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": "يتحكم في ميزانية بكسل المعاينة أثناء التحرير. قللها إذا واجهت بطئًا. لا يؤثر ذلك على جودة الصورة النهائية المحفوظة."
@@ -530,8 +524,8 @@
   "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
     "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": "رموز التنسيق: %Y (السنة)، %y (السنة برقمين)، %m (الشهر)، %d (اليوم)، %H (الساعة)، %M (الدقيقة)، %S (الثانية)، {zzz} (جزء من الثانية)"
   },
-  "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
-    "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": "رموز التنسيق: {user} (اسم المستخدم)، \\n (سطر جديد)، %Y (السنة)، %y (السنة برقمين)، %m (الشهر)، %d (اليوم)، %H (الساعة)، %M (الدقيقة)، %S (الثانية)"
+  "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
+    "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
   },
   "Framerate": {
     "Framerate": "معدل الإطارات"
@@ -683,9 +677,6 @@
   "Live Preview": {
     "Live Preview": "معاينة مباشرة"
   },
-  "Loading contributors...": {
-    "Loading contributors...": "جاري تحميل المساهمين..."
-  },
   "Low": {
     "Low": "منخفض"
   },
@@ -800,12 +791,6 @@
   "Overlay Opacity": {
     "Overlay Opacity": "عتامة التراكب"
   },
-  "PAUSED": {
-    "PAUSED": "مُتوقف مؤقتاً"
-  },
-  "PRIMARY": {
-    "PRIMARY": "أساسي"
-  },
   "Palette Preset": {
     "Palette Preset": "إعدادات اللوحة المسبقة"
   },
@@ -814,6 +799,9 @@
   },
   "Pause / Resume": {
     "Pause / Resume": ""
+  },
+  "Paused": {
+    "Paused": ""
   },
   "Pen Auto-Close": {
     "Pen Auto-Close": "إغلاق القلم تلقائياً"
@@ -910,9 +898,6 @@
   },
   "Quick Capture Error": {
     "Quick Capture Error": "خطأ في الالتقاط السريع"
-  },
-  "RECORDING": {
-    "RECORDING": "جاري التسجيل"
   },
   "Radial Gradient": {
     "Radial Gradient": "تدرج شعاعي"
@@ -1034,6 +1019,9 @@
   "Rounded Rectangle": {
     "Rounded Rectangle": "مستطيل مستدير الزوايا"
   },
+  "Save": {
+    "Save": ""
+  },
   "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": {
     "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": "حفظ (Ctrl+S) | حفظ باسم (Ctrl+Shift+S)"
   },
@@ -1144,9 +1132,6 @@
   },
   "Select Color Slots 5 - 8 (Q, W, E, R)": {
     "Select Color Slots 5 - 8 (Q, W, E, R)": "تحديد خانات الألوان 5 - 8 (Q, W, E, R)"
-  },
-  "Select Directory": {
-    "Select Directory": "تحديد المجلد"
   },
   "Select Image File": {
     "Select Image File": ""
@@ -1300,9 +1285,6 @@
   },
   "System Audio Device": {
     "System Audio Device": "جهاز صوت النظام"
-  },
-  "System Default": {
-    "System Default": "افتراضي النظام"
   },
   "Target Output Name": {
     "Target Output Name": "اسم المخرج المستهدف"

@@ -60,6 +60,9 @@ PopoverSurface {
 
                         StyledText {
                             text: modelData.label
+                            width: parent.width - 4
+                            horizontalAlignment: Text.AlignHCenter
+                            elide: Text.ElideRight
                             font.pixelSize: Constants.presetFontSize
                             font.weight: popoverRoot.backgroundAspectRatio === modelData.value ? Font.DemiBold : Font.Normal
                             color: popoverRoot.backgroundAspectRatio === modelData.value ? Theme.onPrimary : Theme.surfaceVariantText

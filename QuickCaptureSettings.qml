@@ -366,7 +366,7 @@ PluginSettings {
                     c2.resolvedColor, c3.resolvedColor, c4.resolvedColor, c5.resolvedColor, c6.resolvedColor]
                 value: bcsRoot.value
                 customColor: captureConfig.resolveColor(bcsRoot.value)
-                customLabel: bcsRoot.value === "primary" ? I18n.trFor("quickCapture", "PRIMARY") : bcsRoot.value.toString().toUpperCase()
+                customLabel: bcsRoot.value === "primary" ? I18n.trFor("quickCapture", "Primary").toUpperCase() : bcsRoot.value.toString().toUpperCase()
                 onValueSelected: selectedValue => bcsRoot.value = selectedValue
                 onCustomRequested: {
                     if (typeof PopoutService !== "undefined" && PopoutService && PopoutService.colorPickerModal) {
@@ -3311,7 +3311,7 @@ PluginSettings {
                             c2.resolvedColor, c3.resolvedColor, c4.resolvedColor, c5.resolvedColor, c6.resolvedColor]
                         value: presetColorSetting.value
                         customColor: captureConfig.resolveColor(presetColorSetting.value)
-                        customLabel: presetColorSetting.value === "primary" ? I18n.trFor("quickCapture", "PRIMARY") : presetColorSetting.value.toString().toUpperCase()
+                        customLabel: presetColorSetting.value === "primary" ? I18n.trFor("quickCapture", "Primary").toUpperCase() : presetColorSetting.value.toString().toUpperCase()
                         onValueSelected: selectedValue => {
                             presetColorSetting.value = selectedValue;
                             radialMenuCard.activePresetColors[presetIndex] = selectedValue;

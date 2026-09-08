@@ -29,21 +29,31 @@ POEXPORTS_DIR    = TRANSLATIONS_DIR / "poexports"
 
 # ── Target languages & mapping ──────────────────────────────────────────────────
 KNOWN_LANGUAGES = {
+    "ar":    "Arabic",
+    "bg":    "Bulgarian",
     "de":    "German",
+    "eo":    "Esperanto",
     "es":    "Spanish",
+    "fa":    "Persian",
     "fr":    "French",
+    "he":    "Hebrew",
+    "hu":    "Hungarian",
+    "it":    "Italian",
     "ja":    "Japanese",
     "ko":    "Korean",
+    "nl":    "Dutch",
+    "pl":    "Polish",
+    "pt":    "Portuguese",
+    "pt_BR": "Portuguese (Brazil)",
     "ru":    "Russian",
+    "sv":    "Swedish",
+    "tr":    "Turkish",
+    "uk":    "Ukrainian",
     "vi":    "Vietnamese",
     "zh_CN": "Chinese (Simplified)",
     "zh-CN": "Chinese (Simplified)",
-    "it":    "Italian",
-    "pt_BR": "Portuguese (Brazil)",
-    "pl":    "Polish",
-    "nl":    "Dutch",
-    "tr":    "Turkish",
-    "uk":    "Ukrainian",
+    "zh_TW": "Chinese (Traditional)",
+    "zh-TW": "Chinese (Traditional)",
 }
 
 def get_languages() -> list[dict]:
@@ -51,15 +61,15 @@ def get_languages() -> list[dict]:
     langs = []
     seen_files = set()
     if TRANSLATIONS_DIR.exists():
-        for p in TRANSLATIONS_DIR.glob("*.json"):
+        for p in sorted(TRANSLATIONS_DIR.glob("*.json")):
             seen_files.add(p.name)
-            code = p.stem.replace("_", "-") if p.stem == "zh_CN" else p.stem
+            code = p.stem.replace("_", "-")
             name = KNOWN_LANGUAGES.get(p.stem, KNOWN_LANGUAGES.get(code, p.stem))
             langs.append({"code": code, "file": p.name, "name": name})
 
     for code, name in KNOWN_LANGUAGES.items():
         fname = f"{code}.json"
-        if fname not in seen_files and code in ["de", "es", "fr", "ja", "ko", "ru", "vi", "zh_CN"]:
+        if fname not in seen_files and code not in ["zh-CN", "zh-TW", "pt-BR", "pt_BR"]:
             langs.append({"code": code.replace("_", "-"), "file": fname, "name": name})
             seen_files.add(fname)
 

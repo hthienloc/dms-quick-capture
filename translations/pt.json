@@ -8,9 +8,6 @@
   "2 Connecting Lines": {
     "2 Connecting Lines": ""
   },
-  "AUTO": {
-    "AUTO": ""
-  },
   "Action": {
     "Action": "Ação"
   },
@@ -149,9 +146,6 @@
   "Bottom Right": {
     "Bottom Right": "Inferior Direito"
   },
-  "CUST": {
-    "CUST": ""
-  },
   "Callout": {
     "Callout": ""
   },
@@ -163,6 +157,9 @@
   },
   "Callout, Background (Z, B)": {
     "Callout, Background (Z, B)": ""
+  },
+  "Cancel": {
+    "Cancel": ""
   },
   "Capture": {
     "Capture": ""
@@ -241,9 +238,6 @@
   },
   "Container Format": {
     "Container Format": ""
-  },
-  "Contributors": {
-    "Contributors": ""
   },
   "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": {
     "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": ""
@@ -530,8 +524,8 @@
   "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
     "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": ""
   },
-  "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
-    "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
+  "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
+    "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
   },
   "Framerate": {
     "Framerate": ""
@@ -683,9 +677,6 @@
   "Live Preview": {
     "Live Preview": ""
   },
-  "Loading contributors...": {
-    "Loading contributors...": ""
-  },
   "Low": {
     "Low": "Baixo"
   },
@@ -800,12 +791,6 @@
   "Overlay Opacity": {
     "Overlay Opacity": ""
   },
-  "PAUSED": {
-    "PAUSED": ""
-  },
-  "PRIMARY": {
-    "PRIMARY": ""
-  },
   "Palette Preset": {
     "Palette Preset": ""
   },
@@ -814,6 +799,9 @@
   },
   "Pause / Resume": {
     "Pause / Resume": ""
+  },
+  "Paused": {
+    "Paused": ""
   },
   "Pen Auto-Close": {
     "Pen Auto-Close": ""
@@ -910,9 +898,6 @@
   },
   "Quick Capture Error": {
     "Quick Capture Error": ""
-  },
-  "RECORDING": {
-    "RECORDING": ""
   },
   "Radial Gradient": {
     "Radial Gradient": ""
@@ -1034,6 +1019,9 @@
   "Rounded Rectangle": {
     "Rounded Rectangle": ""
   },
+  "Save": {
+    "Save": ""
+  },
   "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": {
     "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": ""
   },
@@ -1144,9 +1132,6 @@
   },
   "Select Color Slots 5 - 8 (Q, W, E, R)": {
     "Select Color Slots 5 - 8 (Q, W, E, R)": ""
-  },
-  "Select Directory": {
-    "Select Directory": ""
   },
   "Select Image File": {
     "Select Image File": ""
@@ -1300,9 +1285,6 @@
   },
   "System Audio Device": {
     "System Audio Device": ""
-  },
-  "System Default": {
-    "System Default": "Padrão do Sistema"
   },
   "Target Output Name": {
     "Target Output Name": ""
