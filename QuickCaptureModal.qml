@@ -2755,25 +2755,27 @@ Item {
     function resetCropRect() {
         const bw = window.screenshotWidth;
         const bh = window.screenshotHeight;
-        let w = bw * 0.8;
-        let h = bh * 0.8;
+        let w = bw;
+        let h = bh;
 
         if (window.cropAspectRatio !== "") {
             const parts = window.cropAspectRatio.split(":");
             const ar = parseFloat(parts[0]) / parseFloat(parts[1]);
             if (ar > 0) {
-                if (w / h > ar) {
-                    h = w / ar;
+                if (bw / bh > ar) {
+                    h = bh;
+                    w = h * ar;
                 } else {
+                    w = bw;
                     h = w / ar;
                 }
             }
         }
 
-        w = Math.max(20, Math.min(w, bw));
-        h = Math.max(20, Math.min(h, bh));
-        const x = (bw - w) / 2;
-        const y = (bh - h) / 2;
+        w = Math.round(Math.max(20, Math.min(w, bw)));
+        h = Math.round(Math.max(20, Math.min(h, bh)));
+        const x = Math.round((bw - w) / 2);
+        const y = Math.round((bh - h) / 2);
         window.cropRect = Qt.rect(x, y, w, h);
         window.hasSelection = true;
         window.repaintActiveCanvas();
