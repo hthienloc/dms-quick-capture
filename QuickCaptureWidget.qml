@@ -66,6 +66,62 @@ PluginComponent {
         return val === "default_output" ? I18n.trFor("quickCapture", "Default Output") : val;
     }
 
+    readonly property bool recordingIsGif: {
+        if (!daemon || !daemon.recordingController) return false;
+        return (daemon.recordingController.videoFormat || "mp4") === "gif";
+    }
+
+    readonly property string recordingTargetIcon: {
+        if (!daemon || !daemon.recordingController) return "fullscreen";
+        const mode = daemon.recordingController.activeRecordingMode;
+        if (mode === "region") return "crop_square";
+        if (mode === "portal") return "window";
+        return "fullscreen";
+    }
+
+    readonly property string recordingResolutionText: {
+        if (!daemon || !daemon.recordingController) return "";
+        const rc = daemon.recordingController;
+        const mode = rc.activeRecordingMode;
+        if (mode === "region") {
+            if (rc.regionW > 0 && rc.regionH > 0) {
+                return rc.regionW + " × " + rc.regionH;
+            }
+            return I18n.trFor("quickCapture", "Region");
+        }
+        if (mode === "portal") {
+            return I18n.trFor("quickCapture", "Window");
+        }
+        let scr = null;
+        const target = rc.recordingScreenTarget;
+        if (target && target !== "screen" && target !== "focused" && Quickshell.screens) {
+            for (let i = 0; i < Quickshell.screens.length; i++) {
+                if (Quickshell.screens[i] && Quickshell.screens[i].name === target) {
+                    scr = Quickshell.screens[i];
+                    break;
+                }
+            }
+        }
+        if (!scr && typeof CompositorService !== "undefined" && CompositorService && typeof CompositorService.getFocusedScreen === "function") {
+            scr = CompositorService.getFocusedScreen();
+        }
+        if (!scr && Quickshell.screens && Quickshell.screens.length > 0) {
+            scr = Quickshell.screens[0];
+        }
+        if (scr && scr.width > 0 && scr.height > 0) {
+            return scr.name ? (scr.name + " (" + scr.width + " × " + scr.height + ")") : (scr.width + " × " + scr.height);
+        }
+        return I18n.trFor("quickCapture", "Full Screen");
+    }
+
+    readonly property string recordingFormatText: {
+        if (!daemon || !daemon.recordingController) return "";
+        const rc = daemon.recordingController;
+        const fmt = (rc.videoFormat || "mp4").toUpperCase();
+        const fps = (fmt === "GIF") ? (rc.gifFramerate || 15) : (rc.framerate || 60);
+        return fmt + " • " + fps + " FPS";
+    }
+
     function savePluginData(key, value) {
         if (daemon && typeof daemon.savePluginData === "function") {
             daemon.savePluginData(key, value);
@@ -145,7 +201,7 @@ PluginComponent {
     // ── Popout (left-click menu) ──────────────────────────────────────────────
     popoutWidth: 260
     popoutHeight: root.widgetMode === "video"
-        ? (root.daemon && root.daemon.isRecording ? 240 : 290)
+        ? (root.daemon && root.daemon.isRecording ? 320 : 290)
         : (outputExpanded ? 445 + Math.min(outputList.length, 5) * 32 : 445)
 
     popoutContent: Component {
@@ -616,7 +672,8 @@ PluginComponent {
                 // Active Recording Status Card
                 Rectangle {
                     width: parent.width
-                    height: 110
+                    implicitHeight: activeRecCol.implicitHeight + Theme.spacingM * 2
+                    height: implicitHeight
                     radius: Theme.cornerRadius
                     color: Theme.surfaceContainerLow
                     border.color: Theme.outlineVariant
@@ -624,7 +681,10 @@ PluginComponent {
                     visible: root.daemon && root.daemon.isRecording
 
                     Column {
-                        anchors.fill: parent
+                        id: activeRecCol
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.top: parent.top
                         anchors.margins: Theme.spacingM
                         spacing: Theme.spacingS
 
@@ -704,6 +764,165 @@ PluginComponent {
                                 onClicked: {
                                     root.closePopout();
                                     if (root.daemon) root.daemon.cancelRecording();
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            width: parent.width
+                            height: 1
+                            color: Theme.withAlpha(Theme.outline, 0.12)
+                        }
+
+                        Column {
+                            width: parent.width
+                            spacing: 4
+
+                            Item {
+                                width: parent.width
+                                implicitHeight: 18
+
+                                Row {
+                                    anchors.left: parent.left
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 6
+
+                                    DankIcon {
+                                        name: root.recordingTargetIcon
+                                        size: 14
+                                        color: Theme.surfaceVariantText
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    StyledText {
+                                        text: I18n.trFor("quickCapture", "Display")
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+                                }
+
+                                StyledText {
+                                    anchors.right: parent.right
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: Math.min(implicitWidth, parent.width - 90)
+                                    text: root.recordingResolutionText
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    font.weight: Font.Medium
+                                    color: Theme.surfaceText
+                                    horizontalAlignment: Text.AlignRight
+                                    elide: Text.ElideRight
+                                }
+                            }
+
+                            Item {
+                                width: parent.width
+                                implicitHeight: 18
+
+                                Row {
+                                    anchors.left: parent.left
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 6
+
+                                    DankIcon {
+                                        name: (!root.recordingIsGif && root.recordMic) ? "mic" : "mic_off"
+                                        size: 14
+                                        color: (!root.recordingIsGif && root.recordMic) ? Theme.primary : Theme.surfaceVariantText
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    StyledText {
+                                        text: I18n.trFor("quickCapture", "Microphone")
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+                                }
+
+                                StyledText {
+                                    anchors.right: parent.right
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: Math.min(implicitWidth, parent.width - 100)
+                                    text: (!root.recordingIsGif && root.recordMic) ? root.currentMicLabel : I18n.trFor("quickCapture", "Off")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    font.weight: Font.Medium
+                                    color: (!root.recordingIsGif && root.recordMic) ? Theme.surfaceText : Theme.surfaceVariantText
+                                    horizontalAlignment: Text.AlignRight
+                                    elide: Text.ElideRight
+                                }
+                            }
+
+                            Item {
+                                width: parent.width
+                                implicitHeight: 18
+
+                                Row {
+                                    anchors.left: parent.left
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 6
+
+                                    DankIcon {
+                                        name: (!root.recordingIsGif && root.recordSystemAudio) ? "volume_up" : "volume_off"
+                                        size: 14
+                                        color: (!root.recordingIsGif && root.recordSystemAudio) ? Theme.primary : Theme.surfaceVariantText
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    StyledText {
+                                        text: I18n.trFor("quickCapture", "Audio")
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+                                }
+
+                                StyledText {
+                                    anchors.right: parent.right
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: Math.min(implicitWidth, parent.width - 80)
+                                    text: (!root.recordingIsGif && root.recordSystemAudio) ? root.currentAudioLabel : I18n.trFor("quickCapture", "Off")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    font.weight: Font.Medium
+                                    color: (!root.recordingIsGif && root.recordSystemAudio) ? Theme.surfaceText : Theme.surfaceVariantText
+                                    horizontalAlignment: Text.AlignRight
+                                    elide: Text.ElideRight
+                                }
+                            }
+
+                            Item {
+                                width: parent.width
+                                implicitHeight: 18
+
+                                Row {
+                                    anchors.left: parent.left
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 6
+
+                                    DankIcon {
+                                        name: "movie"
+                                        size: 14
+                                        color: Theme.surfaceVariantText
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    StyledText {
+                                        text: I18n.trFor("quickCapture", "Output Format")
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+                                }
+
+                                StyledText {
+                                    anchors.right: parent.right
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: Math.min(implicitWidth, parent.width - 110)
+                                    text: root.recordingFormatText
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    font.weight: Font.Medium
+                                    color: Theme.surfaceText
+                                    horizontalAlignment: Text.AlignRight
+                                    elide: Text.ElideRight
                                 }
                             }
                         }
