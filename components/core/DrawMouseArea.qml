@@ -855,9 +855,13 @@ MouseArea {
 
     onDoubleClicked: (mouse) => {
         if (window.currentTool !== "select") return;
+        if (mouse.button !== Qt.LeftButton) return;
         const absPt = getAbsolutePoint(mouse.x, mouse.y);
         const strokeIdx = window.findStrokeAt(absPt.x, absPt.y);
-        if (strokeIdx === -1) return;
+        if (strokeIdx === -1) {
+            window.resetUserZoom();
+            return;
+        }
         const stroke = window.strokes[strokeIdx];
         if (stroke.tool !== "text" || !stroke.points || stroke.points.length === 0) return;
 
