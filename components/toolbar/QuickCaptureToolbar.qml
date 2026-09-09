@@ -269,30 +269,6 @@ Rectangle {
                     height: Constants.btnSize
                     anchors.verticalCenter: parent.verticalCenter
                     DankActionButton {
-                        anchors.fill: parent
-                        iconName: "save"
-                        buttonSize: Constants.btnSize
-                        iconSize: Constants.iconSize
-                        tooltipText: I18n.trFor("quickCapture", "Save (Ctrl+S) | Save As (Ctrl+Shift+S)")
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        acceptedButtons: Qt.LeftButton | Qt.RightButton
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: mouse => {
-                            if (mouse.button === Qt.RightButton) {
-                                root.saveAsRequested();
-                            } else {
-                                root.saveRequested();
-                            }
-                        }
-                    }
-                }
-                Item {
-                    width: Constants.btnSize
-                    height: Constants.btnSize
-                    anchors.verticalCenter: parent.verticalCenter
-                    DankActionButton {
                         id: copyButton
                         anchors.fill: parent
                         iconName: "content_copy"
@@ -309,6 +285,30 @@ Rectangle {
                                 root.anonymousCopyRequested();
                             } else {
                                 root.copyRequested();
+                            }
+                        }
+                    }
+                }
+                Item {
+                    width: Constants.btnSize
+                    height: Constants.btnSize
+                    anchors.verticalCenter: parent.verticalCenter
+                    DankActionButton {
+                        anchors.fill: parent
+                        iconName: "save"
+                        buttonSize: Constants.btnSize
+                        iconSize: Constants.iconSize
+                        tooltipText: I18n.trFor("quickCapture", "Save (Ctrl+S) | Save As (Ctrl+Shift+S)")
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        acceptedButtons: Qt.LeftButton | Qt.RightButton
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: mouse => {
+                            if (mouse.button === Qt.RightButton) {
+                                root.saveAsRequested();
+                            } else {
+                                root.saveRequested();
                             }
                         }
                     }
