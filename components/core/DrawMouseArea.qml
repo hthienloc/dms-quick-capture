@@ -859,7 +859,19 @@ MouseArea {
         const absPt = getAbsolutePoint(mouse.x, mouse.y);
         const strokeIdx = window.findStrokeAt(absPt.x, absPt.y);
         if (strokeIdx === -1) {
-            window.resetUserZoom();
+            const isInitial = Math.abs(window.userZoomScale - 1.0) <= 0.001
+                && Math.abs(window.userPanX) <= 0.001
+                && Math.abs(window.userPanY) <= 0.001;
+            if (isInitial) {
+                let focusPt = null;
+                if (window.boardContainerItem) {
+                    const containerPt = drawMouseArea.mapToItem(window.boardContainerItem, mouse.x, mouse.y);
+                    focusPt = Qt.point(containerPt.x - window.boardContainerItem.width / 2, containerPt.y - window.boardContainerItem.height / 2);
+                }
+                window.zoomToPoint(2.0, focusPt);
+            } else {
+                window.resetUserZoom();
+            }
             return;
         }
         const stroke = window.strokes[strokeIdx];

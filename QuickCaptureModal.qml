@@ -2464,9 +2464,9 @@ Item {
     property bool isCtrlPressed: false
     property point lastPanMouse: Qt.point(0, 0)
 
-    function adjustUserZoom(delta, focusPt) {
+    function zoomToPoint(targetZoom, focusPt) {
         const oldZoom = window.userZoomScale;
-        const nextZoom = Helpers.clamp(oldZoom + delta, 1.0, 4.0);
+        const nextZoom = Helpers.clamp(targetZoom, 1.0, 4.0);
         if (Math.abs(nextZoom - oldZoom) <= 0.001) return;
 
         window.userZoomScale = Math.round(nextZoom * 100) / 100.0;
@@ -2482,6 +2482,10 @@ Item {
             const newPanY = window.userPanY - (ratio - 1.0) * (focusPt.y - window.userPanY);
             window.updatePanOffset(newPanX, newPanY);
         }
+    }
+
+    function adjustUserZoom(delta, focusPt) {
+        window.zoomToPoint(window.userZoomScale + delta, focusPt);
     }
 
     function resetUserZoom() {
