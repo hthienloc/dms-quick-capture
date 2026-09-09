@@ -13,6 +13,7 @@ Item {
 
     signal toolSelected(string tool)
     signal moreToolsClicked(var controlItem)
+    readonly property alias moreToolsButton: moreActionsButton
 
     width: content.implicitWidth
     height: content.implicitHeight
@@ -44,12 +45,14 @@ Item {
             }
         }
 
-        DankActionButton {
+        DankShortcutActionButton {
             id: moreActionsButton
             iconName: control.compact ? "more_vert" : "more_horiz"
             buttonSize: Constants.btnSize
             iconSize: Constants.iconSize
-            tooltipText: I18n.trFor("quickCapture", "More Tools")
+            tooltipText: I18n.trFor("quickCapture", "More Tools (`)")
+            shortcutText: "`"
+            showShortcut: control.showShortcutHints
             onClicked: control.moreToolsClicked(moreActionsButton)
         }
     }

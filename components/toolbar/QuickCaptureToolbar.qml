@@ -63,6 +63,8 @@ Rectangle {
     signal rotateRequested()
     signal mirrorRequested()
     signal moreToolsClicked(var buttonItem)
+    signal moreToolsButtonReady(var buttonItem)
+    property var moreToolsButton: null
     signal backgroundControlHovered(string type, var controlItem)
     signal backgroundControlExited(string type)
     signal backgroundControlWheel(string type, int delta)
@@ -191,12 +193,20 @@ Rectangle {
             ToolbarSeparator { vertical: true; anchors.verticalCenter: parent.verticalCenter }
 
             ToolButtonsControl {
+                id: hToolButtonsControl
                 anchors.verticalCenter: parent.verticalCenter
                 toolButtons: config.toolButtons
                 currentTool: root.currentTool
                 showShortcutHints: root.showShortcutHints
+                Component.onCompleted: {
+                    root.moreToolsButton = hToolButtonsControl.moreToolsButton;
+                    root.moreToolsButtonReady(hToolButtonsControl.moreToolsButton);
+                }
                 onToolSelected: (tool) => root.toolSelected(tool)
-                onMoreToolsClicked: (controlItem) => root.moreToolsClicked(controlItem)
+                onMoreToolsClicked: (controlItem) => {
+                    root.moreToolsButton = controlItem;
+                    root.moreToolsClicked(controlItem);
+                }
             }
 
             ToolbarSeparator { vertical: true; anchors.verticalCenter: parent.verticalCenter }
@@ -340,13 +350,21 @@ Rectangle {
             ToolbarSeparator { anchors.horizontalCenter: parent.horizontalCenter }
 
             ToolButtonsControl {
+                id: vToolButtonsControl
                 anchors.horizontalCenter: parent.horizontalCenter
                 compact: true
                 toolButtons: config.toolButtons
                 currentTool: root.currentTool
                 showShortcutHints: root.showShortcutHints
+                Component.onCompleted: {
+                    root.moreToolsButton = vToolButtonsControl.moreToolsButton;
+                    root.moreToolsButtonReady(vToolButtonsControl.moreToolsButton);
+                }
                 onToolSelected: (tool) => root.toolSelected(tool)
-                onMoreToolsClicked: (controlItem) => root.moreToolsClicked(controlItem)
+                onMoreToolsClicked: (controlItem) => {
+                    root.moreToolsButton = controlItem;
+                    root.moreToolsClicked(controlItem);
+                }
             }
 
             ToolbarSeparator { anchors.horizontalCenter: parent.horizontalCenter }

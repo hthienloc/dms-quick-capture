@@ -130,6 +130,7 @@ function formatCounter(n, format) {
  */
 function shortcutToken(key, Qt) {
     switch (key) {
+    case Qt.Key_QuoteLeft: return "`";
     case Qt.Key_0: return "0";
     case Qt.Key_1: return "1";
     case Qt.Key_2: return "2";

@@ -214,6 +214,9 @@ Item {
     // State Variables
     property var paletteWarningDialogRef: null
     property var toolbarItem: null
+    property var moreToolsMenuRef: null
+    property var moreToolsButtonRef: null
+    property var contentRootRef: null
     property int activeColorSlotIndex: 0
     property var scanResultPopoverRef: null
     property int editorSessionGeneration: 0
@@ -3648,6 +3651,28 @@ Item {
         return window.acceptKeyEvent(event);
     }
 
+    function handleMoreToolsShortcut(event) {
+        if (event.key !== Qt.Key_QuoteLeft || window.isTyping) return false;
+        if (event.isAutoRepeat) return window.acceptKeyEvent(event);
+        const menu = window.moreToolsMenuRef;
+        if (!menu) return false;
+        const btn = (window.toolbarItem && window.toolbarItem.moreToolsButton)
+            ? window.toolbarItem.moreToolsButton
+            : window.moreToolsButtonRef;
+        const anchor = btn || window.toolbarItem;
+        if (anchor) {
+            window.toggleMoreToolsMenu(anchor, menu, window.toolbarItem, window.contentRootRef);
+        } else if (menu.opened) {
+            menu.close();
+        } else {
+            const cr = window.contentRootRef;
+            menu.x = cr ? (cr.width - menu.width) / 2 : 0;
+            menu.y = cr ? (cr.height - menu.height) / 2 : 0;
+            menu.open();
+        }
+        return window.acceptKeyEvent(event);
+    }
+
     function handleZoomKeyReleased(event) {
         if (event.key === Qt.Key_Space) {
             return window.acceptKeyEvent(event);
@@ -3726,6 +3751,7 @@ Item {
         }
         if (window.handleTabShortcut(event)) return;
         if (window.handleZoomKeyPressed(event)) return;
+        if (window.handleMoreToolsShortcut(event)) return;
         if (window.handleTypingKeyPressed(event)) return;
         window.handleShortcutKey(event);
     }
@@ -4362,7 +4388,7 @@ Item {
             focus: true
             implicitWidth: window.modalWidth
             implicitHeight: window.modalHeight
-
+            Component.onCompleted: window.contentRootRef = contentRoot
             Keys.onPressed: (event) => {
                 if (window.floatingMode)
                     window.handleModalKeyPressed(event);
@@ -4583,7 +4609,11 @@ Item {
                     onCloseRequested: {
                         window.runToolbarAction(window.discardAndClose, moreToolsMenu);
                     }
+                    onMoreToolsButtonReady: (buttonItem) => {
+                        window.moreToolsButtonRef = buttonItem;
+                    }
                     onMoreToolsClicked: (buttonItem) => {
+                        window.moreToolsButtonRef = buttonItem;
                         window.toggleMoreToolsMenu(buttonItem, moreToolsMenu, toolbarCard, contentRoot);
                     }
                     onBackgroundControlHovered: (type, controlItem) => {
@@ -5061,6 +5091,7 @@ Item {
 
                 MoreToolsMenu {
                     id: moreToolsMenu
+                    Component.onCompleted: window.moreToolsMenuRef = moreToolsMenu
                     watermarkEnabled: window.watermarkEnabled
                     floatingMode: window.floatingMode
                     onRotateLeftRequested: window.rotateScreenshot("left")
