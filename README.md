@@ -20,12 +20,16 @@ Screenshot annotation and screen recording plugin for DankMaterialShell.
 | Dependency                           | Purpose                                            |
 | ------------------------------------ | -------------------------------------------------- |
 | DankMaterialShell >= **1.6.0**       | Required for floating window and scrolling capture |
-| **gpu-screen-recorder**              | Screen recording backend                           |
+| **gpu-screen-recorder**              | Screen recording backend (Hardware NVENC / VA-API) |
+| **wf-recorder**                      | Alternative CPU screen recording backend (Software libx264, fallback when GPU encoder is unavailable) |
 | **ffmpeg**                           | Video thumbnail generation                         |
 | **ImageMagick** (`magick`/`mogrify`) | WebP/JPEG exports and OCR/QR crop                  |
 | **img2pdf**                          | PDF export                                         |
 | **tesseract**                        | OCR text scanner                                   |
 | **zbar** (`zbarimg`)                 | QR scanner                                         |
+
+> [!NOTE]
+> At least one recording backend (`gpu-screen-recorder` or `wf-recorder`) is required for video capture. `gpu-screen-recorder` is recommended for optimal performance and audio support; `wf-recorder` serves as a lightweight CPU-based alternative (video only).
 
 ## Install
 

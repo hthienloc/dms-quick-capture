@@ -28,11 +28,11 @@ PluginSettings {
         if (daemon && typeof daemon.refreshAudioDevices === "function") {
             daemon.refreshAudioDevices();
         }
-        Proc.runCommand("quickCapture.listAudioDevices", ["gpu-screen-recorder", "--list-audio-devices"], (stdout, exitCode) => {
+        const parseAndSet = (stdout) => {
             const inputs = [{"label": I18n.trFor("quickCapture", "Default Microphone"), "value": "default_input"}];
             const outputs = [{"label": I18n.trFor("quickCapture", "Default Output"), "value": "default_output"}];
 
-            if (exitCode === 0 && stdout) {
+            if (stdout) {
                 const lines = stdout.trim().split("\n");
                 for (let i = 0; i < lines.length; i++) {
                     const line = lines[i].trim();
@@ -55,6 +55,16 @@ PluginSettings {
             }
             root.audioInputsList = inputs;
             root.audioOutputsList = outputs;
+        };
+
+        Proc.runCommand("quickCapture.listAudioDevices", ["gpu-screen-recorder", "--list-audio-devices"], (stdout, exitCode) => {
+            if (exitCode === 0 && stdout && stdout.trim()) {
+                parseAndSet(stdout);
+            } else {
+                Proc.runCommand("quickCapture.listAudioDevicesPactl", ["sh", "-c", "pactl list sources 2>/dev/null | awk '/Name: /{name=$2} /Description: /{desc=substr($0, index($0,$2)); print name \"|\" desc}'"], (pactlOut, pactlExit) => {
+                    parseAndSet(pactlExit === 0 ? pactlOut : "");
+                });
+            }
         });
     }
 
@@ -672,9 +682,10 @@ PluginSettings {
                 SectionTitle {
                     text: I18n.trFor("quickCapture", "Video Settings")
                     icon: "videocam"
-                    showReset: recordingDirectory.isDirty || recordingScreenTarget.isDirty || recordingFormat.isDirty || recordingGifFramerate.isDirty || recordingFramerate.isDirty || recordingQuality.isDirty || recordingCodec.isDirty || recordCursor.isDirty
+                    showReset: recordingDirectory.isDirty || recordingBackend.isDirty || recordingScreenTarget.isDirty || recordingFormat.isDirty || recordingGifFramerate.isDirty || recordingFramerate.isDirty || recordingQuality.isDirty || recordingCodec.isDirty || recordCursor.isDirty
                     onResetClicked: {
                         recordingDirectory.resetToDefault();
+                        recordingBackend.resetToDefault();
                         recordingScreenTarget.resetToDefault();
                         recordingFormat.resetToDefault();
                         recordingGifFramerate.resetToDefault();
@@ -692,6 +703,21 @@ PluginSettings {
                     placeholder: "~/Videos/Recordings"
                     defaultValue: "~/Videos/Recordings"
                     isDirectory: true
+                }
+
+                Separator {}
+
+                SelectionSettingPlus {
+                    id: recordingBackend
+                    settingKey: "recordingBackend"
+                    label: I18n.trFor("quickCapture", "Recording Backend")
+                    description: I18n.trFor("quickCapture", "Select screen recording backend. Auto attempts GPU first and falls back to CPU (wf-recorder).")
+                    options: [
+                        { label: I18n.trFor("quickCapture", "Auto (GPU if available, fallback to CPU)"), value: "auto" },
+                        { label: "GPU Screen Recorder (Hardware NVENC / VA-API)", value: "gpu-screen-recorder" },
+                        { label: "wf-recorder (CPU Software libx264)", value: "wf-recorder" }
+                    ]
+                    defaultValue: "auto"
                 }
 
                 Separator {}
@@ -830,11 +856,19 @@ PluginSettings {
                     }
                 }
 
+                InfoText {
+                    text: I18n.trFor("quickCapture", "Audio recording is disabled when using the wf-recorder (CPU) backend.")
+                    opacity: 0.85
+                    visible: recordingBackend.value === "wf-recorder"
+                    height: visible ? implicitHeight : 0
+                }
+
                 ToggleSettingPlus {
                     id: recordSystemAudio
                     settingKey: "recordSystemAudio"
                     label: I18n.trFor("quickCapture", "Record System Audio")
                     defaultValue: true
+                    visible: recordingBackend.value !== "wf-recorder"
                 }
 
                 SelectionSettingPlus {
@@ -843,11 +877,11 @@ PluginSettings {
                     label: I18n.trFor("quickCapture", "System Audio Device")
                     options: root.audioOutputsList
                     defaultValue: "default_output"
-                    visible: recordSystemAudio.value === true
+                    visible: recordingBackend.value !== "wf-recorder" && recordSystemAudio.value === true
                 }
 
                 Separator {
-                    visible: recordSystemAudio.value === true
+                    visible: recordingBackend.value !== "wf-recorder" && recordSystemAudio.value === true
                 }
 
                 ToggleSettingPlus {
@@ -855,6 +889,7 @@ PluginSettings {
                     settingKey: "recordMic"
                     label: I18n.trFor("quickCapture", "Record Microphone")
                     defaultValue: false
+                    visible: recordingBackend.value !== "wf-recorder"
                 }
 
                 SelectionSettingPlus {
@@ -863,11 +898,11 @@ PluginSettings {
                     label: I18n.trFor("quickCapture", "Microphone Device")
                     options: root.audioInputsList
                     defaultValue: "default_input"
-                    visible: recordMic.value === true
+                    visible: recordingBackend.value !== "wf-recorder" && recordMic.value === true
                 }
 
                 Separator {
-                    visible: recordMic.value === true
+                    visible: recordingBackend.value !== "wf-recorder" && recordMic.value === true
                 }
 
                 ButtonGroupSettingPlus {
@@ -880,6 +915,11 @@ PluginSettings {
                         { label: "FLAC", value: "flac" }
                     ]
                     defaultValue: "opus"
+                    visible: recordingBackend.value !== "wf-recorder"
+                }
+
+                Separator {
+                    visible: recordingBackend.value !== "wf-recorder"
                 }
 
                 Separator {}

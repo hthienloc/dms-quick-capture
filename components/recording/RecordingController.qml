@@ -47,6 +47,11 @@ Item {
     property var audioInputsList: [{"label": I18n.trFor("quickCapture", "Default Microphone"), "value": "default_input"}]
     property var audioOutputsList: [{"label": I18n.trFor("quickCapture", "Default Output"), "value": "default_output"}]
 
+    readonly property string recordingBackend: pluginData.recordingBackend || "auto"
+    property string activeRecorderBin: ""
+    readonly property bool isPauseSupported: activeRecorderBin !== "wf-recorder"
+    property bool hasGsr: false
+    property bool hasWfRecorder: false
     property bool gpuScreenRecorderMissing: false
 
     function formatDuration(sec) {
@@ -132,10 +137,14 @@ Item {
 
     Process {
         id: binaryCheck
-        command: ["sh", "-c", "command -v gpu-screen-recorder >/dev/null 2>&1"]
+        command: ["sh", "-c", "command -v gpu-screen-recorder >/dev/null 2>&1 && echo gsr; command -v wf-recorder >/dev/null 2>&1 && echo wf"]
         running: true
-        onExited: exitCode => {
-            root.gpuScreenRecorderMissing = (exitCode !== 0);
+        stdout: StdioCollector {}
+        onExited: {
+            const out = (binaryCheck.stdout && binaryCheck.stdout.text) ? binaryCheck.stdout.text : "";
+            root.hasGsr = out.includes("gsr");
+            root.hasWfRecorder = out.includes("wf");
+            root.gpuScreenRecorderMissing = !root.hasGsr && !root.hasWfRecorder;
         }
     }
 
@@ -192,9 +201,13 @@ Item {
             fileCheckTimer.stop();
             safetyTimer.stop();
 
+            const wasStarting = (root.recordingState === "starting");
             const wasCancelling = root.isCancelling;
             const finishedPath = root.outputPath;
             const gifTarget = root.targetGifPath;
+            const prevBin = root.activeRecorderBin;
+            const prevMode = root.activeRecordingMode;
+            const prevGeom = root.regionGeometry;
 
             root.isRecording = false;
             root.isPaused = false;
@@ -218,6 +231,12 @@ Item {
             if (exitCode === 0 || exitCode === 130) {
                 root.finalizeRecording(finishedPath, gifTarget);
             } else {
+                if (wasStarting && prevBin === "gpu-screen-recorder" && root.recordingBackend === "auto" && root.hasWfRecorder) {
+                    root.sendNotification(I18n.trFor("quickCapture", "GPU encoder failed. Retrying with wf-recorder (CPU)..."), false);
+                    root.activeRecorderBin = "wf-recorder";
+                    root.executeRecordingProcess(prevMode, prevGeom);
+                    return;
+                }
                 root.sendNotification(I18n.trFor("quickCapture", "Recording ended with error code %1.").arg(exitCode), true);
                 if (finishedPath) {
                     Proc.runCommand("cleanup-failed-recording", ["rm", "-f", "--", finishedPath]);
@@ -230,10 +249,30 @@ Item {
     function startRecording(mode, customGeometry) {
         if (root.isRecording || root.recordingState !== "idle") return;
 
-        if (root.gpuScreenRecorderMissing) {
-            root.sendNotification(I18n.trFor("quickCapture", "gpu-screen-recorder is not installed. Please install it first."), true);
-            return;
+        let bin = "";
+        if (root.recordingBackend === "gpu-screen-recorder") {
+            if (!root.hasGsr) {
+                root.sendNotification(I18n.trFor("quickCapture", "gpu-screen-recorder is not installed. Please install it first."), true);
+                return;
+            }
+            bin = "gpu-screen-recorder";
+        } else if (root.recordingBackend === "wf-recorder") {
+            if (!root.hasWfRecorder) {
+                root.sendNotification(I18n.trFor("quickCapture", "wf-recorder is not installed. Please install it first."), true);
+                return;
+            }
+            bin = "wf-recorder";
+        } else {
+            if (root.hasGsr) {
+                bin = "gpu-screen-recorder";
+            } else if (root.hasWfRecorder) {
+                bin = "wf-recorder";
+            } else {
+                root.sendNotification(I18n.trFor("quickCapture", "Neither gpu-screen-recorder nor wf-recorder is installed."), true);
+                return;
+            }
         }
+        root.activeRecorderBin = bin;
 
         const targetMode = mode || "screen";
 
@@ -275,55 +314,82 @@ Item {
                 root.outputPath = resolvedDir + "/recording_" + root.getTimestampString() + "." + root.videoFormat;
             }
 
-            let source = "screen";
-            if (activeMode === "window" || activeMode === "portal") {
-                source = "portal";
-            } else if (activeMode === "region") {
-                source = "region";
-            } else if (activeMode === "screen") {
-                const target = root.recordingScreenTarget;
-                if (target === "focused") {
-                    const focused = CompositorService.getFocusedScreen();
-                    source = (focused && focused.name) ? focused.name : "screen";
-                } else if (target && target !== "screen") {
-                    source = target;
-                } else {
-                    source = "screen";
-                }
-            }
-
-            const args = ["gpu-screen-recorder", "-w", source];
-            if (activeMode === "region" && geom) {
-                args.push("-region", geom);
-            }
-
             const fps = isGif ? Math.min(root.framerate, root.gifFramerate) : root.framerate;
-            args.push("-f", fps.toString(), "-o", root.outputPath);
-            args.push("-cursor", root.showCursor ? "yes" : "no");
+            let args = [];
 
-            let hasAudio = false;
-            let audioCount = 0;
-            if (!isGif) {
-                if (root.recordAudio) {
-                    args.push("-a", root.systemAudioDevice || "default_output");
-                    hasAudio = true;
-                    audioCount++;
+            if (root.activeRecorderBin === "wf-recorder") {
+                args = ["wf-recorder", "-c", "libx264", "--no-dmabuf", "-x", "yuv420p", "-p", "preset=ultrafast", "-y"];
+                if (activeMode === "region") {
+                    args.push("-g", `${root.regionX},${root.regionY} ${root.regionW}x${root.regionH}`);
+                } else if (activeMode === "screen") {
+                    const target = root.recordingScreenTarget;
+                    if (target === "focused") {
+                        const focused = CompositorService.getFocusedScreen();
+                        if (focused && focused.name) {
+                            args.push("-o", focused.name);
+                        }
+                    } else if (target && target !== "screen") {
+                        args.push("-o", target);
+                    }
                 }
-                if (root.recordMic) {
-                    args.push("-a", root.micDevice || "default_input");
-                    hasAudio = true;
-                    audioCount++;
-                }
-                if (hasAudio) {
-                    args.push("-ac", root.audioCodec);
-                }
-            }
-            root._recordedAudioCount = audioCount;
+                args.push("-r", fps.toString(), "-f", root.outputPath);
 
-            args.push("-q", root.videoQuality);
+                root._recordedAudioCount = 0;
+                recorderProcess.command = args;
+                recorderProcess.running = true;
+                safetyTimer.restart();
+                root.recordingState = "starting";
+                return;
+            } else {
+                let source = "screen";
+                if (activeMode === "window" || activeMode === "portal") {
+                    source = "portal";
+                } else if (activeMode === "region") {
+                    source = "region";
+                } else if (activeMode === "screen") {
+                    const target = root.recordingScreenTarget;
+                    if (target === "focused") {
+                        const focused = CompositorService.getFocusedScreen();
+                        source = (focused && focused.name) ? focused.name : "screen";
+                    } else if (target && target !== "screen") {
+                        source = target;
+                    } else {
+                        source = "screen";
+                    }
+                }
 
-            if (root.videoCodec !== "auto") {
-                args.push("-k", root.videoCodec);
+                args = ["gpu-screen-recorder", "-w", source];
+                if (activeMode === "region" && geom) {
+                    args.push("-region", geom);
+                }
+
+                args.push("-f", fps.toString(), "-o", root.outputPath);
+                args.push("-cursor", root.showCursor ? "yes" : "no");
+
+                let hasAudio = false;
+                let audioCount = 0;
+                if (!isGif) {
+                    if (root.recordAudio) {
+                        args.push("-a", root.systemAudioDevice || "default_output");
+                        hasAudio = true;
+                        audioCount++;
+                    }
+                    if (root.recordMic) {
+                        args.push("-a", root.micDevice || "default_input");
+                        hasAudio = true;
+                        audioCount++;
+                    }
+                    if (hasAudio) {
+                        args.push("-ac", root.audioCodec);
+                    }
+                }
+                root._recordedAudioCount = audioCount;
+
+                args.push("-q", root.videoQuality);
+
+                if (root.videoCodec !== "auto") {
+                    args.push("-k", root.videoCodec);
+                }
             }
 
             recorderProcess.command = args;
@@ -339,6 +405,10 @@ Item {
 
     function pauseRecording() {
         if (!root.isRecording) return;
+        if (root.activeRecorderBin === "wf-recorder") {
+            root.sendNotification(I18n.trFor("quickCapture", "Pausing is not supported with wf-recorder."), true);
+            return;
+        }
         root.isPaused = !root.isPaused;
         root.recordingState = root.isPaused ? "paused" : "recording";
         Proc.runCommand("screenRecorder.signal", ["killall", "-SIGUSR2", "gpu-screen-recorder"]);
@@ -347,7 +417,8 @@ Item {
     function stopRecording() {
         if (!root.isRecording && root.recordingState !== "starting") return;
         root.recordingState = "stopping";
-        Proc.runCommand("screenRecorder.stop", ["killall", "-INT", "gpu-screen-recorder"]);
+        const bin = root.activeRecorderBin || "gpu-screen-recorder";
+        Proc.runCommand("screenRecorder.stop", ["killall", "-INT", bin]);
         safetyTimer.restart();
     }
 
@@ -366,7 +437,8 @@ Item {
             Proc.runCommand("cleanup-cancelled-gif", ["rm", "-f", "--", root.targetGifPath]);
             root.targetGifPath = "";
         }
-        Proc.runCommand("screenRecorder.kill", ["killall", "-KILL", "gpu-screen-recorder"]);
+        const bin = root.activeRecorderBin || "gpu-screen-recorder";
+        Proc.runCommand("screenRecorder.kill", ["killall", "-KILL", bin]);
     }
 
     function _mergeAudio(videoPath, callback) {
@@ -492,11 +564,11 @@ Item {
     }
 
     function refreshAudioDevices() {
-        Proc.runCommand("screenRecorder.listAudioDevices", ["gpu-screen-recorder", "--list-audio-devices"], (stdout, exitCode) => {
+        const parseAndSet = (stdout) => {
             const inputs = [{"label": I18n.trFor("quickCapture", "Default Microphone"), "value": "default_input"}];
             const outputs = [{"label": I18n.trFor("quickCapture", "Default Output"), "value": "default_output"}];
 
-            if (exitCode === 0 && stdout) {
+            if (stdout) {
                 const lines = stdout.trim().split("\n");
                 for (let i = 0; i < lines.length; i++) {
                     const line = lines[i].trim();
@@ -519,6 +591,16 @@ Item {
             }
             root.audioInputsList = inputs;
             root.audioOutputsList = outputs;
+        };
+
+        Proc.runCommand("screenRecorder.listAudioDevices", ["gpu-screen-recorder", "--list-audio-devices"], (stdout, exitCode) => {
+            if (exitCode === 0 && stdout && stdout.trim()) {
+                parseAndSet(stdout);
+            } else {
+                Proc.runCommand("screenRecorder.listAudioDevicesPactl", ["sh", "-c", "pactl list sources 2>/dev/null | awk '/Name: /{name=$2} /Description: /{desc=substr($0, index($0,$2)); print name \"|\" desc}'"], (pactlOut, pactlExit) => {
+                    parseAndSet(pactlExit === 0 ? pactlOut : "");
+                });
+            }
         });
     }
 

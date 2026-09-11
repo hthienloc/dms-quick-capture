@@ -733,6 +733,7 @@ PluginComponent {
                             spacing: Theme.spacingM
 
                             DankActionButton {
+                                visible: !root.daemon || !root.daemon.recordingController || root.daemon.recordingController.isPauseSupported !== false
                                 iconName: (root.daemon && root.daemon.recordingController && root.daemon.recordingController.isPaused) ? "play_arrow" : "pause"
                                 buttonSize: 34
                                 iconSize: 18
@@ -818,6 +819,8 @@ PluginComponent {
                             Item {
                                 width: parent.width
                                 implicitHeight: 18
+                                visible: !root.daemon || !root.daemon.recordingController || root.daemon.recordingController.activeRecorderBin !== "wf-recorder"
+                                height: visible ? implicitHeight : 0
 
                                 Row {
                                     anchors.left: parent.left
@@ -855,6 +858,8 @@ PluginComponent {
                             Item {
                                 width: parent.width
                                 implicitHeight: 18
+                                visible: !root.daemon || !root.daemon.recordingController || root.daemon.recordingController.activeRecorderBin !== "wf-recorder"
+                                height: visible ? implicitHeight : 0
 
                                 Row {
                                     anchors.left: parent.left
@@ -1815,6 +1820,7 @@ PluginComponent {
                         anchors.verticalCenter: parent.verticalCenter
 
                         DankActionButton {
+                            visible: !root.daemon || !root.daemon.recordingController || root.daemon.recordingController.isPauseSupported !== false
                             iconName: (root.daemon && root.daemon.recordingController && root.daemon.recordingController.isPaused) ? "play_arrow" : "pause"
                             buttonSize: 36
                             iconSize: 20
