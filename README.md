@@ -1,4 +1,4 @@
-# DMS Quick Capture & Annotate
+# DMS Quick Capture
 
 <p align="center">
   <a href="https://github.com/AvengeMedia/dms-plugin-registry/issues/432">
