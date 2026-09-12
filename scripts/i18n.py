@@ -56,6 +56,17 @@ KNOWN_LANGUAGES = {
     "zh-TW": "Chinese (Traditional)",
 }
 
+# ── Language Contributors ───────────────────────────────────────────────────────
+# Map locale code (e.g. "zh-CN", "zh_CN") to list of contributor handles/markdown links.
+LANGUAGE_CONTRIBUTORS = {
+    "zh-CN": [
+        "[@Lemon-mon-254](https://github.com/Lemon-mon-254)",
+    ],
+    "zh_CN": [
+        "[@Lemon-mon-254](https://github.com/Lemon-mon-254)",
+    ],
+}
+
 def get_languages() -> list[dict]:
     """Return all configured and discovered translation files sorted alphabetically by locale code."""
     langs = []
@@ -169,8 +180,8 @@ def cmd_extract(_args):
 
 def _generate_markdown_table(stats: list[dict], total: int) -> str:
     lines = [
-        "| Language | Locale | Progress | Coverage | Status |",
-        "| :--- | :--- | :---: | :---: | :---: |",
+        "| Language | Locale | Progress | Coverage | Status | Contributors |",
+        "| :--- | :--- | :---: | :---: | :---: | :--- |",
     ]
     for s in stats:
         pct_str = f"{s['pct']:.1f}%"
@@ -180,7 +191,11 @@ def _generate_markdown_table(stats: list[dict], total: int) -> str:
             badge = "🟡 In Progress"
         else:
             badge = "⚪ Not Started"
-        lines.append(f"| {s['name']} | `{s['code']}` | {s['done']}/{total} | {pct_str} | {badge} |")
+
+        contribs = LANGUAGE_CONTRIBUTORS.get(s["code"], LANGUAGE_CONTRIBUTORS.get(s["filename"].replace(".json", ""), []))
+        contrib_str = ", ".join(contribs) if contribs else "—"
+
+        lines.append(f"| {s['name']} | `{s['code']}` | {s['done']}/{total} | {pct_str} | {badge} | {contrib_str} |")
     return "\n".join(lines)
 
 def cmd_status(args):

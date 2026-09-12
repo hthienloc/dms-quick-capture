@@ -50,32 +50,30 @@ git clone https://github.com/hthienloc/dms-quick-capture ~/.config/DankMaterialS
 Quick Capture supports native DMS 1.6+ sideload translations located in `translations/<locale>.json`. Contributions and improvements to translations are welcome!
 
 <!-- TRANSLATIONS_TABLE_START -->
-
-| Language              | Locale  | Progress | Coverage |     Status     |
-| :-------------------- | :------ | :------: | :------: | :------------: |
-| Arabic                | `ar`    | 466/479  |  97.3%   | 🟡 In Progress |
-| Bulgarian             | `bg`    |  68/479  |  14.2%   | 🟡 In Progress |
-| German                | `de`    |  83/479  |  17.3%   | 🟡 In Progress |
-| Esperanto             | `eo`    |  63/479  |  13.2%   | 🟡 In Progress |
-| Spanish               | `es`    |  82/479  |  17.1%   | 🟡 In Progress |
-| Persian               | `fa`    |  58/479  |  12.1%   | 🟡 In Progress |
-| French                | `fr`    |  70/479  |  14.6%   | 🟡 In Progress |
-| Hebrew                | `he`    |  67/479  |  14.0%   | 🟡 In Progress |
-| Hungarian             | `hu`    |  68/479  |  14.2%   | 🟡 In Progress |
-| Italian               | `it`    | 466/479  |  97.3%   | 🟡 In Progress |
-| Japanese              | `ja`    |  80/479  |  16.7%   | 🟡 In Progress |
-| Korean                | `ko`    |  80/479  |  16.7%   | 🟡 In Progress |
-| Dutch                 | `nl`    |  67/479  |  14.0%   | 🟡 In Progress |
-| Polish                | `pl`    |  64/479  |  13.4%   | 🟡 In Progress |
-| Portuguese            | `pt`    |  67/479  |  14.0%   | 🟡 In Progress |
-| Russian               | `ru`    |  82/479  |  17.1%   | 🟡 In Progress |
-| Swedish               | `sv`    |  55/479  |  11.5%   | 🟡 In Progress |
-| Turkish               | `tr`    |  43/479  |   9.0%   | 🟡 In Progress |
-| Ukrainian             | `uk`    |  68/479  |  14.2%   | 🟡 In Progress |
-| Vietnamese            | `vi`    |  82/479  |  17.1%   | 🟡 In Progress |
-| Chinese (Simplified)  | `zh-CN` |  82/479  |  17.1%   | 🟡 In Progress |
-| Chinese (Traditional) | `zh-TW` |  62/479  |  12.9%   | 🟡 In Progress |
-
+| Language | Locale | Progress | Coverage | Status | Contributors |
+| :--- | :--- | :---: | :---: | :---: | :--- |
+| Arabic | `ar` | 465/491 | 94.7% | 🟡 In Progress | — |
+| Bulgarian | `bg` | 68/491 | 13.8% | 🟡 In Progress | — |
+| German | `de` | 83/491 | 16.9% | 🟡 In Progress | — |
+| Esperanto | `eo` | 63/491 | 12.8% | 🟡 In Progress | — |
+| Spanish | `es` | 82/491 | 16.7% | 🟡 In Progress | — |
+| Persian | `fa` | 58/491 | 11.8% | 🟡 In Progress | — |
+| French | `fr` | 70/491 | 14.3% | 🟡 In Progress | — |
+| Hebrew | `he` | 67/491 | 13.6% | 🟡 In Progress | — |
+| Hungarian | `hu` | 68/491 | 13.8% | 🟡 In Progress | — |
+| Italian | `it` | 465/491 | 94.7% | 🟡 In Progress | — |
+| Japanese | `ja` | 80/491 | 16.3% | 🟡 In Progress | — |
+| Korean | `ko` | 80/491 | 16.3% | 🟡 In Progress | — |
+| Dutch | `nl` | 67/491 | 13.6% | 🟡 In Progress | — |
+| Polish | `pl` | 64/491 | 13.0% | 🟡 In Progress | — |
+| Portuguese | `pt` | 67/491 | 13.6% | 🟡 In Progress | — |
+| Russian | `ru` | 82/491 | 16.7% | 🟡 In Progress | — |
+| Swedish | `sv` | 55/491 | 11.2% | 🟡 In Progress | — |
+| Turkish | `tr` | 43/491 | 8.8% | 🟡 In Progress | — |
+| Ukrainian | `uk` | 68/491 | 13.8% | 🟡 In Progress | — |
+| Vietnamese | `vi` | 82/491 | 16.7% | 🟡 In Progress | — |
+| Chinese (Simplified) | `zh-CN` | 491/491 | 100.0% | 🟢 Complete | [@Lemon-mon-254](https://github.com/Lemon-mon-254) |
+| Chinese (Traditional) | `zh-TW` | 62/491 | 12.6% | 🟡 In Progress | — |
 <!-- TRANSLATIONS_TABLE_END -->
 
 ### Contributing Translations

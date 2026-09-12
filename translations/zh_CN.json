@@ -56,14 +56,23 @@
   "Arrow Vector": {
     "Arrow Vector": "箭头"
   },
+  "Audio": {
+    "Audio": "音频"
+  },
   "Audio & Overlay": {
     "Audio & Overlay": "音频与悬浮层"
   },
   "Audio Codec": {
     "Audio Codec": "音频编解码器"
   },
+  "Audio recording is disabled when using the wf-recorder (CPU) backend.": {
+    "Audio recording is disabled when using the wf-recorder (CPU) backend.": "使用 wf-recorder (CPU) 后端时已禁用音频录制。"
+  },
   "Auto": {
     "Auto": "自动"
+  },
+  "Auto (GPU if available, fallback to CPU)": {
+    "Auto (GPU if available, fallback to CPU)": "自动（首选 GPU，不可用时回退至 CPU）"
   },
   "Auto Balance": {
     "Auto Balance": "自动平衡"
@@ -386,6 +395,9 @@
   "Discard & Close (Esc)": {
     "Discard & Close (Esc)": "放弃并关闭 (Esc)"
   },
+  "Display": {
+    "Display": "显示器"
+  },
   "Done": {
     "Done": "完成"
   },
@@ -554,6 +566,9 @@
   "GIF Framerate": {
     "GIF Framerate": "GIF 帧率"
   },
+  "GPU encoder failed. Retrying with wf-recorder (CPU)...": {
+    "GPU encoder failed. Retrying with wf-recorder (CPU)...": "GPU 编码器失败。正在重试使用 wf-recorder (CPU)..."
+  },
   "General Shortcuts": {
     "General Shortcuts": "通用快捷键"
   },
@@ -695,6 +710,9 @@
   "Merging audio tracks...": {
     "Merging audio tracks...": "正在合并音轨..."
   },
+  "Microphone": {
+    "Microphone": "麦克风"
+  },
   "Microphone Device": {
     "Microphone Device": "麦克风设备"
   },
@@ -710,8 +728,11 @@
   "Modal": {
     "Modal": "模态"
   },
-  "More Tools": {
-    "More Tools": "更多工具"
+  "More Tools (`)": {
+    "More Tools (`)": "更多工具 (`)"
+  },
+  "Neither gpu-screen-recorder nor wf-recorder is installed.": {
+    "Neither gpu-screen-recorder nor wf-recorder is installed.": "未安装 gpu-screen-recorder 或 wf-recorder。"
   },
   "Niri Binding Example": {
     "Niri Binding Example": "Niri 按键绑定示例"
@@ -761,6 +782,9 @@
   "OCR Text Recognition": {
     "OCR Text Recognition": "OCR 文本识别"
   },
+  "Off": {
+    "Off": "关闭"
+  },
   "Opacity": {
     "Opacity": "不透明度"
   },
@@ -802,6 +826,9 @@
   },
   "Paused": {
     "Paused": "已暂停"
+  },
+  "Pausing is not supported with wf-recorder.": {
+    "Pausing is not supported with wf-recorder.": "wf-recorder 不支持暂停。"
   },
   "Pen Auto-Close": {
     "Pen Auto-Close": "画笔自动闭合"
@@ -934,6 +961,9 @@
   },
   "Recording": {
     "Recording": "录制中"
+  },
+  "Recording Backend": {
+    "Recording Backend": "录制后端"
   },
   "Recording Folder": {
     "Recording Folder": "录制文件夹"
@@ -1138,6 +1168,9 @@
   },
   "Select Image to Annotate": {
     "Select Image to Annotate": "选择要标注的图像"
+  },
+  "Select screen recording backend. Auto attempts GPU first and falls back to CPU (wf-recorder).": {
+    "Select screen recording backend. Auto attempts GPU first and falls back to CPU (wf-recorder).": "选择屏幕录制后端。自动模式优先尝试 GPU，失败时回退至 CPU (wf-recorder)。"
   },
   "Selected Tool / Action": {
     "Selected Tool / Action": "所选工具 / 操作"
@@ -1435,5 +1468,8 @@
   },
   "gpu-screen-recorder is not installed. Please install it first.": {
     "gpu-screen-recorder is not installed. Please install it first.": "未安装 gpu-screen-recorder。请先安装它。"
+  },
+  "wf-recorder is not installed. Please install it first.": {
+    "wf-recorder is not installed. Please install it first.": "未安装 wf-recorder。请先安装它。"
   }
 }

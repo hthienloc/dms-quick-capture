@@ -56,14 +56,23 @@
   "Arrow Vector": {
     "Arrow Vector": ""
   },
+  "Audio": {
+    "Audio": ""
+  },
   "Audio & Overlay": {
     "Audio & Overlay": ""
   },
   "Audio Codec": {
     "Audio Codec": "Kodek audio"
   },
+  "Audio recording is disabled when using the wf-recorder (CPU) backend.": {
+    "Audio recording is disabled when using the wf-recorder (CPU) backend.": ""
+  },
   "Auto": {
     "Auto": "Automatycznie"
+  },
+  "Auto (GPU if available, fallback to CPU)": {
+    "Auto (GPU if available, fallback to CPU)": ""
   },
   "Auto Balance": {
     "Auto Balance": ""
@@ -386,6 +395,9 @@
   "Discard & Close (Esc)": {
     "Discard & Close (Esc)": ""
   },
+  "Display": {
+    "Display": ""
+  },
   "Done": {
     "Done": ""
   },
@@ -554,6 +566,9 @@
   "GIF Framerate": {
     "GIF Framerate": ""
   },
+  "GPU encoder failed. Retrying with wf-recorder (CPU)...": {
+    "GPU encoder failed. Retrying with wf-recorder (CPU)...": ""
+  },
   "General Shortcuts": {
     "General Shortcuts": ""
   },
@@ -695,6 +710,9 @@
   "Merging audio tracks...": {
     "Merging audio tracks...": ""
   },
+  "Microphone": {
+    "Microphone": ""
+  },
   "Microphone Device": {
     "Microphone Device": ""
   },
@@ -710,8 +728,11 @@
   "Modal": {
     "Modal": ""
   },
-  "More Tools": {
-    "More Tools": ""
+  "More Tools (`)": {
+    "More Tools (`)": ""
+  },
+  "Neither gpu-screen-recorder nor wf-recorder is installed.": {
+    "Neither gpu-screen-recorder nor wf-recorder is installed.": ""
   },
   "Niri Binding Example": {
     "Niri Binding Example": ""
@@ -761,6 +782,9 @@
   "OCR Text Recognition": {
     "OCR Text Recognition": ""
   },
+  "Off": {
+    "Off": ""
+  },
   "Opacity": {
     "Opacity": "Przezroczystość"
   },
@@ -802,6 +826,9 @@
   },
   "Paused": {
     "Paused": ""
+  },
+  "Pausing is not supported with wf-recorder.": {
+    "Pausing is not supported with wf-recorder.": ""
   },
   "Pen Auto-Close": {
     "Pen Auto-Close": ""
@@ -934,6 +961,9 @@
   },
   "Recording": {
     "Recording": ""
+  },
+  "Recording Backend": {
+    "Recording Backend": ""
   },
   "Recording Folder": {
     "Recording Folder": ""
@@ -1138,6 +1168,9 @@
   },
   "Select Image to Annotate": {
     "Select Image to Annotate": ""
+  },
+  "Select screen recording backend. Auto attempts GPU first and falls back to CPU (wf-recorder).": {
+    "Select screen recording backend. Auto attempts GPU first and falls back to CPU (wf-recorder).": ""
   },
   "Selected Tool / Action": {
     "Selected Tool / Action": ""
@@ -1435,5 +1468,8 @@
   },
   "gpu-screen-recorder is not installed. Please install it first.": {
     "gpu-screen-recorder is not installed. Please install it first.": ""
+  },
+  "wf-recorder is not installed. Please install it first.": {
+    "wf-recorder is not installed. Please install it first.": ""
   }
 }
