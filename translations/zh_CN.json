@@ -1,63 +1,63 @@
 {
   "%1 — %2": {
-    "%1 — %2": ""
+    "%1 — %2": "%1 — %2"
   },
   "1 Connecting Line": {
-    "1 Connecting Line": ""
+    "1 Connecting Line": "1 条连接线"
   },
   "2 Connecting Lines": {
-    "2 Connecting Lines": ""
+    "2 Connecting Lines": "2 条连接线"
   },
   "Action": {
     "Action": "操作"
   },
   "Action when Enter": {
-    "Action when Enter": "输入时的操作"
+    "Action when Enter": "按回车时的操作"
   },
   "Active Window": {
-    "Active Window": ""
+    "Active Window": "活动窗口"
   },
   "Adaptive": {
     "Adaptive": "自适应"
   },
   "Adaptive (DMS Theme)": {
-    "Adaptive (DMS Theme)": ""
+    "Adaptive (DMS Theme)": "自适应（DMS 主题）"
   },
   "Add": {
     "Add": "添加"
   },
   "Add Text Note": {
-    "Add Text Note": ""
+    "Add Text Note": "添加文本备注"
   },
   "All Combined Outputs": {
-    "All Combined Outputs": ""
+    "All Combined Outputs": "所有显示器合并"
   },
   "All Outputs": {
-    "All Outputs": ""
+    "All Outputs": "所有显示器"
   },
   "Annotating": {
-    "Annotating": ""
+    "Annotating": "标注中"
   },
   "Annotation Tools": {
-    "Annotation Tools": ""
+    "Annotation Tools": "标注工具"
   },
   "Anonymous Copy (stripped metadata)": {
-    "Anonymous Copy (stripped metadata)": ""
+    "Anonymous Copy (stripped metadata)": "匿名复制（去除元数据）"
   },
   "Arrow (3)": {
-    "Arrow (3)": ""
+    "Arrow (3)": "箭头 (3)"
   },
   "Arrow Color": {
-    "Arrow Color": ""
+    "Arrow Color": "箭头颜色"
   },
   "Arrow Thickness": {
-    "Arrow Thickness": ""
+    "Arrow Thickness": "箭头粗细"
   },
   "Arrow Vector": {
     "Arrow Vector": "箭头"
   },
   "Audio & Overlay": {
-    "Audio & Overlay": ""
+    "Audio & Overlay": "音频与悬浮层"
   },
   "Audio Codec": {
     "Audio Codec": "音频编解码器"
@@ -66,64 +66,64 @@
     "Auto": "自动"
   },
   "Auto Balance": {
-    "Auto Balance": ""
+    "Auto Balance": "自动平衡"
   },
   "Auto Detect": {
-    "Auto Detect": ""
+    "Auto Detect": "自动检测"
   },
   "Auto-apply background defaults": {
-    "Auto-apply background defaults": ""
+    "Auto-apply background defaults": "自动应用背景默认值"
   },
   "Auto-close the loop when ending near the start point.": {
-    "Auto-close the loop when ending near the start point.": ""
+    "Auto-close the loop when ending near the start point.": "在结束点接近起点时自动闭合环路。"
   },
   "Auto-minimize": {
-    "Auto-minimize": ""
+    "Auto-minimize": "自动最小化"
   },
   "Auto-select a tool preset on hover, without releasing the mouse.": {
-    "Auto-select a tool preset on hover, without releasing the mouse.": ""
+    "Auto-select a tool preset on hover, without releasing the mouse.": "悬停时自动选择工具预设，无需松开鼠标。"
   },
   "Auto-tiling": {
-    "Auto-tiling": ""
+    "Auto-tiling": "自动平铺"
   },
   "Automatically minimize the float window after a delay": {
-    "Automatically minimize the float window after a delay": ""
+    "Automatically minimize the float window after a delay": "延迟后自动最小化悬浮窗口"
   },
   "Automatically stack windows to avoid overlap": {
-    "Automatically stack windows to avoid overlap": ""
+    "Automatically stack windows to avoid overlap": "自动堆叠窗口以避免重叠"
   },
   "Back to Annotation (B)": {
-    "Back to Annotation (B)": ""
+    "Back to Annotation (B)": "返回标注 (B)"
   },
   "Background": {
     "Background": "背景"
   },
   "Background (B)": {
-    "Background (B)": ""
+    "Background (B)": "背景 (B)"
   },
   "Background Defaults": {
-    "Background Defaults": ""
+    "Background Defaults": "背景默认值"
   },
   "Background Image Folder": {
-    "Background Image Folder": ""
+    "Background Image Folder": "背景图片文件夹"
   },
   "Background Images": {
-    "Background Images": ""
+    "Background Images": "背景图片"
   },
   "Background Presets": {
-    "Background Presets": ""
+    "Background Presets": "背景预设"
   },
   "Balanced": {
     "Balanced": "平衡"
   },
   "Bar Interactions": {
-    "Bar Interactions": ""
+    "Bar Interactions": "状态栏交互"
   },
   "Blink Recording Dot": {
-    "Blink Recording Dot": ""
+    "Blink Recording Dot": "录制红点闪烁"
   },
   "Blur Background Image": {
-    "Blur Background Image": ""
+    "Blur Background Image": "模糊背景图像"
   },
   "Border Color": {
     "Border Color": "边框颜色"
@@ -132,7 +132,7 @@
     "Border Width": "边框宽度"
   },
   "Both": {
-    "Both": ""
+    "Both": "两者"
   },
   "Bottom": {
     "Bottom": "底部"
@@ -147,67 +147,67 @@
     "Bottom Right": "右下"
   },
   "Callout": {
-    "Callout": ""
+    "Callout": "标注框"
   },
   "Callout (Z) | Hold G for Loupe": {
-    "Callout (Z) | Hold G for Loupe": ""
+    "Callout (Z) | Hold G for Loupe": "标注框 (Z) | 按住 G 启用放大镜"
   },
   "Callout Zoom": {
-    "Callout Zoom": ""
+    "Callout Zoom": "标注框缩放"
   },
   "Callout, Background (Z, B)": {
-    "Callout, Background (Z, B)": ""
+    "Callout, Background (Z, B)": "标注框、背景 (Z, B)"
   },
   "Cancel": {
-    "Cancel": ""
+    "Cancel": "取消"
   },
   "Capture": {
-    "Capture": ""
+    "Capture": "截图"
   },
   "Capture Actions": {
-    "Capture Actions": ""
+    "Capture Actions": "截图操作"
   },
   "Capture Options": {
-    "Capture Options": ""
+    "Capture Options": "截图选项"
   },
   "Capturing...": {
-    "Capturing...": ""
+    "Capturing...": "正在截图..."
   },
   "Catppuccin": {
-    "Catppuccin": ""
+    "Catppuccin": "Catppuccin"
   },
   "Center": {
-    "Center": ""
+    "Center": "居中"
   },
   "Center Left": {
-    "Center Left": ""
+    "Center Left": "中左"
   },
   "Center Right": {
-    "Center Right": ""
+    "Center Right": "中右"
   },
   "Choose Color": {
     "Choose Color": "选择颜色"
   },
   "Choose notifications shown after copy or save.": {
-    "Choose notifications shown after copy or save.": ""
+    "Choose notifications shown after copy or save.": "选择复制或保存后显示的通知。"
   },
   "Choose the editor shape for portrait or landscape screens.": {
-    "Choose the editor shape for portrait or landscape screens.": ""
+    "Choose the editor shape for portrait or landscape screens.": "为竖屏或横屏屏幕选择编辑器形状。"
   },
   "Choose whether the editor opens as a modal overlay or a movable floating window.": {
-    "Choose whether the editor opens as a modal overlay or a movable floating window.": ""
+    "Choose whether the editor opens as a modal overlay or a movable floating window.": "选择编辑器以模态覆盖层还是可移动的悬浮窗口打开。"
   },
   "Choose which monitor to capture during full screen recording.": {
-    "Choose which monitor to capture during full screen recording.": ""
+    "Choose which monitor to capture during full screen recording.": "选择全屏录制期间要截取的显示器。"
   },
   "Classic (Tailwind)": {
-    "Classic (Tailwind)": ""
+    "Classic (Tailwind)": "经典（Tailwind）"
   },
   "Clean Text Eraser": {
-    "Clean Text Eraser": ""
+    "Clean Text Eraser": "文本擦除工具"
   },
   "Clear saved region selection before each capture": {
-    "Clear saved region selection before each capture": ""
+    "Clear saved region selection before each capture": "每次截图前清除已保存的区域选择"
   },
   "Clipboard": {
     "Clipboard": "剪贴板"
@@ -216,199 +216,199 @@
     "Close": "关闭"
   },
   "Close Annotator": {
-    "Close Annotator": ""
+    "Close Annotator": "关闭标注器"
   },
   "Color Palette": {
-    "Color Palette": ""
+    "Color Palette": "调色板"
   },
   "Color Picker (F for RGB | Eyedropper)": {
-    "Color Picker (F for RGB | Eyedropper)": ""
+    "Color Picker (F for RGB | Eyedropper)": "取色器（F 为 RGB | 吸管）"
   },
   "Color Picker, Eraser (F, T)": {
-    "Color Picker, Eraser (F, T)": ""
+    "Color Picker, Eraser (F, T)": "取色器、橡皮 (F, T)"
   },
   "Color copied to clipboard: %1": {
-    "Color copied to clipboard: %1": ""
+    "Color copied to clipboard: %1": "颜色已复制到剪贴板：%1"
   },
   "Configure up to 8 quick-access tool presets. Right-click during capture to open the radial menu.": {
-    "Configure up to 8 quick-access tool presets. Right-click during capture to open the radial menu.": ""
+    "Configure up to 8 quick-access tool presets. Right-click during capture to open the radial menu.": "配置最多 8 个快速访问工具预设。截图时右键单击可打开径向菜单。"
   },
   "Conic Gradient": {
-    "Conic Gradient": ""
+    "Conic Gradient": "锥形渐变"
   },
   "Container Format": {
-    "Container Format": ""
+    "Container Format": "容器格式"
   },
   "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": {
-    "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": ""
+    "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": "控制编辑时的预览像素预算。如果卡顿请调低。不影响最终保存的图像质量。"
   },
   "Converting recording to GIF...": {
-    "Converting recording to GIF...": ""
+    "Converting recording to GIF...": "正在将录像转换为 GIF..."
   },
   "Copied": {
-    "Copied": ""
+    "Copied": "已复制"
   },
   "Copied & saved": {
-    "Copied & saved": ""
+    "Copied & saved": "已复制并保存"
   },
   "Copied Anonymously": {
-    "Copied Anonymously": ""
+    "Copied Anonymously": "已匿名复制"
   },
   "Copied to clipboard": {
     "Copied to clipboard": "已复制到剪贴板"
   },
   "Copied:": {
-    "Copied:": ""
+    "Copied:": "已复制："
   },
   "Copy": {
     "Copy": "复制"
   },
   "Copy & Save": {
-    "Copy & Save": ""
+    "Copy & Save": "复制并保存"
   },
   "Copy (Ctrl+C) | Anonymous Copy (Ctrl+Shift+C)": {
-    "Copy (Ctrl+C) | Anonymous Copy (Ctrl+Shift+C)": ""
+    "Copy (Ctrl+C) | Anonymous Copy (Ctrl+Shift+C)": "复制 (Ctrl+C) | 匿名复制 (Ctrl+Shift+C)"
   },
   "Copy Color": {
-    "Copy Color": ""
+    "Copy Color": "复制颜色"
   },
   "Copy Current Palette": {
-    "Copy Current Palette": ""
+    "Copy Current Palette": "复制当前调色板"
   },
   "Copy and customize this preset": {
-    "Copy and customize this preset": ""
+    "Copy and customize this preset": "复制并自定义此预设"
   },
   "Copy vector / Paste / Duplicate": {
-    "Copy vector / Paste / Duplicate": ""
+    "Copy vector / Paste / Duplicate": "复制矢量 / 粘贴 / 复制"
   },
   "Crop / Resize": {
     "Crop / Resize": "裁剪/调整大小"
   },
   "Crop / Resize Area": {
-    "Crop / Resize Area": ""
+    "Crop / Resize Area": "裁剪/调整大小区域"
   },
   "Custom": {
     "Custom": "自定义"
   },
   "Custom Colors": {
-    "Custom Colors": ""
+    "Custom Colors": "自定义颜色"
   },
   "Custom Tool": {
-    "Custom Tool": ""
+    "Custom Tool": "自定义工具"
   },
   "Dank Violet": {
-    "Dank Violet": ""
+    "Dank Violet": "Dank 紫"
   },
   "Dark": {
-    "Dark": ""
+    "Dark": "深色"
   },
   "Darken the image to improve foreground contrast": {
-    "Darken the image to improve foreground contrast": ""
+    "Darken the image to improve foreground contrast": "压暗图像以提高前景对比度"
   },
   "Dashed Line": {
-    "Dashed Line": ""
+    "Dashed Line": "虚线"
   },
   "Default Alignment": {
-    "Default Alignment": ""
+    "Default Alignment": "默认对齐"
   },
   "Default Aspect Ratio": {
-    "Default Aspect Ratio": ""
+    "Default Aspect Ratio": "默认宽高比"
   },
   "Default Background Image": {
-    "Default Background Image": ""
+    "Default Background Image": "默认背景图像"
   },
   "Default Background Mode": {
-    "Default Background Mode": ""
+    "Default Background Mode": "默认背景模式"
   },
   "Default Bold Text": {
-    "Default Bold Text": ""
+    "Default Bold Text": "默认粗体文本"
   },
   "Default Corner Radius": {
-    "Default Corner Radius": ""
+    "Default Corner Radius": "默认圆角半径"
   },
   "Default Gradient Angle": {
-    "Default Gradient Angle": ""
+    "Default Gradient Angle": "默认渐变角度"
   },
   "Default Gradient End": {
-    "Default Gradient End": ""
+    "Default Gradient End": "默认渐变终点"
   },
   "Default Gradient Start": {
-    "Default Gradient Start": ""
+    "Default Gradient Start": "默认渐变起点"
   },
   "Default Italic Text": {
-    "Default Italic Text": ""
+    "Default Italic Text": "默认斜体文本"
   },
   "Default Microphone": {
-    "Default Microphone": ""
+    "Default Microphone": "默认麦克风"
   },
   "Default Output": {
-    "Default Output": ""
+    "Default Output": "默认输出"
   },
   "Default Padding": {
-    "Default Padding": ""
+    "Default Padding": "默认内边距"
   },
   "Default Shadow Strength": {
-    "Default Shadow Strength": ""
+    "Default Shadow Strength": "默认阴影强度"
   },
   "Default Solid Color": {
-    "Default Solid Color": ""
+    "Default Solid Color": "默认纯色"
   },
   "Default Text Background": {
-    "Default Text Background": ""
+    "Default Text Background": "默认文本背景"
   },
   "Default Text Font Size": {
-    "Default Text Font Size": ""
+    "Default Text Font Size": "默认文本字号"
   },
   "Default Underline Text": {
-    "Default Underline Text": ""
+    "Default Underline Text": "默认下划线文本"
   },
   "Default Watermark": {
-    "Default Watermark": ""
+    "Default Watermark": "默认水印"
   },
   "Delete": {
     "Delete": "删除"
   },
   "Dim Background Image": {
-    "Dim Background Image": ""
+    "Dim Background Image": "调暗背景图像"
   },
   "Dim Intensity": {
-    "Dim Intensity": ""
+    "Dim Intensity": "调暗强度"
   },
   "Dimming Opacity": {
-    "Dimming Opacity": ""
+    "Dimming Opacity": "变暗不透明度"
   },
   "Direct": {
-    "Direct": ""
+    "Direct": "直接"
   },
   "Discard & Close": {
-    "Discard & Close": ""
+    "Discard & Close": "放弃并关闭"
   },
   "Discard & Close (Esc)": {
-    "Discard & Close (Esc)": ""
+    "Discard & Close (Esc)": "放弃并关闭 (Esc)"
   },
   "Done": {
-    "Done": ""
+    "Done": "完成"
   },
   "Done (Action based on settings)": {
-    "Done (Action based on settings)": ""
+    "Done (Action based on settings)": "完成（按设置执行操作）"
   },
   "Dotted Line": {
-    "Dotted Line": ""
+    "Dotted Line": "点线"
   },
   "Dracula": {
-    "Dracula": ""
+    "Dracula": "Dracula"
   },
   "Drag Image": {
-    "Drag Image": ""
+    "Drag Image": "拖动图像"
   },
   "Draw an outer ring using the stamp number color": {
-    "Draw an outer ring using the stamp number color": ""
+    "Draw an outer ring using the stamp number color": "用数字印章颜色绘制外环"
   },
   "Drop image onto bar icon to annotate it": {
-    "Drop image onto bar icon to annotate it": ""
+    "Drop image onto bar icon to annotate it": "将图像拖放到状态栏图标上进行标注"
   },
   "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": {
-    "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": ""
+    "Each command accepts action: <b>edit</b> (open editor) or <b>float</b> (always-on-top window).": "每个命令接受的操作：<b>edit</b>（打开编辑器）或 <b>float</b>（置顶窗口）。"
   },
   "Edge Spacing": {
     "Edge Spacing": "边缘间距"
@@ -417,91 +417,91 @@
     "Edit": "编辑"
   },
   "Edit Color Palette": {
-    "Edit Color Palette": ""
+    "Edit Color Palette": "编辑调色板"
   },
   "Edit Image from Clipboard": {
-    "Edit Image from Clipboard": ""
+    "Edit Image from Clipboard": "从剪贴板编辑图像"
   },
   "Edit Text Note": {
-    "Edit Text Note": ""
+    "Edit Text Note": "编辑文本备注"
   },
   "Editor": {
-    "Editor": ""
+    "Editor": "编辑器"
   },
   "Editor Aspect Ratio": {
-    "Editor Aspect Ratio": ""
+    "Editor Aspect Ratio": "编辑器宽高比"
   },
   "Editor Display Mode": {
-    "Editor Display Mode": ""
+    "Editor Display Mode": "编辑器显示模式"
   },
   "Editor Display Screen": {
-    "Editor Display Screen": ""
+    "Editor Display Screen": "编辑器显示屏幕"
   },
   "Editor Preview Quality": {
-    "Editor Preview Quality": ""
+    "Editor Preview Quality": "编辑器预览质量"
   },
   "Ellipse": {
-    "Ellipse": ""
+    "Ellipse": "椭圆"
   },
   "Ellipse / Circle": {
     "Ellipse / Circle": "椭圆/圆形"
   },
   "Ellipse / Circle (Q)": {
-    "Ellipse / Circle (Q)": ""
+    "Ellipse / Circle (Q)": "椭圆/圆形 (Q)"
   },
   "Ellipse Color": {
-    "Ellipse Color": ""
+    "Ellipse Color": "椭圆颜色"
   },
   "Ellipse Thickness": {
-    "Ellipse Thickness": ""
+    "Ellipse Thickness": "椭圆粗细"
   },
   "Ellipse, Text, Pixelate, Redact (Q, W, E, R)": {
-    "Ellipse, Text, Pixelate, Redact (Q, W, E, R)": ""
+    "Ellipse, Text, Pixelate, Redact (Q, W, E, R)": "椭圆、文本、像素化、涂黑 (Q, W, E, R)"
   },
   "Enable background automatically when opening the editor": {
-    "Enable background automatically when opening the editor": ""
+    "Enable background automatically when opening the editor": "打开编辑器时自动启用背景"
   },
   "Eraser": {
     "Eraser": "橡皮"
   },
   "Everforest": {
-    "Everforest": ""
+    "Everforest": "Everforest"
   },
   "Failed to convert recording to GIF.": {
-    "Failed to convert recording to GIF.": ""
+    "Failed to convert recording to GIF.": "录像转换为 GIF 失败。"
   },
   "Failed to copy screenshot to clipboard.": {
-    "Failed to copy screenshot to clipboard.": ""
+    "Failed to copy screenshot to clipboard.": "截图复制到剪贴板失败。"
   },
   "Failed to generate blurred background image": {
-    "Failed to generate blurred background image": ""
+    "Failed to generate blurred background image": "生成模糊背景图像失败"
   },
   "Failed to save screenshot": {
-    "Failed to save screenshot": ""
+    "Failed to save screenshot": "保存截图失败"
   },
   "Failed to save screenshot file.": {
-    "Failed to save screenshot file.": ""
+    "Failed to save screenshot file.": "保存截图文件失败。"
   },
   "Flip Horiz": {
-    "Flip Horiz": ""
+    "Flip Horiz": "水平翻转"
   },
   "Flip Vert": {
-    "Flip Vert": ""
+    "Flip Vert": "垂直翻转"
   },
   "Float": {
     "Float": "浮动"
   },
   "Float Image": {
-    "Float Image": ""
+    "Float Image": "浮动图像"
   },
   "Float Window": {
-    "Float Window": ""
+    "Float Window": "悬浮窗口"
   },
   "Floating": {
     "Floating": "浮动"
   },
   "Focused Screen": {
-    "Focused Screen": ""
+    "Focused Screen": "聚焦屏幕"
   },
   "Focused Window": {
     "Focused Window": "聚焦窗口"
@@ -510,64 +510,64 @@
     "Font Size": "字体大小"
   },
   "Font family used for number stamp labels": {
-    "Font family used for number stamp labels": ""
+    "Font family used for number stamp labels": "数字印章标签使用的字体族"
   },
   "Force Copy & Save": {
-    "Force Copy & Save": ""
+    "Force Copy & Save": "强制复制并保存"
   },
   "Force Copy to Clipboard": {
-    "Force Copy to Clipboard": ""
+    "Force Copy to Clipboard": "强制复制到剪贴板"
   },
   "Force Save to File": {
-    "Force Save to File": ""
+    "Force Save to File": "强制保存到文件"
   },
   "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
-    "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": ""
+    "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": "格式标记：%Y（年）、%y（两位全年）、%m（月）、%d（日）、%H（时）、%M（分）、%S（秒）、{zzz}（毫秒）"
   },
   "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
-    "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
+    "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": "格式标记：{user}（用户名）、\\n（换行）、%Y（年）、%y（两位全年）、%m（月）、%d（日）、%H（时）、%M（分）、%S（秒）"
   },
   "Framerate": {
-    "Framerate": ""
+    "Framerate": "帧率"
   },
   "Free": {
-    "Free": ""
+    "Free": "自由"
   },
   "Freehand Pen": {
-    "Freehand Pen": "写意笔"
+    "Freehand Pen": "自由画笔"
   },
   "Freehand Pen (1)": {
-    "Freehand Pen (1)": ""
+    "Freehand Pen (1)": "自由画笔 (1)"
   },
   "From Clipboard": {
-    "From Clipboard": ""
+    "From Clipboard": "来自剪贴板"
   },
   "From File": {
-    "From File": ""
+    "From File": "来自文件"
   },
   "Full Screen": {
     "Full Screen": "全屏"
   },
   "Full Screen Target": {
-    "Full Screen Target": ""
+    "Full Screen Target": "全屏目标"
   },
   "GIF Framerate": {
-    "GIF Framerate": ""
+    "GIF Framerate": "GIF 帧率"
   },
   "General Shortcuts": {
-    "General Shortcuts": ""
+    "General Shortcuts": "通用快捷键"
   },
   "Gruvbox Material": {
-    "Gruvbox Material": ""
+    "Gruvbox Material": "Gruvbox Material"
   },
   "Help": {
     "Help": "帮助"
   },
   "Hide Control Center": {
-    "Hide Control Center": ""
+    "Hide Control Center": "隐藏控制中心"
   },
   "Hide Control Center by Default": {
-    "Hide Control Center by Default": ""
+    "Hide Control Center by Default": "默认隐藏控制中心"
   },
   "High": {
     "High": "高"
@@ -576,160 +576,160 @@
     "Highlighter": "荧光笔"
   },
   "Highlighter (S)": {
-    "Highlighter (S)": ""
+    "Highlighter (S)": "荧光笔 (S)"
   },
   "Highlighter Color": {
-    "Highlighter Color": ""
+    "Highlighter Color": "荧光笔颜色"
   },
   "Highlighter Thickness": {
-    "Highlighter Thickness": ""
+    "Highlighter Thickness": "荧光笔粗细"
   },
   "History": {
     "History": "历史记录"
   },
   "Hover Trigger Delay": {
-    "Hover Trigger Delay": ""
+    "Hover Trigger Delay": "悬停触发延迟"
   },
   "IPC Commands": {
-    "IPC Commands": ""
+    "IPC Commands": "IPC 命令"
   },
   "Image": {
     "Image": "图像"
   },
   "Image + Text": {
-    "Image + Text": ""
+    "Image + Text": "图像 + 文本"
   },
   "Image Background": {
-    "Image Background": ""
+    "Image Background": "图像背景"
   },
   "Image Error": {
-    "Image Error": ""
+    "Image Error": "图像错误"
   },
   "Image Size": {
-    "Image Size": ""
+    "Image Size": "图像大小"
   },
   "Image copied to clipboard": {
     "Image copied to clipboard": "已复制图像至剪贴板"
   },
   "Image selected automatically when using Image Background mode": {
-    "Image selected automatically when using Image Background mode": ""
+    "Image selected automatically when using Image Background mode": "使用图像背景模式时自动选择的图像"
   },
   "Include Cursor": {
-    "Include Cursor": ""
+    "Include Cursor": "包含光标"
   },
   "Initial Width": {
-    "Initial Width": ""
+    "Initial Width": "初始宽度"
   },
   "Initial state for the Control Center toggle.": {
-    "Initial state for the Control Center toggle.": ""
+    "Initial state for the Control Center toggle.": "控制中心开关的初始状态。"
   },
   "Input Mode": {
-    "Input Mode": ""
+    "Input Mode": "输入模式"
   },
   "Insert Image": {
-    "Insert Image": ""
+    "Insert Image": "插入图像"
   },
   "Interaction / Result": {
-    "Interaction / Result": ""
+    "Interaction / Result": "交互 / 结果"
   },
   "Interactive Region": {
-    "Interactive Region": ""
+    "Interactive Region": "交互区域"
   },
   "JPEG Quality": {
-    "JPEG Quality": ""
+    "JPEG Quality": "JPEG 质量"
   },
   "Kanagawa": {
-    "Kanagawa": ""
+    "Kanagawa": "Kanagawa"
   },
   "Key": {
     "Key": "键"
   },
   "Landscape": {
-    "Landscape": ""
+    "Landscape": "横向"
   },
   "Last Reg": {
-    "Last Reg": ""
+    "Last Reg": "上次区域"
   },
   "Last Region": {
-    "Last Region": ""
+    "Last Region": "上次区域"
   },
   "Last Selected Region": {
-    "Last Selected Region": ""
+    "Last Selected Region": "上次选中的区域"
   },
   "Left": {
     "Left": "左侧"
   },
   "Left Click": {
-    "Left Click": ""
+    "Left Click": "左键单击"
   },
   "Light": {
-    "Light": "细体"
+    "Light": "细"
   },
   "Line Color": {
-    "Line Color": ""
+    "Line Color": "线条颜色"
   },
   "Line Thickness": {
-    "Line Thickness": ""
+    "Line Thickness": "线条粗细"
   },
   "Linear Gradient": {
-    "Linear Gradient": ""
+    "Linear Gradient": "线性渐变"
   },
   "Live Preview": {
-    "Live Preview": ""
+    "Live Preview": "实时预览"
   },
   "Low": {
     "Low": "低"
   },
   "Magnifier Loupe": {
-    "Magnifier Loupe": ""
+    "Magnifier Loupe": "放大镜"
   },
   "Max Height (0 = no limit)": {
-    "Max Height (0 = no limit)": ""
+    "Max Height (0 = no limit)": "最大高度（0 = 无限制）"
   },
   "Medium": {
     "Medium": "中等"
   },
   "Menu Item Right Click": {
-    "Menu Item Right Click": ""
+    "Menu Item Right Click": "菜单项右键"
   },
   "Merging audio tracks...": {
-    "Merging audio tracks...": ""
+    "Merging audio tracks...": "正在合并音轨..."
   },
   "Microphone Device": {
-    "Microphone Device": ""
+    "Microphone Device": "麦克风设备"
   },
   "Middle Click": {
-    "Middle Click": ""
+    "Middle Click": "中键单击"
   },
   "Middle Click Action": {
-    "Middle Click Action": ""
+    "Middle Click Action": "中键单击操作"
   },
   "Minimize Delay": {
-    "Minimize Delay": ""
+    "Minimize Delay": "最小化延迟"
   },
   "Modal": {
-    "Modal": ""
+    "Modal": "模态"
   },
   "More Tools": {
-    "More Tools": ""
+    "More Tools": "更多工具"
   },
   "Niri Binding Example": {
-    "Niri Binding Example": ""
+    "Niri Binding Example": "Niri 按键绑定示例"
   },
   "No Background": {
     "No Background": "无背景色"
   },
   "No Image Specified": {
-    "No Image Specified": ""
+    "No Image Specified": "未指定图像"
   },
   "No output available": {
-    "No output available": ""
+    "No output available": "没有可用输出"
   },
   "No saved images yet": {
-    "No saved images yet": ""
+    "No saved images yet": "暂无已保存的图像"
   },
   "No supported images found": {
-    "No supported images found": ""
+    "No supported images found": "未找到受支持的图像"
   },
   "None": {
     "None": "无"
@@ -738,10 +738,10 @@
     "None / Disabled": "无/禁用"
   },
   "Nord": {
-    "Nord": ""
+    "Nord": "Nord"
   },
   "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": {
-    "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": ""
+    "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": "注意：若起始工具与其匹配，起始工具模式将覆盖工具粗细和颜色默认值。"
   },
   "Notification": {
     "Notification": "通知"
@@ -753,13 +753,13 @@
     "Number Stamp": "数字印章"
   },
   "OCR": {
-    "OCR": ""
+    "OCR": "OCR"
   },
   "OCR Result": {
-    "OCR Result": ""
+    "OCR Result": "OCR 结果"
   },
   "OCR Text Recognition": {
-    "OCR Text Recognition": ""
+    "OCR Text Recognition": "OCR 文本识别"
   },
   "Opacity": {
     "Opacity": "不透明度"
@@ -768,118 +768,118 @@
     "Open": "打开"
   },
   "Open Folder": {
-    "Open Folder": ""
+    "Open Folder": "打开文件夹"
   },
   "Open Quick Capture menu (Popout)": {
-    "Open Quick Capture menu (Popout)": ""
+    "Open Quick Capture menu (Popout)": "打开 Quick Capture 菜单（弹出层）"
   },
   "Open Specific Image Path": {
-    "Open Specific Image Path": ""
+    "Open Specific Image Path": "打开指定图像路径"
   },
   "Outline Variant": {
-    "Outline Variant": ""
+    "Outline Variant": "边框变体"
   },
   "Output Format": {
-    "Output Format": ""
+    "Output Format": "输出格式"
   },
   "Output format applies only to disk saves. Clipboard copies are always PNG.": {
-    "Output format applies only to disk saves. Clipboard copies are always PNG.": ""
+    "Output format applies only to disk saves. Clipboard copies are always PNG.": "输出格式仅适用于保存到磁盘。剪贴板复制始终为 PNG。"
   },
   "Outputs": {
-    "Outputs": ""
+    "Outputs": "输出"
   },
   "Overlay Opacity": {
-    "Overlay Opacity": ""
+    "Overlay Opacity": "覆盖层不透明度"
   },
   "Palette Preset": {
-    "Palette Preset": ""
+    "Palette Preset": "调色板预设"
   },
   "Pause": {
     "Pause": "暂停"
   },
   "Pause / Resume": {
-    "Pause / Resume": ""
+    "Pause / Resume": "暂停 / 恢复"
   },
   "Paused": {
-    "Paused": ""
+    "Paused": "已暂停"
   },
   "Pen Auto-Close": {
-    "Pen Auto-Close": ""
+    "Pen Auto-Close": "画笔自动闭合"
   },
   "Pen Color": {
-    "Pen Color": ""
+    "Pen Color": "画笔颜色"
   },
   "Pen Thickness": {
-    "Pen Thickness": ""
+    "Pen Thickness": "画笔粗细"
   },
   "Pen, Line, Arrow, Rect": {
-    "Pen, Line, Arrow, Rect": ""
+    "Pen, Line, Arrow, Rect": "画笔、直线、箭头、矩形"
   },
   "Pick Color": {
-    "Pick Color": ""
+    "Pick Color": "取色"
   },
   "Pick a palette preset or customize individual color slots.": {
-    "Pick a palette preset or customize individual color slots.": ""
+    "Pick a palette preset or customize individual color slots.": "选择一个调色板预设或自定义各个颜色槽。"
   },
   "Pixel Intensity": {
-    "Pixel Intensity": ""
+    "Pixel Intensity": "像素强度"
   },
   "Pixelate": {
     "Pixelate": "像素化"
   },
   "Pixelate (E)": {
-    "Pixelate (E)": ""
+    "Pixelate (E)": "像素化 (E)"
   },
   "Pixelate Intensity": {
-    "Pixelate Intensity": ""
+    "Pixelate Intensity": "像素化强度"
   },
   "Popup Input": {
-    "Popup Input": ""
+    "Popup Input": "弹出输入"
   },
   "Portrait": {
-    "Portrait": ""
+    "Portrait": "纵向"
   },
   "Position": {
     "Position": "位置"
   },
   "Post-Capture Notification": {
-    "Post-Capture Notification": ""
+    "Post-Capture Notification": "截图后通知"
   },
   "Preset %1": {
-    "Preset %1": ""
+    "Preset %1": "预设 %1"
   },
   "Preset 1": {
-    "Preset 1": ""
+    "Preset 1": "预设 1"
   },
   "Preset 2": {
-    "Preset 2": ""
+    "Preset 2": "预设 2"
   },
   "Preset 3": {
-    "Preset 3": ""
+    "Preset 3": "预设 3"
   },
   "Preset 4": {
-    "Preset 4": ""
+    "Preset 4": "预设 4"
   },
   "Preset 5": {
-    "Preset 5": ""
+    "Preset 5": "预设 5"
   },
   "Preset 6": {
-    "Preset 6": ""
+    "Preset 6": "预设 6"
   },
   "Preset 7": {
-    "Preset 7": ""
+    "Preset 7": "预设 7"
   },
   "Preset 8": {
-    "Preset 8": ""
+    "Preset 8": "预设 8"
   },
   "Preset Color": {
-    "Preset Color": ""
+    "Preset Color": "预设颜色"
   },
   "Preset Thickness": {
-    "Preset Thickness": ""
+    "Preset Thickness": "预设粗细"
   },
   "Preset Tool": {
-    "Preset Tool": ""
+    "Preset Tool": "预设工具"
   },
   "Preview": {
     "Preview": "预览"
@@ -888,106 +888,106 @@
     "Primary": "主色"
   },
   "Primary Screen": {
-    "Primary Screen": ""
+    "Primary Screen": "主屏幕"
   },
   "QR Result": {
-    "QR Result": ""
+    "QR Result": "二维码结果"
   },
   "Quick Capture": {
-    "Quick Capture": ""
+    "Quick Capture": "Quick Capture"
   },
   "Quick Capture Error": {
-    "Quick Capture Error": ""
+    "Quick Capture Error": "Quick Capture 错误"
   },
   "Radial Gradient": {
-    "Radial Gradient": ""
+    "Radial Gradient": "径向渐变"
   },
   "Radial Menu": {
-    "Radial Menu": ""
+    "Radial Menu": "径向菜单"
   },
   "Radial Menu Opacity": {
-    "Radial Menu Opacity": ""
+    "Radial Menu Opacity": "径向菜单不透明度"
   },
   "Radial Menu Settings": {
-    "Radial Menu Settings": ""
+    "Radial Menu Settings": "径向菜单设置"
   },
   "Radial Preset": {
-    "Radial Preset": ""
+    "Radial Preset": "径向预设"
   },
   "Ratio": {
-    "Ratio": ""
+    "Ratio": "比例"
   },
   "Ready": {
     "Ready": "就绪"
   },
   "Recent Edits": {
-    "Recent Edits": ""
+    "Recent Edits": "最近的编辑"
   },
   "Record Microphone": {
-    "Record Microphone": ""
+    "Record Microphone": "录制麦克风"
   },
   "Record Mouse Cursor": {
-    "Record Mouse Cursor": ""
+    "Record Mouse Cursor": "录制鼠标光标"
   },
   "Record System Audio": {
-    "Record System Audio": ""
+    "Record System Audio": "录制系统音频"
   },
   "Recording": {
-    "Recording": ""
+    "Recording": "录制中"
   },
   "Recording Folder": {
-    "Recording Folder": ""
+    "Recording Folder": "录制文件夹"
   },
   "Recording ended with error code %1.": {
-    "Recording ended with error code %1.": ""
+    "Recording ended with error code %1.": "录制以错误代码 %1 结束。"
   },
   "Recording...": {
-    "Recording...": ""
+    "Recording...": "正在录制..."
   },
   "Recordings Directory": {
-    "Recordings Directory": ""
+    "Recordings Directory": "录制目录"
   },
   "Rectangle": {
-    "Rectangle": ""
+    "Rectangle": "矩形"
   },
   "Rectangle Color": {
-    "Rectangle Color": ""
+    "Rectangle Color": "矩形颜色"
   },
   "Rectangle Outline": {
     "Rectangle Outline": "矩形（线框）"
   },
   "Rectangle Outline (4)": {
-    "Rectangle Outline (4)": ""
+    "Rectangle Outline (4)": "矩形（线框）(4)"
   },
   "Rectangle Thickness": {
-    "Rectangle Thickness": ""
+    "Rectangle Thickness": "矩形粗细"
   },
   "Redact": {
-    "Redact": ""
+    "Redact": "涂黑"
   },
   "Redact (R)": {
-    "Redact (R)": ""
+    "Redact (R)": "涂黑 (R)"
   },
   "Redact Thickness": {
-    "Redact Thickness": ""
+    "Redact Thickness": "涂黑粗细"
   },
   "Redo (Ctrl+Y / Ctrl+Shift+Z)": {
-    "Redo (Ctrl+Y / Ctrl+Shift+Z)": ""
+    "Redo (Ctrl+Y / Ctrl+Shift+Z)": "重做 (Ctrl+Y / Ctrl+Shift+Z)"
   },
   "Redo last undone stroke": {
-    "Redo last undone stroke": ""
+    "Redo last undone stroke": "重做上一步取消的笔画"
   },
   "Refresh": {
     "Refresh": "刷新"
   },
   "Region": {
-    "Region": ""
+    "Region": "区域"
   },
   "Reset": {
     "Reset": "重置"
   },
   "Reset Last Region": {
-    "Reset Last Region": ""
+    "Reset Last Region": "重置上次区域"
   },
   "Resume": {
     "Resume": "恢复"
@@ -996,355 +996,355 @@
     "Right": "右侧"
   },
   "Right Click": {
-    "Right Click": ""
+    "Right Click": "右键单击"
   },
   "Right Click Action": {
-    "Right Click Action": ""
+    "Right Click Action": "右键单击操作"
   },
   "Rosé Pine": {
-    "Rosé Pine": ""
+    "Rosé Pine": "Rosé Pine"
   },
   "Rotate L": {
-    "Rotate L": ""
+    "Rotate L": "左旋"
   },
   "Rotate R": {
-    "Rotate R": ""
+    "Rotate R": "右旋"
   },
   "Round Highlighter Tips": {
-    "Round Highlighter Tips": ""
+    "Round Highlighter Tips": "圆形荧光笔笔尖"
   },
   "Round Rectangle Corners": {
-    "Round Rectangle Corners": ""
+    "Round Rectangle Corners": "圆角矩形圆角"
   },
   "Rounded Rectangle": {
-    "Rounded Rectangle": ""
+    "Rounded Rectangle": "圆角矩形"
   },
   "Save": {
-    "Save": ""
+    "Save": "保存"
   },
   "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": {
-    "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": ""
+    "Save (Ctrl+S) | Save As (Ctrl+Shift+S)": "保存 (Ctrl+S) | 另存为 (Ctrl+Shift+S)"
   },
   "Save Directory": {
     "Save Directory": "保存目录"
   },
   "Save Filename Pattern": {
-    "Save Filename Pattern": ""
+    "Save Filename Pattern": "保存文件名模式"
   },
   "Save Screenshot As": {
-    "Save Screenshot As": ""
+    "Save Screenshot As": "另存截图"
   },
   "Saved %1 (%2)": {
-    "Saved %1 (%2)": ""
+    "Saved %1 (%2)": "已保存 %1（%2）"
   },
   "Saving": {
-    "Saving": ""
+    "Saving": "正在保存"
   },
   "Scale Editor to Screenshot Size": {
-    "Scale Editor to Screenshot Size": ""
+    "Scale Editor to Screenshot Size": "将编辑器缩放到截图大小"
   },
   "Scan QR": {
-    "Scan QR": ""
+    "Scan QR": "扫描二维码"
   },
   "Screen": {
-    "Screen": ""
+    "Screen": "屏幕"
   },
   "Screen Recorder": {
-    "Screen Recorder": ""
+    "Screen Recorder": "屏幕录制"
   },
   "Screen Recording (%1)": {
-    "Screen Recording (%1)": ""
+    "Screen Recording (%1)": "屏幕录制 (%1)"
   },
   "Screen Recording Error": {
-    "Screen Recording Error": ""
+    "Screen Recording Error": "屏幕录制错误"
   },
   "Screen Recording Saved": {
-    "Screen Recording Saved": ""
+    "Screen Recording Saved": "屏幕录制已保存"
   },
   "Screen recording timed out or was cancelled.": {
-    "Screen recording timed out or was cancelled.": ""
+    "Screen recording timed out or was cancelled.": "屏幕录制超时或已取消。"
   },
   "Screen: %1 (%2x%3)": {
-    "Screen: %1 (%2x%3)": ""
+    "Screen: %1 (%2x%3)": "屏幕：%1（%2x%3）"
   },
   "Screenshot (%1) — %2": {
-    "Screenshot (%1) — %2": ""
+    "Screenshot (%1) — %2": "截图 (%1) — %2"
   },
   "Screenshot Copied": {
-    "Screenshot Copied": ""
+    "Screenshot Copied": "截图已复制"
   },
   "Screenshot Folder": {
-    "Screenshot Folder": ""
+    "Screenshot Folder": "截图文件夹"
   },
   "Screenshot Saved": {
-    "Screenshot Saved": ""
+    "Screenshot Saved": "截图已保存"
   },
   "Screenshot copied anonymously with randomized name and stripped metadata.": {
-    "Screenshot copied anonymously with randomized name and stripped metadata.": ""
+    "Screenshot copied anonymously with randomized name and stripped metadata.": "截图已匿名复制，名称随机化且去除元数据。"
   },
   "Screenshot copied to clipboard and saved to %1": {
-    "Screenshot copied to clipboard and saved to %1": ""
+    "Screenshot copied to clipboard and saved to %1": "截图已复制到剪贴板并保存至 %1"
   },
   "Screenshot copied to clipboard but failed to save file: %1": {
-    "Screenshot copied to clipboard but failed to save file: %1": ""
+    "Screenshot copied to clipboard but failed to save file: %1": "截图已复制到剪贴板，但保存文件失败：%1"
   },
   "Screenshot copied to clipboard.": {
-    "Screenshot copied to clipboard.": ""
+    "Screenshot copied to clipboard.": "截图已复制到剪贴板。"
   },
   "Screenshot copied with randomized name.": {
-    "Screenshot copied with randomized name.": ""
+    "Screenshot copied with randomized name.": "截图已复制，名称为随机生成。"
   },
   "Screenshot failed (mode: %1).": {
-    "Screenshot failed (mode: %1).": ""
+    "Screenshot failed (mode: %1).": "截图失败（模式：%1）。"
   },
   "Screenshot saved": {
-    "Screenshot saved": ""
+    "Screenshot saved": "截图已保存"
   },
   "Screenshot saved to %1": {
-    "Screenshot saved to %1": ""
+    "Screenshot saved to %1": "截图已保存至 %1"
   },
   "Screenshot saved to %1/%2": {
-    "Screenshot saved to %1/%2": ""
+    "Screenshot saved to %1/%2": "截图已保存至 %1/%2"
   },
   "Scroll": {
-    "Scroll": "Scroll"
+    "Scroll": "滚动"
   },
   "Scroll Interval": {
-    "Scroll Interval": ""
+    "Scroll Interval": "滚动间隔"
   },
   "Scroll capture: select a region, scroll content, then press Enter to finish.": {
-    "Scroll capture: select a region, scroll content, then press Enter to finish.": ""
+    "Scroll capture: select a region, scroll content, then press Enter to finish.": "滚动截图：选择区域，滚动内容，然后按回车完成。"
   },
   "Scrolling": {
     "Scrolling": "滚动"
   },
   "Scrolling Capture": {
-    "Scrolling Capture": ""
+    "Scrolling Capture": "滚动截图"
   },
   "Select": {
     "Select": "选择"
   },
   "Select / Move stroke": {
-    "Select / Move stroke": ""
+    "Select / Move stroke": "选择 / 移动笔画"
   },
   "Select Color Slots 1 - 4": {
-    "Select Color Slots 1 - 4": ""
+    "Select Color Slots 1 - 4": "选择颜色槽 1 - 4"
   },
   "Select Color Slots 5 - 8 (Q, W, E, R)": {
-    "Select Color Slots 5 - 8 (Q, W, E, R)": ""
+    "Select Color Slots 5 - 8 (Q, W, E, R)": "选择颜色槽 5 - 8 (Q, W, E, R)"
   },
   "Select Image File": {
-    "Select Image File": ""
+    "Select Image File": "选择图像文件"
   },
   "Select Image to Annotate": {
-    "Select Image to Annotate": ""
+    "Select Image to Annotate": "选择要标注的图像"
   },
   "Selected Tool / Action": {
-    "Selected Tool / Action": ""
+    "Selected Tool / Action": "所选工具 / 操作"
   },
   "Settings": {
     "Settings": "设置"
   },
   "Shapes": {
-    "Shapes": ""
+    "Shapes": "形状"
   },
   "Shortcut Action": {
-    "Shortcut Action": ""
+    "Shortcut Action": "快捷键操作"
   },
   "Shortcuts": {
     "Shortcuts": "快捷键"
   },
   "Show Control Center": {
-    "Show Control Center": ""
+    "Show Control Center": "显示控制中心"
   },
   "Show Keyboard Shortcut Hints": {
-    "Show Keyboard Shortcut Hints": ""
+    "Show Keyboard Shortcut Hints": "显示快捷键提示"
   },
   "Show Pill Border": {
-    "Show Pill Border": ""
+    "Show Pill Border": "显示胶囊边框"
   },
   "Show Recent Edits History": {
-    "Show Recent Edits History": ""
+    "Show Recent Edits History": "显示近期编辑历史"
   },
   "Show Region Border": {
-    "Show Region Border": ""
+    "Show Region Border": "显示区域边框"
   },
   "Show Screenshot Border": {
-    "Show Screenshot Border": ""
+    "Show Screenshot Border": "显示截图边框"
   },
   "Show Toolbar": {
-    "Show Toolbar": ""
+    "Show Toolbar": "显示工具栏"
   },
   "Show Toolbar Border": {
-    "Show Toolbar Border": ""
+    "Show Toolbar Border": "显示工具栏边框"
   },
   "Show only the image on a transparent background": {
-    "Show only the image on a transparent background": ""
+    "Show only the image on a transparent background": "仅在透明背景上显示图像"
   },
   "Skip Confirmation": {
-    "Skip Confirmation": ""
+    "Skip Confirmation": "跳过确认"
   },
   "Slot 1": {
-    "Slot 1": ""
+    "Slot 1": "槽 1"
   },
   "Slot 2": {
-    "Slot 2": ""
+    "Slot 2": "槽 2"
   },
   "Slot 3": {
-    "Slot 3": ""
+    "Slot 3": "槽 3"
   },
   "Slot 4": {
-    "Slot 4": ""
+    "Slot 4": "槽 4"
   },
   "Slot 5": {
-    "Slot 5": ""
+    "Slot 5": "槽 5"
   },
   "Slot 6": {
-    "Slot 6": ""
+    "Slot 6": "槽 6"
   },
   "Slot 7": {
-    "Slot 7": ""
+    "Slot 7": "槽 7"
   },
   "Slot 8": {
-    "Slot 8": ""
+    "Slot 8": "槽 8"
   },
   "Soften image details so screenshot content stands out": {
-    "Soften image details so screenshot content stands out": ""
+    "Soften image details so screenshot content stands out": "柔化图像细节，让截图内容更突出"
   },
   "Solid Color": {
-    "Solid Color": ""
+    "Solid Color": "纯色"
   },
   "Solid Fill": {
-    "Solid Fill": ""
+    "Solid Fill": "实心填充"
   },
   "Solid Line": {
-    "Solid Line": ""
+    "Solid Line": "实线"
   },
   "Spawn Position": {
-    "Spawn Position": ""
+    "Spawn Position": "生成位置"
   },
   "Specific Output": {
-    "Specific Output": ""
+    "Specific Output": "指定输出"
   },
   "Spotlight": {
-    "Spotlight": "聚焦"
+    "Spotlight": "聚光灯"
   },
   "Spotlight (D)": {
-    "Spotlight (D)": ""
+    "Spotlight (D)": "聚光灯 (D)"
   },
   "Spotlight Opacity": {
-    "Spotlight Opacity": ""
+    "Spotlight Opacity": "聚光灯不透明度"
   },
   "Stamp (A)": {
-    "Stamp (A)": ""
+    "Stamp (A)": "印章 (A)"
   },
   "Stamp Color": {
-    "Stamp Color": ""
+    "Stamp Color": "印章颜色"
   },
   "Stamp Contrast Ring": {
-    "Stamp Contrast Ring": ""
+    "Stamp Contrast Ring": "印章对比环"
   },
   "Stamp Number Font": {
-    "Stamp Number Font": ""
+    "Stamp Number Font": "印章数字字体"
   },
   "Stamp Size": {
-    "Stamp Size": ""
+    "Stamp Size": "印章大小"
   },
   "Stamp, Highlighter, Spotlight (A, S, D)": {
-    "Stamp, Highlighter, Spotlight (A, S, D)": ""
+    "Stamp, Highlighter, Spotlight (A, S, D)": "印章、荧光笔、聚光灯 (A, S, D)"
   },
   "Starting Preset": {
-    "Starting Preset": ""
+    "Starting Preset": "起始预设"
   },
   "Starting Tool": {
     "Starting Tool": "初始工具"
   },
   "Starting Tool Mode": {
-    "Starting Tool Mode": ""
+    "Starting Tool Mode": "起始工具模式"
   },
   "Stop & Save": {
-    "Stop & Save": ""
+    "Stop & Save": "停止并保存"
   },
   "Straight Line": {
     "Straight Line": "直线"
   },
   "Straight Line (2)": {
-    "Straight Line (2)": ""
+    "Straight Line (2)": "直线 (2)"
   },
   "Surface Container Highest": {
-    "Surface Container Highest": ""
+    "Surface Container Highest": "Surface 容器最高层"
   },
   "Switch to Select Tool": {
-    "Switch to Select Tool": ""
+    "Switch to Select Tool": "切换到选择工具"
   },
   "Switch to your custom preset": {
-    "Switch to your custom preset": ""
+    "Switch to your custom preset": "切换到你的自定义预设"
   },
   "Synthwave Electric": {
-    "Synthwave Electric": ""
+    "Synthwave Electric": "Synthwave Electric"
   },
   "System Audio Device": {
-    "System Audio Device": ""
+    "System Audio Device": "系统音频设备"
   },
   "Target Output Name": {
-    "Target Output Name": ""
+    "Target Output Name": "目标输出名称"
   },
   "Text": {
     "Text": "文本"
   },
   "Text (W)": {
-    "Text (W)": ""
+    "Text (W)": "文本 (W)"
   },
   "Text Background Roundness": {
-    "Text Background Roundness": ""
+    "Text Background Roundness": "文本背景圆角"
   },
   "Text Color": {
     "Text Color": "文本颜色"
   },
   "Text Font": {
-    "Text Font": ""
+    "Text Font": "文本字体"
   },
   "Text Note": {
-    "Text Note": "文本"
+    "Text Note": "文本备注"
   },
   "Text Size": {
-    "Text Size": ""
+    "Text Size": "文本大小"
   },
   "Theme Primary Color": {
-    "Theme Primary Color": ""
+    "Theme Primary Color": "主题主色"
   },
   "Thickness": {
-    "Thickness": "厚度"
+    "Thickness": "粗细"
   },
   "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": {
-    "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": ""
+    "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": "此调色板预设为只读。选择下方任一选项切换到自定义调色板并编辑颜色："
   },
   "Toast": {
     "Toast": "浮动通知"
   },
   "Toggle Hide/Show Annotations": {
-    "Toggle Hide/Show Annotations": ""
+    "Toggle Hide/Show Annotations": "切换隐藏/显示标注"
   },
   "Toggle Start / Stop": {
-    "Toggle Start / Stop": ""
+    "Toggle Start / Stop": "切换开始 / 停止"
   },
   "Toggle between 2 latest presets": {
-    "Toggle between 2 latest presets": ""
+    "Toggle between 2 latest presets": "在两个最近的预设间切换"
   },
   "Tokyo Night": {
-    "Tokyo Night": ""
+    "Tokyo Night": "Tokyo Night"
   },
   "Tool Defaults": {
-    "Tool Defaults": ""
+    "Tool Defaults": "工具默认值"
   },
   "Toolbar": {
-    "Toolbar": ""
+    "Toolbar": "工具栏"
   },
   "Toolbar Palette": {
-    "Toolbar Palette": ""
+    "Toolbar Palette": "工具栏调色板"
   },
   "Toolbar Position": {
-    "Toolbar Position": ""
+    "Toolbar Position": "工具栏位置"
   },
   "Top": {
     "Top": "顶部"
@@ -1359,81 +1359,81 @@
     "Top Right": "右上"
   },
   "Transparent": {
-    "Transparent": ""
+    "Transparent": "透明"
   },
   "Transparent Background": {
-    "Transparent Background": ""
+    "Transparent Background": "透明背景"
   },
   "Trigger Middle-Click Action (Default: Interactive Region)": {
-    "Trigger Middle-Click Action (Default: Interactive Region)": ""
+    "Trigger Middle-Click Action (Default: Interactive Region)": "触发中键单击操作（默认：交互区域）"
   },
   "Trigger Right-Click Action (Default: Clipboard Annotate)": {
-    "Trigger Right-Click Action (Default: Clipboard Annotate)": ""
+    "Trigger Right-Click Action (Default: Clipboard Annotate)": "触发右键单击操作（默认：标注剪贴板）"
   },
   "Trigger on Hover": {
-    "Trigger on Hover": ""
+    "Trigger on Hover": "悬停触发"
   },
   "Type note...": {
-    "Type note...": ""
+    "Type note...": "输入备注..."
   },
   "Undo (Ctrl+Z)": {
-    "Undo (Ctrl+Z)": ""
+    "Undo (Ctrl+Z)": "撤销 (Ctrl+Z)"
   },
   "Undo last stroke": {
-    "Undo last stroke": ""
+    "Undo last stroke": "撤销上一步笔画"
   },
   "Usage Guide": {
-    "Usage Guide": ""
+    "Usage Guide": "使用指南"
   },
   "Use Existing Custom": {
-    "Use Existing Custom": ""
+    "Use Existing Custom": "使用现有自定义"
   },
   "Use Floating Editor": {
-    "Use Floating Editor": ""
+    "Use Floating Editor": "使用悬浮编辑器"
   },
   "Use Modal Editor": {
-    "Use Modal Editor": ""
+    "Use Modal Editor": "使用模态编辑器"
   },
   "Very High": {
     "Very High": "非常高"
   },
   "Video Codec": {
-    "Video Codec": ""
+    "Video Codec": "视频编解码器"
   },
   "Video Quality": {
-    "Video Quality": ""
+    "Video Quality": "视频质量"
   },
   "Video Settings": {
-    "Video Settings": ""
+    "Video Settings": "视频设置"
   },
   "Watermark": {
-    "Watermark": ""
+    "Watermark": "水印"
   },
   "Watermark Image": {
-    "Watermark Image": ""
+    "Watermark Image": "水印图像"
   },
   "Watermark Text": {
-    "Watermark Text": ""
+    "Watermark Text": "水印文本"
   },
   "Watermark Type": {
-    "Watermark Type": ""
+    "Watermark Type": "水印类型"
   },
   "WebP Quality": {
-    "WebP Quality": ""
+    "WebP Quality": "WebP 质量"
   },
   "When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.": {
-    "When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.": ""
+    "When enabled, the editor shrinks to match the captured region instead of filling 90% of the screen.": "启用后，编辑器将缩小以匹配截取的区域，而不是占满屏幕的 90%。"
   },
   "Window": {
-    "Window": ""
+    "Window": "窗口"
   },
   "Window / Portal": {
-    "Window / Portal": ""
+    "Window / Portal": "窗口 / 门户"
   },
   "Zoom Level": {
-    "Zoom Level": ""
+    "Zoom Level": "缩放级别"
   },
   "gpu-screen-recorder is not installed. Please install it first.": {
-    "gpu-screen-recorder is not installed. Please install it first.": ""
+    "gpu-screen-recorder is not installed. Please install it first.": "未安装 gpu-screen-recorder。请先安装它。"
   }
 }
