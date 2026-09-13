@@ -124,7 +124,7 @@ Variants {
             property real pulseValue: 0.15
 
             SequentialAnimation on pulseValue {
-                running: borderRect.visible && !borderRect.isPaused
+                running: overlayWin.visible && !borderRect.isPaused
                 loops: Animation.Infinite
                 NumberAnimation { from: 0.15; to: 0.6; duration: 1500; easing.type: Easing.InOutQuad }
                 NumberAnimation { from: 0.6; to: 0.15; duration: 1500; easing.type: Easing.InOutQuad }
