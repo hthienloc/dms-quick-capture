@@ -1,84 +1,45 @@
 import QtQuick
-import Quickshell
 import qs.Common
 import qs.Services
 import "Helpers.js" as Helpers
+import "Defaults.js" as Defaults
 
 QtObject {
     id: root
 
-    property var parentWidget: null
+    property var daemon: null
     property var modal: null
-    property var exportAndExecute: null
     property var floatService: null
+    property var exportAndExecute: null
 
-    signal closeRequested()
+    signal closeRequested
 
-    function getPluginData() {
-        return (root.parentWidget && root.parentWidget.pluginData) || {};
+    readonly property var pluginData: daemon?.pluginData ?? ({})
+
+    function setting(key) {
+        return Defaults.get(root.pluginData, key);
     }
 
     function saveDirectory() {
-        const rawDir = root.getPluginData().saveDirectory || "~/Pictures/Screenshots";
-        return (typeof Paths !== "undefined" && Paths && Paths.expandTilde)
-            ? Paths.expandTilde(String(rawDir))
-            : String(rawDir).replace(/^~/, Quickshell.env("HOME") || "");
+        return Paths.expandTilde(String(setting("saveDirectory")));
     }
 
     function screenshotFilename() {
-        const data = root.getPluginData();
-        const pattern = data.saveFilenamePattern || "Screenshot-%Y-%m-%d_%H-%M-%S";
-        const format = data.outputFormat || "png";
-
-        const now = new Date();
-        const pad = function(num, size) {
-            let s = num + "";
-            while (s.length < (size || 2)) s = "0" + s;
-            return s;
-        };
-
-        const yyyy = now.getFullYear();
-        const yy = pad(yyyy % 100);
-        const MM = pad(now.getMonth() + 1);
-        const dd = pad(now.getDate());
-        const HH = pad(now.getHours());
-        const mm = pad(now.getMinutes());
-        const ss = pad(now.getSeconds());
-        const zzz = pad(now.getMilliseconds(), 3);
-
-        let filename = pattern
-            .replace(/%Y/g, yyyy)
-            .replace(/%y/g, yy)
-            .replace(/%m/g, MM)
-            .replace(/%d/g, dd)
-            .replace(/%H/g, HH)
-            .replace(/%M/g, mm)
-            .replace(/%S/g, ss)
-            .replace(/\{yyyy\}/gi, yyyy)
-            .replace(/\{MM\}/g, MM)
-            .replace(/\{dd\}/gi, dd)
-            .replace(/\{HH\}/gi, HH)
-            .replace(/\{mm\}/g, mm)
-            .replace(/\{ss\}/gi, ss)
-            .replace(/\{zzz\}/gi, zzz);
-
-        if (!filename) {
-            filename = "Screenshot-" + yyyy + "-" + MM + "-" + dd + "_" + HH + "-" + mm + "-" + ss;
-        }
-
-        return filename + "." + format;
+        const name = Helpers.expandDateTokens(setting("saveFilenamePattern")) || Helpers.expandDateTokens(Defaults.values.saveFilenamePattern);
+        return name + "." + setting("outputFormat");
     }
 
     function cleanupTemp(path) {
-        if (path && (path.startsWith("/tmp/dms_capture_") || path.startsWith("/tmp/img_"))) {
-            // Delay cleanup by 10s to allow notification daemons to load the image
-            Proc.runCommand(null, ["sh", "-c", 'sleep 10 && rm -f -- "$1"', "_", path]);
-        }
+        if (!path || !(path.startsWith("/tmp/dms_capture_") || path.startsWith("/tmp/img_")))
+            return;
+        // Delayed so notification daemons can still load the image
+        Proc.runCommand(null, ["sh", "-c", 'sleep 10 && rm -f -- "$1"', "_", path]);
     }
 
     function cleanupConvertedFiles(finalPath, originalPng) {
         cleanupTemp(finalPath);
-        if (originalPng) cleanupTemp(originalPng);
+        if (originalPng)
+            cleanupTemp(originalPng);
     }
 
     function commandOutputOrFallback(output, fallback) {
@@ -86,139 +47,101 @@ QtObject {
     }
 
     function sendNotification(title, message, imagePath, openPath) {
-        if (!message) return;
-        const mode = root.getPluginData().postNotification || "notification";
-        
-        if (mode === "none") return;
+        if (!message)
+            return;
+        const mode = setting("postNotification");
+        if (mode === "none")
+            return;
+        if (mode === "toast" || mode === "both")
+            ToastService.showInfo(message);
+        if (mode !== "notification" && mode !== "both")
+            return;
 
-        // Toast Notification
-        if (mode === "toast" || mode === "both") {
-            if (typeof ToastService !== "undefined" && ToastService) {
-                ToastService.showInfo(message);
-            }
-        }
-
-        // System Notification
-        if (mode === "notification" || mode === "both") {
-            let icon = imagePath ? imagePath : "camera-photo-symbolic";
-            
-            if (icon.toLowerCase().endsWith(".pdf")) {
-                icon = "image-x-generic";
-            }
-
-            const args = ["dms", "notify", "--app", "Quick Capture"];
-            if (icon) args.push("--icon", icon);
-            const fileTarget = openPath || (imagePath && !imagePath.toLowerCase().endsWith(".pdf") ? imagePath : "");
-            if (fileTarget) args.push("--file", fileTarget);
-            args.push("--timeout", "5000", title, message);
-            Proc.runCommand("system-notify", args);
-        }
+        let icon = imagePath || "camera-photo-symbolic";
+        if (icon.toLowerCase().endsWith(".pdf"))
+            icon = "image-x-generic";
+        const args = [Proc.dmsBin, "notify", "--app", "Quick Capture", "--icon", icon];
+        const fileTarget = openPath || (imagePath && !imagePath.toLowerCase().endsWith(".pdf") ? imagePath : "");
+        if (fileTarget)
+            args.push("--file", fileTarget);
+        args.push("--timeout", "5000", title, message);
+        Proc.runCommand("quickCapture.notify", args);
     }
 
     function notifyWarning(message) {
-        if (typeof ToastService !== "undefined" && ToastService) {
-            ToastService.showWarning(message);
-        }
+        ToastService.showWarning(message);
     }
 
     function notifyError(message, detail) {
-        let fullMsg = message;
-        if (detail) {
-            fullMsg += "\n" + detail;
-        }
-        console.error("[QuickCapture Error]", message, detail ? ("| Detail: " + detail) : "");
-        if (typeof ToastService !== "undefined" && ToastService) {
-            ToastService.showError(fullMsg);
-        }
-        
-        const mode = root.getPluginData().postNotification || "notification";
-        if (mode === "notification" || mode === "both") {
-            Proc.runCommand("system-notify-error", ["notify-send", "-u", "critical", "-a", "Quick Capture", "-i", "error", I18n.trFor("quickCapture", "Quick Capture Error"), fullMsg]);
-        }
+        const fullMsg = detail ? message + "\n" + detail : message;
+        console.error("quickCapture:", message, detail || "");
+        ToastService.showError(fullMsg);
+        const mode = setting("postNotification");
+        if (mode !== "notification" && mode !== "both")
+            return;
+        Proc.runCommand("quickCapture.notifyError", ["notify-send", "-u", "critical", "-a", "Quick Capture", "-i", "error", I18n.trFor("quickCapture", "Quick Capture Error"), fullMsg]);
     }
 
     function withExport(callback) {
         if (!root.exportAndExecute) {
-            console.warn("QuickCaptureActions: exportAndExecute is not initialized");
+            console.warn("quickCapture: exportAndExecute is not wired");
             return;
         }
         root.exportAndExecute(callback);
     }
 
     function convertIfNeeded(pngPath, callback) {
-        const data = root.getPluginData();
-        const format = data.outputFormat || "png";
-
+        const format = setting("outputFormat");
         if (format === "png" || format === "ppm") {
             callback(pngPath, "");
             return;
         }
 
         const finalOut = pngPath.replace(/\.png$/, "." + format);
-        let cmd = "";
-        let args = [];
-
+        let command = [];
         if (format === "webp" || format === "jpg") {
-            const quality = format === "webp"
-                ? String(data.webpQuality ?? 80)
-                : String(data.jpegQuality ?? 90);
-            cmd = "magick";
-            args = ["convert", pngPath, "-quality", quality, finalOut];
+            const quality = String(setting(format === "webp" ? "webpQuality" : "jpegQuality"));
+            command = ["magick", "convert", pngPath, "-quality", quality, finalOut];
         } else if (format === "pdf") {
-            cmd = "img2pdf";
-            args = [pngPath, "-o", finalOut];
+            command = ["img2pdf", pngPath, "-o", finalOut];
         }
-
-        if (cmd) {
-            Proc.runCommand("convert-format", [cmd].concat(args), (stdout, exitCode) => {
-                if (exitCode === 0) {
-                    callback(finalOut, pngPath);
-                } else {
-                    console.error("[QuickCapture] Conversion failed (exit " + exitCode + "):", stdout);
-                    callback(pngPath, ""); // Fallback to PNG
-                }
-            });
-        } else {
+        if (command.length === 0) {
             callback(pngPath, "");
+            return;
         }
-    }
 
-    /**
-     * Exports the current capture and converts it to the configured format.
-     * @param {function} callback - Receives the final path and optional original PNG path.
-     */
-    function withConvertedExport(callback) {
-        withExport((pngPath) => {
-            convertIfNeeded(pngPath, callback);
+        Proc.runCommand("quickCapture.convert", command, (stdout, exitCode) => {
+            if (exitCode === 0) {
+                callback(finalOut, pngPath);
+                return;
+            }
+            console.error("quickCapture: conversion failed (exit " + exitCode + "):", stdout);
+            callback(pngPath, "");
         });
     }
 
+    function withConvertedExport(callback) {
+        withExport(pngPath => convertIfNeeded(pngPath, callback));
+    }
+
     function copyFileToClipboard(tempOut, callback) {
-        Proc.runCommand("check-copy-file", ["test", "-s", tempOut], (checkOut, checkCode) => {
+        Proc.runCommand("quickCapture.checkCopyFile", ["test", "-s", tempOut], (checkOut, checkCode) => {
             if (checkCode !== 0) {
-                const errDetail = "Exported file missing or empty (" + tempOut + ")";
-                console.error("[QuickCapture] Copy pre-check failed:", errDetail);
-                callback(errDetail, checkCode);
+                callback("Exported file missing or empty (" + tempOut + ")", checkCode);
                 return;
             }
-            DMSService.sendRequest("clipboard.copyFile", { "filePath": tempOut }, function(response) {
-                if (response && response.error) {
-                    const errStr = String(response.error);
-                    console.error("[QuickCapture] DMS clipboard copy failed:", errStr);
-                    callback(errStr, 1);
-                } else {
-                    callback("", 0);
+            DMSService.sendRequest("clipboard.copyFile", {
+                "filePath": tempOut
+            }, response => {
+                if (response?.error) {
+                    callback(String(response.error), 1);
+                    return;
                 }
+                callback("", 0);
             });
         }, 0, 2000);
     }
 
-    /**
-     * Copies an exported image and normalizes clipboard failure details.
-     * @param {string} sourceFile - File to copy to the clipboard.
-     * @param {function} onSuccess - Called after a successful copy.
-     * @param {function} onFailure - Called with a readable detail and exit code.
-     */
     function copyExportedFile(sourceFile, onSuccess, onFailure) {
         copyFileToClipboard(sourceFile, (output, exitCode) => {
             if (exitCode === 0) {
@@ -233,132 +156,129 @@ QtObject {
         const saveDir = saveDirectory();
         const filename = screenshotFilename();
         const targetPath = saveDir.replace(/\/$/, "") + "/" + filename;
-        saveFileToPath(tempOut, targetPath, (stdout, exitCode) => {
-            callback(stdout, exitCode, saveDir, filename, targetPath);
-        });
+        saveFileToPath(tempOut, targetPath, (stdout, exitCode) => callback(stdout, exitCode, saveDir, filename, targetPath));
     }
 
     function saveFileToPath(tempOut, targetPath, callback) {
-        const resolvedTargetPath = (typeof Paths !== "undefined" && Paths && Paths.expandTilde)
-            ? Paths.expandTilde(String(targetPath))
-            : String(targetPath).replace(/^~/, Quickshell.env("HOME") || "");
+        const resolvedTargetPath = Paths.expandTilde(String(targetPath));
         const slashIndex = resolvedTargetPath.lastIndexOf("/");
         const saveDir = slashIndex > 0 ? resolvedTargetPath.slice(0, slashIndex) : ".";
-        const saveCmd = '[ -s "$1" ] || { echo "ERROR: Exported screenshot file is empty or missing" >&2; exit 2; }; ' +
-                        'mkdir -p -- "$2" && cp -- "$1" "$3"';
-
-        Proc.runCommand("save-capture-file", ["sh", "-c", saveCmd, "_", tempOut, saveDir, resolvedTargetPath], callback, 0, 5000);
+        const saveCmd = '[ -s "$1" ] || { echo "ERROR: Exported screenshot file is empty or missing" >&2; exit 2; }; ' + 'mkdir -p -- "$2" && cp -- "$1" "$3"';
+        Proc.runCommand("quickCapture.saveFile", ["sh", "-c", saveCmd, "_", tempOut, saveDir, resolvedTargetPath], callback, 0, 5000);
     }
 
     function normalizeSaveAsPath(path) {
         let targetPath = Paths.strip(String(path || "").trim());
-        if (!targetPath) return "";
+        if (!targetPath)
+            return "";
         targetPath = Paths.expandTilde(targetPath);
-
-        const format = root.getPluginData().outputFormat || "png";
-        const extension = "." + format.toLowerCase();
+        const extension = "." + String(setting("outputFormat")).toLowerCase();
         const slashIndex = targetPath.lastIndexOf("/");
         const dotIndex = targetPath.lastIndexOf(".");
-        if (dotIndex <= slashIndex) return targetPath + extension;
+        if (dotIndex <= slashIndex)
+            return targetPath + extension;
         return targetPath.slice(0, dotIndex) + extension;
+    }
+
+    function notifySaved(targetPath, originalPng) {
+        const notifyPath = Paths.expandTilde(targetPath);
+        const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && originalPng) ? originalPng : notifyPath;
+        sendNotification(I18n.trFor("quickCapture", "Screenshot Saved"), I18n.trFor("quickCapture", "Screenshot saved to %1").arg(notifyPath), iconPath, notifyPath);
+    }
+
+    function copyImage(path, after) {
+        copyExportedFile(path, () => {
+            sendNotification(I18n.trFor("quickCapture", "Screenshot Copied"), I18n.trFor("quickCapture", "Copied to clipboard"), path);
+            if (after)
+                after(true);
+        }, detail => {
+            notifyError(I18n.trFor("quickCapture", "Failed to copy screenshot"), detail);
+            if (after)
+                after(false);
+        });
+    }
+
+    function saveImage(path, after, originalPng) {
+        saveFile(path, (stdout, exitCode, saveDir, filename, targetPath) => {
+            if (exitCode !== 0) {
+                notifyError(I18n.trFor("quickCapture", "Failed to save screenshot"), commandOutputOrFallback(stdout, "Save exit code " + exitCode));
+                if (after)
+                    after(false);
+                return;
+            }
+            notifySaved(targetPath, originalPng);
+            if (after)
+                after(true);
+        });
+    }
+
+    function saveImageAs(path, targetPath, after, originalPng) {
+        saveFileToPath(path, targetPath, (stdout, exitCode) => {
+            if (exitCode !== 0) {
+                notifyError(I18n.trFor("quickCapture", "Failed to save screenshot"), commandOutputOrFallback(stdout, "Save exit code " + exitCode));
+                if (after)
+                    after(false);
+                return;
+            }
+            notifySaved(targetPath, originalPng);
+            if (after)
+                after(true);
+        });
+    }
+
+    function copyAndSaveImage(path, after, originalPng) {
+        copyExportedFile(path, () => {
+            saveFile(originalPng ? path : path, (stdout, exitCode, saveDir, filename, targetPath) => {
+                if (exitCode !== 0) {
+                    notifyWarning(I18n.trFor("quickCapture", "Screenshot copied to clipboard but failed to save file: %1").arg(commandOutputOrFallback(stdout, "Save exit code " + exitCode)));
+                    if (after)
+                        after(false);
+                    return;
+                }
+                const notifyPath = Paths.expandTilde(targetPath);
+                const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && originalPng) ? originalPng : notifyPath;
+                sendNotification(I18n.trFor("quickCapture", "Screenshot Saved"), I18n.trFor("quickCapture", "Screenshot copied to clipboard and saved to %1").arg(saveDir), iconPath, notifyPath);
+                if (after)
+                    after(true);
+            });
+        }, detail => {
+            notifyError(I18n.trFor("quickCapture", "Failed to copy screenshot"), detail);
+            if (after)
+                after(false);
+        });
+    }
+
+    function finishExport(finalPath, originalPng) {
+        root.closeRequested();
+        cleanupConvertedFiles(finalPath, originalPng);
     }
 
     function performSaveOnly() {
         withConvertedExport((finalPath, originalPng) => {
-            saveFile(finalPath, (stdout, exitCode, saveDir, filename, targetPath) => {
-                if (exitCode === 0) {
-                    const notifyPath = Paths.expandTilde(targetPath);
-                    const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && originalPng) ? originalPng : notifyPath;
-                    root.sendNotification(I18n.trFor("quickCapture", "Screenshot Saved"), I18n.trFor("quickCapture", "Screenshot saved to %1/%2").arg(saveDir).arg(filename), iconPath, notifyPath);
+            saveImage(finalPath, ok => {
+                if (ok)
                     root.closeRequested();
-                } else {
-                    const errDetail = commandOutputOrFallback(stdout, "Save command failed with exit code " + exitCode);
-                    console.error("[QuickCapture] Save failed:", errDetail);
-                    notifyError(I18n.trFor("quickCapture", "Failed to save screenshot file."), errDetail);
-                }
                 cleanupConvertedFiles(finalPath, originalPng);
-            });
+            }, originalPng);
         });
     }
 
     function performSaveAs(path) {
         const targetPath = normalizeSaveAsPath(path);
-        if (!targetPath) return;
-
+        if (!targetPath)
+            return;
         withConvertedExport((finalPath, originalPng) => {
-            saveFileToPath(finalPath, targetPath, (stdout, exitCode) => {
-                if (exitCode === 0) {
-                    const notifyPath = Paths.expandTilde(targetPath);
-                    const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && originalPng) ? originalPng : notifyPath;
-                    root.sendNotification(I18n.trFor("quickCapture", "Screenshot Saved"), I18n.trFor("quickCapture", "Screenshot saved to %1").arg(notifyPath), iconPath, notifyPath);
+            saveImageAs(finalPath, targetPath, ok => {
+                if (ok)
                     root.closeRequested();
-                } else {
-                    const errDetail = commandOutputOrFallback(stdout, "Save As command failed with exit code " + exitCode);
-                    console.error("[QuickCapture] Save As failed:", errDetail);
-                    notifyError(I18n.trFor("quickCapture", "Failed to save screenshot file."), errDetail);
-                }
                 cleanupConvertedFiles(finalPath, originalPng);
-            });
+            }, originalPng);
         });
     }
 
     function performCopyOnly() {
         withConvertedExport((finalPath, originalPng) => {
-            const clipSource = originalPng || finalPath;
-            copyExportedFile(clipSource, () => {
-                root.sendNotification(I18n.trFor("quickCapture", "Screenshot Copied"), I18n.trFor("quickCapture", "Screenshot copied to clipboard."), clipSource);
-                root.closeRequested();
-                cleanupConvertedFiles(finalPath, originalPng);
-            }, (errDetail) => {
-                console.error("[QuickCapture] Copy failed:", errDetail);
-                notifyError(I18n.trFor("quickCapture", "Failed to copy screenshot to clipboard."), errDetail);
-                root.closeRequested();
-                cleanupConvertedFiles(finalPath, originalPng);
-            });
-        });
-    }
-
-    function generateRandomString(length) {
-        let result = "";
-        const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        for (let i = 0; i < (length || 12); i++) {
-            result += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return result;
-    }
-
-    function performAnonymousCopy() {
-        withExport((pngPath) => {
-            const randomStr = generateRandomString(12);
-            const anonPath = "/tmp/img_" + randomStr + ".png";
-            Proc.runCommand("anon-copy-strip", ["magick", "convert", "--", pngPath, "-strip", anonPath], (stdout, exitCode) => {
-                const stripSuccess = (exitCode === 0);
-                const doCopy = (sourceFile, isStripped) => {
-                    copyExportedFile(sourceFile, () => {
-                        const msg = isStripped
-                            ? I18n.trFor("quickCapture", "Screenshot copied anonymously with randomized name and stripped metadata.")
-                            : I18n.trFor("quickCapture", "Screenshot copied with randomized name.");
-                        root.sendNotification(I18n.trFor("quickCapture", "Copied Anonymously"), msg, sourceFile);
-                        root.closeRequested();
-                        cleanupTemp(pngPath);
-                        if (sourceFile !== pngPath) cleanupTemp(sourceFile);
-                    }, (errDetail) => {
-                        notifyError(I18n.trFor("quickCapture", "Failed to copy screenshot to clipboard."), errDetail);
-                        root.closeRequested();
-                        cleanupTemp(pngPath);
-                        if (sourceFile !== pngPath) cleanupTemp(sourceFile);
-                    });
-                };
-
-                if (stripSuccess) {
-                    doCopy(anonPath, true);
-                } else {
-                    Proc.runCommand("anon-copy-fallback", ["cp", "--", pngPath, anonPath], (fbOut, fbExit) => {
-                        const targetFile = (fbExit === 0) ? anonPath : pngPath;
-                        doCopy(targetFile, false);
-                    });
-                }
-            });
+            copyImage(originalPng || finalPath, () => finishExport(finalPath, originalPng));
         });
     }
 
@@ -366,113 +286,138 @@ QtObject {
         withConvertedExport((finalPath, originalPng) => {
             const clipSource = originalPng || finalPath;
             copyExportedFile(clipSource, () => {
-                saveFile(finalPath, (saveOut, saveCode, saveDir, filename, targetPath) => {
-                    if (saveCode === 0) {
-                        const notifyPath = Paths.expandTilde(targetPath);
-                        const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && originalPng) ? originalPng : notifyPath;
-                        root.sendNotification(I18n.trFor("quickCapture", "Screenshot Saved"), I18n.trFor("quickCapture", "Screenshot copied to clipboard and saved to %1").arg(saveDir), iconPath, notifyPath);
-                    } else {
-                        const errDetail = commandOutputOrFallback(saveOut, "Save exit code " + saveCode);
-                        notifyWarning(I18n.trFor("quickCapture", "Screenshot copied to clipboard but failed to save file: %1").arg(errDetail));
-                    }
-                    root.closeRequested();
-                    cleanupConvertedFiles(finalPath, originalPng);
+                saveImageAfterCopy(finalPath, originalPng);
+            }, detail => {
+                notifyError(I18n.trFor("quickCapture", "Failed to copy screenshot"), detail);
+                finishExport(finalPath, originalPng);
+            });
+        });
+    }
+
+    function saveImageAfterCopy(finalPath, originalPng) {
+        saveFile(finalPath, (stdout, exitCode, saveDir, filename, targetPath) => {
+            if (exitCode !== 0) {
+                notifyWarning(I18n.trFor("quickCapture", "Screenshot copied to clipboard but failed to save file: %1").arg(commandOutputOrFallback(stdout, "Save exit code " + exitCode)));
+            } else {
+                const notifyPath = Paths.expandTilde(targetPath);
+                const iconPath = (notifyPath.toLowerCase().endsWith(".pdf") && originalPng) ? originalPng : notifyPath;
+                sendNotification(I18n.trFor("quickCapture", "Screenshot Saved"), I18n.trFor("quickCapture", "Screenshot copied to clipboard and saved to %1").arg(saveDir), iconPath, notifyPath);
+            }
+            finishExport(finalPath, originalPng);
+        });
+    }
+
+    function generateRandomString(length) {
+        const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        let result = "";
+        for (let i = 0; i < length; i++)
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        return result;
+    }
+
+    function performAnonymousCopy() {
+        withExport(pngPath => {
+            const anonPath = "/tmp/img_" + generateRandomString(12) + ".png";
+            const copyAnon = (sourceFile, stripped) => {
+                copyExportedFile(sourceFile, () => {
+                    const msg = stripped ? I18n.trFor("quickCapture", "Screenshot copied anonymously with randomized name and stripped metadata.") : I18n.trFor("quickCapture", "Screenshot copied with randomized name.");
+                    sendNotification(I18n.trFor("quickCapture", "Copied Anonymously"), msg, sourceFile);
+                    finishExport(pngPath, sourceFile !== pngPath ? sourceFile : "");
+                }, detail => {
+                    notifyError(I18n.trFor("quickCapture", "Failed to copy screenshot"), detail);
+                    finishExport(pngPath, sourceFile !== pngPath ? sourceFile : "");
                 });
-            }, (errDetail) => {
-                console.error("[QuickCapture] Copy&Save failed on copy step:", errDetail);
-                notifyError(I18n.trFor("quickCapture", "Failed to copy screenshot to clipboard."), errDetail);
-                root.closeRequested();
-                cleanupConvertedFiles(finalPath, originalPng);
+            };
+
+            Proc.runCommand("quickCapture.stripMetadata", ["magick", "convert", "--", pngPath, "-strip", anonPath], (stdout, exitCode) => {
+                if (exitCode === 0) {
+                    copyAnon(anonPath, true);
+                    return;
+                }
+                Proc.runCommand("quickCapture.anonFallback", ["cp", "--", pngPath, anonPath], (fbOut, fbExit) => {
+                    copyAnon(fbExit === 0 ? anonPath : pngPath, false);
+                });
             });
         });
     }
 
     function performDoneAction() {
-        const action = root.getPluginData().doneAction || "both";
-
-        if (action === "clipboard") {
-            root.performCopyOnly();
-        } else if (action === "file") {
-            root.performSaveOnly();
-        } else {
-            root.performCopyAndSave();
+        switch (setting("doneAction")) {
+        case "clipboard":
+            performCopyOnly();
+            return;
+        case "file":
+            performSaveOnly();
+            return;
+        default:
+            performCopyAndSave();
         }
     }
 
     function performFloatAction() {
         if (!root.modal) {
-            console.error("QuickCaptureActions: modal reference is null");
+            console.error("quickCapture: modal reference is null");
             return;
         }
-
         if (!root.floatService) {
-            notifyError("Float service not available.");
+            notifyError(I18n.trFor("quickCapture", "Float service not available."));
             return;
         }
 
-        // Build annotation state from current modal
-        var strokesList = root.modal.strokes || [];
-        var serializedStrokes = [];
-        for (var si = 0; si < strokesList.length; si++) {
-            var s = strokesList[si];
-            var newStroke = {
+        const serializedStrokes = (root.modal.strokes || []).map(s => {
+            const copy = {
                 tool: s.tool,
                 color: s.color,
                 width: s.width,
-                points: []
+                points: (s.points || []).map(p => ({
+                            x: p.x,
+                            y: p.y
+                        }))
             };
-            if (s.points) {
-                for (var pj = 0; pj < s.points.length; pj++) {
-                    newStroke.points.push({ x: s.points[pj].x, y: s.points[pj].y });
-                }
-            }
-            Helpers.copyStrokeProperties(s, newStroke);
-            serializedStrokes.push(newStroke);
-        }
+            Helpers.copyStrokeProperties(s, copy);
+            return copy;
+        });
 
-        var annotationState = {
+        const m = root.modal;
+        const annotationState = {
             strokes: serializedStrokes,
-            originalImageSource: root.modal.bgImageSource,
-            stampCounter: root.modal.stampCounter,
-            bgRotation: root.modal.bgRotation,
-            bgFlipH: root.modal.bgFlipH,
-            bgFlipV: root.modal.bgFlipV,
+            originalImageSource: m.bgImageSource,
+            stampCounter: m.stampCounter,
+            bgRotation: m.bgRotation,
+            bgFlipH: m.bgFlipH,
+            bgFlipV: m.bgFlipV,
             cropRect: {
-                x: root.modal.cropRect.x,
-                y: root.modal.cropRect.y,
-                width: root.modal.cropRect.width,
-                height: root.modal.cropRect.height
+                x: m.cropRect.x,
+                y: m.cropRect.y,
+                width: m.cropRect.width,
+                height: m.cropRect.height
             },
-            hasSelection: root.modal.hasSelection,
-            backgroundMode: root.modal.backgroundMode,
-            backgroundImagePath: root.modal.backgroundImagePath,
-            backgroundImageBlur: root.modal.backgroundImageBlur,
-            backgroundImageDim: root.modal.backgroundImageDim,
-            backgroundImageDimStrength: root.modal.backgroundImageDimStrength,
-            watermarkEnabled: root.modal.watermarkEnabled,
-            backgroundSolidColor: root.modal.backgroundSolidColor,
-            backgroundGradientStart: root.modal.backgroundGradientStart,
-            backgroundGradientEnd: root.modal.backgroundGradientEnd,
-            backgroundGradientAngle: root.modal.backgroundGradientAngle,
-            backgroundPadding: root.modal.backgroundPadding,
-            backgroundCornerRadius: root.modal.backgroundCornerRadius,
-            backgroundShadowStrength: root.modal.backgroundShadowStrength,
-            backgroundAspectRatio: root.modal.backgroundAspectRatio,
-            backgroundAlignment: root.modal.backgroundAlignment,
-            customAspectRatio: root.modal.customAspectRatio,
-            hasUserCustomizedBackground: root.modal.hasUserCustomizedBackground,
-            autoBackgroundGradientStart: root.modal.autoBackgroundGradientStart,
-            autoBackgroundGradientEnd: root.modal.autoBackgroundGradientEnd,
-            autoBackgroundSolidColor: root.modal.autoBackgroundSolidColor
+            hasSelection: m.hasSelection,
+            backgroundMode: m.backgroundMode,
+            backgroundImagePath: m.backgroundImagePath,
+            backgroundImageBlur: m.backgroundImageBlur,
+            backgroundImageDim: m.backgroundImageDim,
+            backgroundImageDimStrength: m.backgroundImageDimStrength,
+            watermarkEnabled: m.watermarkEnabled,
+            backgroundSolidColor: m.backgroundSolidColor,
+            backgroundGradientStart: m.backgroundGradientStart,
+            backgroundGradientEnd: m.backgroundGradientEnd,
+            backgroundGradientAngle: m.backgroundGradientAngle,
+            backgroundPadding: m.backgroundPadding,
+            backgroundCornerRadius: m.backgroundCornerRadius,
+            backgroundShadowStrength: m.backgroundShadowStrength,
+            backgroundAspectRatio: m.backgroundAspectRatio,
+            backgroundAlignment: m.backgroundAlignment,
+            customAspectRatio: m.customAspectRatio,
+            hasUserCustomizedBackground: m.hasUserCustomizedBackground,
+            autoBackgroundGradientStart: m.autoBackgroundGradientStart,
+            autoBackgroundGradientEnd: m.autoBackgroundGradientEnd,
+            autoBackgroundSolidColor: m.autoBackgroundSolidColor
         };
 
         withConvertedExport((finalPath, originalPng) => {
-            var pluginData = root.getPluginData();
-
-            var tempPaths = [finalPath];
-            if (originalPng) tempPaths.push(originalPng);
-
-            root.floatService.spawnWindow("file://" + finalPath, pluginData, annotationState, tempPaths);
+            const tempPaths = originalPng ? [finalPath, originalPng] : [finalPath];
+            root.floatService.spawnWindow("file://" + finalPath, annotationState, tempPaths);
             root.closeRequested();
         });
     }

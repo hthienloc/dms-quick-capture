@@ -23,9 +23,18 @@
  * @returns {object} { r, g, b }
  */
 function hexToRgb(hex, Qt) {
-    if (!hex) return { r: 0.2, g: 0.5, b: 1 };
+    if (!hex)
+        return {
+            r: 0.2,
+            g: 0.5,
+            b: 1
+        };
     const c = Qt.color(hex);
-    return { r: c.r, g: c.g, b: c.b };
+    return {
+        r: c.r,
+        g: c.g,
+        b: c.b
+    };
 }
 
 /**
@@ -104,10 +113,58 @@ function formatCounter(n, format) {
     }
     if (format === "roman") {
         const roman = [
-            { v: 1000, s: "M" }, { v: 900, s: "CM" }, { v: 500, s: "D" }, { v: 400, s: "CD" },
-            { v: 100, s: "C" }, { v: 90, s: "XC" }, { v: 50, s: "L" }, { v: 40, s: "XL" },
-            { v: 10, s: "X" }, { v: 9, s: "IX" }, { v: 5, s: "V" }, { v: 4, s: "IV" },
-            { v: 1, s: "I" }
+            {
+                v: 1000,
+                s: "M"
+            },
+            {
+                v: 900,
+                s: "CM"
+            },
+            {
+                v: 500,
+                s: "D"
+            },
+            {
+                v: 400,
+                s: "CD"
+            },
+            {
+                v: 100,
+                s: "C"
+            },
+            {
+                v: 90,
+                s: "XC"
+            },
+            {
+                v: 50,
+                s: "L"
+            },
+            {
+                v: 40,
+                s: "XL"
+            },
+            {
+                v: 10,
+                s: "X"
+            },
+            {
+                v: 9,
+                s: "IX"
+            },
+            {
+                v: 5,
+                s: "V"
+            },
+            {
+                v: 4,
+                s: "IV"
+            },
+            {
+                v: 1,
+                s: "I"
+            }
         ];
         let res = "";
         let num = n;
@@ -130,44 +187,82 @@ function formatCounter(n, format) {
  */
 function shortcutToken(key, Qt) {
     switch (key) {
-    case Qt.Key_QuoteLeft: return "`";
-    case Qt.Key_0: return "0";
-    case Qt.Key_1: return "1";
-    case Qt.Key_2: return "2";
-    case Qt.Key_3: return "3";
-    case Qt.Key_4: return "4";
-    case Qt.Key_5: return "5";
-    case Qt.Key_6: return "6";
-    case Qt.Key_7: return "7";
-    case Qt.Key_8: return "8";
-    case Qt.Key_9: return "9";
-    case Qt.Key_A: return "A";
-    case Qt.Key_B: return "B";
-    case Qt.Key_C: return "C";
-    case Qt.Key_D: return "D";
-    case Qt.Key_E: return "E";
-    case Qt.Key_F: return "F";
-    case Qt.Key_G: return "G";
-    case Qt.Key_H: return "H";
-    case Qt.Key_I: return "I";
-    case Qt.Key_J: return "J";
-    case Qt.Key_K: return "K";
-    case Qt.Key_L: return "L";
-    case Qt.Key_M: return "M";
-    case Qt.Key_N: return "N";
-    case Qt.Key_O: return "O";
-    case Qt.Key_P: return "P";
-    case Qt.Key_Q: return "Q";
-    case Qt.Key_R: return "R";
-    case Qt.Key_S: return "S";
-    case Qt.Key_T: return "T";
-    case Qt.Key_U: return "U";
-    case Qt.Key_V: return "V";
-    case Qt.Key_W: return "W";
-    case Qt.Key_X: return "X";
-    case Qt.Key_Y: return "Y";
-    case Qt.Key_Z: return "Z";
-    default: return "";
+    case Qt.Key_QuoteLeft:
+        return "`";
+    case Qt.Key_0:
+        return "0";
+    case Qt.Key_1:
+        return "1";
+    case Qt.Key_2:
+        return "2";
+    case Qt.Key_3:
+        return "3";
+    case Qt.Key_4:
+        return "4";
+    case Qt.Key_5:
+        return "5";
+    case Qt.Key_6:
+        return "6";
+    case Qt.Key_7:
+        return "7";
+    case Qt.Key_8:
+        return "8";
+    case Qt.Key_9:
+        return "9";
+    case Qt.Key_A:
+        return "A";
+    case Qt.Key_B:
+        return "B";
+    case Qt.Key_C:
+        return "C";
+    case Qt.Key_D:
+        return "D";
+    case Qt.Key_E:
+        return "E";
+    case Qt.Key_F:
+        return "F";
+    case Qt.Key_G:
+        return "G";
+    case Qt.Key_H:
+        return "H";
+    case Qt.Key_I:
+        return "I";
+    case Qt.Key_J:
+        return "J";
+    case Qt.Key_K:
+        return "K";
+    case Qt.Key_L:
+        return "L";
+    case Qt.Key_M:
+        return "M";
+    case Qt.Key_N:
+        return "N";
+    case Qt.Key_O:
+        return "O";
+    case Qt.Key_P:
+        return "P";
+    case Qt.Key_Q:
+        return "Q";
+    case Qt.Key_R:
+        return "R";
+    case Qt.Key_S:
+        return "S";
+    case Qt.Key_T:
+        return "T";
+    case Qt.Key_U:
+        return "U";
+    case Qt.Key_V:
+        return "V";
+    case Qt.Key_W:
+        return "W";
+    case Qt.Key_X:
+        return "X";
+    case Qt.Key_Y:
+        return "Y";
+    case Qt.Key_Z:
+        return "Z";
+    default:
+        return "";
     }
 }
 
@@ -181,7 +276,8 @@ function shortcutToken(key, Qt) {
  * @returns {object} Constrained point.
  */
 function constrainSquarePoint(start, point, Qt) {
-    if (!start || !point) return point || Qt.point(0, 0);
+    if (!start || !point)
+        return point || Qt.point(0, 0);
     const dx = point.x - start.x;
     const dy = point.y - start.y;
     const size = Math.max(Math.abs(dx), Math.abs(dy));
@@ -203,8 +299,14 @@ function constrainSquarePoint(start, point, Qt) {
  * @returns {object} Source and destination rectangle endpoints.
  */
 function getCalloutPlacement(p0, p1, zoom, visibleX, visibleY, visibleWidth, visibleHeight, margin) {
-    const sourceStart = { x: Math.min(p0.x, p1.x), y: Math.min(p0.y, p1.y) };
-    const sourceEnd = { x: Math.max(p0.x, p1.x), y: Math.max(p0.y, p1.y) };
+    const sourceStart = {
+        x: Math.min(p0.x, p1.x),
+        y: Math.min(p0.y, p1.y)
+    };
+    const sourceEnd = {
+        x: Math.max(p0.x, p1.x),
+        y: Math.max(p0.y, p1.y)
+    };
     const sourceWidth = sourceEnd.x - sourceStart.x;
     const sourceHeight = sourceEnd.y - sourceStart.y;
     const destinationWidth = sourceWidth * zoom;
@@ -216,12 +318,8 @@ function getCalloutPlacement(p0, p1, zoom, visibleX, visibleY, visibleWidth, vis
     const directionX = visibleCenterX - sourceCenterX >= 0 ? 1 : -1;
     const directionY = visibleCenterY - sourceCenterY >= 0 ? 1 : -1;
 
-    let destinationX = directionX > 0
-        ? sourceEnd.x + margin
-        : sourceStart.x - destinationWidth - margin;
-    let destinationY = directionY > 0
-        ? sourceEnd.y + margin
-        : sourceStart.y - destinationHeight - margin;
+    let destinationX = directionX > 0 ? sourceEnd.x + margin : sourceStart.x - destinationWidth - margin;
+    let destinationY = directionY > 0 ? sourceEnd.y + margin : sourceStart.y - destinationHeight - margin;
     const rightBound = visibleX + visibleWidth - destinationWidth - margin;
     const bottomBound = visibleY + visibleHeight - destinationHeight - margin;
     destinationX = Math.max(visibleX + margin, Math.min(destinationX, rightBound));
@@ -230,8 +328,14 @@ function getCalloutPlacement(p0, p1, zoom, visibleX, visibleY, visibleWidth, vis
     return {
         sourceStart: sourceStart,
         sourceEnd: sourceEnd,
-        destinationStart: { x: destinationX, y: destinationY },
-        destinationEnd: { x: destinationX + destinationWidth, y: destinationY + destinationHeight }
+        destinationStart: {
+            x: destinationX,
+            y: destinationY
+        },
+        destinationEnd: {
+            x: destinationX + destinationWidth,
+            y: destinationY + destinationHeight
+        }
     };
 }
 
@@ -244,11 +348,10 @@ function getCalloutPlacement(p0, p1, zoom, visibleX, visibleY, visibleWidth, vis
  * @returns {boolean}
  */
 function isInsideCropRect(mx, my, hasSelection, cropRect) {
-    if (!hasSelection) return false;
-    return mx >= cropRect.x && mx <= (cropRect.x + cropRect.width) &&
-           my >= cropRect.y && my <= (cropRect.y + cropRect.height);
+    if (!hasSelection)
+        return false;
+    return mx >= cropRect.x && mx <= (cropRect.x + cropRect.width) && my >= cropRect.y && my <= (cropRect.y + cropRect.height);
 }
-
 
 /**
  * Finds an item in a list by its 'key' property.
@@ -258,56 +361,60 @@ function isInsideCropRect(mx, my, hasSelection, cropRect) {
  * @returns {object|null}
  */
 function findByKey(items, key) {
-    if (!items) return null;
+    if (!items)
+        return null;
     for (let i = 0; i < items.length; i++) {
-        if (items[i].key === key) return items[i];
+        if (items[i].key === key)
+            return items[i];
     }
     return null;
 }
 
-/**
- * Formats watermark text patterns.
- * @param {string} pattern - The pattern string.
- * @param {object} Quickshell - The Quickshell object.
- * @returns {string} Formatted string.
- */
-function formatWatermarkText(pattern, Quickshell) {
-    if (!pattern) return "";
-    const username = Quickshell.env("USER") || Quickshell.env("USERNAME") || "User";
-    const now = new Date();
-    const pad = (num, size) => {
-        let s = num + "";
-        while (s.length < (size || 2)) s = "0" + s;
-        return s;
+function sectorIndexAt(dx, dy, numSectors, innerRadius, outerRadius) {
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < innerRadius || (outerRadius !== undefined && dist > outerRadius))
+        return -1;
+    let angle = Math.atan2(dy, dx) * 180 / Math.PI + 90;
+    if (angle < 0)
+        angle += 360;
+    const sectorSize = 360 / numSectors;
+    const idx = Math.floor((angle + sectorSize / 2) % 360 / sectorSize);
+    return idx >= 0 && idx < numSectors ? idx : -1;
+}
+
+function expandDateTokens(pattern, now) {
+    const date = now || new Date();
+    const pad = (num, size) => String(num).padStart(size || 2, "0");
+    const year = String(date.getFullYear());
+    const month = pad(date.getMonth() + 1);
+    const tokens = {
+        "%Y": year,
+        "%y": pad(date.getFullYear() % 100),
+        "%m": month,
+        "%d": pad(date.getDate()),
+        "%H": pad(date.getHours()),
+        "%M": pad(date.getMinutes()),
+        "%S": pad(date.getSeconds()),
+        "{yyyy}": year,
+        "{dd}": pad(date.getDate()),
+        "{hh}": pad(date.getHours()),
+        "{mm}": pad(date.getMinutes()),
+        "{ss}": pad(date.getSeconds()),
+        "{zzz}": pad(date.getMilliseconds(), 3)
     };
+    return String(pattern || "").replace(/%[YymdHMS]|\{(?:yyyy|MM|mm|dd|HH|hh|ss|zzz)\}/g, token => {
+        if (token === "{MM}")
+            return month;
+        return tokens[token.startsWith("{") ? token.toLowerCase() : token] ?? token;
+    });
+}
 
-    const yyyy = now.getFullYear();
-    const yy = pad(yyyy % 100);
-    const MM = pad(now.getMonth() + 1);
-    const dd = pad(now.getDate());
-    const HH = pad(now.getHours());
-    const mm = pad(now.getMinutes());
-    const ss = pad(now.getSeconds());
-
-    return pattern
-        .replace(/\\n/g, "\n")
-        .replace(/\{nl\}/gi, "\n")
-        .replace(/\{newline\}/gi, "\n")
-        .replace(/\{user\}/gi, username)
-        .replace(/\{username\}/gi, username)
-        .replace(/%Y/g, yyyy)
-        .replace(/%y/g, yy)
-        .replace(/%m/g, MM)
-        .replace(/%d/g, dd)
-        .replace(/%H/g, HH)
-        .replace(/%M/g, mm)
-        .replace(/%S/g, ss)
-        .replace(/\{yyyy\}/gi, yyyy)
-        .replace(/\{MM\}/g, MM)
-        .replace(/\{dd\}/gi, dd)
-        .replace(/\{HH\}/gi, HH)
-        .replace(/\{mm\}/g, mm)
-        .replace(/\{ss\}/gi, ss);
+function formatWatermarkText(pattern, Quickshell) {
+    if (!pattern)
+        return "";
+    const username = Quickshell.env("USER") || Quickshell.env("USERNAME") || "User";
+    const text = pattern.replace(/\\n/g, "\n").replace(/\{nl\}|\{newline\}/gi, "\n").replace(/\{user\}|\{username\}/gi, username);
+    return expandDateTokens(text);
 }
 
 // ─── 4. Color analysis ────────────────────────────────────────────────────────
@@ -323,7 +430,8 @@ function extractDominantColors(imgData, Qt) {
         start: Qt.rgba(0.2, 0.33, 0.47, 1),
         end: Qt.rgba(0.07, 0.13, 0.2, 1)
     };
-    if (!imgData || !imgData.data || !imgData.width || !imgData.height) return fallback;
+    if (!imgData || !imgData.data || !imgData.width || !imgData.height)
+        return fallback;
 
     const sampleWidth = imgData.width;
     const sampleHeight = imgData.height;
@@ -336,11 +444,16 @@ function extractDominantColors(imgData, Qt) {
                 g: imgData.data[index + 1] / 255,
                 b: imgData.data[index + 2] / 255
             };
-            if (x === 0 || x === sampleWidth - 1 || y === 0 || y === sampleHeight - 1) edgePixels.push(pixel);
+            if (x === 0 || x === sampleWidth - 1 || y === 0 || y === sampleHeight - 1)
+                edgePixels.push(pixel);
         }
     }
 
-    let edgeColor = { r: 0, g: 0, b: 0 };
+    let edgeColor = {
+        r: 0,
+        g: 0,
+        b: 0
+    };
     for (let i = 0; i < edgePixels.length; i++) {
         edgeColor.r += edgePixels[i].r;
         edgeColor.g += edgePixels[i].g;
@@ -373,7 +486,11 @@ function extractDominantColors(imgData, Qt) {
             };
         }
         const scale = target / Math.max(0.01, luminance);
-        return { r: rgb.r * scale, g: rgb.g * scale, b: rgb.b * scale };
+        return {
+            r: rgb.r * scale,
+            g: rgb.g * scale,
+            b: rgb.b * scale
+        };
     }
 
     const imageIsLight = edgeLuminance > 0.5;
@@ -437,7 +554,12 @@ function isPointNearSegment(mx, my, p0, p1, maxDistanceSq) {
 function getTextBBox(stroke, measureTextBoundsFn) {
     const txtPt = (stroke.isSpeechBubble && stroke.points.length >= 2) ? stroke.points[1] : stroke.points[0];
     const measured = measureTextBoundsFn ? measureTextBoundsFn(stroke) : null;
-    return measured || { minX: txtPt.x, minY: txtPt.y, maxX: txtPt.x, maxY: txtPt.y };
+    return measured || {
+        minX: txtPt.x,
+        minY: txtPt.y,
+        maxX: txtPt.x,
+        maxY: txtPt.y
+    };
 }
 
 /** Rotates a point around a center by an angle in radians. */
@@ -455,10 +577,16 @@ function rotatePoint(point, center, angle) {
 /** Returns the shared local frame and rotated bounds for a text stroke. */
 function getTextTransformFrame(stroke, textBounds) {
     if (!textBounds) {
-        const point = stroke && stroke.points && stroke.points.length > 0
-            ? stroke.points[stroke.isSpeechBubble && stroke.points.length >= 2 ? 1 : 0]
-            : { x: 0, y: 0 };
-        textBounds = { minX: point.x, minY: point.y, maxX: point.x, maxY: point.y };
+        const point = stroke && stroke.points && stroke.points.length > 0 ? stroke.points[stroke.isSpeechBubble && stroke.points.length >= 2 ? 1 : 0] : {
+            x: 0,
+            y: 0
+        };
+        textBounds = {
+            minX: point.x,
+            minY: point.y,
+            maxX: point.x,
+            maxY: point.y
+        };
     }
     const bounds = {
         minX: textBounds.minX,
@@ -480,10 +608,22 @@ function getTextTransformFrame(stroke, textBounds) {
     };
     const angle = ((Number(stroke.rotation) || 0) * Math.PI) / 180;
     const corners = [
-        { x: bounds.minX, y: bounds.minY },
-        { x: bounds.maxX, y: bounds.minY },
-        { x: bounds.minX, y: bounds.maxY },
-        { x: bounds.maxX, y: bounds.maxY }
+        {
+            x: bounds.minX,
+            y: bounds.minY
+        },
+        {
+            x: bounds.maxX,
+            y: bounds.minY
+        },
+        {
+            x: bounds.minX,
+            y: bounds.maxY
+        },
+        {
+            x: bounds.maxX,
+            y: bounds.maxY
+        }
     ].map(point => rotatePoint(point, center, angle));
 
     return {
@@ -513,7 +653,13 @@ function getStrokeBBox(stroke, measureTextBoundsFn) {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     const pts = stroke.points;
     const len = pts.length;
-    if (len === 0) return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
+    if (len === 0)
+        return {
+            minX: 0,
+            minY: 0,
+            maxX: 0,
+            maxY: 0
+        };
 
     if (stroke.tool === "text") {
         const textBounds = getTextBBox(stroke, measureTextBoundsFn);
@@ -548,13 +694,22 @@ function getStrokeBBox(stroke, measureTextBoundsFn) {
     } else {
         for (let i = 0; i < len; i++) {
             const p = pts[i];
-            if (p.x < minX) minX = p.x;
-            if (p.y < minY) minY = p.y;
-            if (p.x > maxX) maxX = p.x;
-            if (p.y > maxY) maxY = p.y;
+            if (p.x < minX)
+                minX = p.x;
+            if (p.y < minY)
+                minY = p.y;
+            if (p.x > maxX)
+                maxX = p.x;
+            if (p.y > maxY)
+                maxY = p.y;
         }
     }
-    return { minX: minX, minY: minY, maxX: maxX, maxY: maxY };
+    return {
+        minX: minX,
+        minY: minY,
+        maxX: maxX,
+        maxY: maxY
+    };
 }
 
 /**
@@ -570,19 +725,23 @@ function findStrokeAt(mx, my, strokes, measureTextBoundsFn) {
     // then pixelate, and use Spotlight as the lowest-priority fallback.
     const searchOrder = [];
     for (let i = strokes.length - 1; i >= 0; i--) {
-        if (strokes[i].tool !== "spotlight" && strokes[i].tool !== "pixelate") searchOrder.push(i);
+        if (strokes[i].tool !== "spotlight" && strokes[i].tool !== "pixelate")
+            searchOrder.push(i);
     }
     for (let i = strokes.length - 1; i >= 0; i--) {
-        if (strokes[i].tool === "pixelate") searchOrder.push(i);
+        if (strokes[i].tool === "pixelate")
+            searchOrder.push(i);
     }
     for (let i = strokes.length - 1; i >= 0; i--) {
-        if (strokes[i].tool === "spotlight") searchOrder.push(i);
+        if (strokes[i].tool === "spotlight")
+            searchOrder.push(i);
     }
 
     for (let orderIdx = 0; orderIdx < searchOrder.length; orderIdx++) {
         const i = searchOrder[orderIdx];
         const stroke = strokes[i];
-        if (stroke.points.length === 0) continue;
+        if (stroke.points.length === 0)
+            continue;
 
         const threshold = Constants.selectionThresholdBase + stroke.width;
         const thresholdSq = threshold * threshold;
@@ -590,16 +749,16 @@ function findStrokeAt(mx, my, strokes, measureTextBoundsFn) {
         // Fast bounding box reject check
         const bbox = getStrokeBBox(stroke, measureTextBoundsFn);
         const pad = threshold + 2;
-        if (mx < bbox.minX - pad || mx > bbox.maxX + pad ||
-            my < bbox.minY - pad || my > bbox.maxY + pad) {
+        if (mx < bbox.minX - pad || mx > bbox.maxX + pad || my < bbox.minY - pad || my > bbox.maxY + pad) {
             continue;
         }
 
         if (stroke.tool === "pen" || stroke.tool === "highlighter") {
             for (let j = 0; j < stroke.points.length - 1; j++) {
                 const A = stroke.points[j];
-                const B = stroke.points[j+1];
-                if (isPointNearSegment(mx, my, A, B, thresholdSq)) return i;
+                const B = stroke.points[j + 1];
+                if (isPointNearSegment(mx, my, A, B, thresholdSq))
+                    return i;
             }
         } else if (stroke.tool === "rect") {
             const p0 = stroke.points[0];
@@ -612,7 +771,8 @@ function findStrokeAt(mx, my, strokes, measureTextBoundsFn) {
             if (mx >= x1 - threshold && mx <= x2 + threshold && my >= y1 - threshold && my <= y2 + threshold) {
                 const dx = Math.min(Math.abs(mx - x1), Math.abs(mx - x2));
                 const dy = Math.min(Math.abs(my - y1), Math.abs(my - y2));
-                if (dx <= threshold || dy <= threshold) return i;
+                if (dx <= threshold || dy <= threshold)
+                    return i;
             }
         } else if (stroke.tool === "redact") {
             const p0 = stroke.points[0];
@@ -629,7 +789,8 @@ function findStrokeAt(mx, my, strokes, measureTextBoundsFn) {
                 const cx = x1 + rx;
                 const cy = y1 + ry;
                 const normalized = Math.pow((mx - cx) / rx, 2) + Math.pow((my - cy) / ry, 2);
-                if (normalized <= 1.1) return i;
+                if (normalized <= 1.1)
+                    return i;
             } else {
                 if (mx >= x1 - Constants.rectSelectionPadding && mx <= x2 + Constants.rectSelectionPadding && my >= y1 - Constants.rectSelectionPadding && my <= y2 + Constants.rectSelectionPadding) {
                     return i;
@@ -660,11 +821,13 @@ function findStrokeAt(mx, my, strokes, measureTextBoundsFn) {
             const cy = y1 + ry;
             const normalized = Math.pow((mx - cx) / rx, 2) + Math.pow((my - cy) / ry, 2);
             const tolerance = Math.max(0.08, threshold / Math.max(rx, ry));
-            if (Math.abs(normalized - 1) <= tolerance) return i;
+            if (Math.abs(normalized - 1) <= tolerance)
+                return i;
         } else if (stroke.tool === "arrow" || stroke.tool === "line") {
             const p0 = stroke.points[0];
             const p1 = stroke.points[stroke.points.length - 1];
-            if (isPointNearSegment(mx, my, p0, p1, thresholdSq)) return i;
+            if (isPointNearSegment(mx, my, p0, p1, thresholdSq))
+                return i;
         } else if (stroke.tool === "stamp") {
             const radius = stroke.width * Constants.stampRadiusMultiplier + Constants.stampSelectThresholdOffset;
             if (stroke.hasLeaderLine && stroke.points.length >= 2) {
@@ -673,21 +836,26 @@ function findStrokeAt(mx, my, strokes, measureTextBoundsFn) {
 
                 // Check stamp circle at points[1]
                 const distStampSq = (mx - p1.x) * (mx - p1.x) + (my - p1.y) * (my - p1.y);
-                if (distStampSq <= radius * radius) return i;
+                if (distStampSq <= radius * radius)
+                    return i;
 
                 // Check leader line segment points[0] -> points[1]
-                if (isPointNearSegment(mx, my, p0, p1, thresholdSq)) return i;
+                if (isPointNearSegment(mx, my, p0, p1, thresholdSq))
+                    return i;
             } else {
                 const p0 = stroke.points[0];
                 const distSq = (mx - p0.x) * (mx - p0.x) + (my - p0.y) * (my - p0.y);
-                if (distSq <= radius * radius) return i;
+                if (distSq <= radius * radius)
+                    return i;
             }
         } else if (stroke.tool === "text") {
             const textBounds = getTextBBox(stroke, measureTextBoundsFn);
             const frame = getTextTransformFrame(stroke, textBounds);
-            const local = inverseRotatePoint({ x: mx, y: my }, frame.center, frame.angle);
-            if (local.x >= textBounds.minX - Constants.ocrSelectionPadding && local.x <= textBounds.maxX + Constants.ocrSelectionPadding &&
-                local.y >= textBounds.minY - Constants.ocrSelectionPadding && local.y <= textBounds.maxY + Constants.ocrSelectionPadding) {
+            const local = inverseRotatePoint({
+                x: mx,
+                y: my
+            }, frame.center, frame.angle);
+            if (local.x >= textBounds.minX - Constants.ocrSelectionPadding && local.x <= textBounds.maxX + Constants.ocrSelectionPadding && local.y >= textBounds.minY - Constants.ocrSelectionPadding && local.y <= textBounds.maxY + Constants.ocrSelectionPadding) {
                 return i;
             }
 
@@ -696,7 +864,8 @@ function findStrokeAt(mx, my, strokes, measureTextBoundsFn) {
                 if (stroke.points.length >= 2) {
                     const pTarget = stroke.points[0];
                     const localTarget = inverseRotatePoint(pTarget, frame.center, frame.angle);
-                    if (isPointNearSegment(local.x, local.y, txtPt, localTarget, thresholdSq)) return i;
+                    if (isPointNearSegment(local.x, local.y, txtPt, localTarget, thresholdSq))
+                        return i;
                 }
             }
         } else if (stroke.tool === "callout" && stroke.points.length === 4) {
@@ -712,19 +881,23 @@ function findStrokeAt(mx, my, strokes, measureTextBoundsFn) {
                 const srcRy = (srcP1.y - srcP0.y) / 2 + pad;
                 let dx = mx - srcCx;
                 let dy = my - srcCy;
-                if (srcRx > 0 && srcRy > 0 && (dx * dx) / (srcRx * srcRx) + (dy * dy) / (srcRy * srcRy) <= 1) return i;
+                if (srcRx > 0 && srcRy > 0 && (dx * dx) / (srcRx * srcRx) + (dy * dy) / (srcRy * srcRy) <= 1)
+                    return i;
                 const dstCx = (dstP0.x + dstP1.x) / 2;
                 const dstCy = (dstP0.y + dstP1.y) / 2;
                 const dstRx = (dstP1.x - dstP0.x) / 2 + pad;
                 const dstRy = (dstP1.y - dstP0.y) / 2 + pad;
                 dx = mx - dstCx;
                 dy = my - dstCy;
-                if (dstRx > 0 && dstRy > 0 && (dx * dx) / (dstRx * dstRx) + (dy * dy) / (dstRy * dstRy) <= 1) return i;
+                if (dstRx > 0 && dstRy > 0 && (dx * dx) / (dstRx * dstRx) + (dy * dy) / (dstRy * dstRy) <= 1)
+                    return i;
             } else {
                 const srcBounds = getRectBounds(srcP0, srcP1);
                 const dstBounds = getRectBounds(dstP0, dstP1);
-                if (mx >= srcBounds.x1 - pad && mx <= srcBounds.x2 + pad && my >= srcBounds.y1 - pad && my <= srcBounds.y2 + pad) return i;
-                if (mx >= dstBounds.x1 - pad && mx <= dstBounds.x2 + pad && my >= dstBounds.y1 - pad && my <= dstBounds.y2 + pad) return i;
+                if (mx >= srcBounds.x1 - pad && mx <= srcBounds.x2 + pad && my >= srcBounds.y1 - pad && my <= srcBounds.y2 + pad)
+                    return i;
+                if (mx >= dstBounds.x1 - pad && mx <= dstBounds.x2 + pad && my >= dstBounds.y1 - pad && my <= dstBounds.y2 + pad)
+                    return i;
             }
         }
     }
@@ -739,7 +912,8 @@ function findStrokeAt(mx, my, strokes, measureTextBoundsFn) {
  * @param {function} measureTextBoundsFn - Optional callback used for text bounds.
  */
 function getStrokeHandleAt(mx, my, stroke, measureTextBoundsFn) {
-    if (!stroke || !stroke.points || stroke.points.length === 0) return "none";
+    if (!stroke || !stroke.points || stroke.points.length === 0)
+        return "none";
     const threshold = Constants.selectionHandleSize + 4;
     const thresholdSq = threshold * threshold;
 
@@ -749,14 +923,15 @@ function getStrokeHandleAt(mx, my, stroke, measureTextBoundsFn) {
 
     function firstNearHandle(handles) {
         for (let i = 0; i < handles.length; i++) {
-            if (isNearSquarePoint(handles[i].point)) return handles[i].name;
+            if (isNearSquarePoint(handles[i].point))
+                return handles[i].name;
         }
         return "none";
     }
 
-    if (stroke.tool === "rect" || stroke.tool === "ellipse" || stroke.tool === "redact" ||
-        stroke.tool === "pixelate" || stroke.tool === "spotlight" || stroke.tool === "image") {
-        if (stroke.points.length < 2) return "none";
+    if (stroke.tool === "rect" || stroke.tool === "ellipse" || stroke.tool === "redact" || stroke.tool === "pixelate" || stroke.tool === "spotlight" || stroke.tool === "image") {
+        if (stroke.points.length < 2)
+            return "none";
         const p0 = stroke.points[0];
         const p1 = stroke.points[stroke.points.length - 1];
         const bounds = getRectBounds(p0, p1);
@@ -768,23 +943,74 @@ function getStrokeHandleAt(mx, my, stroke, measureTextBoundsFn) {
         const cy = (y1 + y2) / 2;
 
         return firstNearHandle([
-            { name: "tl", point: { x: x1, y: y1 } },
-            { name: "tr", point: { x: x2, y: y1 } },
-            { name: "bl", point: { x: x1, y: y2 } },
-            { name: "br", point: { x: x2, y: y2 } },
-            { name: "tc", point: { x: cx, y: y1 } },
-            { name: "bc", point: { x: cx, y: y2 } },
-            { name: "lc", point: { x: x1, y: cy } },
-            { name: "rc", point: { x: x2, y: cy } }
+            {
+                name: "tl",
+                point: {
+                    x: x1,
+                    y: y1
+                }
+            },
+            {
+                name: "tr",
+                point: {
+                    x: x2,
+                    y: y1
+                }
+            },
+            {
+                name: "bl",
+                point: {
+                    x: x1,
+                    y: y2
+                }
+            },
+            {
+                name: "br",
+                point: {
+                    x: x2,
+                    y: y2
+                }
+            },
+            {
+                name: "tc",
+                point: {
+                    x: cx,
+                    y: y1
+                }
+            },
+            {
+                name: "bc",
+                point: {
+                    x: cx,
+                    y: y2
+                }
+            },
+            {
+                name: "lc",
+                point: {
+                    x: x1,
+                    y: cy
+                }
+            },
+            {
+                name: "rc",
+                point: {
+                    x: x2,
+                    y: cy
+                }
+            }
         ]);
     }
 
     if (stroke.tool === "line" || stroke.tool === "arrow" || stroke.tool === "highlighter") {
-        if (stroke.points.length < 2) return "none";
+        if (stroke.points.length < 2)
+            return "none";
         const p0 = stroke.points[0];
         const p1 = stroke.points[stroke.points.length - 1];
-        if (isNearSquarePoint(p0)) return "start";
-        if (isNearSquarePoint(p1)) return "end";
+        if (isNearSquarePoint(p0))
+            return "start";
+        if (isNearSquarePoint(p1))
+            return "end";
         return "none";
     }
 
@@ -800,13 +1026,18 @@ function getStrokeHandleAt(mx, my, stroke, measureTextBoundsFn) {
                 x: stampPt.x - stroke.width * Constants.stampRadiusMultiplier,
                 y: stampPt.y - stroke.width * Constants.stampRadiusMultiplier
             };
-            if (isNearSquarePoint(anchorPt)) return "anchor";
-            if (isNearSquarePoint(stampHandlePt)) return "stamp";
-            if (dx * dx + dy * dy <= stampRadius * stampRadius) return "stampBody";
+            if (isNearSquarePoint(anchorPt))
+                return "anchor";
+            if (isNearSquarePoint(stampHandlePt))
+                return "stamp";
+            if (dx * dx + dy * dy <= stampRadius * stampRadius)
+                return "stampBody";
 
-            if (isPointNearSegment(mx, my, anchorPt, stampPt, thresholdSq)) return "stampBody";
+            if (isPointNearSegment(mx, my, anchorPt, stampPt, thresholdSq))
+                return "stampBody";
         } else {
-            if (dx * dx + dy * dy <= stampRadius * stampRadius) return "stamp";
+            if (dx * dx + dy * dy <= stampRadius * stampRadius)
+                return "stamp";
         }
         return "none";
     }
@@ -823,21 +1054,72 @@ function getStrokeHandleAt(mx, my, stroke, measureTextBoundsFn) {
         const cy = (y1 + y2) / 2;
 
         return firstNearHandle([
-            { name: "src_tl", point: { x: x1, y: y1 } },
-            { name: "src_tr", point: { x: x2, y: y1 } },
-            { name: "src_bl", point: { x: x1, y: y2 } },
-            { name: "src_br", point: { x: x2, y: y2 } },
-            { name: "src_tc", point: { x: cx, y: y1 } },
-            { name: "src_bc", point: { x: cx, y: y2 } },
-            { name: "src_lc", point: { x: x1, y: cy } },
-            { name: "src_rc", point: { x: x2, y: cy } }
+            {
+                name: "src_tl",
+                point: {
+                    x: x1,
+                    y: y1
+                }
+            },
+            {
+                name: "src_tr",
+                point: {
+                    x: x2,
+                    y: y1
+                }
+            },
+            {
+                name: "src_bl",
+                point: {
+                    x: x1,
+                    y: y2
+                }
+            },
+            {
+                name: "src_br",
+                point: {
+                    x: x2,
+                    y: y2
+                }
+            },
+            {
+                name: "src_tc",
+                point: {
+                    x: cx,
+                    y: y1
+                }
+            },
+            {
+                name: "src_bc",
+                point: {
+                    x: cx,
+                    y: y2
+                }
+            },
+            {
+                name: "src_lc",
+                point: {
+                    x: x1,
+                    y: cy
+                }
+            },
+            {
+                name: "src_rc",
+                point: {
+                    x: x2,
+                    y: cy
+                }
+            }
         ]);
     }
 
     if (stroke.tool === "text") {
         const textBounds = getTextBBox(stroke, measureTextBoundsFn);
         const frame = getTextTransformFrame(stroke, textBounds);
-        const local = inverseRotatePoint({ x: mx, y: my }, frame.center, frame.angle);
+        const local = inverseRotatePoint({
+            x: mx,
+            y: my
+        }, frame.center, frame.angle);
         const rotationPoint = {
             x: (textBounds.minX + textBounds.maxX) / 2,
             y: textBounds.minY - 24
@@ -846,8 +1128,10 @@ function getStrokeHandleAt(mx, my, stroke, measureTextBoundsFn) {
             return "rotate";
         }
         if (stroke.isSpeechBubble && stroke.points.length >= 2) {
-            if (Math.abs(local.x - stroke.points[0].x) <= threshold && Math.abs(local.y - stroke.points[0].y) <= threshold) return "start";
-            if (Math.abs(local.x - stroke.points[1].x) <= threshold && Math.abs(local.y - stroke.points[1].y) <= threshold) return "end";
+            if (Math.abs(local.x - stroke.points[0].x) <= threshold && Math.abs(local.y - stroke.points[0].y) <= threshold)
+                return "start";
+            if (Math.abs(local.x - stroke.points[1].x) <= threshold && Math.abs(local.y - stroke.points[1].y) <= threshold)
+                return "end";
         }
         return "none";
     }
@@ -866,15 +1150,13 @@ function getStrokeHandleAt(mx, my, stroke, measureTextBoundsFn) {
  * @returns {Array} New smoothed array of Qt.point objects.
  */
 function smoothStrokePoints(points, passes, Qt) {
-    if (!points || points.length < 3) return points;
+    if (!points || points.length < 3)
+        return points;
     let pts = points;
     for (let p = 0; p < passes; p++) {
         const next = [pts[0]]; // keep start fixed
         for (let i = 1; i < pts.length - 1; i++) {
-            next.push(Qt.point(
-                0.25 * pts[i - 1].x + 0.5 * pts[i].x + 0.25 * pts[i + 1].x,
-                0.25 * pts[i - 1].y + 0.5 * pts[i].y + 0.25 * pts[i + 1].y
-            ));
+            next.push(Qt.point(0.25 * pts[i - 1].x + 0.5 * pts[i].x + 0.25 * pts[i + 1].x, 0.25 * pts[i - 1].y + 0.5 * pts[i].y + 0.25 * pts[i + 1].y));
         }
         next.push(pts[pts.length - 1]); // keep end fixed
         pts = next;
@@ -883,16 +1165,18 @@ function smoothStrokePoints(points, passes, Qt) {
 }
 
 function getBoundaryColorOrGradient(ctx, rx, ry, rw, rh, offscreenSampler, Qt) {
-    if (!offscreenSampler) return "transparent";
+    if (!offscreenSampler)
+        return "transparent";
     const octx = offscreenSampler.getContext("2d");
     const border = 3;
     const sampleX = Math.max(0, Math.min(offscreenSampler.width - 1, rx - border));
     const sampleY = Math.max(0, Math.min(offscreenSampler.height - 1, ry - border));
     const sampleW = Math.max(1, Math.min(offscreenSampler.width - sampleX, rw + border * 2));
     const sampleH = Math.max(1, Math.min(offscreenSampler.height - sampleY, rh + border * 2));
-    
-    if (sampleW <= 0 || sampleH <= 0) return "transparent";
-    
+
+    if (sampleW <= 0 || sampleH <= 0)
+        return "transparent";
+
     let imgData;
     try {
         imgData = octx.getImageData(sampleX, sampleY, sampleW, sampleH);
@@ -900,11 +1184,11 @@ function getBoundaryColorOrGradient(ctx, rx, ry, rw, rh, offscreenSampler, Qt) {
         return "transparent";
     }
     const data = imgData.data;
-    
+
     const counts = {};
     let maxCount = 0;
     let dominantColorKey = null;
-    
+
     for (let y = 0; y < sampleH; y++) {
         for (let x = 0; x < sampleW; x++) {
             const isBorder = (x < border) || (x >= sampleW - border) || (y < border) || (y >= sampleH - border);
@@ -914,12 +1198,13 @@ function getBoundaryColorOrGradient(ctx, rx, ry, rw, rh, offscreenSampler, Qt) {
                 const g = data[idx + 1];
                 const b = data[idx + 2];
                 const a = data[idx + 3];
-                if (a === 0) continue;
-                
+                if (a === 0)
+                    continue;
+
                 const qr = Math.round(r / 8) * 8;
                 const qg = Math.round(g / 8) * 8;
                 const qb = Math.round(b / 8) * 8;
-                
+
                 const key = (qr << 16) | (qg << 8) | qb;
                 counts[key] = (counts[key] || 0) + 1;
                 if (counts[key] > maxCount) {
@@ -929,9 +1214,10 @@ function getBoundaryColorOrGradient(ctx, rx, ry, rw, rh, offscreenSampler, Qt) {
             }
         }
     }
-    
-    if (dominantColorKey === null) return "transparent";
-    
+
+    if (dominantColorKey === null)
+        return "transparent";
+
     let rSum = 0, gSum = 0, bSum = 0, count = 0;
     for (let y = 0; y < sampleH; y++) {
         for (let x = 0; x < sampleW; x++) {
@@ -942,8 +1228,9 @@ function getBoundaryColorOrGradient(ctx, rx, ry, rw, rh, offscreenSampler, Qt) {
                 const g = data[idx + 1];
                 const b = data[idx + 2];
                 const a = data[idx + 3];
-                if (a === 0) continue;
-                
+                if (a === 0)
+                    continue;
+
                 const qr = Math.round(r / 8) * 8;
                 const qg = Math.round(g / 8) * 8;
                 const qb = Math.round(b / 8) * 8;
@@ -957,7 +1244,7 @@ function getBoundaryColorOrGradient(ctx, rx, ry, rw, rh, offscreenSampler, Qt) {
             }
         }
     }
-    
+
     const finalR = Math.round(rSum / count);
     const finalG = Math.round(gSum / count);
     const finalB = Math.round(bSum / count);
@@ -970,8 +1257,9 @@ function getBoundaryColorOrGradient(ctx, rx, ry, rw, rh, offscreenSampler, Qt) {
  * @returns {string} The formatted hex string.
  */
 function formatHexColor(color) {
-    if (!color) return "#000000";
-    
+    if (!color)
+        return "#000000";
+
     // Coerce to string to see if it represents a valid hex color
     const s = String(color).trim();
     const match = s.match(/^#?([a-fA-F0-9]{3,8})$/);
@@ -987,12 +1275,12 @@ function formatHexColor(color) {
         }
         return "#000000";
     }
-    
+
     // Otherwise, check if it is a QML color object (has r, g, b)
     if (color && typeof color === "object" && color.r !== undefined) {
         return rgbToHex(color, true);
     }
-    
+
     return "#000000";
 }
 
@@ -1003,9 +1291,11 @@ function formatHexColor(color) {
  * @returns {string} Normalized lowercase hex string.
  */
 function toHex6(c, Qt) {
-    if (c === undefined || c === null) return "";
+    if (c === undefined || c === null)
+        return "";
     const col = (typeof c === "string") ? Qt.color(c) : c;
-    if (!col) return "";
+    if (!col)
+        return "";
     return rgbToHex(col, false);
 }
 
@@ -1023,33 +1313,60 @@ function colorEquals(c1, c2, Qt) {
 // ─── 6. Stroke data ───────────────────────────────────────────────────────────
 
 function copyStrokeProperties(source, target) {
-    if (!source || !target) return;
-    if (source.text !== undefined) target.text = source.text;
-    if (source.fontFamily !== undefined) target.fontFamily = source.fontFamily;
-    if (source.isBold !== undefined) target.isBold = source.isBold;
-    if (source.isItalic !== undefined) target.isItalic = source.isItalic;
-    if (source.isUnderline !== undefined) target.isUnderline = source.isUnderline;
-    if (source.counter !== undefined) target.counter = source.counter;
-    if (source.format !== undefined) target.format = source.format;
-    if (source.hasBackground !== undefined) target.hasBackground = source.hasBackground;
-    if (source.cornerRadius !== undefined) target.cornerRadius = source.cornerRadius;
-    if (source.borderWidth !== undefined) target.borderWidth = source.borderWidth;
-    if (source.lineStyle !== undefined) target.lineStyle = source.lineStyle;
-    if (source.arrowLineStyle !== undefined) target.arrowLineStyle = source.arrowLineStyle;
-    if (source.arrowHeadStyle !== undefined) target.arrowHeadStyle = source.arrowHeadStyle;
-    if (source.redactMode !== undefined) target.redactMode = source.redactMode;
-    if (source.redactShape !== undefined) target.redactShape = source.redactShape;
-    if (source.hasLeaderLine !== undefined) target.hasLeaderLine = source.hasLeaderLine;
-    if (source.isSpeechBubble !== undefined) target.isSpeechBubble = source.isSpeechBubble;
-    if (source.calloutLinkLines !== undefined) target.calloutLinkLines = source.calloutLinkLines;
-    if (source.calloutShape !== undefined) target.calloutShape = source.calloutShape;
-    if (source.id !== undefined) target.id = source.id;
-    if (source.randomize !== undefined) target.randomize = source.randomize;
-    if (source.randomSeed !== undefined) target.randomSeed = source.randomSeed;
-    if (source.rotation !== undefined) target.rotation = source.rotation;
-    if (source.source !== undefined) target.source = source.source;
-    if (source.originalAspectRatio !== undefined) target.originalAspectRatio = source.originalAspectRatio;
-    if (source.opacity !== undefined) target.opacity = source.opacity;
+    if (!source || !target)
+        return;
+    if (source.text !== undefined)
+        target.text = source.text;
+    if (source.fontFamily !== undefined)
+        target.fontFamily = source.fontFamily;
+    if (source.isBold !== undefined)
+        target.isBold = source.isBold;
+    if (source.isItalic !== undefined)
+        target.isItalic = source.isItalic;
+    if (source.isUnderline !== undefined)
+        target.isUnderline = source.isUnderline;
+    if (source.counter !== undefined)
+        target.counter = source.counter;
+    if (source.format !== undefined)
+        target.format = source.format;
+    if (source.hasBackground !== undefined)
+        target.hasBackground = source.hasBackground;
+    if (source.cornerRadius !== undefined)
+        target.cornerRadius = source.cornerRadius;
+    if (source.borderWidth !== undefined)
+        target.borderWidth = source.borderWidth;
+    if (source.lineStyle !== undefined)
+        target.lineStyle = source.lineStyle;
+    if (source.arrowLineStyle !== undefined)
+        target.arrowLineStyle = source.arrowLineStyle;
+    if (source.arrowHeadStyle !== undefined)
+        target.arrowHeadStyle = source.arrowHeadStyle;
+    if (source.redactMode !== undefined)
+        target.redactMode = source.redactMode;
+    if (source.redactShape !== undefined)
+        target.redactShape = source.redactShape;
+    if (source.hasLeaderLine !== undefined)
+        target.hasLeaderLine = source.hasLeaderLine;
+    if (source.isSpeechBubble !== undefined)
+        target.isSpeechBubble = source.isSpeechBubble;
+    if (source.calloutLinkLines !== undefined)
+        target.calloutLinkLines = source.calloutLinkLines;
+    if (source.calloutShape !== undefined)
+        target.calloutShape = source.calloutShape;
+    if (source.id !== undefined)
+        target.id = source.id;
+    if (source.randomize !== undefined)
+        target.randomize = source.randomize;
+    if (source.randomSeed !== undefined)
+        target.randomSeed = source.randomSeed;
+    if (source.rotation !== undefined)
+        target.rotation = source.rotation;
+    if (source.source !== undefined)
+        target.source = source.source;
+    if (source.originalAspectRatio !== undefined)
+        target.originalAspectRatio = source.originalAspectRatio;
+    if (source.opacity !== undefined)
+        target.opacity = source.opacity;
 }
 
 /**
@@ -1059,7 +1376,8 @@ function copyStrokeProperties(source, target) {
  * @returns {number} Distance value.
  */
 function distance(p1, p2) {
-    if (!p1 || !p2) return 0;
+    if (!p1 || !p2)
+        return 0;
     return Math.hypot(p2.x - p1.x, p2.y - p1.y);
 }
 

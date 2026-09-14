@@ -9,58 +9,38 @@ Item {
     property string iconName: ""
     property string valueText: ""
     property bool compact: false
+    property int valueWidth: 40
+    property int iconSize: compact ? Constants.iconSize : Constants.backgroundIconSize
 
     signal hovered(var controlItem)
-    signal exited()
+    signal exited
     signal wheeled(int delta)
 
-    implicitWidth: compact ? Constants.btnSize : metricRow.implicitWidth
-    implicitHeight: compact ? 40 : Constants.btnSize
+    implicitWidth: compact ? Constants.btnSize + 8 : layout.implicitWidth
+    implicitHeight: compact ? Constants.compactControlHeight : Constants.btnSize
     width: implicitWidth
     height: implicitHeight
 
-    Row {
-        id: metricRow
-        visible: !root.compact
-        spacing: Theme.spacingXS
-        anchors.verticalCenter: parent.verticalCenter
-
-        DankIcon {
-            name: root.iconName
-            size: Constants.backgroundIconSize
-            color: Theme.surfaceText
-            anchors.verticalCenter: parent.verticalCenter
-        }
-
-        StyledText {
-            text: root.valueText
-            width: 40
-            horizontalAlignment: Text.AlignRight
-            font.pixelSize: Theme.fontSizeSmall
-            color: Theme.surfaceText
-            anchors.verticalCenter: parent.verticalCenter
-        }
-    }
-
-    Column {
-        visible: root.compact
-        spacing: Constants.spacingCompact
+    Grid {
+        id: layout
+        columns: root.compact ? 1 : 2
+        spacing: root.compact ? Constants.spacingCompact : Theme.spacingXS
         anchors.centerIn: parent
+        horizontalItemAlignment: Grid.AlignHCenter
+        verticalItemAlignment: Grid.AlignVCenter
 
         DankIcon {
             name: root.iconName
-            size: Constants.iconSize
+            size: root.iconSize
             color: Theme.surfaceText
-            anchors.horizontalCenter: parent.horizontalCenter
         }
 
         StyledText {
             text: root.valueText
-            width: parent.width
-            horizontalAlignment: Text.AlignHCenter
+            width: root.compact ? root.width : root.valueWidth
+            horizontalAlignment: root.compact ? Text.AlignHCenter : Text.AlignRight
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceText
-            anchors.horizontalCenter: parent.horizontalCenter
         }
     }
 
@@ -70,6 +50,6 @@ Item {
         cursorShape: Qt.PointingHandCursor
         onEntered: root.hovered(root)
         onExited: root.exited()
-        onWheel: (wheel) => root.wheeled(wheel.angleDelta.y)
+        onWheel: wheel => root.wheeled(wheel.angleDelta.y)
     }
 }

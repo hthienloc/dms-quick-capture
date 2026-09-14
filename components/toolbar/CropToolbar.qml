@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Layouts
 import qs.Common
 import qs.Widgets
-import "../core/Constants.js" as Constants
 
 Rectangle {
     id: root
@@ -10,9 +9,9 @@ Rectangle {
     property string currentRatio: "" // "" = Free, "1:1", "4:3", "16:9", "3:2"
 
     signal ratioSelected(string ratio)
-    signal resetRequested()
-    signal cancelRequested()
-    signal doneRequested()
+    signal resetRequested
+    signal cancelRequested
+    signal doneRequested
 
     implicitHeight: 44
     implicitWidth: mainRow.implicitWidth + 24
@@ -36,11 +35,26 @@ Rectangle {
         // Aspect ratio pills
         Repeater {
             model: [
-                { label: I18n.trFor("quickCapture", "Free"), value: "" },
-                { label: "1:1", value: "1:1" },
-                { label: "4:3", value: "4:3" },
-                { label: "16:9", value: "16:9" },
-                { label: "3:2", value: "3:2" }
+                {
+                    label: I18n.trFor("quickCapture", "Free"),
+                    value: ""
+                },
+                {
+                    label: "1:1",
+                    value: "1:1"
+                },
+                {
+                    label: "4:3",
+                    value: "4:3"
+                },
+                {
+                    label: "16:9",
+                    value: "16:9"
+                },
+                {
+                    label: "3:2",
+                    value: "3:2"
+                }
             ]
 
             delegate: Rectangle {

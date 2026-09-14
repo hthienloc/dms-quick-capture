@@ -8,9 +8,9 @@ DankActionButton {
     property string shortcutText: ""
     property bool showShortcut: false
 
-    Text {
+    StyledText {
         text: button.shortcutText
-        font.pixelSize: 9
+        font.pixelSize: Theme.fontSizeSmall - 3
         font.weight: Font.Bold
         color: button.enabled ? Theme.withAlpha(Theme.surfaceText, 0.5) : Theme.withAlpha(Theme.surfaceText, 0.25)
         anchors.bottom: button.bottom

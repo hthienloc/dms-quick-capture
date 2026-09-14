@@ -10,7 +10,8 @@ Item {
     property bool synchronizing: false
 
     Component.onCompleted: {
-        if (editor.window) editor.window.inlineTextEditorItem = editor;
+        if (editor.window)
+            editor.window.inlineTextEditorItem = editor;
     }
 
     Component.onDestruction: {
@@ -28,30 +29,31 @@ Item {
     transformOrigin: Item.Center
 
     readonly property real displayScale: {
-        if (!window) return 1;
+        if (!window)
+            return 1;
         return window.editScale * (window.effectiveBackgroundMode !== "none" ? window.backgroundScaleFactor : 1);
     }
     readonly property real canvasOriginX: window && window.hasActiveCropSelection ? window.cropRect.x : 0
     readonly property real canvasOriginY: window && window.hasActiveCropSelection ? window.cropRect.y : 0
     readonly property point displayOrigin: {
-        if (!window) return Qt.point(0, 0);
+        if (!window)
+            return Qt.point(0, 0);
         const point = window.typingCoords;
         const offsetX = window.effectiveBackgroundMode !== "none" ? window.screenshotXOffset : 0;
         const offsetY = window.effectiveBackgroundMode !== "none" ? window.screenshotYOffset : 0;
         const factor = window.effectiveBackgroundMode !== "none" ? window.backgroundScaleFactor : 1;
-        return Qt.point(
-            (offsetX + (point.x - editor.canvasOriginX) * factor) * window.editScale,
-            (offsetY + (point.y - editor.canvasOriginY) * factor) * window.editScale
-        );
+        return Qt.point((offsetX + (point.x - editor.canvasOriginX) * factor) * window.editScale, (offsetY + (point.y - editor.canvasOriginY) * factor) * window.editScale);
     }
     readonly property real fontSize: window ? window.textFontSize * editor.displayScale : 16
     readonly property real horizontalPadding: Math.max(2, editor.fontSize * 0.02)
     readonly property real verticalPadding: Math.max(1, editor.fontSize * 0.02)
 
     function synchronizeFromSession() {
-        if (!editor.editing || !editor.window) return;
+        if (!editor.editing || !editor.window)
+            return;
         Qt.callLater(() => {
-            if (!editor.editing) return;
+            if (!editor.editing)
+                return;
             editor.synchronizing = true;
             textEdit.text = editor.window.currentTypingText || "";
             textEdit.cursorPosition = Math.min(editor.window.typingCursorIndex, textEdit.length);
@@ -67,12 +69,6 @@ Item {
         } else if (editor.window) {
             Qt.callLater(() => editor.window.focusModalAfterToolbarAction());
         }
-    }
-
-    Rectangle {
-        anchors.fill: parent
-        color: "transparent"
-        border.width: 0
     }
 
     TextEdit {
@@ -100,29 +96,34 @@ Item {
         inputMethodHints: Qt.ImhNoAutoUppercase
 
         onVisibleChanged: {
-            if (!visible || !editor.window) return;
+            if (!visible || !editor.window)
+                return;
             editor.synchronizeFromSession();
         }
 
         onTextChanged: {
-            if (!editor.window || editor.synchronizing || !editor.editing) return;
+            if (!editor.window || editor.synchronizing || !editor.editing)
+                return;
             editor.window.currentTypingText = text;
             editor.window.typingCursorIndex = cursorPosition;
             editor.window.requestAnnotationPaintAll();
         }
 
         onCursorPositionChanged: {
-            if (!editor.window || editor.synchronizing || !editor.editing) return;
+            if (!editor.window || editor.synchronizing || !editor.editing)
+                return;
             editor.window.typingCursorIndex = cursorPosition;
             editor.window.requestAnnotationPaintAll();
         }
 
         function applyEnterAction(shouldCommit) {
-            if (!editor.window || !editor.editing) return;
+            if (!editor.window || !editor.editing)
+                return;
             if (!shouldCommit) {
                 const start = selectionStart;
                 const end = selectionEnd;
-                if (start !== end) remove(start, end);
+                if (start !== end)
+                    remove(start, end);
                 insert(start, "\n");
                 cursorPosition = start + 1;
                 return;
@@ -133,25 +134,27 @@ Item {
 
         function handleEnterKey(event) {
             const shouldCommit = !!(event.modifiers & Qt.ControlModifier);
-            if (!editor.window || !editor.editing) return;
+            if (!editor.window || !editor.editing)
+                return;
             if (inputMethodComposing) {
                 Qt.inputMethod.commit();
-                Qt.callLater(() => editor.applyEnterAction(shouldCommit));
+                Qt.callLater(() => textEdit.applyEnterAction(shouldCommit));
             } else {
-                editor.applyEnterAction(shouldCommit);
+                textEdit.applyEnterAction(shouldCommit);
             }
             event.accepted = true;
         }
 
         Keys.onEscapePressed: event => {
-            if (!editor.window || !editor.editing) return;
+            if (!editor.window || !editor.editing)
+                return;
             editor.window.cancelTypingText();
             event.accepted = true;
         }
         Keys.priority: Keys.BeforeItem
         Keys.onPressed: event => {
             if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.text === "\n") {
-                editor.handleEnterKey(event);
+                textEdit.handleEnterKey(event);
             }
         }
     }
@@ -161,8 +164,10 @@ Item {
         enabled: !!editor.window
 
         function onCurrentTypingTextChanged() {
-            if (!textEdit.activeFocus || editor.synchronizing || !editor.editing) return;
-            if (textEdit.text === editor.window.currentTypingText) return;
+            if (!textEdit.activeFocus || editor.synchronizing || !editor.editing)
+                return;
+            if (textEdit.text === editor.window.currentTypingText)
+                return;
             editor.synchronizing = true;
             textEdit.text = editor.window.currentTypingText || "";
             textEdit.cursorPosition = Math.min(editor.window.typingCursorIndex, textEdit.length);

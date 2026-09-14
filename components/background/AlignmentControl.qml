@@ -1,75 +1,25 @@
 import QtQuick
-import qs.Common
-import qs.Widgets
 import "../core/Constants.js" as Constants
 
-Item {
+BackgroundMetricControl {
     id: control
 
     property string backgroundAlignment: "center"
-    property bool compact: false
 
-    signal hovered()
-    signal exited()
+    readonly property var labels: ({
+            "top-left": "TL",
+            "top-center": "TC",
+            "top-right": "TR",
+            "center-left": "CL",
+            "center": "C",
+            "center-right": "CR",
+            "bottom-left": "BL",
+            "bottom-center": "BC",
+            "bottom-right": "BR"
+        })
 
-    readonly property var _labelMap: ({
-        "top-left": "TL", "top-center": "TC", "top-right": "TR",
-        "center-left": "CL", "center": "C", "center-right": "CR",
-        "bottom-left": "BL", "bottom-center": "BC", "bottom-right": "BR"
-    })
-
-    width: compact ? (Constants.btnSize + 8) : row.implicitWidth
-    height: compact ? Constants.compactControlHeight : Constants.btnSize
-
-    Row {
-        id: row
-        visible: !control.compact
-        spacing: Theme.spacingXS
-        anchors.verticalCenter: parent.verticalCenter
-
-        DankIcon {
-            name: "align_justify_center"
-            size: Constants.iconSize
-            color: Theme.surfaceText
-            anchors.verticalCenter: parent.verticalCenter
-        }
-        StyledText {
-            text: control._labelMap[control.backgroundAlignment] ?? "C"
-            width: 22; horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: Theme.fontSizeSmall
-            color: Theme.surfaceText
-            anchors.verticalCenter: parent.verticalCenter
-        }
-    }
-
-    Column {
-        id: col
-        visible: control.compact
-        width: parent.width
-        spacing: Constants.spacingCompact
-        anchors.centerIn: parent
-
-        DankIcon {
-            name: "align_justify_center"
-            size: Constants.iconSize
-            color: Theme.surfaceText
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-        StyledText {
-            text: control._labelMap[control.backgroundAlignment] ?? "C"
-            width: parent.width
-            horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: Theme.fontSizeSmall
-            color: Theme.surfaceText
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        onEntered: control.hovered()
-        onExited: control.exited()
-    }
+    iconName: "align_justify_center"
+    iconSize: Constants.iconSize
+    valueWidth: 22
+    valueText: labels[backgroundAlignment] ?? "C"
 }

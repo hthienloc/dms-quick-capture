@@ -9,7 +9,7 @@ Item {
     property string currentTool: ""
 
     signal customPickerRequested(var controlItem)
-    signal drawPickerRequested()
+    signal drawPickerRequested
 
     width: Constants.btnSize
     height: Constants.btnSize
@@ -19,7 +19,7 @@ Item {
         iconName: "colorize"
         buttonSize: Constants.btnSize
         iconSize: Constants.iconSize
-        tooltipText: I18n.trFor("quickCapture", "Color Picker (F for RGB | Eyedropper)")
+        tooltipText: I18n.trFor("quickCapture", "Color Picker") + " (F)"
         backgroundColor: control.currentTool === "colorpicker" ? Theme.withAlpha(Theme.primary, 0.15) : "transparent"
         iconColor: control.currentTool === "colorpicker" ? Theme.primary : Theme.surfaceText
     }
@@ -28,7 +28,7 @@ Item {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         cursorShape: Qt.PointingHandCursor
-        onClicked: (mouse) => {
+        onClicked: mouse => {
             if (mouse.button === Qt.RightButton) {
                 control.drawPickerRequested();
             } else {

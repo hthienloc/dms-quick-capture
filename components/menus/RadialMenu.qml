@@ -1,21 +1,24 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
+import "../core/Helpers.js" as Helpers
 import "../.."
 
 Item {
     id: root
     z: 1000
 
-    CaptureConfig { id: config }
+    CaptureConfig {
+        id: config
+    }
     property var presets: []
     property int selectedIndex: -1
-    
+
     // Hover Trigger Config
     property bool hoverTrigger: true
     property int hoverDelay: 200
     property real menuOpacity: 1.0
-    
+
     // Premium geometry config
     readonly property real outerRadius: 130
     readonly property real innerRadius: 50
@@ -24,7 +27,7 @@ Item {
     readonly property real itemRadius: 28
 
     signal presetSelected(var preset)
-    signal centerClicked()
+    signal centerClicked
 
     property bool visibleState: false
     visible: opacity > 0
@@ -35,13 +38,21 @@ Item {
         State {
             name: "visible"
             when: root.visibleState
-            PropertyChanges { target: root; opacity: root.menuOpacity; scale: 1.0 }
+            PropertyChanges {
+                target: root
+                opacity: root.menuOpacity
+                scale: 1.0
+            }
         }
     ]
 
     transitions: [
         Transition {
-            NumberAnimation { properties: "opacity,scale"; duration: 150; easing.type: Easing.OutQuad }
+            NumberAnimation {
+                properties: "opacity,scale"
+                duration: 150
+                easing.type: Easing.OutQuad
+            }
         }
     ]
 
@@ -60,37 +71,21 @@ Item {
     }
 
     function updateHoverPosition(parentX, parentY) {
-        if (!visibleState) return;
+        if (!visibleState)
+            return;
         const localX = parentX - root.x;
         const localY = parentY - root.y;
 
         const dx = localX - width / 2;
         const dy = localY - height / 2;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist >= 12) {
+        if (dx * dx + dy * dy >= 144)
             hasDragged = true;
-        }
-
-        if (dist < root.innerRadius) {
-            root.selectedIndex = -1;
-            return;
-        }
-
-        let angle = Math.atan2(dy, dx) * 180 / Math.PI + 90;
-        if (angle < 0) angle += 360;
-
-        const numSectors = root.presets.length || 8;
-        const sectorSize = 360 / numSectors;
-        const idx = Math.floor((angle + sectorSize / 2) % 360 / sectorSize);
-
-        if (idx >= 0 && idx < numSectors) {
-            root.selectedIndex = idx;
-        }
+        root.selectedIndex = Helpers.sectorIndexAt(dx, dy, root.presets.length || 8, root.innerRadius);
     }
 
     function confirmAndClose(isRelease) {
-        if (!visibleState) return;
+        if (!visibleState)
+            return;
         if (isRelease && !hasDragged) {
             // Single right-click tap: keep menu open on screen
             return;
@@ -113,7 +108,7 @@ Item {
             }
         }
     }
-    
+
     onPresetsChanged: radialCanvas.requestPaint()
 
     onVisibleStateChanged: {
@@ -194,10 +189,10 @@ Item {
         delegate: Item {
             width: root.itemRadius * 2
             height: width
-            
+
             property real angle: (index * 360 / root.presets.length) - 90
             property real rad: angle * Math.PI / 180
-            
+
             x: (root.width / 2) + root.midRadius * Math.cos(rad) - root.itemRadius
             y: (root.height / 2) + root.midRadius * Math.sin(rad) - root.itemRadius
 
@@ -236,7 +231,8 @@ Item {
 
         // Glow matching Matugen primary / preset color
         color: {
-            if (root.selectedIndex === -2) return Theme.withAlpha(Theme.primary, 0.12);
+            if (root.selectedIndex === -2)
+                return Theme.withAlpha(Theme.primary, 0.12);
             if (root.selectedIndex >= 0 && root.selectedIndex < root.presets.length) {
                 var p = root.presets[root.selectedIndex];
                 return p && p.color ? Theme.withAlpha(p.color, 0.15) : Theme.withAlpha(Theme.primary, 0.15);
@@ -244,7 +240,8 @@ Item {
             return Theme.surfaceContainerHighest;
         }
         border.color: {
-            if (root.selectedIndex === -2) return Theme.primary;
+            if (root.selectedIndex === -2)
+                return Theme.primary;
             if (root.selectedIndex >= 0 && root.selectedIndex < root.presets.length) {
                 var p = root.presets[root.selectedIndex];
                 return p && p.color ? p.color : Theme.primary;
@@ -254,16 +251,25 @@ Item {
         border.width: (root.selectedIndex >= 0 || root.selectedIndex === -2) ? 2.5 : 1
 
         scale: root.selectedIndex === -2 ? 1.05 : 1.0
-        Behavior on scale { NumberAnimation { duration: 100 } }
-        Behavior on border.width { NumberAnimation { duration: 100 } }
+        Behavior on scale {
+            NumberAnimation {
+                duration: 100
+            }
+        }
+        Behavior on border.width {
+            NumberAnimation {
+                duration: 100
+            }
+        }
 
         Column {
             anchors.centerIn: parent
             spacing: 2
-            
+
             DankIcon {
                 name: {
-                    if (root.selectedIndex === -2) return "near_me";
+                    if (root.selectedIndex === -2)
+                        return "near_me";
                     if (root.selectedIndex >= 0 && root.selectedIndex < root.presets.length) {
                         return config.getToolIcon(root.presets[root.selectedIndex].tool);
                     }
@@ -271,7 +277,8 @@ Item {
                 }
                 size: 24
                 color: {
-                    if (root.selectedIndex === -2) return Theme.primary;
+                    if (root.selectedIndex === -2)
+                        return Theme.primary;
                     if (root.selectedIndex >= 0 && root.selectedIndex < root.presets.length) {
                         return root.presets[root.selectedIndex].color;
                     }
@@ -282,7 +289,8 @@ Item {
 
             StyledText {
                 text: {
-                    if (root.selectedIndex === -2) return I18n.trFor("quickCapture", "Select");
+                    if (root.selectedIndex === -2)
+                        return I18n.trFor("quickCapture", "Select");
                     if (root.selectedIndex >= 0 && root.selectedIndex < root.presets.length) {
                         return config.getToolLabel(root.presets[root.selectedIndex].tool);
                     }
@@ -304,15 +312,15 @@ Item {
         hoverEnabled: true
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-        onPositionChanged: (mouse) => {
+        onPositionChanged: mouse => {
             root.updateHoverPosition(root.x + mouse.x, root.y + mouse.y);
         }
 
-        onReleased: (mouse) => {
+        onReleased: mouse => {
             root.confirmAndClose(false);
         }
 
-        onClicked: (mouse) => {
+        onClicked: mouse => {
             if (mouse.button === Qt.RightButton) {
                 root.close();
             } else if (mouse.button === Qt.LeftButton) {

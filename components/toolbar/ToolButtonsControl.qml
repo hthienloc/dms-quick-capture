@@ -50,7 +50,7 @@ Item {
             iconName: control.compact ? "more_vert" : "more_horiz"
             buttonSize: Constants.btnSize
             iconSize: Constants.iconSize
-            tooltipText: I18n.trFor("quickCapture", "More Tools (`)")
+            tooltipText: I18n.trFor("quickCapture", "More Tools") + " (`)"
             shortcutText: "`"
             showShortcut: control.showShortcutHints
             onClicked: control.moreToolsClicked(moreActionsButton)

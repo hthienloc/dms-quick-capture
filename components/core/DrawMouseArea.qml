@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import qs.Common
 import qs.Services
 import "Helpers.js" as Helpers
@@ -16,18 +15,11 @@ MouseArea {
     required property var radialMenu
     required property var textInputDialog
     required property var moreToolsMenu
-    required property var stampOptionsToolbar
-    required property var textOptionsToolbar
-    required property var lineOptionsToolbar
-    required property var arrowOptionsToolbar
-    required property var redactOptionsToolbar
-    required property var calloutOptionsToolbar
+    required property var toolOptions
 
-    property string activeHandle: "none"
     property string hoveredHandle: "none"
     property int hoveredStrokeIdx: -1
     property string shiftLockAxis: "none"
-    property real originalRotation: 0
     property point rotationCenter: Qt.point(0, 0)
     property real rotationStartAngle: 0
     property point cropMoveStart: Qt.point(0, 0)
@@ -35,25 +27,8 @@ MouseArea {
     property rect cropResizeOrigin: Qt.rect(0, 0, 0, 0)
     property point cropResizeOffset: Qt.point(0, 0)
 
-    // Pen real-time smoothing state (exponential moving average)
     property real penSmoothX: 0
     property real penSmoothY: 0
-
-    function resetInteractionState() {
-        activeHandle = "none";
-        hoveredHandle = "none";
-        hoveredStrokeIdx = -1;
-        shiftLockAxis = "none";
-        originalRotation = 0;
-        rotationCenter = Qt.point(0, 0);
-        rotationStartAngle = 0;
-        cropMoveStart = Qt.point(0, 0);
-        cropMoveOrigin = Qt.rect(0, 0, 0, 0);
-        cropResizeOrigin = Qt.rect(0, 0, 0, 0);
-        cropResizeOffset = Qt.point(0, 0);
-        penSmoothX = 0;
-        penSmoothY = 0;
-    }
 
     function getAbsolutePoint(mx, my) {
         let rx = mx / window.editScale;
@@ -82,12 +57,8 @@ MouseArea {
         }
 
         const absPt = getAbsolutePoint(mx, my);
-        hoveredHandle = window.selectedStroke
-            ? window.getSelectedStrokeHandleAt(absPt.x, absPt.y)
-            : "none";
-        hoveredStrokeIdx = hoveredHandle !== "none"
-            ? window.strokes.indexOf(window.selectedStroke)
-            : window.findStrokeAt(absPt.x, absPt.y);
+        hoveredHandle = window.selectedStroke ? window.getSelectedStrokeHandleAt(absPt.x, absPt.y) : "none";
+        hoveredStrokeIdx = hoveredHandle !== "none" ? window.strokes.indexOf(window.selectedStroke) : window.findStrokeAt(absPt.x, absPt.y);
     }
 
     function updateCalloutDestinationDrag(stroke, pt) {
@@ -98,8 +69,7 @@ MouseArea {
 
         const dstP0 = stroke.points[2];
         const dstP1 = stroke.points[3];
-        window.calloutDestDragging = pt.x >= dstP0.x && pt.x <= dstP1.x
-            && pt.y >= dstP0.y && pt.y <= dstP1.y;
+        window.calloutDestDragging = pt.x >= dstP0.x && pt.x <= dstP1.x && pt.y >= dstP0.y && pt.y <= dstP1.y;
     }
 
     // Applies the shared rectangle resize rules used by shapes and callouts.
@@ -111,14 +81,34 @@ MouseArea {
         const minSize = 10;
 
         switch (handle) {
-        case "tl": x1 = Math.min(x1 + dx, x2 - minSize); y1 = Math.min(y1 + dy, y2 - minSize); break;
-        case "tr": x2 = Math.max(x2 + dx, x1 + minSize); y1 = Math.min(y1 + dy, y2 - minSize); break;
-        case "bl": x1 = Math.min(x1 + dx, x2 - minSize); y2 = Math.max(y2 + dy, y1 + minSize); break;
-        case "br": x2 = Math.max(x2 + dx, x1 + minSize); y2 = Math.max(y2 + dy, y1 + minSize); break;
-        case "tc": y1 = Math.min(y1 + dy, y2 - minSize); break;
-        case "bc": y2 = Math.max(y2 + dy, y1 + minSize); break;
-        case "lc": x1 = Math.min(x1 + dx, x2 - minSize); break;
-        case "rc": x2 = Math.max(x2 + dx, x1 + minSize); break;
+        case "tl":
+            x1 = Math.min(x1 + dx, x2 - minSize);
+            y1 = Math.min(y1 + dy, y2 - minSize);
+            break;
+        case "tr":
+            x2 = Math.max(x2 + dx, x1 + minSize);
+            y1 = Math.min(y1 + dy, y2 - minSize);
+            break;
+        case "bl":
+            x1 = Math.min(x1 + dx, x2 - minSize);
+            y2 = Math.max(y2 + dy, y1 + minSize);
+            break;
+        case "br":
+            x2 = Math.max(x2 + dx, x1 + minSize);
+            y2 = Math.max(y2 + dy, y1 + minSize);
+            break;
+        case "tc":
+            y1 = Math.min(y1 + dy, y2 - minSize);
+            break;
+        case "bc":
+            y2 = Math.max(y2 + dy, y1 + minSize);
+            break;
+        case "lc":
+            x1 = Math.min(x1 + dx, x2 - minSize);
+            break;
+        case "rc":
+            x2 = Math.max(x2 + dx, x1 + minSize);
+            break;
         }
 
         if (keepSquare && ["tl", "tr", "bl", "br"].indexOf(handle) !== -1) {
@@ -127,16 +117,26 @@ MouseArea {
             const currentH = y2 - y1;
             if (currentW / Math.max(1, currentH) > ratio) {
                 const newH = currentW / ratio;
-                if (handle === "br") { y2 = y1 + newH; }
-                else if (handle === "tl") { y1 = y2 - newH; }
-                else if (handle === "tr") { y1 = y2 - newH; }
-                else if (handle === "bl") { y2 = y1 + newH; }
+                if (handle === "br") {
+                    y2 = y1 + newH;
+                } else if (handle === "tl") {
+                    y1 = y2 - newH;
+                } else if (handle === "tr") {
+                    y1 = y2 - newH;
+                } else if (handle === "bl") {
+                    y2 = y1 + newH;
+                }
             } else {
                 const newW = currentH * ratio;
-                if (handle === "br") { x2 = x1 + newW; }
-                else if (handle === "tl") { x1 = x2 - newW; }
-                else if (handle === "tr") { x2 = x1 + newW; }
-                else if (handle === "bl") { x1 = x2 - newW; }
+                if (handle === "br") {
+                    x2 = x1 + newW;
+                } else if (handle === "tl") {
+                    x1 = x2 - newW;
+                } else if (handle === "tr") {
+                    x2 = x1 + newW;
+                } else if (handle === "bl") {
+                    x1 = x2 - newW;
+                }
             }
         }
 
@@ -151,7 +151,8 @@ MouseArea {
         const dx = point.x - fixed.x;
         const dy = point.y - fixed.y;
         const length = Math.sqrt(dx * dx + dy * dy);
-        if (length === 0) return point;
+        if (length === 0)
+            return point;
         const snapStep = Math.PI / 12;
         const angle = Math.atan2(dy, dx);
         const snapped = Math.round(angle / snapStep) * snapStep;
@@ -204,9 +205,7 @@ MouseArea {
             drawingCanvas.requestPaint();
         }
         if (window.activeHandle === "new") {
-            const end = (keepSquare || window.cropAspectRatio === "1:1")
-                ? constrainCropSquarePoint(window.selectStart, Qt.point(ox, oy))
-                : Qt.point(ox, oy);
+            const end = (keepSquare || window.cropAspectRatio === "1:1") ? constrainCropSquarePoint(window.selectStart, Qt.point(ox, oy)) : Qt.point(ox, oy);
             const rect = getDragRect(window.selectStart, end.x, end.y);
             window.cropRect = window.clampCropRect(rect.x, rect.y, rect.width, rect.height);
             drawingCanvas.requestPaint();
@@ -239,7 +238,8 @@ MouseArea {
     }
 
     function handleScanPosition(mouse) {
-        if (window.activeHandle !== "ocr" && window.activeHandle !== "qr") return;
+        if (window.activeHandle !== "ocr" && window.activeHandle !== "qr")
+            return;
         const ox = mouse.x / window.editScale;
         const oy = mouse.y / window.editScale;
         const rect = getDragRect(window.selectStart, ox, oy);
@@ -248,10 +248,10 @@ MouseArea {
     }
 
     function moveSelectedStroke(dx, dy, moveCalloutDestination) {
-        if (!window.selectedStroke || window.originalPoints.length === 0) return;
+        if (!window.selectedStroke || window.originalPoints.length === 0)
+            return;
         const newPoints = [];
-        if (moveCalloutDestination && window.selectedStroke.tool === "callout" &&
-            window.calloutDestDragging && window.originalPoints.length === 4) {
+        if (moveCalloutDestination && window.selectedStroke.tool === "callout" && window.calloutDestDragging && window.originalPoints.length === 4) {
             for (let i = 0; i < window.originalPoints.length; i++) {
                 newPoints.push(Qt.point(window.originalPoints[i].x, window.originalPoints[i].y));
             }
@@ -285,8 +285,10 @@ MouseArea {
                             shiftLockAxis = Math.abs(dx) > Math.abs(dy) ? "horizontal" : "vertical";
                         }
                     }
-                    if (shiftLockAxis === "horizontal") dy = 0;
-                    else if (shiftLockAxis === "vertical") dx = 0;
+                    if (shiftLockAxis === "horizontal")
+                        dy = 0;
+                    else if (shiftLockAxis === "vertical")
+                        dx = 0;
                 } else {
                     shiftLockAxis = "none";
                 }
@@ -305,8 +307,7 @@ MouseArea {
                         angle = Math.round(angle / (Math.PI / 12)) * (Math.PI / 12);
                     }
                     window.selectedStroke.rotation = window.originalRotation + angle * 180 / Math.PI;
-                } else if (tool === "rect" || tool === "ellipse" || tool === "redact" ||
-                    tool === "pixelate" || tool === "spotlight" || tool === "image") {
+                } else if (tool === "rect" || tool === "ellipse" || tool === "redact" || tool === "pixelate" || tool === "spotlight" || tool === "image") {
                     let imageRatio = 0;
                     if (tool === "image" && window.selectedStroke) {
                         const s = window.selectedStroke;
@@ -323,7 +324,8 @@ MouseArea {
                     newPoints[0] = resized.start;
                     newPoints[newPoints.length - 1] = resized.end;
                     window.selectedStroke.points = newPoints;
-                    if (tool === "redact") window.selectedStroke.cachedCleanColor = undefined;
+                    if (tool === "redact")
+                        window.selectedStroke.cachedCleanColor = undefined;
                 } else if (tool === "line" || tool === "arrow" || tool === "highlighter" || (tool === "text" && window.selectedStroke.isSpeechBubble)) {
                     const newPoints = [...window.selectedStroke.points];
                     let targetIdx = -1;
@@ -337,7 +339,8 @@ MouseArea {
                     }
                     if (targetIdx !== -1) {
                         let newPt = Qt.point(orig[targetIdx].x + dx, orig[targetIdx].y + dy);
-                        if (mouse.modifiers & Qt.ShiftModifier) newPt = snapPointToAngle(newPt, orig[fixedIdx]);
+                        if (mouse.modifiers & Qt.ShiftModifier)
+                            newPt = snapPointToAngle(newPt, orig[fixedIdx]);
                         newPoints[targetIdx] = newPt;
                     }
                     window.selectedStroke.points = newPoints;
@@ -347,20 +350,21 @@ MouseArea {
                     newPoints[0] = resized.start;
                     newPoints[1] = resized.end;
                     const zoom = window.selectedStroke.width / 100.0;
-                    newPoints[3] = Qt.point(newPoints[2].x + Math.abs(resized.end.x - resized.start.x) * zoom,
-                        newPoints[2].y + Math.abs(resized.end.y - resized.start.y) * zoom);
+                    newPoints[3] = Qt.point(newPoints[2].x + Math.abs(resized.end.x - resized.start.x) * zoom, newPoints[2].y + Math.abs(resized.end.y - resized.start.y) * zoom);
                     window.selectedStroke.points = newPoints;
                 } else if (tool === "stamp") {
                     const newPoints = [...window.selectedStroke.points];
                     const hasLeader = window.selectedStroke.hasLeaderLine && window.selectedStroke.points.length >= 2;
                     if (window.activeHandle === "anchor" && hasLeader) {
                         let newPt = Qt.point(orig[0].x + dx, orig[0].y + dy);
-                        if (mouse.modifiers & Qt.ShiftModifier) newPt = snapPointToAngle(newPt, orig[1]);
+                        if (mouse.modifiers & Qt.ShiftModifier)
+                            newPt = snapPointToAngle(newPt, orig[1]);
                         newPoints[0] = newPt;
                     } else if (window.activeHandle === "stamp") {
                         const idx = hasLeader ? 1 : 0;
                         let newPt = Qt.point(orig[idx].x + dx, orig[idx].y + dy);
-                        if (idx === 1 && (mouse.modifiers & Qt.ShiftModifier)) newPt = snapPointToAngle(newPt, orig[0]);
+                        if (idx === 1 && (mouse.modifiers & Qt.ShiftModifier))
+                            newPt = snapPointToAngle(newPt, orig[0]);
                         newPoints[idx] = newPt;
                     } else if (window.activeHandle === "stampBody") {
                         for (let i = 0; i < orig.length; i++) {
@@ -371,9 +375,7 @@ MouseArea {
                 }
             }
             if (window.originalPoints.length === 0 || !(mouse.buttons & Qt.LeftButton)) {
-                hoveredStrokeIdx = hoveredHandle !== "none"
-                    ? window.strokes.indexOf(window.selectedStroke)
-                    : window.findStrokeAt(absPt.x, absPt.y);
+                hoveredStrokeIdx = hoveredHandle !== "none" ? window.strokes.indexOf(window.selectedStroke) : window.findStrokeAt(absPt.x, absPt.y);
             }
             drawingCanvas.requestPaint();
         } else {
@@ -383,7 +385,8 @@ MouseArea {
     }
 
     function handleDrawingPosition(mouse, absPt) {
-        if (!window.currentStroke) return;
+        if (!window.currentStroke)
+            return;
 
         if (window.currentTool === "pen") {
             if (mouse.modifiers & Qt.ShiftModifier) {
@@ -404,12 +407,12 @@ MouseArea {
                 finalPt = Helpers.constrainSquarePoint(window.currentStroke.points[0], absPt, Qt);
             }
             updateCurrentStrokeEndpoint(finalPt);
-        } else if (window.currentTool === "rect" || window.currentTool === "ellipse" || window.currentTool === "arrow" || window.currentTool === "line"
-                   || window.currentTool === "pixelate" || window.currentTool === "highlighter" || window.currentTool === "spotlight" || window.currentTool === "callout" || window.currentTool === "text") {
+        } else if (window.currentTool === "rect" || window.currentTool === "ellipse" || window.currentTool === "arrow" || window.currentTool === "line" || window.currentTool === "pixelate" || window.currentTool === "highlighter" || window.currentTool === "spotlight" || window.currentTool === "callout" || window.currentTool === "text") {
             let finalPt = absPt;
             if (mouse.modifiers & Qt.ShiftModifier && (window.currentTool === "line" || window.currentTool === "arrow" || window.currentTool === "highlighter")) {
                 const p0 = window.currentStroke.points[0];
-                if (p0) finalPt = snapPointToAngle(absPt, p0);
+                if (p0)
+                    finalPt = snapPointToAngle(absPt, p0);
             } else if (mouse.modifiers & Qt.ShiftModifier && (window.currentTool === "ellipse" || window.currentTool === "rect" || window.currentTool === "redact" || window.currentTool === "pixelate" || window.currentTool === "spotlight" || window.currentTool === "callout")) {
                 if (window.currentStroke.points[0]) {
                     finalPt = Helpers.constrainSquarePoint(window.currentStroke.points[0], absPt, Qt);
@@ -458,45 +461,48 @@ MouseArea {
      * @returns {number} Intensity multiplier.
      */
     function getIntensityMultiplier(tool) {
-        if (tool === "text" || tool === "pixelate") return 2;
-        if (tool === "spotlight") return 5;
-        if (tool === "callout") return 10;
+        if (tool === "text" || tool === "pixelate")
+            return 2;
+        if (tool === "spotlight")
+            return 5;
+        if (tool === "callout")
+            return 10;
         return 1;
     }
 
-    onPositionChanged: (mouse) => {
-         if (typeof radialMenu !== "undefined" && radialMenu && radialMenu.visibleState) {
-             const mapped = drawMouseArea.mapToItem(radialMenu.parent, mouse.x, mouse.y);
-             radialMenu.updateHoverPosition(mapped.x, mapped.y);
-             return;
-         }
+    onPositionChanged: mouse => {
+        if (radialMenu.visibleState) {
+            const mapped = drawMouseArea.mapToItem(radialMenu.parent, mouse.x, mouse.y);
+            radialMenu.updateHoverPosition(mapped.x, mapped.y);
+            return;
+        }
 
-         if (pressed && (mouse.buttons & Qt.LeftButton) && (mouse.modifiers & Qt.ControlModifier) && (mouse.modifiers & Qt.ShiftModifier)) {
-             const currentPt = drawMouseArea.mapToItem(window.boardContainerItem, mouse.x, mouse.y);
-             if (window.lastPanMouse.x === 0 && window.lastPanMouse.y === 0) {
-                 window.lastPanMouse = currentPt;
-             } else {
-                 const dx = currentPt.x - window.lastPanMouse.x;
-                 const dy = currentPt.y - window.lastPanMouse.y;
-                 window.updatePanOffset(window.userPanX + dx, window.userPanY + dy);
-                 window.lastPanMouse = currentPt;
-             }
-             return;
-         }
+        if (pressed && (mouse.buttons & Qt.LeftButton) && (mouse.modifiers & Qt.ControlModifier) && (mouse.modifiers & Qt.ShiftModifier)) {
+            const currentPt = drawMouseArea.mapToItem(window.boardContainerItem, mouse.x, mouse.y);
+            if (window.lastPanMouse.x === 0 && window.lastPanMouse.y === 0) {
+                window.lastPanMouse = currentPt;
+            } else {
+                const dx = currentPt.x - window.lastPanMouse.x;
+                const dy = currentPt.y - window.lastPanMouse.y;
+                window.updatePanOffset(window.userPanX + dx, window.userPanY + dy);
+                window.lastPanMouse = currentPt;
+            }
+            return;
+        }
 
-         const origX = mouse.x / window.editScale;
-         const origY = mouse.y / window.editScale;
-         window.cursorX = origX;
-         window.cursorY = origY;
-         if (window.pastePreviewActive && window.activeCanvas) {
-             hoveredStrokeIdx = -1;
-             hoveredHandle = "none";
-             window.activeCanvas.requestPaint();
-             return;
-         }
-         if (window.currentTool === "colorpicker") {
-             window.hoveredColor = window.sampleCanvasColor(mouse.x, mouse.y);
-         };
+        const origX = mouse.x / window.editScale;
+        const origY = mouse.y / window.editScale;
+        window.cursorX = origX;
+        window.cursorY = origY;
+        if (window.pastePreviewActive && window.activeCanvas) {
+            hoveredStrokeIdx = -1;
+            hoveredHandle = "none";
+            window.activeCanvas.requestPaint();
+            return;
+        }
+        if (window.currentTool === "colorpicker") {
+            window.hoveredColor = window.sampleCanvasColor(mouse.x, mouse.y);
+        }
 
         const absPt = getAbsolutePoint(mouse.x, mouse.y);
 
@@ -532,16 +538,26 @@ MouseArea {
 
         const h = (window.activeHandle !== "none" && window.activeHandle !== "new") ? window.activeHandle : hoveredHandle;
         const hs = (h && h.length > 4) ? h.slice(-3) : h;
-        if (h === "tl" || h === "br" || hs === "_tl" || hs === "_br") return Qt.SizeFDiagCursor;
-        if (h === "tr" || h === "bl" || hs === "_tr" || hs === "_bl") return Qt.SizeBDiagCursor;
-        if (h === "tc" || h === "bc" || hs === "_tc" || hs === "_bc") return Qt.SplitVCursor;
-        if (h === "lc" || h === "rc" || hs === "_lc" || hs === "_rc") return Qt.SplitHCursor;
-        if (h === "rotate") return Qt.SizeAllCursor;
-        if (h === "move") return Qt.SizeAllCursor;
-        if (h === "stamp" && window.selectedStroke && window.selectedStroke.tool === "stamp" && window.selectedStroke.hasLeaderLine) return Qt.SizeAllCursor;
-        if (h === "stampBody") return pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor;
-        if (h === "stamp") return pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor;
-        if (h === "start" || h === "end" || h === "anchor") return Qt.SizeAllCursor;
+        if (h === "tl" || h === "br" || hs === "_tl" || hs === "_br")
+            return Qt.SizeFDiagCursor;
+        if (h === "tr" || h === "bl" || hs === "_tr" || hs === "_bl")
+            return Qt.SizeBDiagCursor;
+        if (h === "tc" || h === "bc" || hs === "_tc" || hs === "_bc")
+            return Qt.SplitVCursor;
+        if (h === "lc" || h === "rc" || hs === "_lc" || hs === "_rc")
+            return Qt.SplitHCursor;
+        if (h === "rotate")
+            return Qt.SizeAllCursor;
+        if (h === "move")
+            return Qt.SizeAllCursor;
+        if (h === "stamp" && window.selectedStroke && window.selectedStroke.tool === "stamp" && window.selectedStroke.hasLeaderLine)
+            return Qt.SizeAllCursor;
+        if (h === "stampBody")
+            return pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor;
+        if (h === "stamp")
+            return pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor;
+        if (h === "start" || h === "end" || h === "anchor")
+            return Qt.SizeAllCursor;
         if (window.currentTool === "colorpicker") {
             return Qt.CrossCursor;
         }
@@ -551,7 +567,7 @@ MouseArea {
         return Qt.CrossCursor;
     }
 
-    onPressed: (mouse) => {
+    onPressed: mouse => {
         shiftLockAxis = "none";
         if (window.modalFocusScope) {
             window.modalFocusScope.forceActiveFocus();
@@ -586,25 +602,8 @@ MouseArea {
             const mapped = drawMouseArea.mapToItem(radialMenu.parent, mouse.x, mouse.y);
             if (mouse.modifiers & Qt.ShiftModifier) {
                 radialMenu.close();
-                if (window.currentTool === "stamp") {
-                    stampOptionsToolbar.open(mapped.x, mapped.y);
+                if (toolOptions.openFor(window.currentTool, mapped.x, mapped.y))
                     return;
-                } else if (window.currentTool === "text") {
-                    textOptionsToolbar.open(mapped.x, mapped.y);
-                    return;
-                } else if (window.currentTool === "line") {
-                    lineOptionsToolbar.open(mapped.x, mapped.y);
-                    return;
-                } else if (window.currentTool === "arrow") {
-                    arrowOptionsToolbar.open(mapped.x, mapped.y);
-                    return;
-                } else if (window.currentTool === "redact") {
-                    redactOptionsToolbar.open(mapped.x, mapped.y);
-                    return;
-                } else if (window.currentTool === "callout") {
-                    calloutOptionsToolbar.open(mapped.x, mapped.y);
-                    return;
-                }
             }
             radialMenu.open(mapped.x, mapped.y);
             return;
@@ -672,7 +671,7 @@ MouseArea {
 
             if (strokeIdx !== -1) {
                 const stroke = window.strokes[strokeIdx];
-                
+
                 if (stroke.tool === "pixelate" && stroke.randomSeed === undefined) {
                     stroke.randomSeed = Math.floor(Math.random() * 2147483647);
                 }
@@ -683,40 +682,39 @@ MouseArea {
                 if (mouse.modifiers & Qt.ControlModifier) {
                     window.activeHandle = "move";
                 }
-                if (window.activeCanvas) window.activeCanvas.requestPaint();
+                if (window.activeCanvas)
+                    window.activeCanvas.requestPaint();
             }
             return;
         }
 
-         if (window.currentTool === "colorpicker") {
-              if (mouse.button === Qt.LeftButton) {
-                  const pickedColor = window.sampleCanvasColor(mouse.x, mouse.y);
-                  if (window.backgroundColorPickingSlot !== "none") {
-                      if (window.backgroundColorPickingSlot === "solid") {
-                          window.backgroundSolidColor = pickedColor;
-                      } else if (window.backgroundColorPickingSlot === "start") {
-                          window.backgroundGradientStart = pickedColor;
-                      } else if (window.backgroundColorPickingSlot === "end") {
-                          window.backgroundGradientEnd = pickedColor;
-                      }
-                      window.hasUserCustomizedBackground = true;
-                      window.backgroundColorPickingSlot = "none";
-                      window.currentTool = "background";
-                  } else {
-                      const hexStr = window.formatHexColor(pickedColor).toUpperCase();
-                      if (window.colorPickerMode === "copy") {
-                          Quickshell.execDetached(["dms", "cl", "copy", hexStr]);
-                          if (typeof ToastService !== "undefined" && ToastService) {
-                              ToastService.showInfo(I18n.trFor("quickCapture", "Color copied to clipboard: %1").arg(hexStr));
-                          }
-                      } else {
-                           window.updateColorSlot(window.activeColorSlotIndex, pickedColor);
-                       }
-                       window.currentTool = window.lastActiveTool;
-                  }
-              }
-              return;
-          }
+        if (window.currentTool === "colorpicker") {
+            if (mouse.button === Qt.LeftButton) {
+                const pickedColor = window.sampleCanvasColor(mouse.x, mouse.y);
+                if (window.backgroundColorPickingSlot !== "none") {
+                    if (window.backgroundColorPickingSlot === "solid") {
+                        window.backgroundSolidColor = pickedColor;
+                    } else if (window.backgroundColorPickingSlot === "start") {
+                        window.backgroundGradientStart = pickedColor;
+                    } else if (window.backgroundColorPickingSlot === "end") {
+                        window.backgroundGradientEnd = pickedColor;
+                    }
+                    window.hasUserCustomizedBackground = true;
+                    window.backgroundColorPickingSlot = "none";
+                    window.currentTool = "background";
+                } else {
+                    const hexStr = window.formatHexColor(pickedColor).toUpperCase();
+                    if (window.colorPickerMode === "copy") {
+                        Proc.runCommand("quickCapture.copyColor", [Proc.dmsBin, "cl", "copy", hexStr]);
+                        ToastService.showInfo(I18n.trFor("quickCapture", "Color %1 copied").arg(hexStr));
+                    } else {
+                        window.updateColorSlot(window.activeColorSlotIndex, pickedColor);
+                    }
+                    window.currentTool = window.lastActiveTool;
+                }
+            }
+            return;
+        }
 
         if (window.currentTool === "crop") {
             const ox = mouse.x / window.editScale;
@@ -729,10 +727,14 @@ MouseArea {
                 cropResizeOrigin = window.cropRect;
                 let hx = window.cropRect.x;
                 let hy = window.cropRect.y;
-                if (handle === "tr" || handle === "br" || handle === "rc") hx += window.cropRect.width;
-                else if (handle === "tc" || handle === "bc") hx += window.cropRect.width / 2;
-                if (handle === "bl" || handle === "br" || handle === "bc") hy += window.cropRect.height;
-                else if (handle === "lc" || handle === "rc") hy += window.cropRect.height / 2;
+                if (handle === "tr" || handle === "br" || handle === "rc")
+                    hx += window.cropRect.width;
+                else if (handle === "tc" || handle === "bc")
+                    hx += window.cropRect.width / 2;
+                if (handle === "bl" || handle === "br" || handle === "bc")
+                    hy += window.cropRect.height;
+                else if (handle === "lc" || handle === "rc")
+                    hy += window.cropRect.height / 2;
                 cropResizeOffset = Qt.point(ox - hx, oy - hy);
                 return;
             }
@@ -783,24 +785,26 @@ MouseArea {
                 fontFamily: window.textFontFamily,
                 rotation: 0
             };
-            if (window.activeCanvas) window.activeCanvas.requestPaint();
+            if (window.activeCanvas)
+                window.activeCanvas.requestPaint();
             return;
         }
 
         if (window.currentTool === "stamp") {
-             window.currentStroke = {
-                 id: window.stampIdCounter++,
-                 tool: "stamp",
-                 color: window.currentColor.toString(),
-                 width: window.strokeWidth,
-                 points: [getAbsolutePoint(mouse.x, mouse.y)],
-                 counter: window.stampCounter,
-                 format: window.stampCounterFormat,
-                 hasLeaderLine: false
-             };
-             window.pressCoords = getAbsolutePoint(mouse.x, mouse.y);
-             if (window.activeCanvas) window.activeCanvas.requestPaint();
-             return;
+            window.currentStroke = {
+                id: window.stampIdCounter++,
+                tool: "stamp",
+                color: window.currentColor.toString(),
+                width: window.strokeWidth,
+                points: [getAbsolutePoint(mouse.x, mouse.y)],
+                counter: window.stampCounter,
+                format: window.stampCounterFormat,
+                hasLeaderLine: false
+            };
+            window.pressCoords = getAbsolutePoint(mouse.x, mouse.y);
+            if (window.activeCanvas)
+                window.activeCanvas.requestPaint();
+            return;
         }
 
         if (window.currentTool === "eraser") {
@@ -810,8 +814,9 @@ MouseArea {
             let found = -1;
             for (let i = window.strokes.length - 1; i >= 0; i--) {
                 const stroke = window.strokes[i];
-                if (stroke.points.length === 0) continue;
-                
+                if (stroke.points.length === 0)
+                    continue;
+
                 const bbox = Helpers.getStrokeBBox(stroke, window.measureTextBounds);
                 const pad = 12 + stroke.width * 2;
                 if (sx >= bbox.minX - pad && sx <= bbox.maxX + pad && sy >= bbox.minY - pad && sy <= bbox.maxY + pad) {
@@ -819,12 +824,12 @@ MouseArea {
                     break;
                 }
             }
-             if (found !== -1) {
-                 const list = [...window.strokes];
-                 list.splice(found, 1);
-                 window.strokes = list;
-                 drawingCanvas.requestPaint();
-             }
+            if (found !== -1) {
+                const list = [...window.strokes];
+                list.splice(found, 1);
+                window.strokes = list;
+                drawingCanvas.requestPaint();
+            }
             return;
         }
 
@@ -835,33 +840,33 @@ MouseArea {
             penSmoothY = pt.y;
         }
 
-         window.currentStroke = {
-              tool: window.currentTool,
-              color: window.currentColor.toString(),
-              width: window.activeIntensity,
-              points: [getAbsolutePoint(mouse.x, mouse.y)],
-              lineStyle: window.currentTool === "line" ? window.activeLineStyle : "solid",
-              arrowLineStyle: window.currentTool === "arrow" ? window.activeArrowLineStyle : "solid",
-              arrowHeadStyle: window.currentTool === "arrow" ? window.activeArrowHeadStyle : "single-filled",
-              redactMode: window.currentTool === "redact" ? window.activeRedactMode : "solid",
-              redactShape: window.currentTool === "redact" ? window.activeRedactShape : "rect",
-              calloutLinkLines: window.currentTool === "callout" ? window.calloutLinkLines : 1,
-              calloutShape: window.currentTool === "callout" ? window.calloutShape : "rect",
-              randomize: window.currentTool === "pixelate" ? true : false,
-              randomSeed: window.currentTool === "pixelate" ? Math.floor(Math.random() * 2147483647) : 0
-          };
-         drawingCanvas.requestPaint();
+        window.currentStroke = {
+            tool: window.currentTool,
+            color: window.currentColor.toString(),
+            width: window.activeIntensity,
+            points: [getAbsolutePoint(mouse.x, mouse.y)],
+            lineStyle: window.currentTool === "line" ? window.activeLineStyle : "solid",
+            arrowLineStyle: window.currentTool === "arrow" ? window.activeArrowLineStyle : "solid",
+            arrowHeadStyle: window.currentTool === "arrow" ? window.activeArrowHeadStyle : "single-filled",
+            redactMode: window.currentTool === "redact" ? window.activeRedactMode : "solid",
+            redactShape: window.currentTool === "redact" ? window.activeRedactShape : "rect",
+            calloutLinkLines: window.currentTool === "callout" ? window.calloutLinkLines : 1,
+            calloutShape: window.currentTool === "callout" ? window.calloutShape : "rect",
+            randomize: window.currentTool === "pixelate" ? true : false,
+            randomSeed: window.currentTool === "pixelate" ? Math.floor(Math.random() * 2147483647) : 0
+        };
+        drawingCanvas.requestPaint();
     }
 
-    onDoubleClicked: (mouse) => {
-        if (window.currentTool !== "select") return;
-        if (mouse.button !== Qt.LeftButton) return;
+    onDoubleClicked: mouse => {
+        if (window.currentTool !== "select")
+            return;
+        if (mouse.button !== Qt.LeftButton)
+            return;
         const absPt = getAbsolutePoint(mouse.x, mouse.y);
         const strokeIdx = window.findStrokeAt(absPt.x, absPt.y);
         if (strokeIdx === -1) {
-            const isInitial = Math.abs(window.userZoomScale - 1.0) <= 0.001
-                && Math.abs(window.userPanX) <= 0.001
-                && Math.abs(window.userPanY) <= 0.001;
+            const isInitial = Math.abs(window.userZoomScale - 1.0) <= 0.001 && Math.abs(window.userPanX) <= 0.001 && Math.abs(window.userPanY) <= 0.001;
             if (isInitial) {
                 let focusPt = null;
                 if (window.boardContainerItem) {
@@ -875,14 +880,15 @@ MouseArea {
             return;
         }
         const stroke = window.strokes[strokeIdx];
-        if (stroke.tool !== "text" || !stroke.points || stroke.points.length === 0) return;
+        if (stroke.tool !== "text" || !stroke.points || stroke.points.length === 0)
+            return;
 
         window.beginEditingTextStroke(stroke, textInputDialog);
     }
 
-    onReleased: (mouse) => {
+    onReleased: mouse => {
         shiftLockAxis = "none";
-        if (typeof radialMenu !== "undefined" && radialMenu && radialMenu.visibleState) {
+        if (radialMenu.visibleState) {
             radialMenu.confirmAndClose(true);
             return;
         }
@@ -895,51 +901,52 @@ MouseArea {
             return;
         }
         if (window.currentTool === "select") {
-             window.activeHandle = "none";
-             window.calloutDestDragging = false;
-             window.originalPoints = [];
-             window.originalRotation = 0;
-             drawingCanvas.requestPaint();
-             return;
+            window.activeHandle = "none";
+            window.calloutDestDragging = false;
+            window.originalPoints = [];
+            window.originalRotation = 0;
+            drawingCanvas.requestPaint();
+            return;
         }
 
-          if (window.currentTool === "crop") {
-              var resizeHandles = ["new", "move", "tl", "tr", "bl", "br", "tc", "bc", "lc", "rc"];
-              if (resizeHandles.indexOf(window.activeHandle) >= 0) {
-                 // Ignore accidental clicks and tiny drags without closing the editor.
-                 if (Math.min(window.cropRect.width, window.cropRect.height) <= 3) {
-                     window.hasSelection = false;
-                     window.cropRect = Qt.rect(0, 0, 0, 0);
-                     window.activeHandle = "none";
-                     drawingCanvas.requestPaint();
-                     return;
-                 }
-                 window.cropRect = window.clampCropRect(window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height);
-                  if (Math.min(window.cropRect.width, window.cropRect.height) >= 16) {
-                      window.hasSelection = true;
-                  } else {
-                      window.hasSelection = false;
-                      window.cropRect = Qt.rect(0, 0, 0, 0);
-                  }
-              }
-              window.activeHandle = "none";
-              drawingCanvas.requestPaint();
-              return;
-          }
+        if (window.currentTool === "crop") {
+            var resizeHandles = ["new", "move", "tl", "tr", "bl", "br", "tc", "bc", "lc", "rc"];
+            if (resizeHandles.indexOf(window.activeHandle) >= 0) {
+                // Ignore accidental clicks and tiny drags without closing the editor.
+                if (Math.min(window.cropRect.width, window.cropRect.height) <= 3) {
+                    window.hasSelection = false;
+                    window.cropRect = Qt.rect(0, 0, 0, 0);
+                    window.activeHandle = "none";
+                    drawingCanvas.requestPaint();
+                    return;
+                }
+                window.cropRect = window.clampCropRect(window.cropRect.x, window.cropRect.y, window.cropRect.width, window.cropRect.height);
+                if (Math.min(window.cropRect.width, window.cropRect.height) >= 16) {
+                    window.hasSelection = true;
+                } else {
+                    window.hasSelection = false;
+                    window.cropRect = Qt.rect(0, 0, 0, 0);
+                }
+            }
+            window.activeHandle = "none";
+            drawingCanvas.requestPaint();
+            return;
+        }
 
         if (window.currentTool === "ocr") {
             window.activeHandle = "none";
-            window.executeOcr();
+            window.executeRegionScan("ocr");
             return;
         }
 
         if (window.currentTool === "qr") {
             window.activeHandle = "none";
-            window.executeQrScan();
+            window.executeRegionScan("qr");
             return;
         }
 
-        if (!window.currentStroke) return;
+        if (!window.currentStroke)
+            return;
         let stroke = window.currentStroke;
         if (stroke.tool === "text") {
             window.beginNewTextStroke(stroke, textInputDialog);
@@ -948,104 +955,104 @@ MouseArea {
         window.finalizeCurrentStroke();
         penSmoothX = 0;
         penSmoothY = 0;
-     }
+    }
 
-     onWheel: (wheel) => {
-         if ((wheel.modifiers & Qt.ControlModifier) && (wheel.modifiers & Qt.ShiftModifier)) {
-             const zoomStep = wheel.angleDelta.y > 0 ? 0.1 : -0.1;
-             let focusPt = null;
-             if (window.boardContainerItem) {
-                 const containerPt = drawMouseArea.mapToItem(window.boardContainerItem, wheel.x, wheel.y);
-                 focusPt = Qt.point(containerPt.x - window.boardContainerItem.width / 2, containerPt.y - window.boardContainerItem.height / 2);
-             }
-             window.adjustUserZoom(zoomStep, focusPt);
-             wheel.accepted = true;
-             return;
-         }
+    onWheel: wheel => {
+        if ((wheel.modifiers & Qt.ControlModifier) && (wheel.modifiers & Qt.ShiftModifier)) {
+            const zoomStep = wheel.angleDelta.y > 0 ? 0.1 : -0.1;
+            let focusPt = null;
+            if (window.boardContainerItem) {
+                const containerPt = drawMouseArea.mapToItem(window.boardContainerItem, wheel.x, wheel.y);
+                focusPt = Qt.point(containerPt.x - window.boardContainerItem.width / 2, containerPt.y - window.boardContainerItem.height / 2);
+            }
+            window.adjustUserZoom(zoomStep, focusPt);
+            wheel.accepted = true;
+            return;
+        }
 
-         if (wheel.modifiers & Qt.ControlModifier) {
-             const scrollDelta = wheel.angleDelta.y !== 0 ? wheel.angleDelta.y : wheel.angleDelta.x;
-             const panStep = scrollDelta > 0 ? 40 : -40;
-             window.updatePanOffset(window.userPanX, window.userPanY + panStep);
-             wheel.accepted = true;
-             return;
-         }
+        if (wheel.modifiers & Qt.ControlModifier) {
+            const scrollDelta = wheel.angleDelta.y !== 0 ? wheel.angleDelta.y : wheel.angleDelta.x;
+            const panStep = scrollDelta > 0 ? 40 : -40;
+            window.updatePanOffset(window.userPanX, window.userPanY + panStep);
+            wheel.accepted = true;
+            return;
+        }
 
-         if (wheel.modifiers & Qt.ShiftModifier) {
-             const scrollDelta = wheel.angleDelta.y !== 0 ? wheel.angleDelta.y : wheel.angleDelta.x;
-             const panStep = scrollDelta > 0 ? 40 : -40;
-             window.updatePanOffset(window.userPanX + panStep, window.userPanY);
-             wheel.accepted = true;
-             return;
-         }
+        if (wheel.modifiers & Qt.ShiftModifier) {
+            const scrollDelta = wheel.angleDelta.y !== 0 ? wheel.angleDelta.y : wheel.angleDelta.x;
+            const panStep = scrollDelta > 0 ? 40 : -40;
+            window.updatePanOffset(window.userPanX + panStep, window.userPanY);
+            wheel.accepted = true;
+            return;
+        }
 
-         const step = wheel.angleDelta.y > 0 ? 1 : -1;
-         if (window.enableMagnifier && window.isZoomPressed) {
-             magnifier.zoomFactor = Helpers.clamp(magnifier.zoomFactor + (step * 0.5), 1.5, 4.0);
-             wheel.accepted = true;
-             return;
-         }
+        const step = wheel.angleDelta.y > 0 ? 1 : -1;
+        if (window.enableMagnifier && window.isZoomPressed) {
+            magnifier.zoomFactor = Helpers.clamp(magnifier.zoomFactor + (step * 0.5), 1.5, 4.0);
+            wheel.accepted = true;
+            return;
+        }
 
-          if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "callout") {
-              const calloutMeta = Constants.getToolMeta("callout");
-              if (window.calloutDestDragging) {
-                  const currentZoom = window.selectedStroke.width;
-                  const nextZoom = Helpers.clamp(currentZoom + step * calloutMeta.step, calloutMeta.min, calloutMeta.max);
-                 window.selectedStroke.width = nextZoom;
-                 window.calloutZoom = nextZoom;
-                 
-                 if (window.selectedStroke.points.length === 4 && window.originalPoints.length === 4) {
-                     const srcP0 = window.selectedStroke.points[0];
-                     const srcP1 = window.selectedStroke.points[1];
-                     const dstP0 = window.selectedStroke.points[2];
-                     
-                     const rw = srcP1.x - srcP0.x;
-                     const rh = srcP1.y - srcP0.y;
-                     const zoom = nextZoom / 100.0;
-                     const dw = rw * zoom;
-                     const dh = rh * zoom;
-                     
-                     const newPoints = [...window.selectedStroke.points];
-                     newPoints[3] = Qt.point(dstP0.x + dw, dstP0.y + dh);
-                     window.selectedStroke.points = newPoints;
-                     
-                     window.originalPoints[3] = Qt.point(window.originalPoints[2].x + dw, window.originalPoints[2].y + dh);
-                 }
-             } else {
-                  const currentBorderWidth = window.selectedStroke.borderWidth !== undefined ? window.selectedStroke.borderWidth : 2;
-                  const nextBorderWidth = Helpers.clamp(currentBorderWidth + step, calloutMeta.borderWidthMin, calloutMeta.borderWidthMax);
-                 window.selectedStroke.borderWidth = nextBorderWidth;
-                 window.strokeWidth = nextBorderWidth;
-             }
-             
-             const idx = window.strokes.indexOf(window.selectedStroke);
-             if (idx !== -1) {
-                 window.strokes[idx] = window.selectedStroke;
-                 window.strokes = [...window.strokes];
-             }
-             
-              drawingCanvas.requestPaint();
-              wheel.accepted = true;
-              return;
-          }
+        if (window.currentTool === "select" && window.selectedStroke && window.selectedStroke.tool === "callout") {
+            const calloutMeta = Constants.getToolMeta("callout");
+            if (window.calloutDestDragging) {
+                const currentZoom = window.selectedStroke.width;
+                const nextZoom = Helpers.clamp(currentZoom + step * calloutMeta.step, calloutMeta.min, calloutMeta.max);
+                window.selectedStroke.width = nextZoom;
+                window.calloutZoom = nextZoom;
 
-          const tool = window.effectiveTool;
-          const multiplier = getIntensityMultiplier(tool);
+                if (window.selectedStroke.points.length === 4 && window.originalPoints.length === 4) {
+                    const srcP0 = window.selectedStroke.points[0];
+                    const srcP1 = window.selectedStroke.points[1];
+                    const dstP0 = window.selectedStroke.points[2];
 
-          window.updateActiveIntensity(window.activeIntensity + (step * multiplier));
+                    const rw = srcP1.x - srcP0.x;
+                    const rh = srcP1.y - srcP0.y;
+                    const zoom = nextZoom / 100.0;
+                    const dw = rw * zoom;
+                    const dh = rh * zoom;
 
-          window.previewX = wheel.x;
-          window.previewY = wheel.y;
-          window.showSizePreview = true;
-          wheel.accepted = true;
-     }
+                    const newPoints = [...window.selectedStroke.points];
+                    newPoints[3] = Qt.point(dstP0.x + dw, dstP0.y + dh);
+                    window.selectedStroke.points = newPoints;
 
-     Connections {
-         target: window
-         function onCurrentToolChanged() {
-             penSmoothX = 0;
-             penSmoothY = 0;
-             updateSelectHover(window.cursorX * window.editScale, window.cursorY * window.editScale);
-         }
-     }
+                    window.originalPoints[3] = Qt.point(window.originalPoints[2].x + dw, window.originalPoints[2].y + dh);
+                }
+            } else {
+                const currentBorderWidth = window.selectedStroke.borderWidth !== undefined ? window.selectedStroke.borderWidth : 2;
+                const nextBorderWidth = Helpers.clamp(currentBorderWidth + step, calloutMeta.borderWidthMin, calloutMeta.borderWidthMax);
+                window.selectedStroke.borderWidth = nextBorderWidth;
+                window.strokeWidth = nextBorderWidth;
+            }
+
+            const idx = window.strokes.indexOf(window.selectedStroke);
+            if (idx !== -1) {
+                window.strokes[idx] = window.selectedStroke;
+                window.strokes = [...window.strokes];
+            }
+
+            drawingCanvas.requestPaint();
+            wheel.accepted = true;
+            return;
+        }
+
+        const tool = window.effectiveTool;
+        const multiplier = getIntensityMultiplier(tool);
+
+        window.updateActiveIntensity(window.activeIntensity + (step * multiplier));
+
+        window.previewX = wheel.x;
+        window.previewY = wheel.y;
+        window.showSizePreview = true;
+        wheel.accepted = true;
+    }
+
+    Connections {
+        target: window
+        function onCurrentToolChanged() {
+            penSmoothX = 0;
+            penSmoothY = 0;
+            updateSelectHover(window.cursorX * window.editScale, window.cursorY * window.editScale);
+        }
+    }
 }

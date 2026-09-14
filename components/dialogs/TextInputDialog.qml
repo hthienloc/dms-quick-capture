@@ -2,9 +2,6 @@ import QtQuick
 import QtQuick.Controls
 import qs.Common
 import qs.Widgets
-import qs.Modals.Common
-import qs.Services
-import "../../dms-common"
 
 Popup {
     id: textInputDialog
@@ -44,8 +41,10 @@ Popup {
                 delete window.editingStroke._editTargetCoords;
             }
             window.editingStroke = null;
-            if (window.requestAnnotationPaintAll) window.requestAnnotationPaintAll();
-            else if (window.activeCanvas) window.activeCanvas.requestPaint();
+            if (window.requestAnnotationPaintAll)
+                window.requestAnnotationPaintAll();
+            else if (window.activeCanvas)
+                window.activeCanvas.requestPaint();
         }
         if (modalFocusScope) {
             modalFocusScope.forceActiveFocus();
@@ -90,7 +89,7 @@ Popup {
                     placeholderText: I18n.trFor("quickCapture", "Type note...")
                     wrapMode: TextEdit.Wrap
                     focus: true
-                    font.pixelSize: Theme.fontSizeNormal
+                    font.pixelSize: Theme.fontSizeMedium
                     font.family: Theme.fontFamily
                     color: Theme.surfaceText
                     selectionColor: Theme.primaryContainer
@@ -101,7 +100,7 @@ Popup {
                     rightPadding: Theme.spacingS
                     bottomPadding: Theme.spacingS
 
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && !(event.modifiers & Qt.ShiftModifier)) {
                             if (window) {
                                 window.currentTypingText = textInputField.text;
@@ -124,20 +123,38 @@ Popup {
 
                     Repeater {
                         model: [
-                            { icon: "format_bold", active: window && window.textBold, tag: "bold" },
-                            { icon: "format_italic", active: window && window.textItalic, tag: "italic" },
-                            { icon: "format_underlined", active: window && window.textUnderline, tag: "underline" },
-                            { icon: "layers", active: window && window.textBackground, tag: "bg" },
-                            { icon: "chat_bubble", active: window && window.typingIsSpeechBubble, tag: "bubble" }
+                            {
+                                icon: "format_bold",
+                                active: window && window.textBold,
+                                key: "textBold"
+                            },
+                            {
+                                icon: "format_italic",
+                                active: window && window.textItalic,
+                                key: "textItalic"
+                            },
+                            {
+                                icon: "format_underlined",
+                                active: window && window.textUnderline,
+                                key: "textUnderline"
+                            },
+                            {
+                                icon: "layers",
+                                active: window && window.textBackground,
+                                key: "textBackground"
+                            },
+                            {
+                                icon: "chat_bubble",
+                                active: window && window.typingIsSpeechBubble,
+                                key: ""
+                            }
                         ]
 
                         delegate: Rectangle {
                             width: 28
                             height: 28
                             radius: Theme.cornerRadius / 2
-                            color: modelData.active 
-                                ? Theme.withAlpha(Theme.primary, 0.15) 
-                                : (toggleMouse.containsMouse ? Theme.withAlpha(Theme.surfaceText, 0.08) : "transparent")
+                            color: modelData.active ? Theme.withAlpha(Theme.primary, 0.15) : (toggleMouse.containsMouse ? Theme.withAlpha(Theme.surfaceText, 0.08) : "transparent")
                             border.color: modelData.active ? Theme.primary : "transparent"
                             border.width: 1
 
@@ -154,14 +171,15 @@ Popup {
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    if (!window) return;
+                                    if (!window)
+                                        return;
                                     window.currentTypingText = textInputField.text;
                                     window.typingCursorIndex = textInputField.cursorPosition;
-                                    if (modelData.tag === "bold") window.textBold = !window.textBold;
-                                    else if (modelData.tag === "italic") window.textItalic = !window.textItalic;
-                                    else if (modelData.tag === "underline") window.textUnderline = !window.textUnderline;
-                                    else if (modelData.tag === "bg") window.textBackground = !window.textBackground;
-                                    else if (modelData.tag === "bubble") window.toggleTypingSpeechBubble();
+                                    if (modelData.key === "") {
+                                        window.toggleTypingSpeechBubble();
+                                        return;
+                                    }
+                                    window[modelData.key] = !window[modelData.key];
                                 }
                             }
                         }

@@ -1,6 +1,5 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
 
 PopoverSurface {
     id: popoverRoot
@@ -9,11 +8,7 @@ PopoverSurface {
     signal changeBackgroundAlignment(string alignment)
 
     // 9 positions in row-major order (top → bottom, left → right)
-    readonly property var _positions: [
-        "top-left",    "top-center",    "top-right",
-        "center-left", "center",        "center-right",
-        "bottom-left", "bottom-center", "bottom-right"
-    ]
+    readonly property var _positions: ["top-left", "top-center", "top-right", "center-left", "center", "center-right", "bottom-left", "bottom-center", "bottom-right"]
 
     readonly property int _cellSize: 20
     readonly property int _cellSpacing: 4

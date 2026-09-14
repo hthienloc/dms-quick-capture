@@ -1,10 +1,6 @@
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Widgets
-import qs.Modals.Common
-import qs.Services
-import "../../dms-common"
 import "../core/Constants.js" as Constants
 import "../core/Helpers.js" as Helpers
 
@@ -31,6 +27,9 @@ Rectangle {
     y: drawingCanvas.mapToItem(boardContainer, window.cursorX * window.editScale, window.cursorY * window.editScale).y - (height / 2)
 
     property real zoomFactor: 1.5
+    onZoomFactorChanged: magnifierCanvas.requestPaint()
+    onVisibleChanged: if (visible)
+        magnifierCanvas.requestPaint()
 
     clip: true
 
@@ -40,18 +39,21 @@ Rectangle {
 
         Connections {
             target: drawingCanvas
-            function onPaint() { magnifierCanvas.requestPaint(); }
+            enabled: magnifier.visible
+            function onPaint() {
+                magnifierCanvas.requestPaint();
+            }
         }
 
         Connections {
             target: window
-            function onCursorXChanged() { magnifierCanvas.requestPaint(); }
-            function onCursorYChanged() { magnifierCanvas.requestPaint(); }
-        }
-
-        Connections {
-            target: magnifier
-            function onZoomFactorChanged() { magnifierCanvas.requestPaint(); }
+            enabled: magnifier.visible
+            function onCursorXChanged() {
+                magnifierCanvas.requestPaint();
+            }
+            function onCursorYChanged() {
+                magnifierCanvas.requestPaint();
+            }
         }
 
         onPaint: {
@@ -77,7 +79,7 @@ Rectangle {
                 window.drawEditorBackground(ctx, window.canvasWidth, window.canvasHeight);
                 window.drawScreenshotShadow(ctx, magnifier.zoomFactor);
                 window.drawScreenshotImage(ctx, bgImage, true);
-                
+
                 // 2. Draw annotations
                 if (window.showAnnotations) {
                     ctx.save();

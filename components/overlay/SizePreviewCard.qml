@@ -1,9 +1,6 @@
 import QtQuick
 import qs.Common
 import qs.Widgets
-import qs.Modals.Common
-import qs.Services
-import "../../dms-common"
 import "../core/Constants.js" as Constants
 import "../core/Helpers.js" as Helpers
 
@@ -82,9 +79,12 @@ Rectangle {
     }
     readonly property real shapeRadius: {
         const tool = window.effectiveTool;
-        if (tool === "highlighter") return window.roundHighlighter ? shapeWidth / 2 : 0;
-        if (tool === "spotlight" || tool === "rect" || tool === "redact") return window.roundRect ? (Theme.cornerRadius * window.editScale * (drawingCanvas ? drawingCanvas.scale : 1.0)) : 0;
-        if (tool === "pixelate" || tool === "text") return 0;
+        if (tool === "highlighter")
+            return window.roundHighlighter ? shapeWidth / 2 : 0;
+        if (tool === "spotlight" || tool === "rect" || tool === "redact")
+            return window.roundRect ? (Theme.cornerRadius * window.editScale * (drawingCanvas ? drawingCanvas.scale : 1.0)) : 0;
+        if (tool === "pixelate" || tool === "text")
+            return 0;
         if (tool === "callout") {
             if (window.currentTool === "select" && !window.calloutDestDragging && window.selectedStroke) {
                 return shapeWidth / 2;

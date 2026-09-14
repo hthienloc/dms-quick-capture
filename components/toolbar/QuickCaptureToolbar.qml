@@ -1,10 +1,8 @@
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Widgets
 import "../.."
 import "../background"
-import "../popovers"
 import "../core/Helpers.js" as Helpers
 import "../core/Constants.js" as Constants
 
@@ -12,7 +10,10 @@ Rectangle {
     id: root
 
     property var pluginData: ({})
-    CaptureConfig { id: config; pluginData: root.pluginData }
+    CaptureConfig {
+        id: config
+        pluginData: root.pluginData
+    }
 
     property string currentTool: "crop"
     property string activeToolType: currentTool
@@ -25,7 +26,6 @@ Rectangle {
     property var floatingWindowControls: null
     readonly property bool showShortcutHints: root.pluginData["show_shortcut_hints"] ?? false
 
-    // Background configuration properties
     property string backgroundMode: "none"
     property color backgroundSolidColor: Theme.primary
     property color backgroundGradientStart: Theme.primary
@@ -35,7 +35,7 @@ Rectangle {
     property int backgroundCornerRadius: 12
     property int backgroundShadowStrength: 0
     property string backgroundAspectRatio: "auto"
-    
+
     property real customAspectRatio: 1.50
     property string backgroundAlignment: "center"
     property bool backgroundImageBlur: false
@@ -49,26 +49,13 @@ Rectangle {
     signal changeBackgroundSolidColor(color col)
     signal changeBackgroundGradientStart(color col)
     signal changeBackgroundGradientEnd(color col)
-    signal changeBackgroundGradientAngle(int angle)
-    signal changeBackgroundPadding(int padding)
-    signal changeBackgroundCornerRadius(int radius)
-    signal changeBackgroundShadowStrength(int strength)
-    signal changeBackgroundAspectRatio(string ratio)
-    signal changeCustomAspectRatio(real ratio)
-    signal changeBackgroundAlignment(string alignment)
-    signal rotateLeftRequested()
-    signal rotateRightRequested()
-    signal flipHorizontalRequested()
-    signal flipVerticalRequested()
-    signal rotateRequested()
-    signal mirrorRequested()
     signal moreToolsClicked(var buttonItem)
     signal moreToolsButtonReady(var buttonItem)
     property var moreToolsButton: null
     signal backgroundControlHovered(string type, var controlItem)
     signal backgroundControlExited(string type)
     signal backgroundControlWheel(string type, int delta)
-    signal autoColorBalanceRequested()
+    signal autoColorBalanceRequested
 
     readonly property var toolbarPalette: {
         const isCustom = config.selectedPreset === "custom";
@@ -86,14 +73,12 @@ Rectangle {
     signal customColorPickerRequested(var buttonItem)
     property int activeColorSlotIndex: 0
     signal strokeWidthSelected(int width)
-    signal undoRequested()
-    signal redoRequested()
-    signal floatRequested()
-    signal saveRequested()
-    signal saveAsRequested()
+    signal undoRequested
+    signal redoRequested
+    signal floatRequested
+    signal saveRequested
+    signal saveAsRequested
 
-    // Empty toolbar areas can start a DMS floating-window move without
-    // intercepting clicks handled by the toolbar's child controls.
     MouseArea {
         anchors.fill: parent
         z: -1
@@ -102,21 +87,17 @@ Rectangle {
         cursorShape: Qt.SizeAllCursor
         onPressed: root.floatingWindowControls.tryStartMove()
     }
-    signal copyRequested()
-    signal anonymousCopyRequested()
-    signal copyAndSaveRequested()
-    signal closeRequested()
-    signal annotationsToggled()
+    signal copyRequested
+    signal anonymousCopyRequested
+    signal copyAndSaveRequested
+    signal closeRequested
+    signal annotationsToggled
     signal backgroundColorPickerRequested(color currentColor)
     signal backgroundEyedropperRequested(string slot)
     signal changeBackgroundImageBlur(bool enabled)
     signal changeBackgroundImageDim(bool enabled)
 
-    readonly property color activeBackgroundColor: root.backgroundMode === "solid" ?
-        root.backgroundSolidColor :
-        (root.gradientActiveSlot === "start" ? root.backgroundGradientStart : root.backgroundGradientEnd)
-
-
+    readonly property color activeBackgroundColor: root.backgroundMode === "solid" ? root.backgroundSolidColor : (root.gradientActiveSlot === "start" ? root.backgroundGradientStart : root.backgroundGradientEnd)
 
     width: isVertical ? 56 : (contentLayout.width + Theme.spacingM * 2)
     height: isVertical ? (contentLayout.height + Theme.spacingM * 2) : 56
@@ -128,7 +109,7 @@ Rectangle {
     border.color: showBorder ? Theme.primary : Theme.withAlpha(Theme.outline, 0.15)
     border.width: showBorder ? 1.5 : 1
 
-    component ColorPaletteGrid : Grid {
+    component ColorPaletteGrid: Grid {
         id: paletteGrid
         property var paletteModel: root.toolbarPalette
         property color activeColor: "transparent"
@@ -145,7 +126,10 @@ Rectangle {
         Repeater {
             model: paletteGrid.paletteModel
             delegate: Rectangle {
-                width: paletteGrid.swatchSize; height: paletteGrid.swatchSize; radius: paletteGrid.swatchRadius; color: modelData
+                width: paletteGrid.swatchSize
+                height: paletteGrid.swatchSize
+                radius: paletteGrid.swatchRadius
+                color: modelData
                 readonly property bool isActive: (paletteGrid.activeSlotIndex === -1 || paletteGrid.activeSlotIndex === index) && Helpers.colorEquals(paletteGrid.activeColor, modelData, Qt)
                 border.color: isActive ? Theme.primary : Theme.withAlpha(Theme.outline, 0.3)
                 border.width: isActive ? 2 : 1
@@ -168,80 +152,125 @@ Rectangle {
             id: toolbarLoader
             anchors.centerIn: parent
             sourceComponent: {
-                if (root.currentTool === "background" || (root.currentTool === "colorpicker" && root.backgroundColorPickingSlot !== "none")) {
-                    return root.isVertical ? backgroundVerticalLayout : backgroundHorizontalLayout;
-                }
-                return root.isVertical ? verticalLayout : horizontalLayout;
+                if (root.currentTool === "background" || (root.currentTool === "colorpicker" && root.backgroundColorPickingSlot !== "none"))
+                    return backgroundLayout;
+                return annotationLayout;
+            }
+        }
+    }
+
+    component ToolbarGrid: Grid {
+        property int gap: Theme.spacingL
+        columns: root.isVertical ? 1 : 100
+        spacing: gap
+        horizontalItemAlignment: Grid.AlignHCenter
+        verticalItemAlignment: Grid.AlignVCenter
+    }
+
+    component Divider: ToolbarSeparator {
+        vertical: !root.isVertical
+    }
+
+    component SplitActionButton: Item {
+        property alias iconName: button.iconName
+        property alias tooltipText: button.tooltipText
+
+        signal leftClicked
+        signal rightClicked
+
+        width: Constants.btnSize
+        height: Constants.btnSize
+
+        DankActionButton {
+            id: button
+            anchors.fill: parent
+            buttonSize: Constants.btnSize
+            iconSize: Constants.iconSize
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            cursorShape: Qt.PointingHandCursor
+            onClicked: mouse => {
+                if (mouse.button === Qt.RightButton)
+                    rightClicked();
+                else
+                    leftClicked();
             }
         }
     }
 
     Component {
-        id: horizontalLayout
-        Row {
-            id: horizontalItems
-            spacing: Theme.spacingL
-            
+        id: annotationLayout
+
+        ToolbarGrid {
             AnnotationControls {
-                anchors.verticalCenter: parent.verticalCenter
+                compact: root.isVertical
                 currentTool: root.currentTool
                 showAnnotations: root.showAnnotations
-                onToolSelected: (tool) => root.toolSelected(tool)
+                onToolSelected: tool => root.toolSelected(tool)
                 onAnnotationsToggled: root.annotationsToggled()
             }
 
-            ToolbarSeparator { vertical: true; anchors.verticalCenter: parent.verticalCenter }
+            Divider {}
 
             ToolButtonsControl {
-                id: hToolButtonsControl
-                anchors.verticalCenter: parent.verticalCenter
+                id: toolButtonsControl
+                compact: root.isVertical
                 toolButtons: config.toolButtons
                 currentTool: root.currentTool
                 showShortcutHints: root.showShortcutHints
                 Component.onCompleted: {
-                    root.moreToolsButton = hToolButtonsControl.moreToolsButton;
-                    root.moreToolsButtonReady(hToolButtonsControl.moreToolsButton);
+                    root.moreToolsButton = toolButtonsControl.moreToolsButton;
+                    root.moreToolsButtonReady(toolButtonsControl.moreToolsButton);
                 }
-                onToolSelected: (tool) => root.toolSelected(tool)
-                onMoreToolsClicked: (controlItem) => {
+                onToolSelected: tool => root.toolSelected(tool)
+                onMoreToolsClicked: controlItem => {
                     root.moreToolsButton = controlItem;
                     root.moreToolsClicked(controlItem);
                 }
             }
 
-            ToolbarSeparator { vertical: true; anchors.verticalCenter: parent.verticalCenter }
+            Divider {}
 
-            // Colors
             ColorPaletteGrid {
                 activeColor: root.currentColor
                 activeSlotIndex: root.activeColorSlotIndex
-                swatchSize: Constants.swatchSize
-                swatchRadius: Constants.swatchRadius
-                cols: 4
-                anchors.verticalCenter: parent.verticalCenter
+                swatchSize: root.isVertical ? Constants.swatchSizeVert : Constants.swatchSize
+                swatchRadius: root.isVertical ? Constants.swatchRadiusVert : Constants.swatchRadius
+                cols: root.isVertical ? 2 : 4
+                gridSpacingValue: root.isVertical ? Constants.gridSpacing + 2 : Constants.gridSpacing
                 onColorSelected: (col, idx) => root.colorSelected(col, idx)
             }
 
             ColorPickerControl {
-                anchors.verticalCenter: parent.verticalCenter
                 currentTool: root.currentTool
-                onCustomPickerRequested: (controlItem) => root.customColorPickerRequested(controlItem)
+                onCustomPickerRequested: controlItem => root.customColorPickerRequested(controlItem)
                 onDrawPickerRequested: root.toolSelected("colorpicker-draw")
             }
 
-            ToolbarSeparator { vertical: true; anchors.verticalCenter: parent.verticalCenter }
+            Divider {
+                visible: !root.isVertical
+            }
 
-            // Thickness Section
             Row {
-                spacing: Theme.spacingS; anchors.verticalCenter: parent.verticalCenter
+                visible: !root.isVertical
+                spacing: Theme.spacingS
                 readonly property var toolMeta: Constants.getToolMeta(root.activeToolType)
-                Text {
+
+                StyledText {
                     text: root.strokeWidth + parent.toolMeta.unit
-                    width: Constants.btnSize; horizontalAlignment: Text.AlignRight
-                    color: Theme.surfaceText; font.pixelSize: 11; font.bold: true; anchors.verticalCenter: parent.verticalCenter
+                    width: Constants.btnSize
+                    horizontalAlignment: Text.AlignRight
+                    color: Theme.surfaceText
+                    font.pixelSize: Theme.fontSizeSmall
+                    font.weight: Font.Bold
+                    anchors.verticalCenter: parent.verticalCenter
                 }
+
                 DankSlider {
-                    id: hSlider
+                    id: widthSlider
                     minimum: parent.toolMeta.min
                     maximum: parent.toolMeta.max
                     step: parent.toolMeta.step
@@ -252,263 +281,209 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
 
                     Binding {
-                        target: hSlider
+                        target: widthSlider
                         property: "value"
                         value: root.strokeWidth
                     }
                 }
             }
 
-            ToolbarSeparator { vertical: true; anchors.verticalCenter: parent.verticalCenter }
+            Divider {
+                visible: !root.isVertical
+            }
 
-            // History Actions (Undo & Redo)
             Row {
-                spacing: Theme.spacingXS; anchors.verticalCenter: parent.verticalCenter
-                DankActionButton { iconName: "undo"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; enabled: root.canUndo; opacity: enabled ? 1.0 : 0.4; tooltipText: I18n.trFor("quickCapture", "Undo (Ctrl+Z)"); onClicked: root.undoRequested() }
-                DankActionButton { iconName: "redo"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; enabled: root.canRedo; opacity: enabled ? 1.0 : 0.4; tooltipText: I18n.trFor("quickCapture", "Redo (Ctrl+Y / Ctrl+Shift+Z)"); onClicked: root.redoRequested() }
+                visible: !root.isVertical
+                spacing: Theme.spacingXS
+
+                DankActionButton {
+                    iconName: "undo"
+                    buttonSize: Constants.btnSize
+                    iconSize: Constants.iconSize
+                    enabled: root.canUndo
+                    opacity: enabled ? 1.0 : 0.4
+                    tooltipText: I18n.trFor("quickCapture", "Undo") + " (Ctrl+Z)"
+                    onClicked: root.undoRequested()
+                }
+
+                DankActionButton {
+                    iconName: "redo"
+                    buttonSize: Constants.btnSize
+                    iconSize: Constants.iconSize
+                    enabled: root.canRedo
+                    opacity: enabled ? 1.0 : 0.4
+                    tooltipText: I18n.trFor("quickCapture", "Redo") + " (Ctrl+Y / Ctrl+Shift+Z)"
+                    onClicked: root.redoRequested()
+                }
             }
 
-            ToolbarSeparator { vertical: true; anchors.verticalCenter: parent.verticalCenter }
+            Divider {
+                visible: !root.isVertical
+            }
 
-            // Export Actions
             Row {
-                spacing: Theme.spacingXS; anchors.verticalCenter: parent.verticalCenter
-                DankActionButton { iconName: "push_pin"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; tooltipText: "Float Window (Ctrl+F)"; onClicked: root.floatRequested() }
-                Item {
-                    width: Constants.btnSize
-                    height: Constants.btnSize
-                    anchors.verticalCenter: parent.verticalCenter
-                    DankActionButton {
-                        id: copyButton
-                        anchors.fill: parent
-                        iconName: "content_copy"
-                        buttonSize: Constants.btnSize
-                        iconSize: Constants.iconSize
-                        tooltipText: I18n.trFor("quickCapture", "Copy (Ctrl+C) | Anonymous Copy (Ctrl+Shift+C)")
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        acceptedButtons: Qt.LeftButton | Qt.RightButton
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: mouse => {
-                            if (mouse.button === Qt.RightButton) {
-                                root.anonymousCopyRequested();
-                            } else {
-                                root.copyRequested();
-                            }
-                        }
-                    }
+                visible: !root.isVertical
+                spacing: Theme.spacingXS
+
+                DankActionButton {
+                    iconName: "push_pin"
+                    buttonSize: Constants.btnSize
+                    iconSize: Constants.iconSize
+                    tooltipText: I18n.trFor("quickCapture", "Float Window") + " (Ctrl+F)"
+                    onClicked: root.floatRequested()
                 }
-                Item {
-                    width: Constants.btnSize
-                    height: Constants.btnSize
-                    anchors.verticalCenter: parent.verticalCenter
-                    DankActionButton {
-                        anchors.fill: parent
-                        iconName: "save"
-                        buttonSize: Constants.btnSize
-                        iconSize: Constants.iconSize
-                        tooltipText: I18n.trFor("quickCapture", "Save (Ctrl+S) | Save As (Ctrl+Shift+S)")
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        acceptedButtons: Qt.LeftButton | Qt.RightButton
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: mouse => {
-                            if (mouse.button === Qt.RightButton) {
-                                root.saveAsRequested();
-                            } else {
-                                root.saveRequested();
-                            }
-                        }
-                    }
+
+                SplitActionButton {
+                    iconName: "content_copy"
+                    tooltipText: I18n.trFor("quickCapture", "Copy") + " (Ctrl+C) · " + I18n.trFor("quickCapture", "Anonymous Copy") + " (Ctrl+Shift+C)"
+                    onLeftClicked: root.copyRequested()
+                    onRightClicked: root.anonymousCopyRequested()
                 }
-                DankActionButton { iconName: "done_all"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; tooltipText: "Copy & Save (Enter)"; iconColor: Theme.primary; onClicked: root.copyAndSaveRequested() }
-            }
 
-            ToolbarSeparator { vertical: true; anchors.verticalCenter: parent.verticalCenter }
-
-            DankActionButton { iconName: "close"; buttonSize: Constants.btnSize; iconSize: Constants.iconSize; iconColor: Theme.error; tooltipText: I18n.trFor("quickCapture", "Discard & Close (Esc)"); anchors.verticalCenter: parent.verticalCenter; onClicked: root.closeRequested() }
-        }
-    }
-
-    Component {
-        id: verticalLayout
-        Column {
-            id: verticalItems
-            spacing: Theme.spacingL
-            
-            AnnotationControls {
-                anchors.horizontalCenter: parent.horizontalCenter
-                compact: true
-                currentTool: root.currentTool
-                showAnnotations: root.showAnnotations
-                onToolSelected: (tool) => root.toolSelected(tool)
-                onAnnotationsToggled: root.annotationsToggled()
-            }
-
-            ToolbarSeparator { anchors.horizontalCenter: parent.horizontalCenter }
-
-            ToolButtonsControl {
-                id: vToolButtonsControl
-                anchors.horizontalCenter: parent.horizontalCenter
-                compact: true
-                toolButtons: config.toolButtons
-                currentTool: root.currentTool
-                showShortcutHints: root.showShortcutHints
-                Component.onCompleted: {
-                    root.moreToolsButton = vToolButtonsControl.moreToolsButton;
-                    root.moreToolsButtonReady(vToolButtonsControl.moreToolsButton);
+                SplitActionButton {
+                    iconName: "save"
+                    tooltipText: I18n.trFor("quickCapture", "Save") + " (Ctrl+S) · " + I18n.trFor("quickCapture", "Save As") + " (Ctrl+Shift+S)"
+                    onLeftClicked: root.saveRequested()
+                    onRightClicked: root.saveAsRequested()
                 }
-                onToolSelected: (tool) => root.toolSelected(tool)
-                onMoreToolsClicked: (controlItem) => {
-                    root.moreToolsButton = controlItem;
-                    root.moreToolsClicked(controlItem);
+
+                DankActionButton {
+                    iconName: "done_all"
+                    buttonSize: Constants.btnSize
+                    iconSize: Constants.iconSize
+                    tooltipText: I18n.trFor("quickCapture", "Copy & Save") + " (Enter)"
+                    iconColor: Theme.primary
+                    onClicked: root.copyAndSaveRequested()
                 }
             }
 
-            ToolbarSeparator { anchors.horizontalCenter: parent.horizontalCenter }
-
-            ColorPaletteGrid {
-                activeColor: root.currentColor
-                activeSlotIndex: root.activeColorSlotIndex
-                swatchSize: Constants.swatchSizeVert
-                swatchRadius: Constants.swatchRadiusVert
-                cols: 2
-                gridSpacingValue: Constants.gridSpacing + 2
-                anchors.horizontalCenter: parent.horizontalCenter
-                onColorSelected: (col, idx) => root.colorSelected(col, idx)
+            Divider {
+                visible: !root.isVertical
             }
 
-            ColorPickerControl {
-                anchors.horizontalCenter: parent.horizontalCenter
-                currentTool: root.currentTool
-                onCustomPickerRequested: (controlItem) => root.customColorPickerRequested(controlItem)
-                onDrawPickerRequested: root.toolSelected("colorpicker-draw")
+            DankActionButton {
+                visible: !root.isVertical
+                iconName: "close"
+                buttonSize: Constants.btnSize
+                iconSize: Constants.iconSize
+                iconColor: Theme.error
+                tooltipText: I18n.trFor("quickCapture", "Discard & Close") + " (Esc)"
+                onClicked: root.closeRequested()
             }
         }
     }
 
     Component {
-        id: backgroundHorizontalLayout
-        Row {
-            spacing: Theme.spacingL
-            anchors.verticalCenter: parent.verticalCenter
-            
-            // Back button
+        id: backgroundLayout
+
+        ToolbarGrid {
+            readonly property bool hasBackground: root.backgroundMode !== "none"
+            readonly property bool gradientLike: ["gradient", "radial", "conic"].includes(root.backgroundMode)
+
             DankActionButton {
                 iconName: "arrow_back"
                 buttonSize: Constants.btnSize
                 iconSize: Constants.iconSize
-                anchors.verticalCenter: parent.verticalCenter
-                tooltipText: I18n.trFor("quickCapture", "Back to Annotation (B)")
+                tooltipText: I18n.trFor("quickCapture", "Back to Annotation") + " (B)"
                 onClicked: root.toolSelected("back")
             }
-            
-            ToolbarSeparator { vertical: true; anchors.verticalCenter: parent.verticalCenter }
-            
+
+            Divider {}
+
             BackgroundPresetsControl {
-                id: presetsControl
-                anchors.verticalCenter: parent.verticalCenter
-                onHovered: (controlItem) => root.backgroundControlHovered("presets", controlItem)
+                onHovered: controlItem => root.backgroundControlHovered("presets", controlItem)
                 onExited: root.backgroundControlExited("presets")
             }
 
-            ToolbarSeparator { vertical: true; anchors.verticalCenter: parent.verticalCenter }
+            Divider {}
 
             BackgroundModeSelectors {
                 backgroundMode: root.backgroundMode
-                isVertical: false
+                isVertical: root.isVertical
                 onChangeBackgroundMode: (mode, controlItem) => root.changeBackgroundMode(mode, controlItem)
-                anchors.verticalCenter: parent.verticalCenter
             }
 
-            ToolbarSeparator { vertical: true; anchors.verticalCenter: parent.verticalCenter }
-            
-            // Sliders Row (Hover to reveal popup controls)
-            Row {
-                spacing: Theme.spacingM
-                anchors.verticalCenter: parent.verticalCenter
-                
-                BackgroundMetricControl {
-                    id: padControl
-                    anchors.verticalCenter: parent.verticalCenter
-                    iconName: "padding"
-                    valueText: root.backgroundPadding + "px"
-                    onHovered: (controlItem) => root.backgroundControlHovered("padding", controlItem)
-                    onExited: root.backgroundControlExited("padding")
-                    onWheeled: (delta) => root.backgroundControlWheel("padding", delta)
+            Divider {}
+
+            ToolbarGrid {
+                gap: root.isVertical ? Theme.spacingS : Theme.spacingM
+
+                Repeater {
+                    model: [
+                        {
+                            type: "padding",
+                            icon: "padding",
+                            value: root.backgroundPadding,
+                            unit: "px",
+                            visible: true
+                        },
+                        {
+                            type: "radius",
+                            icon: "rounded_corner",
+                            value: root.backgroundCornerRadius,
+                            unit: "px",
+                            visible: true
+                        },
+                        {
+                            type: "shadow",
+                            icon: "blur_on",
+                            value: root.backgroundShadowStrength,
+                            unit: "%",
+                            visible: true
+                        },
+                        {
+                            type: "angle",
+                            icon: "rotate_right",
+                            value: root.backgroundGradientAngle,
+                            unit: "°",
+                            visible: root.backgroundMode === "gradient" || root.backgroundMode === "conic"
+                        }
+                    ]
+
+                    delegate: BackgroundMetricControl {
+                        required property var modelData
+                        visible: modelData.visible
+                        compact: root.isVertical
+                        iconName: modelData.icon
+                        valueText: root.isVertical ? String(modelData.value) : modelData.value + modelData.unit
+                        onHovered: controlItem => root.backgroundControlHovered(modelData.type, controlItem)
+                        onExited: root.backgroundControlExited(modelData.type)
+                        onWheeled: delta => root.backgroundControlWheel(modelData.type, delta)
+                    }
                 }
 
-                BackgroundMetricControl {
-                    id: radControl
-                    anchors.verticalCenter: parent.verticalCenter
-                    iconName: "rounded_corner"
-                    valueText: root.backgroundCornerRadius + "px"
-                    onHovered: (controlItem) => root.backgroundControlHovered("radius", controlItem)
-                    onExited: root.backgroundControlExited("radius")
-                    onWheeled: (delta) => root.backgroundControlWheel("radius", delta)
-                }
-
-                BackgroundMetricControl {
-                    id: shadowControl
-                    anchors.verticalCenter: parent.verticalCenter
-                    iconName: "blur_on"
-                    valueText: root.backgroundShadowStrength + "%"
-                    onHovered: (controlItem) => root.backgroundControlHovered("shadow", controlItem)
-                    onExited: root.backgroundControlExited("shadow")
-                    onWheeled: (delta) => root.backgroundControlWheel("shadow", delta)
-                }
-
-                BackgroundMetricControl {
-                    id: angleControl
-                    visible: root.backgroundMode === "gradient" || root.backgroundMode === "conic"
-                    width: visible ? implicitWidth : 0
-                    anchors.verticalCenter: parent.verticalCenter
-                    iconName: "rotate_right"
-                    valueText: root.backgroundGradientAngle + "°"
-                    onHovered: (controlItem) => root.backgroundControlHovered("angle", controlItem)
-                    onExited: root.backgroundControlExited("angle")
-                    onWheeled: (delta) => root.backgroundControlWheel("angle", delta)
-                }
-
-                // Aspect Ratio Control (Hover to reveal preset grid + custom slider popover)
                 AspectRatioControl {
                     id: aspectControl
                     backgroundAspectRatio: root.backgroundAspectRatio
                     customAspectRatio: root.customAspectRatio
-                    compact: false
-                    anchors.verticalCenter: parent.verticalCenter
+                    compact: root.isVertical
                     onHovered: root.backgroundControlHovered("aspectRatio", aspectControl)
                     onExited: root.backgroundControlExited("aspectRatio")
-                    onWheeled: (delta) => root.backgroundControlWheel("aspectRatio", delta)
+                    onWheeled: delta => root.backgroundControlWheel("aspectRatio", delta)
                 }
 
-                // Alignment Control (Hover to reveal 3x3 position grid popover)
                 AlignmentControl {
                     id: alignControl
                     backgroundAlignment: root.backgroundAlignment
-                    compact: false
-                    anchors.verticalCenter: parent.verticalCenter
+                    compact: root.isVertical
                     onHovered: root.backgroundControlHovered("alignment", alignControl)
                     onExited: root.backgroundControlExited("alignment")
                 }
             }
-            
-            ToolbarSeparator {
-                opacity: root.backgroundMode !== "none" ? 1 : 0
-                enabled: root.backgroundMode !== "none"
-                vertical: true
-                anchors.verticalCenter: parent.verticalCenter
+
+            Divider {
+                opacity: parent.hasBackground ? 1 : 0
+                enabled: parent.hasBackground
             }
-            
-            // Colors (Solid or Gradient)
-            Row {
-                opacity: root.backgroundMode !== "none" ? 1 : 0
-                enabled: root.backgroundMode !== "none"
-                spacing: Theme.spacingS
-                anchors.verticalCenter: parent.verticalCenter
-                                 BackgroundColorSelectors {
+
+            ToolbarGrid {
+                id: colorGroup
+                gap: Theme.spacingS
+                opacity: parent.hasBackground ? 1 : 0
+                enabled: parent.hasBackground
+
+                BackgroundColorSelectors {
+                    isVertical: root.isVertical
                     backgroundMode: root.backgroundMode
                     backgroundSolidColor: root.backgroundSolidColor
                     backgroundGradientStart: root.backgroundGradientStart
@@ -519,204 +494,35 @@ Rectangle {
                     imageDimStrength: root.backgroundImageDimStrength
                     itemSize: 24
                     iconSize: 18
-                    onSetGradientActiveSlot: (slot) => root.gradientActiveSlot = slot
+                    onSetGradientActiveSlot: slot => root.gradientActiveSlot = slot
                     onAutoColorBalanceRequested: root.autoColorBalanceRequested()
-                    onColorPickerRequested: (currentColor) => root.backgroundColorPickerRequested(currentColor)
-                    onEyedropperRequested: (slot) => root.backgroundEyedropperRequested(slot)
-                    onImageBlurToggled: (enabled) => root.changeBackgroundImageBlur(enabled)
-                    onImageDimToggled: (enabled) => root.changeBackgroundImageDim(enabled)
-                    onImageDimControlHovered: (controlItem) => root.backgroundControlHovered("imageDim", controlItem)
+                    onColorPickerRequested: currentColor => root.backgroundColorPickerRequested(currentColor)
+                    onEyedropperRequested: slot => root.backgroundEyedropperRequested(slot)
+                    onImageBlurToggled: enabled => root.changeBackgroundImageBlur(enabled)
+                    onImageDimToggled: enabled => root.changeBackgroundImageDim(enabled)
+                    onImageDimControlHovered: controlItem => root.backgroundControlHovered("imageDim", controlItem)
                     onImageDimControlExited: root.backgroundControlExited("imageDim")
-                    onImageDimControlWheel: (delta) => root.backgroundControlWheel("imageDim", delta)
+                    onImageDimControlWheel: delta => root.backgroundControlWheel("imageDim", delta)
                 }
-                
+
                 ColorPaletteGrid {
                     visible: root.backgroundMode !== "image"
                     activeColor: root.activeBackgroundColor
                     activeSlotIndex: -1
-                    swatchSize: Constants.swatchSize
-                    swatchRadius: Constants.swatchRadius
-                    cols: 4
-                    anchors.verticalCenter: parent.verticalCenter
-                    onColorSelected: (col, idx) => {
+                    swatchSize: root.isVertical ? Constants.swatchSizeVert : Constants.swatchSize
+                    swatchRadius: root.isVertical ? Constants.swatchRadiusVert : Constants.swatchRadius
+                    cols: root.isVertical ? 2 : 4
+                    onColorSelected: col => {
                         if (root.backgroundMode === "solid") {
                             root.changeBackgroundSolidColor(col);
-                        } else if (root.backgroundMode === "gradient" || root.backgroundMode === "radial" || root.backgroundMode === "conic") {
-                            if (root.gradientActiveSlot === "start") {
-                                root.changeBackgroundGradientStart(col);
-                            } else {
-                                root.changeBackgroundGradientEnd(col);
-                            }
+                            return;
                         }
-                    }
-                }
-            }
-        }
-    }
-
-    Component {
-        id: backgroundVerticalLayout
-        Column {
-            spacing: Theme.spacingL
-            anchors.horizontalCenter: parent.horizontalCenter
-            
-            // Back button
-            DankActionButton {
-                iconName: "arrow_back"
-                buttonSize: Constants.btnSize
-                iconSize: Constants.iconSize
-                anchors.horizontalCenter: parent.horizontalCenter
-                tooltipText: I18n.trFor("quickCapture", "Back to Annotation (B)")
-                onClicked: root.toolSelected("back")
-            }
-            
-            ToolbarSeparator { anchors.horizontalCenter: parent.horizontalCenter }
-            
-            BackgroundPresetsControl {
-                id: presetsControlVert
-                anchors.horizontalCenter: parent.horizontalCenter
-                onHovered: (controlItem) => root.backgroundControlHovered("presets", controlItem)
-                onExited: root.backgroundControlExited("presets")
-            }
-
-            ToolbarSeparator { anchors.horizontalCenter: parent.horizontalCenter }
-
-            BackgroundModeSelectors {
-                backgroundMode: root.backgroundMode
-                isVertical: true
-                onChangeBackgroundMode: (mode, controlItem) => root.changeBackgroundMode(mode, controlItem)
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
-            
-            ToolbarSeparator { anchors.horizontalCenter: parent.horizontalCenter }
-            
-            // Sliders (Hover to reveal popover)
-            Column {
-                spacing: Theme.spacingS
-                anchors.horizontalCenter: parent.horizontalCenter
-                
-                BackgroundMetricControl {
-                    id: padControlVert
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    compact: true
-                    iconName: "padding"
-                    valueText: root.backgroundPadding
-                    onHovered: (controlItem) => root.backgroundControlHovered("padding", controlItem)
-                    onExited: root.backgroundControlExited("padding")
-                    onWheeled: (delta) => root.backgroundControlWheel("padding", delta)
-                }
-
-                BackgroundMetricControl {
-                    id: radControlVert
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    compact: true
-                    iconName: "rounded_corner"
-                    valueText: root.backgroundCornerRadius
-                    onHovered: (controlItem) => root.backgroundControlHovered("radius", controlItem)
-                    onExited: root.backgroundControlExited("radius")
-                    onWheeled: (delta) => root.backgroundControlWheel("radius", delta)
-                }
-
-                BackgroundMetricControl {
-                    id: shadowControlVert
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    compact: true
-                    iconName: "blur_on"
-                    valueText: root.backgroundShadowStrength
-                    onHovered: (controlItem) => root.backgroundControlHovered("shadow", controlItem)
-                    onExited: root.backgroundControlExited("shadow")
-                    onWheeled: (delta) => root.backgroundControlWheel("shadow", delta)
-                }
-
-                BackgroundMetricControl {
-                    id: angleControlVert
-                    visible: root.backgroundMode === "gradient" || root.backgroundMode === "conic"
-                    height: visible ? implicitHeight : 0
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    compact: true
-                    iconName: "rotate_right"
-                    valueText: root.backgroundGradientAngle
-                    onHovered: (controlItem) => root.backgroundControlHovered("angle", controlItem)
-                    onExited: root.backgroundControlExited("angle")
-                    onWheeled: (delta) => root.backgroundControlWheel("angle", delta)
-                }
-
-                // Custom Aspect Ratio Control
-                AspectRatioControl {
-                    id: aspectControlVert
-                    backgroundAspectRatio: root.backgroundAspectRatio
-                    customAspectRatio: root.customAspectRatio
-                    compact: true
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    onHovered: root.backgroundControlHovered("aspectRatio", aspectControlVert)
-                    onExited: root.backgroundControlExited("aspectRatio")
-                    onWheeled: (delta) => root.backgroundControlWheel("aspectRatio", delta)
-                }
-
-                // Alignment Control
-                AlignmentControl {
-                    id: alignControlVert
-                    backgroundAlignment: root.backgroundAlignment
-                    compact: true
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    onHovered: root.backgroundControlHovered("alignment", alignControlVert)
-                    onExited: root.backgroundControlExited("alignment")
-                }
-            }
-            
-            ToolbarSeparator {
-                opacity: root.backgroundMode !== "none" ? 1 : 0
-                enabled: root.backgroundMode !== "none"
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
-            
-            // Colors (Solid or Gradient)
-            Column {
-                opacity: root.backgroundMode !== "none" ? 1 : 0
-                enabled: root.backgroundMode !== "none"
-                spacing: Theme.spacingS
-                anchors.horizontalCenter: parent.horizontalCenter
-                                 BackgroundColorSelectors {
-                    isVertical: true
-                    backgroundMode: root.backgroundMode
-                    backgroundSolidColor: root.backgroundSolidColor
-                    backgroundGradientStart: root.backgroundGradientStart
-                    backgroundGradientEnd: root.backgroundGradientEnd
-                    gradientActiveSlot: root.gradientActiveSlot
-                    imageBlurEnabled: root.backgroundImageBlur
-                    imageDimEnabled: root.backgroundImageDim
-                    imageDimStrength: root.backgroundImageDimStrength
-                    itemSize: 24
-                    iconSize: 18
-                    onSetGradientActiveSlot: (slot) => root.gradientActiveSlot = slot
-                    onAutoColorBalanceRequested: root.autoColorBalanceRequested()
-                    onColorPickerRequested: (currentColor) => root.backgroundColorPickerRequested(currentColor)
-                    onEyedropperRequested: (slot) => root.backgroundEyedropperRequested(slot)
-                    onImageBlurToggled: (enabled) => root.changeBackgroundImageBlur(enabled)
-                    onImageDimToggled: (enabled) => root.changeBackgroundImageDim(enabled)
-                    onImageDimControlHovered: (controlItem) => root.backgroundControlHovered("imageDim", controlItem)
-                    onImageDimControlExited: root.backgroundControlExited("imageDim")
-                    onImageDimControlWheel: (delta) => root.backgroundControlWheel("imageDim", delta)
-                }
-                
-                ColorPaletteGrid {
-                    visible: root.backgroundMode !== "image"
-                    activeColor: root.activeBackgroundColor
-                    activeSlotIndex: -1
-                    swatchSize: Constants.swatchSizeVert
-                    swatchRadius: Constants.swatchRadiusVert
-                    cols: 2
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    onColorSelected: (col, idx) => {
-                        if (root.backgroundMode === "solid") {
-                            root.changeBackgroundSolidColor(col);
-                        } else if (root.backgroundMode === "gradient" || root.backgroundMode === "radial" || root.backgroundMode === "conic") {
-                            if (root.gradientActiveSlot === "start") {
-                                root.changeBackgroundGradientStart(col);
-                            } else {
-                                root.changeBackgroundGradientEnd(col);
-                            }
-                        }
+                        if (!colorGroup.parent.gradientLike)
+                            return;
+                        if (root.gradientActiveSlot === "start")
+                            root.changeBackgroundGradientStart(col);
+                        else
+                            root.changeBackgroundGradientEnd(col);
                     }
                 }
             }

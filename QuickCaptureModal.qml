@@ -1,6 +1,4 @@
 import QtQuick
-import QtQuick.Effects
-import QtQuick.Layouts
 import QtQuick.Controls
 import Quickshell
 import qs.Common
@@ -8,12 +6,12 @@ import qs.Widgets
 import qs.Modals.Common
 import qs.Modals.FileBrowser
 import qs.Services
-import "./dms-common"
 import "components/core"
-import "components/misc"
+import "components/dialogs"
+import "components/menus"
+import "components/overlay"
 import "components/popovers"
 import "components/toolbar"
-import "components/toolbar/options"
 import "components/core/Helpers.js" as Helpers
 import "components/core/DrawingRenderer.js" as DrawingRenderer
 import "components/core/Constants.js" as Constants
@@ -170,18 +168,17 @@ Item {
             id: floatingWindowControls
             targetWindow: floatingSurface
         }
-
     }
 
-    CaptureConfig { 
-        id: config 
+    CaptureConfig {
+        id: config
         pluginData: (window.parentWidget && window.parentWidget.pluginData) ? window.parentWidget.pluginData : ({})
         onPluginDataChanged: window.loadPresetsFromPluginData()
     }
 
     Image {
         id: watermarkImageLoader
-        
+
         source: {
             const rawPath = (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.watermarkImage) ? window.parentWidget.pluginData.watermarkImage : "";
             if (rawPath) {
@@ -193,15 +190,14 @@ Item {
             }
             return "";
         }
-        
+
         visible: false
         cache: true
     }
 
     Image {
         id: backgroundImageLoader
-        source: window.backgroundMode === "image"
-            ? window.localImageSource(window.effectiveBackgroundImagePath) : ""
+        source: window.backgroundMode === "image" ? window.localImageSource(window.effectiveBackgroundImagePath) : ""
         visible: false
         cache: true
         asynchronous: true
@@ -227,12 +223,6 @@ Item {
     property string colorPickerMode: "draw" // draw, copy
     property color hoveredColor: "transparent"
 
-    function requestActiveCanvasPaint() {
-        if (window.activeCanvas) {
-            window.activeCanvas.requestPaint();
-        }
-    }
-
     function savePluginData(key, value) {
         if (window.parentWidget && window.parentWidget.pluginService) {
             window.parentWidget.pluginService.savePluginData("quickCapture", key, value);
@@ -251,10 +241,11 @@ Item {
 
     function refreshStrokeReference(stroke) {
         const idx = window.strokes.indexOf(stroke);
-        if (idx !== -1) {
-            window.strokes[idx] = stroke;
-            window.strokes = [...window.strokes];
-        }
+        if (idx === -1)
+            return;
+        const list = [...window.strokes];
+        list[idx] = stroke;
+        window.strokes = list;
     }
 
     function copyStrokePoints(points) {
@@ -273,24 +264,34 @@ Item {
         if (window.currentStroke && window.currentStroke.tool === tool) {
             updater(window.currentStroke);
         }
-        window.requestActiveCanvasPaint();
+        window.repaintActiveCanvas();
     }
 
     function syncStyleFromStroke(stroke) {
         window.currentColor = stroke.color;
-        if (stroke.tool === "text") window.textFontSize = stroke.width;
-        else if (stroke.tool === "pixelate") window.pixelateIntensity = stroke.width;
-        else if (stroke.tool === "spotlight") window.spotlightIntensity = stroke.width;
-        else if (stroke.tool === "callout") window.calloutZoom = stroke.width;
-        else window.strokeWidth = stroke.width;
+        if (stroke.tool === "text")
+            window.textFontSize = stroke.width;
+        else if (stroke.tool === "pixelate")
+            window.pixelateIntensity = stroke.width;
+        else if (stroke.tool === "spotlight")
+            window.spotlightIntensity = stroke.width;
+        else if (stroke.tool === "callout")
+            window.calloutZoom = stroke.width;
+        else
+            window.strokeWidth = stroke.width;
 
-        if (stroke.tool === "line" && stroke.lineStyle) window.activeLineStyle = stroke.lineStyle;
+        if (stroke.tool === "line" && stroke.lineStyle)
+            window.activeLineStyle = stroke.lineStyle;
         if (stroke.tool === "arrow") {
-            if (stroke.arrowLineStyle) window.activeArrowLineStyle = stroke.arrowLineStyle;
-            if (stroke.arrowHeadStyle) window.activeArrowHeadStyle = stroke.arrowHeadStyle;
+            if (stroke.arrowLineStyle)
+                window.activeArrowLineStyle = stroke.arrowLineStyle;
+            if (stroke.arrowHeadStyle)
+                window.activeArrowHeadStyle = stroke.arrowHeadStyle;
         }
-        if (stroke.tool === "redact" && stroke.redactMode) window.activeRedactMode = stroke.redactMode;
-        if (stroke.tool === "redact" && stroke.redactShape) window.activeRedactShape = stroke.redactShape;
+        if (stroke.tool === "redact" && stroke.redactMode)
+            window.activeRedactMode = stroke.redactMode;
+        if (stroke.tool === "redact" && stroke.redactShape)
+            window.activeRedactShape = stroke.redactShape;
         if (stroke.tool === "callout") {
             window.calloutLinkLines = stroke.calloutLinkLines !== undefined ? stroke.calloutLinkLines : 1;
             window.calloutShape = stroke.calloutShape !== undefined ? stroke.calloutShape : "rect";
@@ -340,7 +341,8 @@ Item {
     }
 
     function enterBackgroundTool() {
-        if (window.backgroundMode !== "none") return;
+        if (window.backgroundMode !== "none")
+            return;
         const defaultMode = (config && config.pluginData && config.pluginData["backgroundDefaultMode"]) || Constants.defaultBackgroundMode;
         window.backgroundMode = defaultMode;
         if (defaultMode === "image") {
@@ -349,14 +351,12 @@ Item {
     }
 
     function enterSelectTool() {
-        if (window.selectedStroke || window.strokes.length === 0) return;
+        if (window.selectedStroke || window.strokes.length === 0)
+            return;
         window.selectStrokeForEditing(window.strokes[window.strokes.length - 1], true);
     }
 
-    readonly property var intensityTools: [
-        "pen", "line", "arrow", "rect", "ellipse", "highlighter",
-        "redact", "stamp", "text", "pixelate", "spotlight", "callout"
-    ]
+    readonly property var intensityTools: ["pen", "line", "arrow", "rect", "ellipse", "highlighter", "redact", "stamp", "text", "pixelate", "spotlight", "callout"]
 
     function isIntensityTool(tool) {
         return window.intensityTools.indexOf(tool) !== -1;
@@ -407,39 +407,44 @@ Item {
     }
 
     function updateSessionToolIntensity(tool, value) {
-        if (!window.isIntensityTool(tool)) return;
+        if (!window.isIntensityTool(tool))
+            return;
         const nextValues = Object.assign({}, window.sessionToolIntensities);
         nextValues[tool] = window.clampToolIntensity(tool, value);
         window.sessionToolIntensities = nextValues;
     }
 
     function sessionToolIntensity(tool) {
-        if (!window.isIntensityTool(tool)) return window.strokeWidth;
+        if (!window.isIntensityTool(tool))
+            return window.strokeWidth;
         const current = window.sessionToolIntensities[tool];
-        if (current !== undefined) return window.clampToolIntensity(tool, current);
+        if (current !== undefined)
+            return window.clampToolIntensity(tool, current);
         return window.configuredToolIntensity(tool);
     }
 
     function applyToolIntensity(tool, value) {
         const clamped = window.clampToolIntensity(tool, value);
-        if (tool === "text") window.textFontSize = clamped;
-        else if (tool === "pixelate") window.pixelateIntensity = clamped;
+        if (tool === "text")
+            window.textFontSize = clamped;
+        else if (tool === "pixelate")
+            window.pixelateIntensity = clamped;
         else if (tool === "spotlight") {
             window.spotlightIntensity = clamped;
             window.preGrabSpotlightIntensity = clamped;
-        }
-        else if (tool === "callout") window.calloutZoom = clamped;
-        else window.strokeWidth = clamped;
+        } else if (tool === "callout")
+            window.calloutZoom = clamped;
+        else
+            window.strokeWidth = clamped;
     }
 
     function applyCurrentToolSessionIntensity() {
-        if (!window.isIntensityTool(window.currentTool)) return;
+        if (!window.isIntensityTool(window.currentTool))
+            return;
         window.applyToolIntensity(window.currentTool, window.sessionToolIntensity(window.currentTool));
     }
 
-    readonly property var colorTools: [
-        "pen", "line", "arrow", "rect", "ellipse", "highlighter", "stamp", "text"
-    ]
+    readonly property var colorTools: ["pen", "line", "arrow", "rect", "ellipse", "highlighter", "stamp", "text"]
 
     property var sessionToolColors: ({})
 
@@ -480,21 +485,25 @@ Item {
     }
 
     function updateSessionToolColor(tool, colorValue) {
-        if (!window.isColorTool(tool)) return;
+        if (!window.isColorTool(tool))
+            return;
         const nextValues = Object.assign({}, window.sessionToolColors);
         nextValues[tool] = colorValue ? colorValue.toString() : "primary";
         window.sessionToolColors = nextValues;
     }
 
     function sessionToolColor(tool) {
-        if (!window.isColorTool(tool)) return window.currentColor;
+        if (!window.isColorTool(tool))
+            return window.currentColor;
         const current = window.sessionToolColors[tool];
-        if (current !== undefined) return config.resolveColor(current);
+        if (current !== undefined)
+            return config.resolveColor(current);
         return config.resolveColor(window.configuredToolColor(tool));
     }
 
     function shouldSkipCurrentStrokeCommit(stroke) {
-        if (!stroke || stroke.tool === "text") return true;
+        if (!stroke || stroke.tool === "text")
+            return true;
 
         const isStamp = stroke.tool === "stamp";
         if ((!isStamp && stroke.points.length < 2) || (isStamp && stroke.points.length < 1)) {
@@ -506,7 +515,8 @@ Item {
 
     function finalizeCurrentStroke() {
         const stroke = window.currentStroke;
-        if (window.shouldSkipCurrentStrokeCommit(stroke)) return false;
+        if (window.shouldSkipCurrentStrokeCommit(stroke))
+            return false;
 
         if (stroke.tool === "callout") {
             if (stroke.points.length < 2) {
@@ -528,17 +538,8 @@ Item {
             const visY = window.hasActiveCropSelection ? window.cropRect.y : 0;
             const visW = window.canvasWidth;
             const visH = window.canvasHeight;
-            const placement = Helpers.getCalloutPlacement(
-                p0, p1, stroke.width / 100.0,
-                visX, visY, visW, visH,
-                Constants.calloutAutoPlacementMargin
-            );
-            stroke.points = [
-                Qt.point(placement.sourceStart.x, placement.sourceStart.y),
-                Qt.point(placement.sourceEnd.x, placement.sourceEnd.y),
-                Qt.point(placement.destinationStart.x, placement.destinationStart.y),
-                Qt.point(placement.destinationEnd.x, placement.destinationEnd.y)
-            ];
+            const placement = Helpers.getCalloutPlacement(p0, p1, stroke.width / 100.0, visX, visY, visW, visH, Constants.calloutAutoPlacementMargin);
+            stroke.points = [Qt.point(placement.sourceStart.x, placement.sourceStart.y), Qt.point(placement.sourceEnd.x, placement.sourceEnd.y), Qt.point(placement.destinationStart.x, placement.destinationStart.y), Qt.point(placement.destinationEnd.x, placement.destinationEnd.y)];
         }
 
         if (stroke.tool === "pen" && stroke.points.length >= 3) {
@@ -553,7 +554,8 @@ Item {
                 }
             }
         }
-        if (stroke.tool === "stamp") window.stampCounter++;
+        if (stroke.tool === "stamp")
+            window.stampCounter++;
         window.pushStroke(stroke);
         window.currentStroke = null;
         return true;
@@ -561,7 +563,8 @@ Item {
 
     function commitStrokeBeforeToolChange() {
         const stroke = window.currentStroke;
-        if (window.shouldSkipCurrentStrokeCommit(stroke)) return null;
+        if (window.shouldSkipCurrentStrokeCommit(stroke))
+            return null;
 
         const dragStart = stroke.points[stroke.points.length - 1];
         return window.finalizeCurrentStroke() ? dragStart : null;
@@ -586,7 +589,7 @@ Item {
         }
         if (window.currentTool !== "select" && window.selectedStroke) {
             window.deselectStrokeForEditing(false);
-            window.requestActiveCanvasPaint();
+            window.repaintActiveCanvas();
         }
         window.applyCurrentToolSessionIntensity();
         if (window.isColorTool(window.currentTool)) {
@@ -620,32 +623,32 @@ Item {
     property string activeLineStyle: "solid"
     property string activeRedactMode: "solid" // solid, blur, clean
     onActiveRedactModeChanged: {
-        window.updateToolStrokeState("redact", function(stroke) {
+        window.updateToolStrokeState("redact", function (stroke) {
             stroke.redactMode = window.activeRedactMode;
             stroke.cachedCleanColor = undefined;
         });
     }
     property string activeRedactShape: window.roundRect ? "roundRect" : "rect" // rect, roundRect, ellipse
     onActiveRedactShapeChanged: {
-        window.updateToolStrokeState("redact", function(stroke) {
+        window.updateToolStrokeState("redact", function (stroke) {
             stroke.redactShape = window.activeRedactShape;
             stroke.cachedCleanColor = undefined;
         });
     }
     onActiveLineStyleChanged: {
-        window.updateToolStrokeState("line", function(stroke) {
+        window.updateToolStrokeState("line", function (stroke) {
             stroke.lineStyle = window.activeLineStyle;
         });
     }
     property string activeArrowLineStyle: "solid"
     property string activeArrowHeadStyle: "single-filled"
     onActiveArrowLineStyleChanged: {
-        window.updateToolStrokeState("arrow", function(stroke) {
+        window.updateToolStrokeState("arrow", function (stroke) {
             stroke.arrowLineStyle = window.activeArrowLineStyle;
         });
     }
     onActiveArrowHeadStyleChanged: {
-        window.updateToolStrokeState("arrow", function(stroke) {
+        window.updateToolStrokeState("arrow", function (stroke) {
             stroke.arrowHeadStyle = window.activeArrowHeadStyle;
         });
     }
@@ -672,8 +675,7 @@ Item {
     property bool backgroundBlurLoading: false
     property bool backgroundBlurShowIndicator: false
     property int backgroundBlurGeneration: 0
-    readonly property string effectiveBackgroundImagePath: window.backgroundImageBlur && window.backgroundBlurredImagePath
-        ? window.backgroundBlurredImagePath : window.backgroundImagePath
+    readonly property string effectiveBackgroundImagePath: window.backgroundImageBlur && window.backgroundBlurredImagePath ? window.backgroundBlurredImagePath : window.backgroundImagePath
     property color backgroundSolidColor: Theme.primary
     property color backgroundGradientStart: Theme.primary
     property color backgroundGradientEnd: Theme.secondary
@@ -688,14 +690,38 @@ Item {
     readonly property real customRatioMin: 0.50
     readonly property real customRatioMax: 2.50
     readonly property var aspectPresets: [
-        { value: "auto", label: I18n.trFor("quickCapture", "Auto").toUpperCase() },
-        { value: "1:1", label: "1:1" },
-        { value: "16:9", label: "16:9" },
-        { value: "9:16", label: "9:16" },
-        { value: "4:3", label: "4:3" },
-        { value: "3:2", label: "3:2" },
-        { value: "21:9", label: "21:9" },
-        { value: "custom", label: I18n.trFor("quickCapture", "Custom").toUpperCase() }
+        {
+            value: "auto",
+            label: I18n.trFor("quickCapture", "Auto").toUpperCase()
+        },
+        {
+            value: "1:1",
+            label: "1:1"
+        },
+        {
+            value: "16:9",
+            label: "16:9"
+        },
+        {
+            value: "9:16",
+            label: "9:16"
+        },
+        {
+            value: "4:3",
+            label: "4:3"
+        },
+        {
+            value: "3:2",
+            label: "3:2"
+        },
+        {
+            value: "21:9",
+            label: "21:9"
+        },
+        {
+            value: "custom",
+            label: I18n.trFor("quickCapture", "Custom").toUpperCase()
+        }
     ]
     property bool hasUserCustomizedBackground: false
     property color autoBackgroundGradientStart: Theme.primary
@@ -706,14 +732,17 @@ Item {
     property var hiddenPresetIds: []
 
     function localImageSource(rawPath) {
-        if (!rawPath) return "";
+        if (!rawPath)
+            return "";
         let path = Paths.expandTilde(String(rawPath).trim());
-        if (path.indexOf("/") === 0) return Paths.toFileUrl(path);
+        if (path.indexOf("/") === 0)
+            return Paths.toFileUrl(path);
         return path;
     }
 
     function localFolderPath(rawPath) {
-        if (!rawPath) return "";
+        if (!rawPath)
+            return "";
         let path = Paths.strip(String(rawPath).trim());
         if (path.indexOf("~/") === 0)
             path = Paths.expandTilde(path);
@@ -725,15 +754,18 @@ Item {
         const generation = window.editorSessionGeneration;
         window.backgroundImagesLoading = true;
         Proc.runCommand("scan-background-images", ["find", folder, "-maxdepth", "1", "-type", "f", "-printf", "%T@|%p\n"], (stdout, exitCode) => {
-            if (generation !== window.editorSessionGeneration) return;
+            if (generation !== window.editorSessionGeneration)
+                return;
             const images = [];
             if (exitCode === 0 && stdout) {
                 const lines = stdout.trim().split("\n");
                 for (let i = 0; i < lines.length; i++) {
                     const separator = lines[i].indexOf("|");
-                    if (separator < 0) continue;
+                    if (separator < 0)
+                        continue;
                     const path = lines[i].substring(separator + 1);
-                    if (!/\.(png|jpe?g|webp|bmp)$/i.test(path)) continue;
+                    if (!/\.(png|jpe?g|webp|bmp)$/i.test(path))
+                        continue;
                     images.push({
                         timestamp: parseFloat(lines[i].substring(0, separator)) || 0,
                         path: path,
@@ -748,21 +780,25 @@ Item {
     }
 
     function setBackgroundImage(path, persist) {
-        if (!path) return;
+        if (!path)
+            return;
         window.backgroundImagePath = String(path);
         window.backgroundMode = "image";
         window.hasUserCustomizedBackground = true;
-        if (persist) window.savePluginData("backgroundDefaultImagePath", window.backgroundImagePath);
+        if (persist)
+            window.savePluginData("backgroundDefaultImagePath", window.backgroundImagePath);
         window.refreshBackgroundBlurCache(true);
     }
 
     function cleanupBackgroundBlurCache(path) {
-        if (!path) return;
+        if (!path)
+            return;
         Proc.runCommand("cleanup-background-blur-cache", ["rm", "-f", "--", path]);
     }
 
     function cancelBackgroundBlurPreparation() {
-        if (!window.backgroundBlurLoading) return;
+        if (!window.backgroundBlurLoading)
+            return;
         window.backgroundBlurGeneration += 1;
         window.backgroundBlurPendingSourcePath = "";
         window.backgroundBlurLoading = false;
@@ -784,7 +820,8 @@ Item {
             return;
         }
         if (inputPath && window.backgroundBlurLoading && window.backgroundBlurPendingSourcePath === inputPath) {
-            if (showIndicator === true) window.backgroundBlurShowIndicator = true;
+            if (showIndicator === true)
+                window.backgroundBlurShowIndicator = true;
             return;
         }
 
@@ -829,9 +866,7 @@ Item {
             if (window.backgroundImageBlur) {
                 window.backgroundImageBlur = false;
                 window.savePluginData("backgroundImageBlur", false);
-                if (typeof ToastService !== "undefined" && ToastService) {
-                    ToastService.showError(I18n.trFor("quickCapture", "Failed to generate blurred background image"));
-                }
+                ToastService.showError(I18n.trFor("quickCapture", "Failed to generate blurred background image"));
             }
             window.requestPaintAll();
         });
@@ -839,12 +874,14 @@ Item {
 
     function setBackgroundImageDim(enabled, persist) {
         window.backgroundImageDim = enabled;
-        if (persist) window.savePluginData("backgroundImageDim", enabled);
+        if (persist)
+            window.savePluginData("backgroundImageDim", enabled);
     }
 
     function setBackgroundImageBlur(enabled, persist) {
         window.backgroundImageBlur = enabled;
-        if (persist) window.savePluginData("backgroundImageBlur", enabled);
+        if (persist)
+            window.savePluginData("backgroundImageBlur", enabled);
         if (enabled && window.backgroundMode === "image" && !window.backgroundBlurredImagePath && !window.backgroundBlurLoading) {
             window.refreshBackgroundBlurCache(true);
         } else {
@@ -854,7 +891,8 @@ Item {
 
     function setBackgroundImageDimStrength(value, persist) {
         window.backgroundImageDimStrength = Helpers.clamp(Math.round(value), 0, 80);
-        if (persist) window.savePluginData("backgroundImageDimStrength", window.backgroundImageDimStrength);
+        if (persist)
+            window.savePluginData("backgroundImageDimStrength", window.backgroundImageDimStrength);
     }
 
     readonly property var backgroundPresets: {
@@ -916,16 +954,22 @@ Item {
     readonly property string effectiveTool: (pastePreviewActive && copiedStroke) ? copiedStroke.tool : ((currentTool === "select" && selectedStroke) ? selectedStroke.tool : currentTool)
     readonly property bool hasActiveCropSelection: window.currentTool !== "crop" && window.hasSelection
     property int activeIntensity: {
-        if (pastePreviewActive && copiedStroke && copiedStroke.width !== undefined) return copiedStroke.width;
-        if (effectiveTool === "text") return textFontSize;
-        if (effectiveTool === "pixelate") return pixelateIntensity;
-        if (effectiveTool === "spotlight") return spotlightIntensity;
-        if (effectiveTool === "callout") return calloutZoom;
+        if (pastePreviewActive && copiedStroke && copiedStroke.width !== undefined)
+            return copiedStroke.width;
+        if (effectiveTool === "text")
+            return textFontSize;
+        if (effectiveTool === "pixelate")
+            return pixelateIntensity;
+        if (effectiveTool === "spotlight")
+            return spotlightIntensity;
+        if (effectiveTool === "callout")
+            return calloutZoom;
         return strokeWidth;
     }
 
     function updateCalloutDestFromWidth(stroke, width) {
-        if (!stroke || stroke.tool !== "callout" || !stroke.points || stroke.points.length !== 4) return;
+        if (!stroke || stroke.tool !== "callout" || !stroke.points || stroke.points.length !== 4)
+            return;
 
         const srcP0 = stroke.points[0];
         const srcP1 = stroke.points[1];
@@ -939,9 +983,12 @@ Item {
     }
 
     function updatePastePreviewWidth(width) {
-        if (!window.pastePreviewActive || !window.copiedStroke) return false;
+        if (!window.pastePreviewActive || !window.copiedStroke)
+            return false;
 
-        const nextStroke = Object.assign({}, window.copiedStroke, { width: width });
+        const nextStroke = Object.assign({}, window.copiedStroke, {
+            width: width
+        });
         if (nextStroke.tool === "redact") {
             nextStroke.cachedCleanColor = undefined;
         }
@@ -952,9 +999,12 @@ Item {
     }
 
     function updatePastePreviewColor(color) {
-        if (!window.pastePreviewActive || !window.copiedStroke) return false;
+        if (!window.pastePreviewActive || !window.copiedStroke)
+            return false;
 
-        const nextStroke = Object.assign({}, window.copiedStroke, { color: color.toString() });
+        const nextStroke = Object.assign({}, window.copiedStroke, {
+            color: color.toString()
+        });
         if (nextStroke.tool === "redact") {
             nextStroke.cachedCleanColor = undefined;
         }
@@ -969,16 +1019,20 @@ Item {
 
         window.updateSessionToolIntensity(effectiveTool, clamped);
 
-        if (effectiveTool === "text") textFontSize = clamped;
-        else if (effectiveTool === "pixelate") pixelateIntensity = clamped;
+        if (effectiveTool === "text")
+            textFontSize = clamped;
+        else if (effectiveTool === "pixelate")
+            pixelateIntensity = clamped;
         else if (effectiveTool === "spotlight") {
             spotlightIntensity = clamped;
             preGrabSpotlightIntensity = clamped;
-        }
-        else if (effectiveTool === "callout") calloutZoom = clamped;
-        else strokeWidth = clamped;
+        } else if (effectiveTool === "callout")
+            calloutZoom = clamped;
+        else
+            strokeWidth = clamped;
 
-        if (window.updatePastePreviewWidth(clamped)) return;
+        if (window.updatePastePreviewWidth(clamped))
+            return;
 
         if (selectedStroke) {
             selectedStroke.width = clamped;
@@ -1024,7 +1078,7 @@ Item {
             if (selectedStroke.calloutShape !== calloutShape) {
                 selectedStroke.calloutShape = calloutShape;
                 window.refreshStrokeReference(selectedStroke);
-                window.requestActiveCanvasPaint();
+                window.repaintActiveCanvas();
             }
         }
     }
@@ -1034,16 +1088,13 @@ Item {
             if (selectedStroke.calloutLinkLines !== calloutLinkLines) {
                 selectedStroke.calloutLinkLines = calloutLinkLines;
                 window.refreshStrokeReference(selectedStroke);
-                window.requestActiveCanvasPaint();
+                window.repaintActiveCanvas();
             }
         }
     }
-    property bool isScreenshotDark: false
-    property bool hasSampledContrast: false
     property real previewX: 0
     property real previewY: 0
     property bool showSizePreview: false
-
 
     // --- Proxy Editing Optimization ---
     readonly property real maxEditPixels: {
@@ -1053,7 +1104,8 @@ Item {
         return supportedBudgets.indexOf(val) !== -1 ? val : Constants.defaultEditPixelBudget;
     }
     readonly property real editScale: {
-        if (!window.bgImageItem) return 1.0;
+        if (!window.bgImageItem)
+            return 1.0;
         const w = window.bgImageItem.sourceSize.width;
         const h = window.bgImageItem.sourceSize.height;
         // Background mode can make the logical canvas much larger than the image.
@@ -1077,25 +1129,34 @@ Item {
         if (window.hasActiveCropSelection) {
             return window.cropRect.width;
         }
-        if (!window.bgImageItem) return 1;
+        if (!window.bgImageItem)
+            return 1;
         return (window.bgRotation % 180 === 0) ? window.bgImageItem.sourceSize.width : window.bgImageItem.sourceSize.height;
     }
     readonly property real screenshotHeight: {
         if (window.hasActiveCropSelection) {
             return window.cropRect.height;
         }
-        if (!window.bgImageItem) return 1;
+        if (!window.bgImageItem)
+            return 1;
         return (window.bgRotation % 180 === 0) ? window.bgImageItem.sourceSize.height : window.bgImageItem.sourceSize.width;
     }
 
     function getTargetRatio(ratioStr) {
-        if (ratioStr === "auto") return 0.0;
-        if (ratioStr === "1:1") return 1.0;
-        if (ratioStr === "16:9") return 16.0 / 9.0;
-        if (ratioStr === "9:16") return 9.0 / 16.0;
-        if (ratioStr === "4:3") return 4.0 / 3.0;
-        if (ratioStr === "3:2") return 3.0 / 2.0;
-        if (ratioStr === "21:9") return 21.0 / 9.0;
+        if (ratioStr === "auto")
+            return 0.0;
+        if (ratioStr === "1:1")
+            return 1.0;
+        if (ratioStr === "16:9")
+            return 16.0 / 9.0;
+        if (ratioStr === "9:16")
+            return 9.0 / 16.0;
+        if (ratioStr === "4:3")
+            return 4.0 / 3.0;
+        if (ratioStr === "3:2")
+            return 3.0 / 2.0;
+        if (ratioStr === "21:9")
+            return 21.0 / 9.0;
         if (ratioStr === "custom") {
             const val = window.customAspectRatio;
             return (isFinite(val) && val > 0) ? val : 1.0;
@@ -1148,17 +1209,23 @@ Item {
     readonly property real backgroundScaleFactor: 1.0
 
     readonly property real screenshotXOffset: {
-        if (window.effectiveBackgroundMode === "none") return 0;
+        if (window.effectiveBackgroundMode === "none")
+            return 0;
         const align = window.backgroundAlignment;
-        if (align.endsWith("-left"))  return 0;
-        if (align.endsWith("-right")) return canvasWidth - screenshotWidth;
+        if (align.endsWith("-left"))
+            return 0;
+        if (align.endsWith("-right"))
+            return canvasWidth - screenshotWidth;
         return (canvasWidth - screenshotWidth) / 2;
     }
     readonly property real screenshotYOffset: {
-        if (window.effectiveBackgroundMode === "none") return 0;
+        if (window.effectiveBackgroundMode === "none")
+            return 0;
         const align = window.backgroundAlignment;
-        if (align.startsWith("top-"))    return 0;
-        if (align.startsWith("bottom-")) return canvasHeight - screenshotHeight;
+        if (align.startsWith("top-"))
+            return 0;
+        if (align.startsWith("bottom-"))
+            return canvasHeight - screenshotHeight;
         return (canvasHeight - screenshotHeight) / 2;
     }
 
@@ -1271,7 +1338,8 @@ Item {
     }
 
     function drawScreenshotShadow(ctx, scale) {
-        if (window.backgroundShadowStrength <= 0) return;
+        if (window.backgroundShadowStrength <= 0)
+            return;
         ctx.save();
         const layout = window.getScreenshotLayout();
         const r = layout.r;
@@ -1279,18 +1347,18 @@ Item {
         const y = layout.y;
         const w = layout.w;
         const h = layout.h;
-        
+
         const s = (scale !== undefined && scale > 0) ? scale : 1.0;
         const opacity = (window.backgroundShadowStrength / 100.0) * Constants.shadowBaseOpacityFactor;
         const STEPS = Constants.defaultShadowSteps;
-        
+
         // Proportional shadow bounds for small layouts
         const baseBlur = Math.min(Constants.maxShadowBlur, Math.min(w, h) * 0.15);
         const baseOffset = Math.min(Constants.maxShadowOffset, Math.min(w, h) * 0.08);
-        
+
         const maxOffset = baseOffset / s;
         const maxBlur = baseBlur / s;
-        
+
         // Draw 12 concentric shadow layers with quadratic spacing and falloff for smooth rendering
         for (let i = 1; i <= STEPS; i++) {
             const t = i / STEPS;
@@ -1298,15 +1366,15 @@ Item {
             const offset = Math.pow(t, 1.5) * maxOffset;
             const verticalOffset = offset * 0.35;
             const alpha = opacity * Math.pow(1.0 - t, 1.5) * 0.75;
-            
+
             ctx.fillStyle = Qt.rgba(0, 0, 0, alpha);
-            
-            const sx = x - blur/2;
-            const sy = y - blur/2 + verticalOffset;
+
+            const sx = x - blur / 2;
+            const sy = y - blur / 2 + verticalOffset;
             const sw = w + blur;
             const sh = h + blur;
-            const sr = r + blur/2;
-            
+            const sr = r + blur / 2;
+
             ctx.beginPath();
             if (sr > 0) {
                 ctx.moveTo(sx + sr, sy);
@@ -1328,20 +1396,21 @@ Item {
     }
 
     function drawScreenshotImage(ctx, imgSource, skipClip) {
-        if (!imgSource || imgSource.status !== Image.Ready) return;
+        if (!imgSource || imgSource.status !== Image.Ready)
+            return;
         ctx.save();
         ctx.imageSmoothingEnabled = true;
         if (ctx.imageSmoothingQuality !== undefined) {
             ctx.imageSmoothingQuality = "high";
         }
-        
+
         const layout = window.getScreenshotLayout();
         const r = layout.r;
         const x = layout.x;
         const y = layout.y;
         const w = layout.w;
         const h = layout.h;
-        
+
         if (!skipClip) {
             ctx.beginPath();
             if (r > 0) {
@@ -1360,7 +1429,7 @@ Item {
             ctx.closePath();
             ctx.clip();
         }
-        
+
         const rawW = imgSource.sourceSize.width;
         const rawH = imgSource.sourceSize.height;
         const isRotated90 = (window.bgRotation === 90 || window.bgRotation === 270);
@@ -1409,13 +1478,15 @@ Item {
     }
     readonly property bool hasSpotlights: {
         for (let i = 0; i < strokes.length; i++) {
-            if (strokes[i].tool === "spotlight") return true;
+            if (strokes[i].tool === "spotlight")
+                return true;
         }
         return false;
     }
     property var currentStroke: null
     onCurrentStrokeChanged: {
-        if (window.bakedCanvas) window.bakedCanvas.requestPaint();
+        if (window.bakedCanvas)
+            window.bakedCanvas.requestPaint();
     }
     property var selectedStroke: null
     property int preGrabStrokeWidth: 8
@@ -1461,21 +1532,24 @@ Item {
 
     // Text Input Management
     property bool isTyping: false
-    property point typingCoords: Qt.point(0,0)
+    property point typingCoords: Qt.point(0, 0)
     property string currentTypingText: ""
     property int typingCursorIndex: 0
     property var editingStroke: null
     property bool typingIsSpeechBubble: false
     property bool typingHasTargetCoords: false
-    property point typingTargetCoords: Qt.point(0,0)
+    property point typingTargetCoords: Qt.point(0, 0)
     readonly property bool inlineTextEditorActive: window.isTyping && window.textInputMode === "inline"
     property var inlineTextEditorItem: null
 
     backgroundOpacity: {
         const data = window.parentWidget && window.parentWidget.pluginData;
-        if (!data) return 0.6;
-        if (data.overlayOpacity !== undefined) return data.overlayOpacity / 100;
-        if (data.modalOpacity !== undefined) return data.modalOpacity / 100;
+        if (!data)
+            return 0.6;
+        if (data.overlayOpacity !== undefined)
+            return data.overlayOpacity / 100;
+        if (data.modalOpacity !== undefined)
+            return data.modalOpacity / 100;
         return 0.6;
     }
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
@@ -1554,9 +1628,9 @@ Item {
         for (let s of list) {
             if (s.points) {
                 s.points = s.points.map(p => ({
-                    x: isLeft ? p.y : uncroppedH - p.y,
-                    y: isLeft ? uncroppedW - p.x : p.x
-                }));
+                            x: isLeft ? p.y : uncroppedH - p.y,
+                            y: isLeft ? uncroppedW - p.x : p.x
+                        }));
             }
         }
         window.strokes = list;
@@ -1586,19 +1660,23 @@ Item {
         for (let s of list) {
             if (s.points) {
                 s.points = s.points.map(p => ({
-                    x: isVertical ? p.x : uncroppedW - p.x,
-                    y: isVertical ? uncroppedH - p.y : p.y
-                }));
+                            x: isVertical ? p.x : uncroppedW - p.x,
+                            y: isVertical ? uncroppedH - p.y : p.y
+                        }));
             }
         }
         window.strokes = list;
 
         if (window.bgRotation === 0 || window.bgRotation === 180) {
-            if (isVertical) window.bgFlipV = !window.bgFlipV;
-            else window.bgFlipH = !window.bgFlipH;
+            if (isVertical)
+                window.bgFlipV = !window.bgFlipV;
+            else
+                window.bgFlipH = !window.bgFlipH;
         } else {
-            if (isVertical) window.bgFlipH = !window.bgFlipH;
-            else window.bgFlipV = !window.bgFlipV;
+            if (isVertical)
+                window.bgFlipH = !window.bgFlipH;
+            else
+                window.bgFlipV = !window.bgFlipV;
         }
 
         window.requestPaintAll();
@@ -1611,18 +1689,19 @@ Item {
     function startRegionScanTool(tool) {
         window.resetRegionScanRect();
         window.currentTool = tool;
-        window.requestActiveCanvasPaint();
+        window.repaintActiveCanvas();
     }
 
     function finishRegionScanTool() {
         window.currentTool = window.lastActiveTool;
         window.resetRegionScanRect();
-        window.requestActiveCanvasPaint();
+        window.repaintActiveCanvas();
     }
 
     function getRegionScanCrop() {
         const r = window.ocrRect;
-        if (r.width < 10 || r.height < 10) return null;
+        if (r.width < 10 || r.height < 10)
+            return null;
 
         // Account for crop offset when mapping to source image coordinates.
         const cropOffsetX = window.hasSelection ? window.cropRect.x : 0;
@@ -1638,17 +1717,14 @@ Item {
     function getBackgroundImagePath() {
         let bgPath = Paths.strip(window.bgImageSource);
         const qIdx = bgPath.indexOf("?");
-        if (qIdx !== -1) bgPath = bgPath.substring(0, qIdx);
+        if (qIdx !== -1)
+            bgPath = bgPath.substring(0, qIdx);
         return bgPath;
     }
 
     function makeTempCropPath(kind) {
         const uniqueId = `${Date.now()}_${Math.floor(Math.random() * 1000000)}`;
         return `/tmp/dms_${kind}_crop_${uniqueId}.png`;
-    }
-
-    function runOcr() {
-        window.startRegionScanTool("ocr");
     }
 
     function showScanResult(type, text) {
@@ -1669,18 +1745,16 @@ Item {
             cropCommandId: "crop-qr-temp",
             scanCommandId: "run-qr-scan",
             cleanupCommandId: "cleanup-qr-temp",
-            scanArgs: (path) => ["zbarimg", "--raw", "-q", path],
-            noResultMessage: "QR Scan: No QR code detected",
-            scanErrorMessage: "QR Scan failed or command execution error",
-            cropErrorMessage: "QR Scan failed: Could not crop image"
+            scanArgs: path => ["zbarimg", "--raw", "-q", path],
+            noResultMessage: I18n.trFor("quickCapture", "No QR code detected"),
+            scanErrorMessage: I18n.trFor("quickCapture", "QR scan failed")
         } : {
             cropCommandId: "crop-ocr-temp",
             scanCommandId: "run-ocr",
             cleanupCommandId: "cleanup-ocr-temp",
-            scanArgs: (path) => ["tesseract", path, "-", "-l", "eng"],
-            noResultMessage: "OCR: No text detected",
-            scanErrorMessage: "OCR failed during text extraction",
-            cropErrorMessage: "OCR failed: Could not crop image"
+            scanArgs: path => ["tesseract", path, "-", "-l", "eng"],
+            noResultMessage: I18n.trFor("quickCapture", "No text detected"),
+            scanErrorMessage: I18n.trFor("quickCapture", "OCR failed")
         };
 
         const bgPath = window.getBackgroundImagePath();
@@ -1693,9 +1767,7 @@ Item {
                 return;
             }
             if (exitCode1 !== 0) {
-                if (typeof ToastService !== "undefined" && ToastService) {
-                    ToastService.showError(I18n.trFor("quickCapture", scanConfig.cropErrorMessage));
-                }
+                ToastService.showError(I18n.trFor("quickCapture", "Could not crop image"));
                 window.finishRegionScanTool();
                 return;
             }
@@ -1707,47 +1779,26 @@ Item {
                 }
                 Proc.runCommand(scanConfig.cleanupCommandId, ["rm", "-f", "--", tempCropPath]);
 
-                if (exitCode2 === 0) {
-                    const result = stdout2.trim();
-                    if (result) {
-                        window.showScanResult(type, result);
-                    } else if (typeof ToastService !== "undefined" && ToastService) {
-                        ToastService.showInfo(I18n.trFor("quickCapture", scanConfig.noResultMessage));
-                    }
-                } else if (isQr && exitCode2 === 4) {
-                    if (typeof ToastService !== "undefined" && ToastService) {
-                        ToastService.showInfo(I18n.trFor("quickCapture", scanConfig.noResultMessage));
-                    }
-                } else if (typeof ToastService !== "undefined" && ToastService) {
-                    ToastService.showError(I18n.trFor("quickCapture", scanConfig.scanErrorMessage));
-                }
+                const result = exitCode2 === 0 ? stdout2.trim() : "";
+                if (result)
+                    window.showScanResult(type, result);
+                else if (exitCode2 === 0 || (isQr && exitCode2 === 4))
+                    ToastService.showInfo(scanConfig.noResultMessage);
+                else
+                    ToastService.showError(scanConfig.scanErrorMessage);
                 window.finishRegionScanTool();
             });
         });
     }
 
-    function executeOcr() {
+    function executeRegionScan(type) {
         const crop = window.getRegionScanCrop();
         if (!crop) {
             window.resetRegionScanRect();
-            window.requestActiveCanvasPaint();
+            window.repaintActiveCanvas();
             return;
         }
-        window.runRegionScan("ocr", crop);
-    }
-
-    function runQrScan() {
-        window.startRegionScanTool("qr");
-    }
-
-    function executeQrScan() {
-        const crop = window.getRegionScanCrop();
-        if (!crop) {
-            window.resetRegionScanRect();
-            window.requestActiveCanvasPaint();
-            return;
-        }
-        window.runRegionScan("qr", crop);
+        window.runRegionScan(type, crop);
     }
 
     // Modal sized to the screenshot (logical px), clamped between the toolbar's
@@ -1763,10 +1814,7 @@ Item {
     readonly property real _floatingTooltipPadding: 10
     readonly property real _minModalW: _toolbarHorizontal && window.toolbarItem && window.toolbarItem.width ? window.toolbarItem.width + Theme.spacingM * 2 : 400
     readonly property real _minModalH: !_toolbarHorizontal && window.toolbarItem && window.toolbarItem.height ? window.toolbarItem.height + Theme.spacingM * 2 : 300
-    readonly property bool _bgSizeKnown: window.bgImageItem
-                                         && window.bgImageItem.status === Image.Ready
-                                         && window.bgImageItem.sourceSize.width > 0
-                                         && window.bgImageItem.sourceSize.height > 0
+    readonly property bool _bgSizeKnown: window.bgImageItem && window.bgImageItem.status === Image.Ready && window.bgImageItem.sourceSize.width > 0 && window.bgImageItem.sourceSize.height > 0
     // Compositor scale (not Screen.devicePixelRatio, which reports the integer buffer scale)
     readonly property real _outputScale: (window.presentationScreen && CompositorService.getScreenScale(window.presentationScreen)) || 1
     readonly property bool _shouldScale: !!(window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.modalScaleToContent)
@@ -1824,14 +1872,17 @@ Item {
     onEditScaleChanged: window.requestPaintAll()
 
     function requestPaintAll() {
-        if (window.backgroundCanvas) window.backgroundCanvas.requestPaint();
+        if (window.backgroundCanvas)
+            window.backgroundCanvas.requestPaint();
         window.repaintActiveCanvas();
-        if (window.bakedCanvas) window.bakedCanvas.requestPaint();
+        if (window.bakedCanvas)
+            window.bakedCanvas.requestPaint();
     }
 
     function requestAnnotationPaintAll() {
         window.repaintActiveCanvas();
-        if (window.bakedCanvas) window.bakedCanvas.requestPaint();
+        if (window.bakedCanvas)
+            window.bakedCanvas.requestPaint();
     }
 
     function applyEditorAnnotationTransform(ctx, isBackgroundActive) {
@@ -1900,7 +1951,8 @@ Item {
     }
 
     function drawBakedAnnotationLayer(ctx) {
-        if (!window.showAnnotations) return;
+        if (!window.showAnnotations)
+            return;
 
         const strokes = window.strokes;
         const selectedStroke = window.selectedStroke;
@@ -1929,13 +1981,16 @@ Item {
     }
 
     function drawActiveAnnotationLayer(ctx) {
-        if (!window.showAnnotations) return;
+        if (!window.showAnnotations)
+            return;
 
         const strokes = window.strokes;
         const selectedStroke = window.selectedStroke;
 
         if (window.currentStroke && window.currentStroke.tool === "pixelate") {
-            const tempStroke = Object.assign({}, window.currentStroke, { isCurrent: true });
+            const tempStroke = Object.assign({}, window.currentStroke, {
+                isCurrent: true
+            });
             window.drawStroke(ctx, tempStroke);
         }
         if (selectedStroke && selectedStroke.tool === "pixelate") {
@@ -1952,9 +2007,12 @@ Item {
         const isPastingSpotlight = pastePreview && pastePreview.tool === "spotlight";
         if (isDrawingSpotlight || isEditingSpotlight || isPastingSpotlight) {
             const activeSpotlights = strokes.filter(s => s.tool === "spotlight" && s !== selectedStroke);
-            if (isDrawingSpotlight) activeSpotlights.push(window.currentStroke);
-            if (isEditingSpotlight) activeSpotlights.push(selectedStroke);
-            if (isPastingSpotlight) activeSpotlights.push(pastePreview);
+            if (isDrawingSpotlight)
+                activeSpotlights.push(window.currentStroke);
+            if (isEditingSpotlight)
+                activeSpotlights.push(selectedStroke);
+            if (isPastingSpotlight)
+                activeSpotlights.push(pastePreview);
 
             DrawingRenderer.drawSpotlightOverlay(ctx, activeSpotlights, window.getSpotlightRenderConfig());
 
@@ -1962,8 +2020,7 @@ Item {
                 const p0 = window.currentStroke.points[0];
                 const p1 = window.currentStroke.points[window.currentStroke.points.length - 1];
                 const bounds = Helpers.getRectBounds(p0, p1);
-                DrawingRenderer.drawHighContrastDashedRect(ctx, bounds.x1, bounds.y1,
-                    bounds.x2 - bounds.x1, bounds.y2 - bounds.y1);
+                DrawingRenderer.drawHighContrastDashedRect(ctx, bounds.x1, bounds.y1, bounds.x2 - bounds.x1, bounds.y2 - bounds.y1);
             }
         }
 
@@ -1978,7 +2035,9 @@ Item {
         }
 
         if (window.currentStroke && window.currentStroke.tool !== "spotlight" && window.currentStroke.tool !== "pixelate") {
-            const tempStroke = Object.assign({}, window.currentStroke, { isCurrent: true });
+            const tempStroke = Object.assign({}, window.currentStroke, {
+                isCurrent: true
+            });
             window.drawStroke(ctx, tempStroke);
         }
 
@@ -1986,7 +2045,8 @@ Item {
             window.drawStroke(ctx, selectedStroke);
         }
 
-        if (pastePreview) window.drawStroke(ctx, pastePreview);
+        if (pastePreview)
+            window.drawStroke(ctx, pastePreview);
 
         const handleStroke = pastePreview || selectedStroke;
         if (handleStroke && window.currentTool === "select") {
@@ -1995,32 +2055,32 @@ Item {
     }
 
     function drawTypingPreview(ctx) {
-        if (!window.isTyping) return;
+        if (!window.isTyping)
+            return;
 
         const rawText = window.currentTypingText || "";
         if (window.inlineTextEditorActive) {
             const previewStroke = window.getTypingStrokeStyle(rawText);
             previewStroke.isSpeechBubble = window.typingIsSpeechBubble;
             if (previewStroke.isSpeechBubble) {
-                const targetCoords = window.typingHasTargetCoords
-                    ? window.typingTargetCoords
-                    : window.defaultTypingSpeechBubbleTarget();
-                previewStroke.points = [
-                    Qt.point(targetCoords.x, targetCoords.y),
-                    Qt.point(window.typingCoords.x, window.typingCoords.y)
-                ];
+                const targetCoords = window.typingHasTargetCoords ? window.typingTargetCoords : window.defaultTypingSpeechBubbleTarget();
+                previewStroke.points = [Qt.point(targetCoords.x, targetCoords.y), Qt.point(window.typingCoords.x, window.typingCoords.y)];
             } else {
                 previewStroke.points = [Qt.point(window.typingCoords.x, window.typingCoords.y)];
             }
-            window.drawStroke(ctx, previewStroke, { skipText: true });
+            window.drawStroke(ctx, previewStroke, {
+                skipText: true
+            });
             return;
         }
 
         ctx.fillStyle = window.currentColor;
 
         let styleStr = "";
-        if (window.textItalic) styleStr += "italic ";
-        if (window.textBold) styleStr += "bold ";
+        if (window.textItalic)
+            styleStr += "italic ";
+        if (window.textBold)
+            styleStr += "bold ";
 
         ctx.font = `${styleStr}${Math.round(window.textFontSize)}px ${DrawingRenderer.canvasFontFamily(window.textFontFamily)}`;
         ctx.textAlign = "left";
@@ -2030,15 +2090,10 @@ Item {
         const lineH = window.textFontSize * 1.35;
 
         if (window.typingIsSpeechBubble && rawText.length > 0) {
-            const targetCoords = window.typingHasTargetCoords
-                ? window.typingTargetCoords
-                : window.defaultTypingSpeechBubbleTarget();
+            const targetCoords = window.typingHasTargetCoords ? window.typingTargetCoords : window.defaultTypingSpeechBubbleTarget();
             const previewStroke = window.getTypingStrokeStyle(rawText);
             previewStroke.isSpeechBubble = true;
-            previewStroke.points = [
-                Qt.point(targetCoords.x, targetCoords.y),
-                Qt.point(window.typingCoords.x, window.typingCoords.y)
-            ];
+            previewStroke.points = [Qt.point(targetCoords.x, targetCoords.y), Qt.point(window.typingCoords.x, window.typingCoords.y)];
             window.drawStroke(ctx, previewStroke);
             return;
         }
@@ -2047,9 +2102,11 @@ Item {
             let maxW = 0;
             for (let li = 0; li < previewLines.length; li++) {
                 const m = ctx.measureText(previewLines[li]);
-                if (m.width > maxW) maxW = m.width;
+                if (m.width > maxW)
+                    maxW = m.width;
             }
-            if (maxW === 0) maxW = Math.max(10, window.textFontSize * 0.4);
+            if (maxW === 0)
+                maxW = Math.max(10, window.textFontSize * 0.4);
             const h = window.textFontSize;
             const padX = h * 0.3;
             const padY = h * 0.15;
@@ -2097,11 +2154,11 @@ Item {
                 ctx.stroke();
             }
         }
-
     }
 
     function drawExportAnnotationLayer(ctx, isBackgroundActive) {
-        if (!window.showAnnotations) return;
+        if (!window.showAnnotations)
+            return;
 
         ctx.save();
         window.applyExportAnnotationTransform(ctx, isBackgroundActive);
@@ -2170,7 +2227,8 @@ Item {
             return;
         }
 
-        if (window.currentTool !== "colorpicker" || imgSource.status !== Image.Ready) return;
+        if (window.currentTool !== "colorpicker" || imgSource.status !== Image.Ready)
+            return;
 
         ctx.save();
         const rawW = imgSource.sourceSize.width;
@@ -2205,7 +2263,8 @@ Item {
             return;
         }
 
-        if (imgSource.status !== Image.Ready) return;
+        if (imgSource.status !== Image.Ready)
+            return;
 
         ctx.save();
         const rawW = imgSource.sourceSize.width;
@@ -2256,7 +2315,8 @@ Item {
     function renderBackgroundCanvas(canvas, imgSource) {
         const ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (window.effectiveBackgroundMode === "none") return;
+        if (window.effectiveBackgroundMode === "none")
+            return;
 
         ctx.save();
         ctx.scale(window.editScale, window.editScale);
@@ -2297,26 +2357,25 @@ Item {
     property var presetHistory: []
 
     function recordPresetUsage(preset) {
-        if (!preset) return;
+        if (!preset)
+            return;
         let history = [...window.presetHistory];
-        
+
         // Find if preset (tool+color+thickness) is already in history and remove it
-        const matchIdx = history.findIndex(p => 
-            p.tool === preset.tool && 
-            p.color.toString() === preset.color.toString() && 
-            p.thickness === preset.thickness
-        );
-        if (matchIdx !== -1) history.splice(matchIdx, 1);
-        
+        const matchIdx = history.findIndex(p => p.tool === preset.tool && p.color.toString() === preset.color.toString() && p.thickness === preset.thickness);
+        if (matchIdx !== -1)
+            history.splice(matchIdx, 1);
+
         // Add current to front
         history.unshift({
             tool: preset.tool,
             color: preset.color,
             thickness: preset.thickness
         });
-        
+
         // Keep only latest 2 for toggling
-        if (history.length > 2) history = history.slice(0, 2);
+        if (history.length > 2)
+            history = history.slice(0, 2);
         window.presetHistory = history;
     }
 
@@ -2331,7 +2390,8 @@ Item {
     }
 
     function getPastePreviewStroke() {
-        if (!window.copiedStroke) return;
+        if (!window.copiedStroke)
+            return;
 
         const absPt = window.getCursorAbsolutePoint();
 
@@ -2345,7 +2405,7 @@ Item {
         const dx = absPt.x - (isFinite(centerX) ? centerX : 0);
         const dy = absPt.y - (isFinite(centerY) ? centerY : 0);
         const newPoints = window.copiedStroke.points.map(p => Qt.point(p.x + dx, p.y + dy));
-        
+
         const pasted = {
             tool: window.copiedStroke.tool,
             color: window.copiedStroke.color,
@@ -2360,7 +2420,8 @@ Item {
     function getStampCount() {
         let count = 0;
         for (let i = 0; i < window.strokes.length; i++) {
-            if (window.strokes[i] && window.strokes[i].tool === "stamp") count++;
+            if (window.strokes[i] && window.strokes[i].tool === "stamp")
+                count++;
         }
         return count;
     }
@@ -2369,29 +2430,34 @@ Item {
         let maxId = 0;
         for (let i = 0; i < window.strokes.length; i++) {
             const stroke = window.strokes[i];
-            if (!stroke || stroke.tool !== "stamp") continue;
+            if (!stroke || stroke.tool !== "stamp")
+                continue;
             const id = Number(stroke.id);
-            if (isFinite(id)) maxId = Math.max(maxId, id);
+            if (isFinite(id))
+                maxId = Math.max(maxId, id);
         }
         return Math.max(maxId + 1, window.stampIdCounter);
     }
 
     function prepareStampCopyForPaste(stroke) {
-        if (!stroke || stroke.tool !== "stamp") return;
+        if (!stroke || stroke.tool !== "stamp")
+            return;
         stroke.id = window.getNextStampId();
         stroke.counter = window.getStampCount() + 1;
         stroke.format = window.stampCounterFormat;
     }
 
     function beginPastePreview() {
-        if (!window.copiedStroke) return;
+        if (!window.copiedStroke)
+            return;
         window.pastePreviewActive = true;
         window.currentTool = "select";
         window.repaintActiveCanvas();
     }
 
     function cancelPastePreview() {
-        if (!window.pastePreviewActive) return false;
+        if (!window.pastePreviewActive)
+            return false;
         window.pastePreviewActive = false;
         window.repaintActiveCanvas();
         return true;
@@ -2399,7 +2465,8 @@ Item {
 
     function performPasteAction() {
         const pasted = window.getPastePreviewStroke();
-        if (!pasted) return;
+        if (!pasted)
+            return;
 
         window.pushStroke(pasted);
         window.pastePreviewActive = false;
@@ -2408,9 +2475,12 @@ Item {
             window.savePreGrabState();
             window.strokeWidth = pasted.width;
             window.currentColor = pasted.color;
-            if (pasted.tool === "redact" && pasted.redactMode) window.activeRedactMode = pasted.redactMode;
-            if (pasted.tool === "redact" && pasted.redactShape) window.activeRedactShape = pasted.redactShape;
-            if (pasted.tool === "callout") window.calloutShape = pasted.calloutShape !== undefined ? pasted.calloutShape : "rect";
+            if (pasted.tool === "redact" && pasted.redactMode)
+                window.activeRedactMode = pasted.redactMode;
+            if (pasted.tool === "redact" && pasted.redactShape)
+                window.activeRedactShape = pasted.redactShape;
+            if (pasted.tool === "callout")
+                window.calloutShape = pasted.calloutShape !== undefined ? pasted.calloutShape : "rect";
             window.selectedStroke = pasted;
             window.pressCoords = window.getCursorAbsolutePoint();
             window.originalPoints = window.copyStrokePoints(pasted.points);
@@ -2426,14 +2496,16 @@ Item {
 
     function getPresetColor(index) {
         const val = window.pluginData[`preset_${index}_color`];
-        if (val !== undefined) return val;
+        if (val !== undefined)
+            return val;
         const defaultColors = ["primary", "primary", "primary", "primary", "primary", "primary", "#000000", "#ffffff"];
         return defaultColors[index] || "primary";
     }
 
     function getPresetThickness(index) {
         const val = window.pluginData[`preset_${index}_thickness`];
-        if (val === undefined) return Constants.getToolMeta("pen").defaultValue;
+        if (val === undefined)
+            return Constants.getToolMeta("pen").defaultValue;
         const parsed = parseInt(val, 10);
         return isNaN(parsed) ? Constants.getToolMeta("pen").defaultValue : parsed;
     }
@@ -2461,13 +2533,13 @@ Item {
     property real userPanX: 0.0
     property real userPanY: 0.0
     property bool isPanSpacePressed: false
-    property bool isCtrlPressed: false
     property point lastPanMouse: Qt.point(0, 0)
 
     function zoomToPoint(targetZoom, focusPt) {
         const oldZoom = window.userZoomScale;
         const nextZoom = Helpers.clamp(targetZoom, 1.0, 4.0);
-        if (Math.abs(nextZoom - oldZoom) <= 0.001) return;
+        if (Math.abs(nextZoom - oldZoom) <= 0.001)
+            return;
 
         window.userZoomScale = Math.round(nextZoom * 100) / 100.0;
         if (window.userZoomScale === 1.0) {
@@ -2495,8 +2567,8 @@ Item {
     }
 
     function updatePanOffset(newX, newY) {
-        const baseW = window.drawingCanvas ? window.drawingCanvas.width * window.drawingCanvas.scale : 800;
-        const baseH = window.drawingCanvas ? window.drawingCanvas.height * window.drawingCanvas.scale : 600;
+        const baseW = window.activeCanvas ? window.activeCanvas.width * window.activeCanvas.scale : 800;
+        const baseH = window.activeCanvas ? window.activeCanvas.height * window.activeCanvas.scale : 600;
         const maxPanX = Math.max(500, (baseW * (window.userZoomScale || 1.0)) / 2);
         const maxPanY = Math.max(500, (baseH * (window.userZoomScale || 1.0)) / 2);
         window.userPanX = Helpers.clamp(newX, -maxPanX, maxPanX);
@@ -2504,12 +2576,14 @@ Item {
     }
 
     property real fitScale: {
-        if (!activeCanvas || !bgImageItem || !boardContainerItem) return 1.0;
+        if (!activeCanvas || !bgImageItem || !boardContainerItem)
+            return 1.0;
         const maxW = boardContainerItem.width;
         const maxH = boardContainerItem.height;
         const targetW = window.canvasWidth;
         const targetH = window.canvasHeight;
-        if (targetW <= 0 || targetH <= 0) return 1.0;
+        if (targetW <= 0 || targetH <= 0)
+            return 1.0;
         const scaleX = maxW / targetW;
         const scaleY = maxH / targetH;
         const scale = Math.min(scaleX, scaleY);
@@ -2548,23 +2622,22 @@ Item {
     }
 
     Connections {
-        target: (typeof PopoutService !== "undefined") ? PopoutService.colorPickerModal : null
+        target: PopoutService.colorPickerModal
         ignoreUnknownSignals: true
         function onDialogClosed() {
-            if (target) target.useOverlayLayer = false;
-            window.shouldHaveFocus = Qt.binding(() => window.shouldBeVisible);
-            if (window.floatingMode)
-                Qt.callLater(() => window.focusModalAfterToolbarAction());
+            if (target)
+                target.useOverlayLayer = false;
+            window.restoreFocusAfterDialog();
         }
     }
 
-    QuickCaptureActions {
-        id: captureActions
-        parentWidget: window.parentWidget
-        modal: window
-        exportAndExecute: window.exportAndExecute
-        floatService: window.floatService
-        onCloseRequested: window.discardAndClose()
+    property var actions: null
+    readonly property var captureActions: window.actions
+
+    function restoreFocusAfterDialog() {
+        window.shouldHaveFocus = Qt.binding(() => window.shouldBeVisible);
+        if (window.floatingMode)
+            Qt.callLater(() => window.focusModalAfterToolbarAction());
     }
 
     FileBrowserSurfaceModal {
@@ -2580,9 +2653,7 @@ Item {
     Connections {
         target: saveAsDialog
         function onDialogClosed() {
-            window.shouldHaveFocus = Qt.binding(() => window.shouldBeVisible);
-            if (window.floatingMode)
-                Qt.callLater(() => window.focusModalAfterToolbarAction());
+            window.restoreFocusAfterDialog();
         }
     }
 
@@ -2600,14 +2671,13 @@ Item {
     Connections {
         target: insertImageDialog
         function onDialogClosed() {
-            window.shouldHaveFocus = Qt.binding(() => window.shouldBeVisible);
-            if (window.floatingMode)
-                Qt.callLater(() => window.focusModalAfterToolbarAction());
+            window.restoreFocusAfterDialog();
         }
     }
 
     function openInsertImageDialog() {
-        if (insertImageDialog.shouldBeVisible) return;
+        if (insertImageDialog.shouldBeVisible)
+            return;
         insertImageDialog.useOverlayLayer = true;
         insertImageDialog.fileExtensions = ["*.png", "*.jpg", "*.jpeg", "*.webp", "*.svg", "*.gif", "*.bmp"];
         window.shouldHaveFocus = false;
@@ -2615,23 +2685,27 @@ Item {
     }
 
     function insertImageFromFile(filePath) {
-        if (!filePath) return;
+        if (!filePath)
+            return;
         let fileUrl = String(filePath).trim();
         if (!fileUrl.startsWith("file://") && !fileUrl.startsWith("http://") && !fileUrl.startsWith("https://") && !fileUrl.startsWith("data:")) {
             fileUrl = "file://" + fileUrl;
         }
 
         const tempImg = Qt.createQmlObject('import QtQuick; Image { visible: false; source: "' + fileUrl + '" }', window, "tempImgLoader_" + Date.now());
-        if (!tempImg) return;
+        if (!tempImg)
+            return;
 
-        function processAndInsert() {
+        const processAndInsert = () => {
             let origW = tempImg.implicitWidth || tempImg.sourceSize.width || 300;
             let origH = tempImg.implicitHeight || tempImg.sourceSize.height || 300;
-            if (origW <= 0) origW = 300;
-            if (origH <= 0) origH = 300;
+            if (origW <= 0)
+                origW = 300;
+            if (origH <= 0)
+                origH = 300;
 
-            const visW = window.editWidth || 800;
-            const visH = window.editHeight || 600;
+            const visW = window.canvasWidth || 800;
+            const visH = window.canvasHeight || 600;
             const centerX = visW / 2;
             const centerY = visH / 2;
 
@@ -2652,7 +2726,16 @@ Item {
                 tool: "image",
                 color: "#000000",
                 width: 1,
-                points: [{ x: x1, y: y1 }, { x: x2, y: y2 }],
+                points: [
+                    {
+                        x: x1,
+                        y: y1
+                    },
+                    {
+                        x: x2,
+                        y: y2
+                    }
+                ],
                 source: fileUrl,
                 imageObj: tempImg,
                 originalAspectRatio: origW / origH,
@@ -2663,12 +2746,12 @@ Item {
             window.currentTool = "select";
             window.selectStrokeForEditing(newStroke, true);
             window.requestPaintAll();
-        }
+        };
 
         if (tempImg.status === Image.Ready) {
             processAndInsert();
         } else {
-            tempImg.statusChanged.connect(function() {
+            tempImg.statusChanged.connect(function () {
                 if (tempImg.status === Image.Ready) {
                     processAndInsert();
                 }
@@ -2677,7 +2760,8 @@ Item {
     }
 
     function getHoveredHandle(mx, my) {
-        if (!hasSelection || currentTool !== "crop") return "none";
+        if (!hasSelection || currentTool !== "crop")
+            return "none";
         const threshold = 16;
         const x1 = cropRect.x;
         const y1 = cropRect.y;
@@ -2687,23 +2771,35 @@ Item {
         const cy = (y1 + y2) / 2;
 
         // Check corners first
-        if (Math.abs(mx - x1) <= threshold && Math.abs(my - y1) <= threshold) return "tl";
-        if (Math.abs(mx - x2) <= threshold && Math.abs(my - y1) <= threshold) return "tr";
-        if (Math.abs(mx - x1) <= threshold && Math.abs(my - y2) <= threshold) return "bl";
-        if (Math.abs(mx - x2) <= threshold && Math.abs(my - y2) <= threshold) return "br";
+        if (Math.abs(mx - x1) <= threshold && Math.abs(my - y1) <= threshold)
+            return "tl";
+        if (Math.abs(mx - x2) <= threshold && Math.abs(my - y1) <= threshold)
+            return "tr";
+        if (Math.abs(mx - x1) <= threshold && Math.abs(my - y2) <= threshold)
+            return "bl";
+        if (Math.abs(mx - x2) <= threshold && Math.abs(my - y2) <= threshold)
+            return "br";
 
         // Check edge pill handles near center
         const edgeThreshold = 14;
-        if (Math.abs(my - y1) <= edgeThreshold && Math.abs(mx - cx) <= 20) return "tc";
-        if (Math.abs(my - y2) <= edgeThreshold && Math.abs(mx - cx) <= 20) return "bc";
-        if (Math.abs(mx - x1) <= edgeThreshold && Math.abs(my - cy) <= 20) return "lc";
-        if (Math.abs(mx - x2) <= edgeThreshold && Math.abs(my - cy) <= 20) return "rc";
+        if (Math.abs(my - y1) <= edgeThreshold && Math.abs(mx - cx) <= 20)
+            return "tc";
+        if (Math.abs(my - y2) <= edgeThreshold && Math.abs(mx - cx) <= 20)
+            return "bc";
+        if (Math.abs(mx - x1) <= edgeThreshold && Math.abs(my - cy) <= 20)
+            return "lc";
+        if (Math.abs(mx - x2) <= edgeThreshold && Math.abs(my - cy) <= 20)
+            return "rc";
 
         // Check full edges as fallback for easy dragging
-        if (Math.abs(my - y1) <= threshold && mx >= x1 && mx <= x2) return "tc";
-        if (Math.abs(my - y2) <= threshold && mx >= x1 && mx <= x2) return "bc";
-        if (Math.abs(mx - x1) <= threshold && my >= y1 && my <= y2) return "lc";
-        if (Math.abs(mx - x2) <= threshold && my >= y1 && my <= y2) return "rc";
+        if (Math.abs(my - y1) <= threshold && mx >= x1 && mx <= x2)
+            return "tc";
+        if (Math.abs(my - y2) <= threshold && mx >= x1 && mx <= x2)
+            return "bc";
+        if (Math.abs(mx - x1) <= threshold && my >= y1 && my <= y2)
+            return "lc";
+        if (Math.abs(mx - x2) <= threshold && my >= y1 && my <= y2)
+            return "rc";
 
         return "none";
     }
@@ -2732,7 +2828,8 @@ Item {
 
         const parts = ratio.split(":");
         const ar = parseFloat(parts[0]) / parseFloat(parts[1]);
-        if (!ar || ar <= 0) return;
+        if (!ar || ar <= 0)
+            return;
 
         const bw = window.screenshotWidth;
         const bh = window.screenshotHeight;
@@ -3000,15 +3097,18 @@ Item {
 
     function backgroundConfigValue(key, defaultValue, numeric) {
         const pd = config && config.pluginData;
-        if (!pd || pd[key] === undefined || pd[key] === null) return defaultValue;
+        if (!pd || pd[key] === undefined || pd[key] === null)
+            return defaultValue;
         return numeric ? parseInt(pd[key], 10) : pd[key];
     }
 
     function backgroundConfigColor(key, defaultValue) {
         const pd = config && config.pluginData;
-        if (!pd) return defaultValue;
+        if (!pd)
+            return defaultValue;
         const val = pd[key];
-        if (!val) return defaultValue;
+        if (!val)
+            return defaultValue;
         return config.resolveColor(val);
     }
 
@@ -3018,7 +3118,8 @@ Item {
     }
 
     function applyAdaptiveBackgroundColors() {
-        if (window.preservingRestoredBackground) return;
+        if (window.preservingRestoredBackground)
+            return;
         if (backgroundUsesAdaptiveColor("backgroundDefaultSolidColor")) {
             window.backgroundSolidColor = window.autoBackgroundSolidColor;
         }
@@ -3028,11 +3129,12 @@ Item {
         if (backgroundUsesAdaptiveColor("backgroundDefaultGradientEnd")) {
             window.backgroundGradientEnd = window.autoBackgroundGradientEnd;
         }
-        window.requestActiveCanvasPaint();
+        window.repaintActiveCanvas();
     }
 
     function measureTextBounds(stroke) {
-        if (!window.activeCanvas) return null;
+        if (!window.activeCanvas)
+            return null;
         const ctx = window.activeCanvas.getContext("2d");
         return DrawingRenderer.measureTextLayout(ctx, stroke, Theme);
     }
@@ -3042,7 +3144,8 @@ Item {
     }
 
     function getSelectedStrokeHandleAt(mx, my) {
-        if (!window.selectedStroke) return "none";
+        if (!window.selectedStroke)
+            return "none";
         return Helpers.getStrokeHandleAt(mx, my, window.selectedStroke, window.measureTextBounds);
     }
 
@@ -3055,20 +3158,14 @@ Item {
             console.warn("exportCanvasItem is not initialized yet");
             return;
         }
-        const exportWidth = window.hasSelection && window.effectiveBackgroundMode === "none"
-            ? window.cropRect.width
-            : window.canvasWidth;
-        const exportHeight = window.hasSelection && window.effectiveBackgroundMode === "none"
-            ? window.cropRect.height
-            : window.canvasHeight;
+        const exportWidth = window.hasSelection && window.effectiveBackgroundMode === "none" ? window.cropRect.width : window.canvasWidth;
+        const exportHeight = window.hasSelection && window.effectiveBackgroundMode === "none" ? window.cropRect.height : window.canvasHeight;
         window.exportCanvasItem.outputPixelWidth = Math.max(1, Math.round(exportWidth));
         window.exportCanvasItem.outputPixelHeight = Math.max(1, Math.round(exportHeight));
         window.exportCanvasItem.width = window.exportCanvasItem.outputPixelWidth / window.exportCanvasItem.exportDpr;
         window.exportCanvasItem.height = window.exportCanvasItem.outputPixelHeight / window.exportCanvasItem.exportDpr;
         window.exportCanvasItem.requestPaint();
     }
-
-    function formatHexColor(color) { return Helpers.formatHexColor(color); }
 
     function reindexStamps() {
         let stamps = [];
@@ -3078,7 +3175,8 @@ Item {
             if (stroke && stroke.tool === "stamp") {
                 stamps.push(stroke);
                 const id = Number(stroke.id);
-                if (isFinite(id)) maxId = Math.max(maxId, id);
+                if (isFinite(id))
+                    maxId = Math.max(maxId, id);
             }
         }
 
@@ -3123,11 +3221,12 @@ Item {
     }
 
     function updateColorSlot(slotIdx, colorValue) {
-        const hex = window.formatHexColor(colorValue).toUpperCase();
+        const hex = Helpers.formatHexColor(colorValue).toUpperCase();
         if (config.selectedPreset !== "custom") {
             window.pendingColorToSave = colorValue;
             window.pendingSlotToSave = slotIdx;
-            if (window.paletteWarningDialogRef) window.paletteWarningDialogRef.open();
+            if (window.paletteWarningDialogRef)
+                window.paletteWarningDialogRef.open();
         } else {
             window.currentColor = colorValue;
             window.writeColorSlotToCustom(slotIdx, hex);
@@ -3135,7 +3234,7 @@ Item {
     }
 
     function openColorPickerModal() {
-        if (typeof PopoutService !== "undefined" && PopoutService && PopoutService.colorPickerModal) {
+        if (PopoutService.colorPickerModal) {
             const picker = PopoutService.colorPickerModal;
             picker.useOverlayLayer = true;
             picker.selectedColor = window.currentColor;
@@ -3151,63 +3250,68 @@ Item {
     }
 
     function writeColorSlotToCustom(slotIdx, hex) {
-        if (!window.parentWidget || !window.parentWidget.pluginService || slotIdx < 0) return;
-        
+        if (!window.parentWidget || !window.parentWidget.pluginService || slotIdx < 0)
+            return;
+
         let pData = Object.assign({}, window.parentWidget.pluginData);
         pData["color_palette_preset"] = "custom";
-        
+
         const key = slotIdx === 0 ? "toolbar_color_primary" : "toolbar_color_" + (slotIdx - 1);
         pData[key] = hex;
-        
+
         window.parentWidget.pluginData = pData;
-        
+
         window.savePluginData("color_palette_preset", "custom");
         window.savePluginData(key, hex);
     }
 
     function switchPresetToCustom(copyCurrent) {
-        if (!window.parentWidget || !window.parentWidget.pluginService) return;
-        
+        if (!window.parentWidget || !window.parentWidget.pluginService)
+            return;
+
         // 1. Read current palette FIRST before switching preset to custom
         // to avoid QML reactive bindings immediately resetting the palette to custom empty/defaults.
         const currentPalette = (copyCurrent && window.toolbarItem && window.toolbarItem.toolbarPalette) ? window.toolbarItem.toolbarPalette : [];
-        
+
         let pData = Object.assign({}, window.parentWidget.pluginData);
         pData["color_palette_preset"] = "custom";
         window.savePluginData("color_palette_preset", "custom");
-        
+
         if (copyCurrent && currentPalette && currentPalette.length >= 8) {
-            pData["toolbar_color_primary"] = window.formatHexColor(currentPalette[0]).toUpperCase();
+            pData["toolbar_color_primary"] = Helpers.formatHexColor(currentPalette[0]).toUpperCase();
             window.savePluginData("toolbar_color_primary", pData["toolbar_color_primary"]);
-            
+
             for (let i = 0; i < 7; i++) {
                 const key = `toolbar_color_${i}`;
-                pData[key] = window.formatHexColor(currentPalette[i + 1]).toUpperCase();
+                pData[key] = Helpers.formatHexColor(currentPalette[i + 1]).toUpperCase();
                 window.savePluginData(key, pData[key]);
             }
         }
-        
+
         if (window.pendingSlotToSave >= 0) {
-            const hex = window.formatHexColor(window.pendingColorToSave).toUpperCase();
+            const hex = Helpers.formatHexColor(window.pendingColorToSave).toUpperCase();
             const key = window.pendingSlotToSave === 0 ? "toolbar_color_primary" : "toolbar_color_" + (window.pendingSlotToSave - 1);
             pData[key] = hex;
             window.savePluginData(key, hex);
-            
+
             window.parentWidget.pluginData = pData;
             window.currentColor = window.pendingColorToSave;
         }
-        
+
         window.pendingColorToSave = "transparent";
         window.pendingSlotToSave = -1;
     }
 
     function readCanvasPixel(canvas, x, y) {
-        if (!canvas) return null;
+        if (!canvas)
+            return null;
         try {
             const ctx = canvas.getContext("2d");
-            if (!ctx) return null;
+            if (!ctx)
+                return null;
             const imgData = ctx.getImageData(x, y, 1, 1);
-            if (!imgData || !imgData.data || imgData.data.length < 4 || imgData.data[3] === 0) return null;
+            if (!imgData || !imgData.data || imgData.data.length < 4 || imgData.data[3] === 0)
+                return null;
 
             // Force alpha to 1.0 so the picker always returns an opaque color.
             return Qt.rgba(imgData.data[0] / 255, imgData.data[1] / 255, imgData.data[2] / 255, 1.0);
@@ -3219,7 +3323,8 @@ Item {
     function sampleCanvasColor(mouseX, mouseY) {
         const canvases = [window.activeCanvas, window.bakedCanvas, window.backgroundCanvas];
         const firstCanvas = canvases.find(canvas => canvas !== null && canvas !== undefined);
-        if (!firstCanvas) return window.currentColor;
+        if (!firstCanvas)
+            return window.currentColor;
 
         // Clamp and round coordinates to prevent out-of-bounds errors and ensure integer coordinates in device pixels.
         const x = Helpers.clamp(Math.floor(mouseX * window.dpr), 0, Math.floor(firstCanvas.width * window.dpr) - 1);
@@ -3233,7 +3338,8 @@ Item {
         let pickedColor = null;
         for (let i = 0; i < canvases.length; i++) {
             pickedColor = window.readCanvasPixel(canvases[i], x, y);
-            if (pickedColor) break;
+            if (pickedColor)
+                break;
         }
 
         window._lastSampledX = x;
@@ -3257,17 +3363,18 @@ Item {
     }
 
     function closeColorPickerIfOpen() {
-        if (typeof PopoutService === "undefined" || !PopoutService || !PopoutService.colorPickerModal) {
+        if (!PopoutService.colorPickerModal)
             return false;
-        }
         const picker = PopoutService.colorPickerModal;
-        if (!picker.shouldBeVisible) return false;
+        if (!picker.shouldBeVisible)
+            return false;
         picker.hide();
         return true;
     }
 
     function repaintActiveCanvas() {
-        if (window.activeCanvas) window.activeCanvas.requestPaint();
+        if (window.activeCanvas)
+            window.activeCanvas.requestPaint();
     }
 
     function handleSelectedStrokeDeleteShortcut(event) {
@@ -3288,16 +3395,18 @@ Item {
     }
 
     function handleSelectedStrokeMoveShortcut(event) {
-        if ((event.key === Qt.Key_Left || event.key === Qt.Key_Right || event.key === Qt.Key_Up || event.key === Qt.Key_Down)
-            && window.currentTool === "select" && window.selectedStroke) {
-
+        if ((event.key === Qt.Key_Left || event.key === Qt.Key_Right || event.key === Qt.Key_Up || event.key === Qt.Key_Down) && window.currentTool === "select" && window.selectedStroke) {
             let step = (event.modifiers & Qt.ShiftModifier) ? 10 : 1;
             let dx = 0;
             let dy = 0;
-            if (event.key === Qt.Key_Left) dx = -step;
-            else if (event.key === Qt.Key_Right) dx = step;
-            else if (event.key === Qt.Key_Up) dy = -step;
-            else if (event.key === Qt.Key_Down) dy = step;
+            if (event.key === Qt.Key_Left)
+                dx = -step;
+            else if (event.key === Qt.Key_Right)
+                dx = step;
+            else if (event.key === Qt.Key_Up)
+                dy = -step;
+            else if (event.key === Qt.Key_Down)
+                dy = step;
 
             const newPoints = [];
             for (let i = 0; i < window.selectedStroke.points.length; i++) {
@@ -3334,7 +3443,8 @@ Item {
             if (window.currentTool === "select" && window.originalPoints && window.originalPoints.length > 0) {
                 if (window.selectedStroke) {
                     window.selectedStroke.points = window.originalPoints.map(p => Qt.point(p.x, p.y));
-                    if (window.originalRotation !== undefined) window.selectedStroke.rotation = window.originalRotation;
+                    if (window.originalRotation !== undefined)
+                        window.selectedStroke.rotation = window.originalRotation;
                 }
                 window.activeHandle = "none";
                 window.originalPoints = [];
@@ -3373,7 +3483,8 @@ Item {
     }
 
     function openSaveAsDialog() {
-        if (saveAsDialog.shouldBeVisible) return;
+        if (saveAsDialog.shouldBeVisible)
+            return;
         saveAsDialog.useOverlayLayer = true;
         saveAsDialog.defaultFileName = captureActions.screenshotFilename();
         saveAsDialog.fileExtensions = window.saveAsFileExtensions();
@@ -3477,7 +3588,8 @@ Item {
 
     function handleColorShortcut(event, token) {
         const colorShortcut = Helpers.findByKey(config.colorShortcuts, token);
-        if (!colorShortcut) return false;
+        if (!colorShortcut)
+            return false;
         let idx = config.colorShortcuts.indexOf(colorShortcut);
         if (idx !== -1) {
             window.activeColorSlotIndex = idx;
@@ -3493,7 +3605,7 @@ Item {
                 window.ocrRect = Qt.rect(0, 0, 0, 0);
                 window.repaintActiveCanvas();
             } else {
-                window.runOcr();
+                window.startRegionScanTool("ocr");
             }
             return window.acceptKeyEvent(event);
         }
@@ -3519,7 +3631,8 @@ Item {
 
     function handleToolShortcut(event, token) {
         const toolShortcut = Helpers.findByKey(config.toolShortcuts, token);
-        if (!toolShortcut) return false;
+        if (!toolShortcut)
+            return false;
 
         if (toolShortcut.tool === "colorpicker") {
             if (!window.openColorPickerModal()) {
@@ -3544,7 +3657,8 @@ Item {
     }
 
     function handleViewZoomShortcut(event, token, hasCtrl) {
-        if (window.isTyping) return false;
+        if (window.isTyping)
+            return false;
         if (token === "0") {
             window.resetUserZoom();
             return window.acceptKeyEvent(event);
@@ -3561,10 +3675,12 @@ Item {
     }
 
     function handleStrokeSizeShortcut(event, token, hasCtrl) {
-        if (hasCtrl || window.isTyping) return false;
+        if (hasCtrl || window.isTyping)
+            return false;
         const isDecrease = event.key === Qt.Key_BracketLeft;
         const isIncrease = event.key === Qt.Key_BracketRight;
-        if (!isDecrease && !isIncrease) return false;
+        if (!isDecrease && !isIncrease)
+            return false;
 
         const tool = window.effectiveTool;
         const meta = Constants.getToolMeta(tool);
@@ -3579,32 +3695,44 @@ Item {
     }
 
     function handleShortcutKey(event) {
-        if (window.handleSelectedStrokeDeleteShortcut(event)) return;
-        if (window.handleSelectedStrokeMoveShortcut(event)) return;
+        if (window.handleSelectedStrokeDeleteShortcut(event))
+            return;
+        if (window.handleSelectedStrokeMoveShortcut(event))
+            return;
 
         const token = Helpers.shortcutToken(event.key, Qt);
         const hasCtrl = event.modifiers & Qt.ControlModifier;
 
-        if (window.handleEscapeShortcut(event)) return;
-        if (window.handleCaptureActionShortcut(event, token, hasCtrl)) return;
-        if (window.handleAnnotationVisibilityShortcut(event, token, hasCtrl)) return;
-        if (window.handleStrokeClipboardShortcut(event, token, hasCtrl)) return;
-        if (window.handleViewZoomShortcut(event, token, hasCtrl)) return;
-        if (window.handleStrokeSizeShortcut(event, token, hasCtrl)) return;
+        if (window.handleEscapeShortcut(event))
+            return;
+        if (window.handleCaptureActionShortcut(event, token, hasCtrl))
+            return;
+        if (window.handleAnnotationVisibilityShortcut(event, token, hasCtrl))
+            return;
+        if (window.handleStrokeClipboardShortcut(event, token, hasCtrl))
+            return;
+        if (window.handleViewZoomShortcut(event, token, hasCtrl))
+            return;
+        if (window.handleStrokeSizeShortcut(event, token, hasCtrl))
+            return;
 
         if (hasCtrl) {
             window.handleColorShortcut(event, token);
             return;
         }
 
-        if (window.handleInsertImageShortcut(event, token, hasCtrl)) return;
-        if (window.handleWatermarkShortcut(event, token, hasCtrl)) return;
-        if (window.handleOcrShortcut(event, token, hasCtrl)) return;
+        if (window.handleInsertImageShortcut(event, token, hasCtrl))
+            return;
+        if (window.handleWatermarkShortcut(event, token, hasCtrl))
+            return;
+        if (window.handleOcrShortcut(event, token, hasCtrl))
+            return;
         window.handleToolShortcut(event, token);
     }
 
     function handleTabShortcut(event) {
-        if (event.key !== Qt.Key_Tab) return false;
+        if (event.key !== Qt.Key_Tab)
+            return false;
         if (event.isAutoRepeat) {
             return window.acceptKeyEvent(event);
         }
@@ -3622,9 +3750,7 @@ Item {
             const p0 = window.presetHistory[0];
             const p1 = window.presetHistory[1];
 
-            const isP0 = current.tool === p0.tool &&
-                         current.color.toString() === p0.color.toString() &&
-                         current.thickness === p0.thickness;
+            const isP0 = current.tool === p0.tool && current.color.toString() === p0.color.toString() && current.thickness === p0.thickness;
 
             const target = isP0 ? p1 : p0;
             window.currentTool = target.tool;
@@ -3647,7 +3773,8 @@ Item {
             }
             return window.acceptKeyEvent(event);
         }
-        if (event.key !== Qt.Key_G || window.isTyping) return false;
+        if (event.key !== Qt.Key_G || window.isTyping)
+            return false;
         if (event.isAutoRepeat) {
             return window.acceptKeyEvent(event);
         }
@@ -3656,13 +3783,14 @@ Item {
     }
 
     function handleMoreToolsShortcut(event) {
-        if (event.key !== Qt.Key_QuoteLeft || window.isTyping) return false;
-        if (event.isAutoRepeat) return window.acceptKeyEvent(event);
+        if (event.key !== Qt.Key_QuoteLeft || window.isTyping)
+            return false;
+        if (event.isAutoRepeat)
+            return window.acceptKeyEvent(event);
         const menu = window.moreToolsMenuRef;
-        if (!menu) return false;
-        const btn = (window.toolbarItem && window.toolbarItem.moreToolsButton)
-            ? window.toolbarItem.moreToolsButton
-            : window.moreToolsButtonRef;
+        if (!menu)
+            return false;
+        const btn = (window.toolbarItem && window.toolbarItem.moreToolsButton) ? window.toolbarItem.moreToolsButton : window.moreToolsButtonRef;
         const anchor = btn || window.toolbarItem;
         if (anchor) {
             window.toggleMoreToolsMenu(anchor, menu, window.toolbarItem, window.contentRootRef);
@@ -3681,7 +3809,8 @@ Item {
         if (event.key === Qt.Key_Space) {
             return window.acceptKeyEvent(event);
         }
-        if (event.key !== Qt.Key_G || window.isTyping) return false;
+        if (event.key !== Qt.Key_G || window.isTyping)
+            return false;
         if (event.isAutoRepeat) {
             return window.acceptKeyEvent(event);
         }
@@ -3690,7 +3819,8 @@ Item {
     }
 
     function handleTypingKeyPressed(event) {
-        if (!window.isTyping) return false;
+        if (!window.isTyping)
+            return false;
         if (window.textInputMode === "inline" && window.isTyping) {
             if (event.key === Qt.Key_Escape) {
                 window.cancelTypingText();
@@ -3711,7 +3841,8 @@ Item {
             }
             if (event.modifiers & Qt.ControlModifier) {
                 const token = Helpers.shortcutToken(event.key, Qt);
-                if (window.handleColorShortcut(event, token)) return true;
+                if (window.handleColorShortcut(event, token))
+                    return true;
                 if ((event.modifiers & Qt.ShiftModifier) && token === "S") {
                     window.openSaveAsDialog();
                     return window.acceptKeyEvent(event);
@@ -3723,7 +3854,8 @@ Item {
 
         if (event.modifiers & Qt.ControlModifier) {
             const token = Helpers.shortcutToken(event.key, Qt);
-            if (window.handleColorShortcut(event, token)) return true;
+            if (window.handleColorShortcut(event, token))
+                return true;
             if ((event.modifiers & Qt.ShiftModifier) && token === "S") {
                 window.openSaveAsDialog();
                 return window.acceptKeyEvent(event);
@@ -3736,9 +3868,6 @@ Item {
     }
 
     function handleModalKeyPressed(event) {
-        if (event.key === Qt.Key_Control) {
-            window.isCtrlPressed = true;
-        }
         if (event.key === Qt.Key_Escape && saveAsDialog.shouldBeVisible) {
             saveAsDialog.close();
             window.acceptKeyEvent(event);
@@ -3753,17 +3882,18 @@ Item {
             window.acceptKeyEvent(event);
             return;
         }
-        if (window.handleTabShortcut(event)) return;
-        if (window.handleZoomKeyPressed(event)) return;
-        if (window.handleMoreToolsShortcut(event)) return;
-        if (window.handleTypingKeyPressed(event)) return;
+        if (window.handleTabShortcut(event))
+            return;
+        if (window.handleZoomKeyPressed(event))
+            return;
+        if (window.handleMoreToolsShortcut(event))
+            return;
+        if (window.handleTypingKeyPressed(event))
+            return;
         window.handleShortcutKey(event);
     }
 
     function handleModalKeyReleased(event) {
-        if (event.key === Qt.Key_Control) {
-            window.isCtrlPressed = false;
-        }
         if (event.key === Qt.Key_Tab) {
             event.accepted = true;
             return;
@@ -3773,7 +3903,6 @@ Item {
 
     function resetEditorSessionState() {
         window.editorSessionGeneration++;
-        if (typeof drawMouseArea !== "undefined" && drawMouseArea) drawMouseArea.resetInteractionState();
 
         window.strokes = [];
         window.undoneStrokes = [];
@@ -3833,11 +3962,11 @@ Item {
     onBackgroundClicked: () => discardAndClose()
 
     // Keyboard Shortcuts Support
-    modalFocusScope.Keys.onPressed: (event) => {
+    modalFocusScope.Keys.onPressed: event => {
         window.handleModalKeyPressed(event);
     }
 
-    modalFocusScope.Keys.onReleased: (event) => {
+    modalFocusScope.Keys.onReleased: event => {
         window.handleModalKeyReleased(event);
     }
 
@@ -3890,7 +4019,11 @@ Item {
         window.updateSessionToolIntensity(startTool, startThickness);
         window.currentColor = startColor;
         window.updateSessionToolColor(startTool, startColor);
-        window.recordPresetUsage({ tool: startTool, color: startColor, thickness: startThickness });
+        window.recordPresetUsage({
+            tool: startTool,
+            color: startColor,
+            thickness: startThickness
+        });
 
         window.stampCounter = 1;
         window.stampIdCounter = 1;
@@ -3904,17 +4037,9 @@ Item {
             window.bgImageSource = `file://${window.currentCapturePath}`;
             // currentCapturePath is consumed in onDialogClosed to survive re-fires during screen changes
         }
-        window.isScreenshotDark = false;
-        window.hasSampledContrast = false;
-        window.backgroundSolidColor = backgroundUsesAdaptiveColor("backgroundDefaultSolidColor")
-            ? window.autoBackgroundSolidColor
-            : backgroundConfigColor("backgroundDefaultSolidColor", config.resolveColor("slot_1"));
-        window.backgroundGradientStart = backgroundUsesAdaptiveColor("backgroundDefaultGradientStart")
-            ? window.autoBackgroundGradientStart
-            : backgroundConfigColor("backgroundDefaultGradientStart", config.resolveColor("slot_1"));
-        window.backgroundGradientEnd = backgroundUsesAdaptiveColor("backgroundDefaultGradientEnd")
-            ? window.autoBackgroundGradientEnd
-            : backgroundConfigColor("backgroundDefaultGradientEnd", config.resolveColor("slot_2"));
+        window.backgroundSolidColor = backgroundUsesAdaptiveColor("backgroundDefaultSolidColor") ? window.autoBackgroundSolidColor : backgroundConfigColor("backgroundDefaultSolidColor", config.resolveColor("slot_1"));
+        window.backgroundGradientStart = backgroundUsesAdaptiveColor("backgroundDefaultGradientStart") ? window.autoBackgroundGradientStart : backgroundConfigColor("backgroundDefaultGradientStart", config.resolveColor("slot_1"));
+        window.backgroundGradientEnd = backgroundUsesAdaptiveColor("backgroundDefaultGradientEnd") ? window.autoBackgroundGradientEnd : backgroundConfigColor("backgroundDefaultGradientEnd", config.resolveColor("slot_2"));
         window.backgroundImagePath = backgroundConfigValue("backgroundDefaultImagePath", "", false);
         window.backgroundImageFolder = backgroundConfigValue("backgroundImageFolder", "~/Pictures/Wallpaper", false);
         window.backgroundImageBlur = backgroundConfigValue("backgroundImageBlur", false, false) === true;
@@ -3929,7 +4054,8 @@ Item {
         window.backgroundMode = "none";
         if (config && config.pluginData && config.pluginData["backgroundAutoApply"] === true) {
             const bm = config.pluginData["backgroundDefaultMode"];
-            if (bm) window.backgroundMode = bm;
+            if (bm)
+                window.backgroundMode = bm;
         }
         window.backgroundPadding = backgroundConfigValue("backgroundDefaultPadding", Constants.defaultBackgroundPadding, true);
         window.backgroundCornerRadius = backgroundConfigValue("backgroundDefaultRadius", Constants.defaultBackgroundCornerRadius, true);
@@ -3956,7 +4082,7 @@ Item {
                         if (restoredImg) {
                             stroke.imageObj = restoredImg;
                             if (restoredImg.status !== Image.Ready) {
-                                restoredImg.statusChanged.connect(function() {
+                                restoredImg.statusChanged.connect(function () {
                                     if (restoredImg.status === Image.Ready) {
                                         window.requestPaintAll();
                                     }
@@ -4006,7 +4132,8 @@ Item {
                 window.backgroundShadowStrength = data.backgroundShadowStrength;
                 window.backgroundAspectRatio = data.backgroundAspectRatio;
                 window.customAspectRatio = data.customAspectRatio;
-                if (data.backgroundAlignment) window.backgroundAlignment = data.backgroundAlignment;
+                if (data.backgroundAlignment)
+                    window.backgroundAlignment = data.backgroundAlignment;
                 window.hasUserCustomizedBackground = data.hasUserCustomizedBackground;
                 window.autoBackgroundGradientStart = data.autoBackgroundGradientStart;
                 window.autoBackgroundGradientEnd = data.autoBackgroundGradientEnd;
@@ -4014,11 +4141,13 @@ Item {
             }
             if (data.user_background_presets) {
                 const parsed = window.parseJsonArrayValue(data.user_background_presets, "user_background_presets");
-                if (parsed !== undefined) window.customBackgroundPresets = parsed;
+                if (parsed !== undefined)
+                    window.customBackgroundPresets = parsed;
             }
             if (data.hidden_background_presets) {
                 const parsed = window.parseJsonArrayValue(data.hidden_background_presets, "hidden_background_presets");
-                if (parsed !== undefined) window.hiddenPresetIds = parsed;
+                if (parsed !== undefined)
+                    window.hiddenPresetIds = parsed;
             }
             window.repaintActiveCanvas();
             window.restoreState = null;
@@ -4029,26 +4158,42 @@ Item {
             if (window.backgroundMode === "image") {
                 window.refreshBackgroundBlurCache(false);
             }
-            if (modalFocusScope) modalFocusScope.forceActiveFocus();
+            if (modalFocusScope)
+                modalFocusScope.forceActiveFocus();
         });
     }
 
     function applyBackgroundPreset(preset) {
-        if (!preset) return;
-        if (preset.imagePath !== undefined) window.backgroundImagePath = preset.imagePath;
-        if (preset.imageBlur !== undefined) window.backgroundImageBlur = preset.imageBlur;
-        if (preset.imageDim !== undefined) window.backgroundImageDim = preset.imageDim;
-        if (preset.imageDimStrength !== undefined) window.backgroundImageDimStrength = preset.imageDimStrength;
-        if (preset.mode !== undefined) window.backgroundMode = preset.mode;
-        if (preset.solidColor !== undefined) window.backgroundSolidColor = preset.solidColor;
-        if (preset.gradientStart !== undefined) window.backgroundGradientStart = preset.gradientStart;
-        if (preset.gradientEnd !== undefined) window.backgroundGradientEnd = preset.gradientEnd;
-        if (preset.gradientAngle !== undefined) window.backgroundGradientAngle = preset.gradientAngle;
-        if (preset.padding !== undefined) window.backgroundPadding = preset.padding;
-        if (preset.cornerRadius !== undefined) window.backgroundCornerRadius = preset.cornerRadius;
-        if (preset.shadowStrength !== undefined) window.backgroundShadowStrength = preset.shadowStrength;
-        if (preset.aspectRatio !== undefined) window.backgroundAspectRatio = preset.aspectRatio;
-        if (preset.customAspectRatio !== undefined) window.customAspectRatio = preset.customAspectRatio;
+        if (!preset)
+            return;
+        if (preset.imagePath !== undefined)
+            window.backgroundImagePath = preset.imagePath;
+        if (preset.imageBlur !== undefined)
+            window.backgroundImageBlur = preset.imageBlur;
+        if (preset.imageDim !== undefined)
+            window.backgroundImageDim = preset.imageDim;
+        if (preset.imageDimStrength !== undefined)
+            window.backgroundImageDimStrength = preset.imageDimStrength;
+        if (preset.mode !== undefined)
+            window.backgroundMode = preset.mode;
+        if (preset.solidColor !== undefined)
+            window.backgroundSolidColor = preset.solidColor;
+        if (preset.gradientStart !== undefined)
+            window.backgroundGradientStart = preset.gradientStart;
+        if (preset.gradientEnd !== undefined)
+            window.backgroundGradientEnd = preset.gradientEnd;
+        if (preset.gradientAngle !== undefined)
+            window.backgroundGradientAngle = preset.gradientAngle;
+        if (preset.padding !== undefined)
+            window.backgroundPadding = preset.padding;
+        if (preset.cornerRadius !== undefined)
+            window.backgroundCornerRadius = preset.cornerRadius;
+        if (preset.shadowStrength !== undefined)
+            window.backgroundShadowStrength = preset.shadowStrength;
+        if (preset.aspectRatio !== undefined)
+            window.backgroundAspectRatio = preset.aspectRatio;
+        if (preset.customAspectRatio !== undefined)
+            window.customAspectRatio = preset.customAspectRatio;
         window.hasUserCustomizedBackground = true;
         window.refreshBackgroundBlurCache(true);
         window.requestPaintAll();
@@ -4081,7 +4226,8 @@ Item {
     }
 
     function deletePreset(presetId) {
-        if (!presetId) return;
+        if (!presetId)
+            return;
         const newCustom = window.customBackgroundPresets.filter(p => p.id !== presetId);
         const newHidden = window.hiddenPresetIds.indexOf(presetId) === -1 ? [...window.hiddenPresetIds, presetId] : window.hiddenPresetIds;
         window.customBackgroundPresets = newCustom;
@@ -4091,7 +4237,8 @@ Item {
     }
 
     function updatePresetWithCurrent(presetId) {
-        if (!presetId) return;
+        if (!presetId)
+            return;
         const currentData = {
             mode: window.backgroundMode,
             imagePath: window.backgroundImagePath,
@@ -4127,15 +4274,20 @@ Item {
     }
 
     function renamePreset(presetId, newName) {
-        if (!presetId || !newName) return;
+        if (!presetId || !newName)
+            return;
         const existingIdx = window.customBackgroundPresets.findIndex(p => p.id === presetId);
         let newList;
         if (existingIdx !== -1) {
-            newList = window.customBackgroundPresets.map(p => p.id === presetId ? Object.assign({}, p, { name: newName }) : p);
+            newList = window.customBackgroundPresets.map(p => p.id === presetId ? Object.assign({}, p, {
+                    name: newName
+                }) : p);
         } else {
             const original = Constants.defaultBackgroundPresets ? Constants.defaultBackgroundPresets.find(p => p.id === presetId) : undefined;
             if (original) {
-                const updated = Object.assign({}, original, { name: newName });
+                const updated = Object.assign({}, original, {
+                    name: newName
+                });
                 newList = [...window.customBackgroundPresets, updated];
             } else {
                 newList = window.customBackgroundPresets;
@@ -4146,8 +4298,9 @@ Item {
     }
 
     function loadPresetsFromPluginData() {
-        if (!config || !config.pluginData) return;
-        
+        if (!config || !config.pluginData)
+            return;
+
         const userPresetsRaw = config.pluginData["user_background_presets"];
         if (userPresetsRaw !== undefined) {
             if (userPresetsRaw) {
@@ -4199,6 +4352,42 @@ Item {
         Qt.callLater(() => {
             window.open();
         });
+    }
+
+    function runMoreToolsAction(action) {
+        switch (action) {
+        case "rotateLeft":
+            window.rotateScreenshot("left");
+            return;
+        case "rotateRight":
+            window.rotateScreenshot("right");
+            return;
+        case "flipHorizontal":
+            window.mirrorScreenshot("horizontal");
+            return;
+        case "flipVertical":
+            window.mirrorScreenshot("vertical");
+            return;
+        case "presentation":
+            window.togglePresentationMode();
+            return;
+        case "insertImage":
+            window.openInsertImageDialog();
+            return;
+        case "ocr":
+            window.startRegionScanTool("ocr");
+            return;
+        case "qr":
+            window.startRegionScanTool("qr");
+            return;
+        case "eraser":
+            window.currentTool = "eraser";
+            return;
+        case "copyColor":
+            window.colorPickerMode = "copy";
+            window.currentTool = "colorpicker";
+            return;
+        }
     }
 
     function closeMoreToolsMenu(menu) {
@@ -4312,7 +4501,8 @@ Item {
     }
 
     function handleBackgroundControlHovered(popover, controlItem, toolbar, contentItem) {
-        if (!popover) return;
+        if (!popover)
+            return;
 
         window.positionBackgroundPopover(popover, controlItem, toolbar, contentItem);
         popover.open();
@@ -4325,7 +4515,8 @@ Item {
     }
 
     function closeBackgroundPopover(popover) {
-        if (!popover) return;
+        if (!popover)
+            return;
         if (typeof popover.stopCloseTimer === "function") {
             popover.stopCloseTimer();
         }
@@ -4335,24 +4526,15 @@ Item {
     }
 
     function closeBackgroundPopovers() {
-        const popovers = [
-            backgroundPaddingPopover,
-            backgroundRadiusPopover,
-            backgroundShadowPopover,
-            backgroundAnglePopover,
-            backgroundImageDimPopover,
-            backgroundAspectRatioPopover,
-            backgroundAlignmentPopover,
-            backgroundImagePopover,
-            backgroundPresetsPopover
-        ];
+        const popovers = [backgroundPaddingPopover, backgroundRadiusPopover, backgroundShadowPopover, backgroundAnglePopover, backgroundImageDimPopover, backgroundAspectRatioPopover, backgroundAlignmentPopover, backgroundImagePopover, backgroundPresetsPopover];
         for (let i = 0; i < popovers.length; i++) {
             window.closeBackgroundPopover(popovers[i]);
         }
     }
 
     function showBackgroundImagePopover(popover, controlItem, toolbar, contentItem) {
-        if (!popover || !controlItem) return;
+        if (!popover || !controlItem)
+            return;
         if (popover.opened) {
             popover.close();
             return;
@@ -4383,7 +4565,7 @@ Item {
         } else if (type === "imageDim" && window.backgroundImageDim) {
             window.setBackgroundImageDimStrength(window.backgroundImageDimStrength + step, true);
         }
-        window.requestActiveCanvasPaint();
+        window.repaintActiveCanvas();
     }
 
     property Component editorContent: Component {
@@ -4393,11 +4575,11 @@ Item {
             implicitWidth: window.modalWidth
             implicitHeight: window.modalHeight
             Component.onCompleted: window.contentRootRef = contentRoot
-            Keys.onPressed: (event) => {
+            Keys.onPressed: event => {
                 if (window.floatingMode)
                     window.handleModalKeyPressed(event);
             }
-            Keys.onReleased: (event) => {
+            Keys.onReleased: event => {
                 if (window.floatingMode)
                     window.handleModalKeyReleased(event);
             }
@@ -4416,7 +4598,6 @@ Item {
 
                 onStatusChanged: {
                     if (status === Image.Ready) {
-                        window.hasSampledContrast = false;
                         if (window.activeCanvas) {
                             window.activeCanvas.unloadImage(source);
                             window.activeCanvas.loadImage(source);
@@ -4434,11 +4615,33 @@ Item {
                         offscreenSampler.requestPaint();
                     }
                 }
-
             }
 
             Item {
                 id: mainLayout
+
+                function backgroundPopoverFor(type) {
+                    switch (type) {
+                    case "padding":
+                        return backgroundPaddingPopover;
+                    case "radius":
+                        return backgroundRadiusPopover;
+                    case "shadow":
+                        return backgroundShadowPopover;
+                    case "angle":
+                        return backgroundAnglePopover;
+                    case "aspectRatio":
+                        return backgroundAspectRatioPopover;
+                    case "alignment":
+                        return backgroundAlignmentPopover;
+                    case "presets":
+                        return backgroundPresetsPopover;
+                    case "imageDim":
+                        return backgroundImageDimPopover;
+                    default:
+                        return null;
+                    }
+                }
                 anchors.fill: parent
 
                 QuickCaptureToolbar {
@@ -4501,15 +4704,15 @@ Item {
                             backgroundImagePopover.close();
                         }
                     }
-                    onChangeBackgroundImageBlur: (enabled) => window.setBackgroundImageBlur(enabled, true)
-                    onChangeBackgroundImageDim: (enabled) => window.setBackgroundImageDim(enabled, true)
-                    onChangeBackgroundSolidColor: (col) => {
+                    onChangeBackgroundImageBlur: enabled => window.setBackgroundImageBlur(enabled, true)
+                    onChangeBackgroundImageDim: enabled => window.setBackgroundImageDim(enabled, true)
+                    onChangeBackgroundSolidColor: col => {
                         window.backgroundSolidColor = col;
                         window.hasUserCustomizedBackground = true;
                     }
-                    onBackgroundColorPickerRequested: (currentColor) => {
+                    onBackgroundColorPickerRequested: currentColor => {
                         moreToolsMenu.close();
-                        if (typeof PopoutService !== "undefined" && PopoutService && PopoutService.colorPickerModal) {
+                        if (PopoutService.colorPickerModal) {
                             const picker = PopoutService.colorPickerModal;
                             picker.useOverlayLayer = true;
                             picker.selectedColor = currentColor;
@@ -4531,38 +4734,17 @@ Item {
                             picker.show();
                         }
                     }
-                    onBackgroundEyedropperRequested: (slot) => {
+                    onBackgroundEyedropperRequested: slot => {
                         window.backgroundColorPickingSlot = slot;
                         window.currentTool = "colorpicker";
                     }
-                    onChangeBackgroundGradientStart: (col) => {
+                    onChangeBackgroundGradientStart: col => {
                         window.backgroundGradientStart = col;
                         window.hasUserCustomizedBackground = true;
                     }
-                    onChangeBackgroundGradientEnd: (col) => {
+                    onChangeBackgroundGradientEnd: col => {
                         window.backgroundGradientEnd = col;
                         window.hasUserCustomizedBackground = true;
-                    }
-                    onChangeBackgroundGradientAngle: (angle) => {
-                        window.backgroundGradientAngle = angle;
-                    }
-                    onChangeBackgroundPadding: (pad) => {
-                        window.backgroundPadding = pad;
-                    }
-                    onChangeBackgroundCornerRadius: (r) => {
-                        window.backgroundCornerRadius = r;
-                    }
-                    onChangeBackgroundShadowStrength: (s) => {
-                        window.backgroundShadowStrength = s;
-                    }
-                    onChangeBackgroundAspectRatio: (ratio) => {
-                        window.backgroundAspectRatio = ratio;
-                    }
-                    onChangeCustomAspectRatio: (ratio) => {
-                        window.customAspectRatio = ratio;
-                    }
-                    onChangeBackgroundAlignment: (alignment) => {
-                        window.backgroundAlignment = alignment;
                     }
                     onAutoColorBalanceRequested: {
                         window.backgroundGradientStart = window.autoBackgroundGradientStart;
@@ -4571,16 +4753,16 @@ Item {
                         window.hasUserCustomizedBackground = true;
                     }
 
-                    onToolSelected: (tool) => {
+                    onToolSelected: tool => {
                         window.handleToolbarToolSelected(tool, moreToolsMenu);
                     }
                     onColorSelected: (color, index) => {
                         window.handleToolbarColorSelected(color, index, moreToolsMenu);
                     }
-                    onCustomColorPickerRequested: (buttonItem) => {
+                    onCustomColorPickerRequested: buttonItem => {
                         window.handleToolbarCustomColorPickerRequested(moreToolsMenu);
                     }
-                    onStrokeWidthSelected: (width) => {
+                    onStrokeWidthSelected: width => {
                         window.handleToolbarStrokeWidthSelected(width, moreToolsMenu);
                     }
                     onUndoRequested: {
@@ -4613,37 +4795,15 @@ Item {
                     onCloseRequested: {
                         window.runToolbarAction(window.discardAndClose, moreToolsMenu);
                     }
-                    onMoreToolsButtonReady: (buttonItem) => {
+                    onMoreToolsButtonReady: buttonItem => {
                         window.moreToolsButtonRef = buttonItem;
                     }
-                    onMoreToolsClicked: (buttonItem) => {
+                    onMoreToolsClicked: buttonItem => {
                         window.moreToolsButtonRef = buttonItem;
                         window.toggleMoreToolsMenu(buttonItem, moreToolsMenu, toolbarCard, contentRoot);
                     }
-                    onBackgroundControlHovered: (type, controlItem) => {
-                        let popover = null;
-                        if (type === "padding") popover = backgroundPaddingPopover;
-                        else if (type === "radius") popover = backgroundRadiusPopover;
-                        else if (type === "shadow") popover = backgroundShadowPopover;
-                        else if (type === "angle") popover = backgroundAnglePopover;
-                        else if (type === "aspectRatio") popover = backgroundAspectRatioPopover;
-                        else if (type === "alignment") popover = backgroundAlignmentPopover;
-                        else if (type === "presets") popover = backgroundPresetsPopover;
-                        else if (type === "imageDim") popover = backgroundImageDimPopover;
-                        window.handleBackgroundControlHovered(popover, controlItem, toolbarCard, contentRoot);
-                    }
-                    onBackgroundControlExited: (type) => {
-                        let popover = null;
-                        if (type === "padding") popover = backgroundPaddingPopover;
-                        else if (type === "radius") popover = backgroundRadiusPopover;
-                        else if (type === "shadow") popover = backgroundShadowPopover;
-                        else if (type === "angle") popover = backgroundAnglePopover;
-                        else if (type === "aspectRatio") popover = backgroundAspectRatioPopover;
-                        else if (type === "alignment") popover = backgroundAlignmentPopover;
-                        else if (type === "presets") popover = backgroundPresetsPopover;
-                        else if (type === "imageDim") popover = backgroundImageDimPopover;
-                        window.handleBackgroundControlExited(popover);
-                    }
+                    onBackgroundControlHovered: (type, controlItem) => window.handleBackgroundControlHovered(mainLayout.backgroundPopoverFor(type), controlItem, toolbarCard, contentRoot)
+                    onBackgroundControlExited: type => window.handleBackgroundControlExited(mainLayout.backgroundPopoverFor(type))
                     onBackgroundControlWheel: (type, delta) => {
                         window.handleBackgroundControlWheel(type, delta);
                     }
@@ -4655,7 +4815,7 @@ Item {
                     z: 110
 
                     currentRatio: window.cropAspectRatio
-                    onRatioSelected: (ratio) => window.applyCropAspectRatio(ratio)
+                    onRatioSelected: ratio => window.applyCropAspectRatio(ratio)
                     onResetRequested: window.resetCropRect()
                     onCancelRequested: window.cancelCrop()
                     onDoneRequested: window.applyCrop()
@@ -4693,7 +4853,7 @@ Item {
                         hoverEnabled: true
                         cursorShape: (window.lastPanMouse.x !== 0 || window.lastPanMouse.y !== 0) ? Qt.ClosedHandCursor : Qt.ArrowCursor
 
-                        onPositionChanged: (mouse) => {
+                        onPositionChanged: mouse => {
                             if (pressed && (mouse.buttons & Qt.LeftButton) && (mouse.modifiers & Qt.ControlModifier) && (mouse.modifiers & Qt.ShiftModifier)) {
                                 const currentPt = Qt.point(mouse.x, mouse.y);
                                 if (window.lastPanMouse.x === 0 && window.lastPanMouse.y === 0) {
@@ -4707,17 +4867,17 @@ Item {
                             }
                         }
 
-                        onPressed: (mouse) => {
+                        onPressed: mouse => {
                             if ((mouse.button === Qt.LeftButton) && (mouse.modifiers & Qt.ControlModifier) && (mouse.modifiers & Qt.ShiftModifier)) {
                                 window.lastPanMouse = Qt.point(mouse.x, mouse.y);
                             }
                         }
 
-                        onReleased: (mouse) => {
+                        onReleased: mouse => {
                             window.lastPanMouse = Qt.point(0, 0);
                         }
 
-                        onWheel: (wheel) => {
+                        onWheel: wheel => {
                             if ((wheel.modifiers & Qt.ControlModifier) && (wheel.modifiers & Qt.ShiftModifier)) {
                                 const zoomStep = wheel.angleDelta.y > 0 ? 0.1 : -0.1;
                                 const focusPt = Qt.point(wheel.x - boardContainer.width / 2, wheel.y - boardContainer.height / 2);
@@ -4918,12 +5078,7 @@ Item {
                             radialMenu: radialMenu
                             textInputDialog: textInputDialog
                             moreToolsMenu: moreToolsMenu
-                            stampOptionsToolbar: stampOptionsToolbar
-                            textOptionsToolbar: textOptionsToolbar
-                            lineOptionsToolbar: lineOptionsToolbar
-                            arrowOptionsToolbar: arrowOptionsToolbar
-                            redactOptionsToolbar: redactOptionsToolbar
-                            calloutOptionsToolbar: calloutOptionsToolbar
+                            toolOptions: toolOptionsPopup
                         }
 
                         InlineTextEditor {
@@ -4949,19 +5104,6 @@ Item {
                         visible: (config.pluginData["showCanvasBorder"] !== undefined ? config.pluginData["showCanvasBorder"] : true) && (window.effectiveBackgroundMode === "none")
                     }
 
-                    Item {
-                        id: canvasRoundedMask
-                        width: drawingCanvas.width
-                        height: drawingCanvas.height
-                        layer.enabled: true
-                        visible: false
-
-                        Rectangle {
-                            anchors.fill: parent
-                            radius: Theme.cornerRadius
-                            color: "black"
-                        }
-                    }
                     TextInputDialog {
                         id: textInputDialog
                         window: rootWindow
@@ -4983,8 +5125,6 @@ Item {
                         staticBgImage: staticBgImage
                         drawMouseArea: drawMouseArea
                     }
-
-
 
                     BusyIndicator {
                         anchors.centerIn: parent
@@ -5023,7 +5163,7 @@ Item {
                     hoverTrigger: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.radialHoverTrigger !== undefined ? window.parentWidget.pluginData.radialHoverTrigger : true
                     hoverDelay: window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.radialHoverDelay !== undefined ? window.parentWidget.pluginData.radialHoverDelay : 200
                     menuOpacity: (window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.radialMenuOpacity !== undefined ? window.parentWidget.pluginData.radialMenuOpacity : 100) / 100
-                    onPresetSelected: (preset) => {
+                    onPresetSelected: preset => {
                         window.currentTool = preset.tool;
                         window.currentColor = preset.color;
                         const meta = Constants.getToolMeta(preset.tool);
@@ -5037,86 +5177,20 @@ Item {
                     }
                 }
 
-                TextOptionsToolbar {
-                    id: textOptionsToolbar
+                ToolOptionsPopup {
+                    id: toolOptionsPopup
+                    window: rootWindow
                     toolbarPosition: window.toolbarPosition
-                    boldActive: window.textBold
-                    italicActive: window.textItalic
-                    underlineActive: window.textUnderline
-                    backgroundActive: window.textBackground
-                    onBoldToggled: window.textBold = !window.textBold
-                    onItalicToggled: window.textItalic = !window.textItalic
-                    onUnderlineToggled: window.textUnderline = !window.textUnderline
-                    onBackgroundToggled: window.textBackground = !window.textBackground
                 }
-
-                StampOptionsToolbar {
-                    id: stampOptionsToolbar
-                    toolbarPosition: window.toolbarPosition
-                    currentFormat: window.stampCounterFormat
-                    onFormatSelected: (format) => window.stampCounterFormat = format
-                }
-
-                LineOptionsToolbar {
-                    id: lineOptionsToolbar
-                    toolbarPosition: window.toolbarPosition
-                    currentStyle: window.activeLineStyle
-                    onStyleSelected: (style) => window.activeLineStyle = style
-                }
-
-                ArrowOptionsToolbar {
-                    id: arrowOptionsToolbar
-                    toolbarPosition: window.toolbarPosition
-                    currentLineStyle: window.activeArrowLineStyle
-                    currentHeadStyle: window.activeArrowHeadStyle
-                    onLineStyleSelected: (style) => window.activeArrowLineStyle = style
-                    onHeadStyleSelected: (style) => window.activeArrowHeadStyle = style
-                }
-
-                RedactOptionsToolbar {
-                    id: redactOptionsToolbar
-                    toolbarPosition: window.toolbarPosition
-                    currentMode: window.activeRedactMode
-                    currentShape: window.activeRedactShape
-                    onModeSelected: (mode) => window.activeRedactMode = mode
-                    onShapeSelected: (shape) => window.activeRedactShape = shape
-                }
-
-                CalloutOptionsToolbar {
-                    id: calloutOptionsToolbar
-                    toolbarPosition: window.toolbarPosition
-                    currentLinkLines: window.calloutLinkLines
-                    currentShape: window.calloutShape
-                    onLinkLinesSelected: (count) => window.calloutLinkLines = count
-                    onShapeSelected: (shape) => window.calloutShape = shape
-                }
-
-
 
                 MoreToolsMenu {
                     id: moreToolsMenu
                     Component.onCompleted: window.moreToolsMenuRef = moreToolsMenu
                     watermarkEnabled: window.watermarkEnabled
                     floatingMode: window.floatingMode
-                    onRotateLeftRequested: window.rotateScreenshot("left")
-                    onRotateRightRequested: window.rotateScreenshot("right")
-                    onFlipHorizontalRequested: window.mirrorScreenshot("horizontal")
-                    onFlipVerticalRequested: window.mirrorScreenshot("vertical")
-                    onRotateRequested: window.rotateScreenshot("right")
-                    onMirrorRequested: window.mirrorScreenshot("horizontal")
-                    onOcrRequested: window.runOcr()
-                    onQrScanRequested: window.runQrScan()
-                    onEraserRequested: window.currentTool = "eraser"
-                    onWatermarkToggled: (enabled) => window.setWatermarkEnabled(enabled)
-                    onEditorPresentationToggled: window.togglePresentationMode()
-                    onInsertImageRequested: window.openInsertImageDialog()
-                    onCopyColorRequested: {
-                        window.colorPickerMode = "copy";
-                        window.currentTool = "colorpicker";
-                    }
+                    onWatermarkToggled: enabled => window.setWatermarkEnabled(enabled)
+                    onActionTriggered: action => window.runMoreToolsAction(action)
                 }
-
-
 
                 PaletteWarningDialog {
                     id: paletteWarningDialog
@@ -5148,7 +5222,7 @@ Item {
                     minimum: 10
                     maximum: 150
                     value: window.backgroundPadding
-                    onUserValueChanged: (val) => {
+                    onUserValueChanged: val => {
                         window.backgroundPadding = val;
                     }
                 }
@@ -5161,7 +5235,7 @@ Item {
                     maximum: 60
                     stepSize: 2
                     value: window.backgroundCornerRadius
-                    onUserValueChanged: (val) => {
+                    onUserValueChanged: val => {
                         window.backgroundCornerRadius = val;
                     }
                 }
@@ -5173,7 +5247,7 @@ Item {
                     minimum: 0
                     maximum: 100
                     value: window.backgroundShadowStrength
-                    onUserValueChanged: (val) => {
+                    onUserValueChanged: val => {
                         window.backgroundShadowStrength = val;
                     }
                 }
@@ -5186,7 +5260,7 @@ Item {
                     maximum: 360
                     stepSize: 15
                     value: window.backgroundGradientAngle
-                    onUserValueChanged: (val) => {
+                    onUserValueChanged: val => {
                         window.backgroundGradientAngle = val;
                     }
                 }
@@ -5198,7 +5272,7 @@ Item {
                     minimum: 0
                     maximum: 80
                     value: window.backgroundImageDimStrength
-                    onUserValueChanged: (val) => window.setBackgroundImageDimStrength(val, true)
+                    onUserValueChanged: val => window.setBackgroundImageDimStrength(val, true)
                 }
 
                 BackgroundAspectRatioPopover {
@@ -5214,10 +5288,10 @@ Item {
                     property bool _anchorIsAbove: false
                     y: _anchorIsAbove ? (_anchorY - height - Theme.spacingXS) : _anchorY
 
-                    onChangeBackgroundAspectRatio: (ratio) => {
+                    onChangeBackgroundAspectRatio: ratio => {
                         window.backgroundAspectRatio = ratio;
                     }
-                    onChangeCustomAspectRatio: (ratio) => {
+                    onChangeCustomAspectRatio: ratio => {
                         window.customAspectRatio = ratio;
                     }
                 }
@@ -5226,7 +5300,7 @@ Item {
                     id: backgroundAlignmentPopover
                     allowOpen: window.currentTool === "background"
                     backgroundAlignment: window.backgroundAlignment
-                    onChangeBackgroundAlignment: (alignment) => {
+                    onChangeBackgroundAlignment: alignment => {
                         window.backgroundAlignment = alignment;
                     }
                 }
@@ -5239,7 +5313,7 @@ Item {
                     selectedPath: window.backgroundImagePath
                     loading: window.backgroundImagesLoading
                     onRefreshRequested: window.loadBackgroundImages()
-                    onImageSelected: (path) => {
+                    onImageSelected: path => {
                         window.setBackgroundImage(path, true);
                         backgroundImagePopover.close();
                     }
@@ -5249,10 +5323,10 @@ Item {
                     id: backgroundPresetsPopover
                     allowOpen: window.currentTool === "background"
                     presetsList: window.backgroundPresets
-                    onPresetSelected: (preset) => window.applyBackgroundPreset(preset)
+                    onPresetSelected: preset => window.applyBackgroundPreset(preset)
                     onSaveCurrentAsPreset: window.saveCurrentBackgroundAsPreset()
-                    onDeletePreset: (presetId) => window.deletePreset(presetId)
-                    onUpdatePresetWithCurrent: (presetId) => window.updatePresetWithCurrent(presetId)
+                    onDeletePreset: presetId => window.deletePreset(presetId)
+                    onUpdatePresetWithCurrent: presetId => window.updatePresetWithCurrent(presetId)
                     onRenamePreset: (presetId, newName) => window.renamePreset(presetId, newName)
                 }
 
@@ -5266,17 +5340,6 @@ Item {
                         ctx.drawImage(bgImage, 0, 0, 8, 8, 0, 0, 8, 8);
                         var imgData = ctx.getImageData(0, 0, 8, 8);
                         if (imgData && imgData.data) {
-                            var centerX = Math.floor(imgData.width / 2);
-                            var centerY = Math.floor(imgData.height / 2);
-                            var centerIndex = (centerY * imgData.width + centerX) * 4;
-                            var r = imgData.data[centerIndex];
-                            var g = imgData.data[centerIndex + 1];
-                            var b = imgData.data[centerIndex + 2];
-                            var brightness = Helpers.getLuminance({ r: r/255, g: g/255, b: b/255 });
-                            window.isScreenshotDark = (brightness < 0.35);
-                            window.hasSampledContrast = true;
-
-                            // Extract auto-balanced colors
                             var colors = Helpers.extractDominantColors(imgData, Qt);
                             window.autoBackgroundGradientStart = colors.start;
                             window.autoBackgroundGradientEnd = colors.end;
@@ -5318,9 +5381,7 @@ Item {
 
         // Store coordinates directly on the stroke to avoid cross-contamination
         // between concurrent edit sessions (multiple dialogs)
-        stroke._editCoords = (stroke.isSpeechBubble && stroke.points.length >= 2)
-            ? Qt.point(stroke.points[1].x, stroke.points[1].y)
-            : Qt.point(stroke.points[0].x, stroke.points[0].y);
+        stroke._editCoords = (stroke.isSpeechBubble && stroke.points.length >= 2) ? Qt.point(stroke.points[1].x, stroke.points[1].y) : Qt.point(stroke.points[0].x, stroke.points[0].y);
         window.typingCoords = stroke._editCoords;
         if (stroke.isSpeechBubble && stroke.points.length >= 2) {
             stroke._editTargetCoords = Qt.point(stroke.points[0].x, stroke.points[0].y);
@@ -5349,9 +5410,7 @@ Item {
     function beginNewTextStroke(stroke, dialog) {
         const hasDrag = stroke.isSpeechBubble && stroke.points.length >= 2;
         window.typingIsSpeechBubble = hasDrag;
-        window.typingCoords = hasDrag
-            ? Qt.point(stroke.points[1].x, stroke.points[1].y)
-            : Qt.point(stroke.points[0].x, stroke.points[0].y);
+        window.typingCoords = hasDrag ? Qt.point(stroke.points[1].x, stroke.points[1].y) : Qt.point(stroke.points[0].x, stroke.points[0].y);
         if (hasDrag) {
             window.typingTargetCoords = Qt.point(stroke.points[0].x, stroke.points[0].y);
         }
@@ -5384,14 +5443,12 @@ Item {
     function defaultTypingSpeechBubbleTarget() {
         const offset = Math.max(32, window.textFontSize * 2.1);
         const xOffset = offset * 0.8;
-        return Qt.point(
-            window.typingCoords.x - xOffset,
-            window.typingCoords.y + offset * 1.15
-        );
+        return Qt.point(window.typingCoords.x - xOffset, window.typingCoords.y + offset * 1.15);
     }
 
     function ensureTypingSpeechBubbleTarget() {
-        if (window.typingHasTargetCoords) return;
+        if (window.typingHasTargetCoords)
+            return;
         window.typingTargetCoords = window.defaultTypingSpeechBubbleTarget();
         window.typingHasTargetCoords = true;
     }
@@ -5417,19 +5474,11 @@ Item {
         stroke.cornerRadius = style.cornerRadius;
     }
 
-    function replaceStrokeReference(stroke) {
-        const idx = window.strokes.indexOf(stroke);
-        if (idx !== -1) {
-            const list = [...window.strokes];
-            list[idx] = stroke;
-            window.strokes = list;
-        }
-    }
-
     function removeTypingEditStroke() {
         const list = [...window.strokes];
         const idx = list.indexOf(window.editingStroke);
-        if (idx !== -1) list.splice(idx, 1);
+        if (idx !== -1)
+            list.splice(idx, 1);
         window.strokes = list;
     }
 
@@ -5447,15 +5496,12 @@ Item {
         }
         if (s.isSpeechBubble) {
             const targetCoords = window.typingHasTargetCoords ? window.typingTargetCoords : editTargetCoords;
-            s.points = [
-                Qt.point(targetCoords.x, targetCoords.y),
-                Qt.point(editCoords.x, editCoords.y)
-            ];
+            s.points = [Qt.point(targetCoords.x, targetCoords.y), Qt.point(editCoords.x, editCoords.y)];
         } else {
             s.points = [Qt.point(editCoords.x, editCoords.y)];
         }
 
-        window.replaceStrokeReference(s);
+        window.refreshStrokeReference(s);
         if (window.currentTool === "select") {
             window.selectedStroke = s;
         }
@@ -5470,9 +5516,7 @@ Item {
         if (stroke.isSpeechBubble) {
             window.ensureTypingSpeechBubbleTarget();
         }
-        stroke.points = window.typingIsSpeechBubble
-            ? [Qt.point(window.typingTargetCoords.x, window.typingTargetCoords.y), Qt.point(window.typingCoords.x, window.typingCoords.y)]
-            : [Qt.point(window.typingCoords.x, window.typingCoords.y)];
+        stroke.points = window.typingIsSpeechBubble ? [Qt.point(window.typingTargetCoords.x, window.typingTargetCoords.y), Qt.point(window.typingCoords.x, window.typingCoords.y)] : [Qt.point(window.typingCoords.x, window.typingCoords.y)];
         window.pushStroke(stroke);
     }
 
@@ -5486,7 +5530,8 @@ Item {
     }
 
     function commitTypingText() {
-        if (!window.isTyping) return;
+        if (!window.isTyping)
+            return;
         const textStr = window.currentTypingText.trim();
         if (window.editingStroke) {
             if (textStr.length > 0) {

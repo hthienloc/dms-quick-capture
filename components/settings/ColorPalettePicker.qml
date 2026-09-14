@@ -12,7 +12,7 @@ Column {
     property string customLabel: ""
 
     signal valueSelected(string value)
-    signal customRequested()
+    signal customRequested
 
     width: parent ? parent.width : implicitWidth
     spacing: Theme.spacingS
@@ -38,7 +38,11 @@ Column {
                     border.width: isSelected ? 2 : 1
                     border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.outline, 0.4)
                     scale: hoverArea.containsMouse ? 1.1 : 1.0
-                    Behavior on scale { NumberAnimation { duration: 100 } }
+                    Behavior on scale {
+                        NumberAnimation {
+                            duration: 100
+                        }
+                    }
 
                     DankIcon {
                         anchors.centerIn: parent
@@ -75,7 +79,11 @@ Column {
             border.width: isSelected ? 2 : 1
             border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.outline, 0.4)
             scale: customHover.containsMouse ? 1.1 : 1.0
-            Behavior on scale { NumberAnimation { duration: 100 } }
+            Behavior on scale {
+                NumberAnimation {
+                    duration: 100
+                }
+            }
 
             DankIcon {
                 anchors.centerIn: parent
@@ -90,7 +98,8 @@ Column {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
-                    if (!parent.isSelected) root.valueSelected("primary");
+                    if (!parent.isSelected)
+                        root.valueSelected("primary");
                 }
             }
         }

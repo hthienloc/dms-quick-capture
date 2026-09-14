@@ -1,9 +1,8 @@
 import QtQuick
-import Quickshell
-import Quickshell.Io
 import qs.Common
 import qs.Services
 import qs.Widgets
+import "../core/Defaults.js" as Defaults
 
 Item {
     id: root
@@ -12,7 +11,7 @@ Item {
     property var entries: []
     property int previewIndex: -1
 
-    signal closeRequested()
+    signal closeRequested
 
     readonly property var previewEntry: previewIndex >= 0 && previewIndex < entries.length ? entries[previewIndex] : null
     readonly property real heightFraction: previewIndex >= 0 ? 0.7 : 0.45
@@ -22,91 +21,108 @@ Item {
     readonly property int totalPages: Math.max(1, Math.ceil(entries.length / itemsPerPage))
 
     function clampPage() {
-        if (currentPage >= totalPages) currentPage = totalPages - 1
-        if (currentPage < 0) currentPage = 0
+        if (currentPage >= totalPages)
+            currentPage = totalPages - 1;
+        if (currentPage < 0)
+            currentPage = 0;
     }
 
     onEntriesChanged: clampPage()
 
+    readonly property string saveDirectory: Defaults.get(root.daemon?.pluginData, "saveDirectory")
+
     function refresh() {
-        if (!root.daemon || !root.daemon.pluginData) return
-        var dir = root.daemon.pluginData.saveDirectory || "~/Pictures/Screenshots"
-        dir = Paths.expandTilde(String(dir))
-        var exts = ["png", "jpg", "jpeg", "webp"]
-        var cmd = "d=\"$1\"; shift; for e in \"$@\"; do for f in \"$d\"/*.\"$e\"; do [ -f \"$f\" ] && echo \"$(stat -c '%Y' \"$f\" 2>/dev/null)|$f\"; done; done | sort -rn | head -50"
-        Proc.runCommand("scan-history", ["sh", "-c", cmd, "sh", dir].concat(exts), function(stdout) {
-            var list = []
-            var lines = stdout.trim().split("\n")
+        if (!root.daemon)
+            return;
+        var dir = Paths.expandTilde(String(root.saveDirectory));
+        var exts = ["png", "jpg", "jpeg", "webp"];
+        var cmd = "d=\"$1\"; shift; for e in \"$@\"; do for f in \"$d\"/*.\"$e\"; do [ -f \"$f\" ] && echo \"$(stat -c '%Y' \"$f\" 2>/dev/null)|$f\"; done; done | sort -rn | head -50";
+        Proc.runCommand("scan-history", ["sh", "-c", cmd, "sh", dir].concat(exts), function (stdout) {
+            var list = [];
+            var lines = stdout.trim().split("\n");
             for (var i = 0; i < lines.length; i++) {
-                var line = lines[i].trim()
-                if (!line) continue
-                var sep = line.indexOf("|")
-                if (sep < 0) continue
-                var ts = parseInt(line.substring(0, sep)) * 1000
-                var path = line.substring(sep + 1)
-                if (path) list.push({ timestamp: ts, savedPath: path, _glIdx: list.length })
+                var line = lines[i].trim();
+                if (!line)
+                    continue;
+                var sep = line.indexOf("|");
+                if (sep < 0)
+                    continue;
+                var ts = parseInt(line.substring(0, sep)) * 1000;
+                var path = line.substring(sep + 1);
+                if (path)
+                    list.push({
+                        timestamp: ts,
+                        savedPath: path,
+                        _glIdx: list.length
+                    });
             }
-            root.entries = list
-        })
+            root.entries = list;
+        });
     }
 
-    onDaemonChanged: { if (root.daemon && root.daemon.pluginData) refresh() }
+    onDaemonChanged: {
+        if (root.daemon)
+            refresh();
+    }
 
     function removeEntry(path) {
-        var filtered = root.entries.filter(function(e) { return e.savedPath !== path })
+        var filtered = root.entries.filter(function (e) {
+            return e.savedPath !== path;
+        });
         for (var i = 0; i < filtered.length; i++) {
-            filtered[i]._glIdx = i
+            filtered[i]._glIdx = i;
         }
-        root.entries = filtered
+        root.entries = filtered;
         if (root.previewIndex >= root.entries.length)
-            root.previewIndex = root.entries.length - 1
+            root.previewIndex = root.entries.length - 1;
     }
 
     function goPrevious() {
         if (root.previewIndex >= 0)
-            root.previewIndex = Math.max(0, root.previewIndex - 1)
+            root.previewIndex = Math.max(0, root.previewIndex - 1);
         else
-            root.currentPage = Math.max(0, root.currentPage - 1)
+            root.currentPage = Math.max(0, root.currentPage - 1);
     }
 
     function goNext() {
         if (root.previewIndex >= 0)
-            root.previewIndex = Math.min(root.entries.length - 1, root.previewIndex + 1)
+            root.previewIndex = Math.min(root.entries.length - 1, root.previewIndex + 1);
         else
-            root.currentPage = Math.min(root.totalPages - 1, root.currentPage + 1)
+            root.currentPage = Math.min(root.totalPages - 1, root.currentPage + 1);
     }
 
     function formatTimeElapsed(timestamp) {
-        if (!timestamp) return ""
-        var now = Date.now()
-        var diff = now - timestamp
-        if (diff < 0) diff = 0
-        
-        var secs = Math.floor(diff / 1000)
-        var mins = Math.floor(secs / 60)
-        var hours = Math.floor(mins / 60)
-        var days = Math.floor(hours / 24)
-        
+        if (!timestamp)
+            return "";
+        var now = Date.now();
+        var diff = now - timestamp;
+        if (diff < 0)
+            diff = 0;
+
+        var secs = Math.floor(diff / 1000);
+        var mins = Math.floor(secs / 60);
+        var hours = Math.floor(mins / 60);
+        var days = Math.floor(hours / 24);
+
         if (days > 0) {
-            var remHours = hours % 24
-            return remHours > 0 ? (days + "d" + remHours + "h") : (days + "d")
+            var remHours = hours % 24;
+            return remHours > 0 ? (days + "d" + remHours + "h") : (days + "d");
         }
         if (hours > 0) {
-            var remMins = mins % 60
-            return remMins > 0 ? (hours + "h" + remMins + "m") : (hours + "h")
+            var remMins = mins % 60;
+            return remMins > 0 ? (hours + "h" + remMins + "m") : (hours + "h");
         }
         if (mins > 0) {
-            var remSecs = secs % 60
-            return remSecs > 0 ? (mins + "m" + remSecs + "s") : (mins + "m")
+            var remSecs = secs % 60;
+            return remSecs > 0 ? (mins + "m" + remSecs + "s") : (mins + "m");
         }
-        return secs + "s"
+        return secs + "s";
     }
 
     Column {
         anchors.fill: parent
         spacing: 0
 
-        // Header
         Item {
             width: parent.width
             height: 44
@@ -126,27 +142,24 @@ Item {
 
             StyledText {
                 anchors.centerIn: parent
-                text: root.previewIndex >= 0 ? I18n.trFor("quickCapture", "Preview") : 
-                     (root.daemon && root.daemon.pluginData ? root.daemon.pluginData.saveDirectory || "~/Pictures/Screenshots" : I18n.trFor("quickCapture", "Recent Edits"))
-                font.pixelSize: Theme.fontSizeNormal
+                text: root.previewIndex >= 0 ? I18n.trFor("quickCapture", "Preview") : root.saveDirectory
+                font.pixelSize: Theme.fontSizeMedium
                 font.bold: true
                 color: Theme.surfaceText
             }
         }
 
-        // Empty state
         StyledText {
             width: parent.width
             height: parent.height - 44
             visible: root.entries.length === 0
             text: I18n.trFor("quickCapture", "No saved images yet")
-            font.pixelSize: Theme.fontSizeNormal
+            font.pixelSize: Theme.fontSizeMedium
             color: Theme.surfaceVariantText
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
         }
 
-        // Carousel
         Item {
             id: carouselView
             width: parent.width
@@ -169,7 +182,12 @@ Item {
                         height: parent.height
                         x: -root.currentPage * root.itemsPerPage * (carouselView.cardW + 10)
 
-                        Behavior on x { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+                        Behavior on x {
+                            NumberAnimation {
+                                duration: 150
+                                easing.type: Easing.OutCubic
+                            }
+                        }
 
                         Repeater {
                             model: root.entries
@@ -193,8 +211,16 @@ Item {
                                     border.width: cardHover.hovered ? 2 : 0
                                     clip: true
 
-                                    Behavior on border.color { ColorAnimation { duration: Theme.shorterDuration } }
-                                    Behavior on border.width { NumberAnimation { duration: Theme.shorterDuration } }
+                                    Behavior on border.color {
+                                        ColorAnimation {
+                                            duration: Theme.shorterDuration
+                                        }
+                                    }
+                                    Behavior on border.width {
+                                        NumberAnimation {
+                                            duration: Theme.shorterDuration
+                                        }
+                                    }
 
                                     Image {
                                         id: previewImage
@@ -205,10 +231,12 @@ Item {
                                         fillMode: Image.PreserveAspectFit
                                         asynchronous: true
 
-                                        // Hover zoom animation
                                         scale: cardHover.hovered ? 1.0 : 0.94
                                         Behavior on scale {
-                                            NumberAnimation { duration: 150; easing.type: Easing.OutCubic }
+                                            NumberAnimation {
+                                                duration: 150
+                                                easing.type: Easing.OutCubic
+                                            }
                                         }
                                     }
                                 }
@@ -221,10 +249,16 @@ Item {
                                     text: root.formatTimeElapsed(modelData.timestamp)
                                     font.pixelSize: Theme.fontSizeSmall - 1
                                     color: cardHover.hovered ? Theme.primary : Theme.surfaceVariantText
-                                    Behavior on color { ColorAnimation { duration: Theme.shorterDuration } }
+                                    Behavior on color {
+                                        ColorAnimation {
+                                            duration: Theme.shorterDuration
+                                        }
+                                    }
                                 }
 
-                                HoverHandler { id: cardHover }
+                                HoverHandler {
+                                    id: cardHover
+                                }
 
                                 MouseArea {
                                     anchors.fill: parent
@@ -256,14 +290,26 @@ Item {
                                     onClicked: Proc.runCommand("open-card", ["xdg-open", modelData.savedPath])
 
                                     property bool _ovHovered: false
-                                    backgroundColor: _ovHovered ? Qt.rgba(0.3, 0.3, 0.3, 0.8) : Qt.rgba(0, 0, 0, 0.55)
-                                    iconColor: "white"
+                                    backgroundColor: Qt.rgba(0, 0, 0, _ovHovered ? 0.8 : 0.55)
+                                    iconColor: Theme.onPrimary
                                     scale: _ovHovered ? 1.15 : 1.0
                                     onEntered: _ovHovered = true
                                     onExited: _ovHovered = false
-                                    Behavior on backgroundColor { ColorAnimation { duration: Theme.shorterDuration } }
-                                    Behavior on scale { NumberAnimation { duration: Theme.shorterDuration } }
-                                    Behavior on opacity { NumberAnimation { duration: Theme.shorterDuration } }
+                                    Behavior on backgroundColor {
+                                        ColorAnimation {
+                                            duration: Theme.shorterDuration
+                                        }
+                                    }
+                                    Behavior on scale {
+                                        NumberAnimation {
+                                            duration: Theme.shorterDuration
+                                        }
+                                    }
+                                    Behavior on opacity {
+                                        NumberAnimation {
+                                            duration: Theme.shorterDuration
+                                        }
+                                    }
                                 }
 
                                 DankActionButton {
@@ -277,22 +323,36 @@ Item {
                                     radius: height / 2
                                     opacity: cardHover.hovered ? 1 : 0
                                     enabled: cardHover.hovered
-                                    tooltipText: parent._copied ? I18n.trFor("quickCapture", "Copied") : I18n.trFor("quickCapture", "Copy")
+                                    tooltipText: parent._copied ? I18n.trFor("quickCapture", "Copied!") : I18n.trFor("quickCapture", "Copy")
                                     onClicked: {
-                                        parent._copied = true
-                                        DMSService.sendRequest("clipboard.copyFile", { "filePath": modelData.savedPath })
-                                        ToastService.showInfo(I18n.trFor("quickCapture", "Image copied to clipboard"))
+                                        parent._copied = true;
+                                        DMSService.sendRequest("clipboard.copyFile", {
+                                            "filePath": modelData.savedPath
+                                        });
+                                        ToastService.showInfo(I18n.trFor("quickCapture", "Copied to clipboard"));
                                     }
 
                                     property bool _ovHovered: false
-                                    backgroundColor: _ovHovered ? Qt.rgba(0.3, 0.3, 0.3, 0.8) : Qt.rgba(0, 0, 0, 0.55)
-                                    iconColor: parent._copied ? "#4caf50" : "white"
+                                    backgroundColor: Qt.rgba(0, 0, 0, _ovHovered ? 0.8 : 0.55)
+                                    iconColor: parent._copied ? Theme.success : Theme.onPrimary
                                     scale: _ovHovered ? 1.15 : 1.0
                                     onEntered: _ovHovered = true
                                     onExited: _ovHovered = false
-                                    Behavior on backgroundColor { ColorAnimation { duration: Theme.shorterDuration } }
-                                    Behavior on scale { NumberAnimation { duration: Theme.shorterDuration } }
-                                    Behavior on opacity { NumberAnimation { duration: Theme.shorterDuration } }
+                                    Behavior on backgroundColor {
+                                        ColorAnimation {
+                                            duration: Theme.shorterDuration
+                                        }
+                                    }
+                                    Behavior on scale {
+                                        NumberAnimation {
+                                            duration: Theme.shorterDuration
+                                        }
+                                    }
+                                    Behavior on opacity {
+                                        NumberAnimation {
+                                            duration: Theme.shorterDuration
+                                        }
+                                    }
                                 }
 
                                 DankActionButton {
@@ -307,26 +367,29 @@ Item {
                                     opacity: cardHover.hovered ? 1 : 0
                                     enabled: cardHover.hovered
                                     tooltipText: I18n.trFor("quickCapture", "Delete")
-                                    backgroundColor: Qt.rgba(1, 0, 0, 0.25)
-                                    iconColor: "#ff6b6b"
+                                    backgroundColor: Theme.withAlpha(Theme.error, 0.25)
+                                    iconColor: Theme.error
                                     onClicked: {
                                         if (root.previewIndex === modelData._glIdx)
-                                            root.previewIndex = -1
-                                        var delPath = modelData.savedPath
-                                        root.removeEntry(delPath)
-                                        Proc.runCommand("delete-card", ["rm", "-f", "--", delPath], function() {
-                                            root.refresh()
-                                        })
+                                            root.previewIndex = -1;
+                                        var delPath = modelData.savedPath;
+                                        root.removeEntry(delPath);
+                                        Proc.runCommand("delete-card", ["rm", "-f", "--", delPath], function () {
+                                            root.refresh();
+                                        });
                                     }
 
-                                    Behavior on opacity { NumberAnimation { duration: Theme.shorterDuration } }
+                                    Behavior on opacity {
+                                        NumberAnimation {
+                                            duration: Theme.shorterDuration
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
 
-                // Page indicator
                 Item {
                     width: parent.width
                     height: 36
@@ -335,30 +398,34 @@ Item {
                         anchors.centerIn: parent
                         visible: root.totalPages > 1
                         model: {
-                            var pages = []
-                            for (var i = 0; i < root.totalPages; i++) pages.push(String(i + 1))
-                            return pages
+                            var pages = [];
+                            for (var i = 0; i < root.totalPages; i++)
+                                pages.push(String(i + 1));
+                            return pages;
                         }
                         currentIndex: root.currentPage
                         size: "small"
                         buttonHeight: 28
                         minButtonWidth: 36
                         onSelectionChanged: (index, selected) => {
-                            if (selected) root.currentPage = index
+                            if (selected)
+                                root.currentPage = index;
                         }
                     }
                 }
             }
         }
 
-        // Preview
         Item {
             id: previewArea
             width: parent.width
             height: parent.height - 44
             visible: root.previewEntry
 
-            onVisibleChanged: { if (!visible) previewArea._previewCopied = false }
+            onVisibleChanged: {
+                if (!visible)
+                    previewArea._previewCopied = false;
+            }
 
             Image {
                 anchors.fill: parent
@@ -420,24 +487,24 @@ Item {
                     textColor: Theme.surfaceText
                     onClicked: {
                         if (root.previewEntry)
-                            Proc.runCommand("open-preview", ["xdg-open", root.previewEntry.savedPath])
+                            Proc.runCommand("open-preview", ["xdg-open", root.previewEntry.savedPath]);
                     }
                 }
 
                 DankButton {
                     iconName: previewArea._previewCopied ? "check" : "content_copy"
-                    text: previewArea._previewCopied ? I18n.trFor("quickCapture", "Copied") : I18n.trFor("quickCapture", "Copy")
+                    text: previewArea._previewCopied ? I18n.trFor("quickCapture", "Copied!") : I18n.trFor("quickCapture", "Copy")
                     buttonHeight: 36
                     horizontalPadding: 16
-                    backgroundColor: previewArea._previewCopied
-                        ? Qt.rgba(0.3, 0.7, 0.3, 0.9)
-                        : Theme.withAlpha(Theme.primary, 0.9)
-                    textColor: previewArea._previewCopied ? "white" : Theme.onPrimary
+                    backgroundColor: Theme.withAlpha(previewArea._previewCopied ? Theme.success : Theme.primary, 0.9)
+                    textColor: Theme.onPrimary
                     onClicked: {
                         if (root.previewEntry) {
-                            previewArea._previewCopied = true
-                            DMSService.sendRequest("clipboard.copyFile", { "filePath": root.previewEntry.savedPath })
-                            ToastService.showInfo(I18n.trFor("quickCapture", "Image copied to clipboard"))
+                            previewArea._previewCopied = true;
+                            DMSService.sendRequest("clipboard.copyFile", {
+                                "filePath": root.previewEntry.savedPath
+                            });
+                            ToastService.showInfo(I18n.trFor("quickCapture", "Copied to clipboard"));
                         }
                     }
                 }
@@ -451,17 +518,17 @@ Item {
                 iconSize: 18
                 buttonSize: 32
                 radius: height / 2
-                backgroundColor: Qt.rgba(1, 0, 0, 0.25)
-                iconColor: "#ff6b6b"
+                backgroundColor: Theme.withAlpha(Theme.error, 0.25)
+                iconColor: Theme.error
                 tooltipText: I18n.trFor("quickCapture", "Delete")
                 onClicked: {
                     if (root.previewEntry) {
-                        var delPath = root.previewEntry.savedPath
-                        root.previewIndex = -1
-                        root.removeEntry(delPath)
-                        Proc.runCommand("delete-preview", ["rm", "-f", "--", delPath], function() {
-                            root.refresh()
-                        })
+                        var delPath = root.previewEntry.savedPath;
+                        root.previewIndex = -1;
+                        root.removeEntry(delPath);
+                        Proc.runCommand("delete-preview", ["rm", "-f", "--", delPath], function () {
+                            root.refresh();
+                        });
                     }
                 }
             }

@@ -31,18 +31,123 @@ const textPaddingMultiplierY = 0.15;
 // Tool intensity metadata
 // Each tool defines: min, max, step, unit, default, and optional multipliers
 const ToolMetadata = {
-    pen:         { min: 1,  max: 50,  step: 1,  unit: "px", defaultValue: 8,  label: "Thickness", previewType: "thickness" },
-    line:        { min: 1,  max: 50,  step: 1,  unit: "px", defaultValue: 8,  label: "Thickness", previewType: "thickness" },
-    arrow:       { min: 1,  max: 50,  step: 1,  unit: "px", defaultValue: 8,  label: "Thickness", previewType: "thickness" },
-    rect:        { min: 1,  max: 50,  step: 1,  unit: "px", defaultValue: 8,  label: "Thickness", previewType: "thickness" },
-    ellipse:     { min: 1,  max: 50,  step: 1,  unit: "px", defaultValue: 8,  label: "Thickness", previewType: "thickness" },
-    highlighter: { min: 1,  max: 50,  step: 1,  unit: "px", defaultValue: 8,  label: "Thickness", previewType: "thickness", previewMultiplier: 4 },
-    redact:      { min: 1,  max: 50,  step: 1,  unit: "px", defaultValue: 8,  label: "Thickness", previewType: "thickness" },
-    stamp:       { min: 1,  max: 50,  step: 1,  unit: "px", defaultValue: 8,  label: "Stamp Size", previewType: "thickness", previewMultiplier: 10 },
-    text:        { min: 12, max: 120, step: 1,  unit: "px", defaultValue: 36, label: "Font Size", previewType: "none" },
-    pixelate:    { min: 2,  max: 16,  step: 1,  unit: "px", defaultValue: 8,  label: "Pixel Intensity", previewType: "none", previewMultiplier: 3, previewClampMin: 8, previewClampMax: 48 },
-    spotlight:   { min: 10, max: 100, step: 1,  unit: "%",  defaultValue: 50, label: "Dimming Opacity", previewType: "none", previewFixedWidth: 100 },
-    callout:     { min: 100,max: 500, step: 10, unit: "%",  defaultValue: 150, label: "Zoom Level", previewType: "none", previewFixedWidth: 40, borderWidthMin: 1, borderWidthMax: 10 },
+    pen: {
+        min: 1,
+        max: 50,
+        step: 1,
+        unit: "px",
+        defaultValue: 8,
+        label: "Thickness",
+        previewType: "thickness"
+    },
+    line: {
+        min: 1,
+        max: 50,
+        step: 1,
+        unit: "px",
+        defaultValue: 8,
+        label: "Thickness",
+        previewType: "thickness"
+    },
+    arrow: {
+        min: 1,
+        max: 50,
+        step: 1,
+        unit: "px",
+        defaultValue: 8,
+        label: "Thickness",
+        previewType: "thickness"
+    },
+    rect: {
+        min: 1,
+        max: 50,
+        step: 1,
+        unit: "px",
+        defaultValue: 8,
+        label: "Thickness",
+        previewType: "thickness"
+    },
+    ellipse: {
+        min: 1,
+        max: 50,
+        step: 1,
+        unit: "px",
+        defaultValue: 8,
+        label: "Thickness",
+        previewType: "thickness"
+    },
+    highlighter: {
+        min: 1,
+        max: 50,
+        step: 1,
+        unit: "px",
+        defaultValue: 8,
+        label: "Thickness",
+        previewType: "thickness",
+        previewMultiplier: 4
+    },
+    redact: {
+        min: 1,
+        max: 50,
+        step: 1,
+        unit: "px",
+        defaultValue: 8,
+        label: "Thickness",
+        previewType: "thickness"
+    },
+    stamp: {
+        min: 1,
+        max: 50,
+        step: 1,
+        unit: "px",
+        defaultValue: 8,
+        label: "Stamp Size",
+        previewType: "thickness",
+        previewMultiplier: 10
+    },
+    text: {
+        min: 12,
+        max: 120,
+        step: 1,
+        unit: "px",
+        defaultValue: 36,
+        label: "Font Size",
+        previewType: "none"
+    },
+    pixelate: {
+        min: 2,
+        max: 16,
+        step: 1,
+        unit: "px",
+        defaultValue: 8,
+        label: "Pixel Intensity",
+        previewType: "none",
+        previewMultiplier: 3,
+        previewClampMin: 8,
+        previewClampMax: 48
+    },
+    spotlight: {
+        min: 10,
+        max: 100,
+        step: 1,
+        unit: "%",
+        defaultValue: 50,
+        label: "Dimming Opacity",
+        previewType: "none",
+        previewFixedWidth: 100
+    },
+    callout: {
+        min: 100,
+        max: 500,
+        step: 10,
+        unit: "%",
+        defaultValue: 150,
+        label: "Zoom Level",
+        previewType: "none",
+        previewFixedWidth: 40,
+        borderWidthMin: 1,
+        borderWidthMax: 10
+    }
 };
 
 function getToolMeta(tool) {
@@ -51,6 +156,7 @@ function getToolMeta(tool) {
 
 // Default radial menu preset tools
 const defaultRadialTools = ["pen", "arrow", "rect", "highlighter", "ellipse", "stamp", "redact", "pixelate"];
+const defaultRadialColors = ["primary", "primary", "primary", "primary", "primary", "primary", "#000000", "#ffffff"];
 
 // Selection resize handles
 const selectionHandleSize = 12;

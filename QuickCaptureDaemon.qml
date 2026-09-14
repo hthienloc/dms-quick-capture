@@ -1,104 +1,91 @@
-import "./dms-common"
-import "./components/floating"
-import "./components/history"
-import "./components/recording"
 import QtQuick
-import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Modules.Plugins
 import qs.Services
-import qs.Widgets
 import qs.Modals.Common
 import qs.Modals.FileBrowser
+import "./components/core"
+import "./components/floating"
+import "./components/history"
+import "./components/recording"
+import "./components/core/Defaults.js" as Defaults
 
 PluginComponent {
     id: root
 
-    readonly property alias recordingController: recordingControllerItem
-    readonly property bool isRecording: recordingControllerItem ? recordingControllerItem.isRecording : false
-    readonly property var audioInputsList: recordingControllerItem ? recordingControllerItem.audioInputsList : [{"label": I18n.trFor("quickCapture", "Default Microphone"), "value": "default_input"}]
-    readonly property var audioOutputsList: recordingControllerItem ? recordingControllerItem.audioOutputsList : [{"label": I18n.trFor("quickCapture", "Default Output"), "value": "default_output"}]
-    readonly property string systemAudioDevice: pluginData.systemAudioDevice || "default_output"
-    readonly property string micDevice: pluginData.micDevice || "default_input"
+    pluginId: "quickCapture"
+    pluginService: PluginService
 
-    function refreshAudioDevices() {
-        if (recordingControllerItem) recordingControllerItem.refreshAudioDevices();
-    }
-
-    // ── State ────────────────────────────────────────────────────────────────
-    property string widgetMode: "photo"
-    property bool isCapturing: false
-    readonly property string middleClickAction: (pluginData.middleClickAction || "region")
+    readonly property alias recordingController: recorder
+    readonly property alias actions: captureActions
+    readonly property bool isRecording: recorder.isRecording
+    readonly property bool isAnnotating: modal.shouldBeVisible
     readonly property var allowedModes: ["region", "window", "full", "output", "all", "last", "scroll"]
-    property string pendingCaptureAction: "edit"
-    property string pendingCaptureMode: ""
-    property bool isDownloading: false
-    property string currentCapturePath: ""
-    property string captureOutputName: ""
-    property bool hideControlCenter: pluginData.defaultHideControlCenter !== false
-    property bool waitingForControlCenterClose: false
     readonly property int captureTimeoutMs: 60000
     readonly property int scrollCaptureTimeoutMs: 120000
-    readonly property bool isAnnotating: modal.shouldBeVisible
 
-    // ── Capture helpers ───────────────────────────────────────────────────────
-    function capturePath() {
-        return "/tmp/dms_capture_" + Date.now() + ".png";
+    property string widgetMode: "photo"
+    property bool isCapturing: false
+    property bool isDownloading: false
+    property bool hideControlCenter: Defaults.get(pluginData, "defaultHideControlCenter")
+    property var outputs: []
+    property string currentCapturePath: ""
+
+    property string pendingCaptureAction: "edit"
+    property string pendingCaptureMode: ""
+    property string pendingOutputName: ""
+    property bool waitingForControlCenterClose: false
+
+    function savePluginData(key, value) {
+        pluginService.savePluginData(pluginId, key, value);
     }
 
-    function modeFlags(mode) {
-        const flags = [];
-
-        if (mode === "region" && pluginData.skipConfirm === true)
-            flags.push("--no-confirm");
-
-        if (mode === "scroll") {
-            const interval = parseInt(pluginData.scrollInterval, 10) || 500;
-            flags.push("--interval", String(interval));
-        }
-
-        if (mode === "output") {
-            const outName = root.captureOutputName || pluginData.outputTargetName || "";
-            flags.push("--output", outName || "DP-1");
-        }
-
-        if (pluginData.resetLastRegion)
-            flags.push("--reset");
-
-        return flags;
+    function refreshAudioDevices() {
+        recorder.refreshAudioDevices();
     }
 
-    function screenshotArgs(mode, filename) {
-        const cursorVal = pluginData.includeCursor ? "on" : "off";
-        return ["dms", "screenshot", mode, "--no-clipboard", "--dir", "/tmp",
-                "--filename", filename, "--format", "png", "--cursor", cursorVal,
-                "--no-notify", "--json"].concat(root.modeFlags(mode));
+    function refreshOutputs(callback) {
+        Proc.runCommand("quickCapture.listOutputs", [Proc.dmsBin, "screenshot", "list"], (stdout, exitCode) => {
+            const list = [];
+            for (const line of (stdout || "").trim().split("\n")) {
+                const m = line.match(/^([^:]+):\s+(\d+)x(\d+)/);
+                if (!m)
+                    continue;
+                list.push({
+                    name: m[1].trim(),
+                    width: parseInt(m[2], 10),
+                    height: parseInt(m[3], 10)
+                });
+            }
+            root.outputs = list;
+            if (callback)
+                callback(list);
+        });
     }
 
-    function triggerCaptureWithAction(mode, action) {
-        const finalMode = mode || root.middleClickAction;
-        const finalAction = action || "edit";
-
-        if (!root.allowedModes.includes(finalMode)) {
-            console.warn("Invalid screenshot mode rejected: " + finalMode);
+    function capture(mode, action, outputName) {
+        switch (mode) {
+        case "clipboard":
+            fromClipboard(action);
             return;
-        }
-
-        if (root.isCapturing || modal.shouldBeVisible)
+        case "selectFile":
+            selectImage(action);
             return;
-
-        root.isCapturing = true;
-        root.pendingCaptureAction = finalAction;
-        root.pendingCaptureMode = finalMode;
-
-        if (root.hideControlCenter) {
-            root.closeControlCenter();
-            root.waitForControlCenterClose();
-        } else {
-            root.startActualCapture();
+        default:
+            triggerCapture(mode, action, outputName);
         }
+    }
+
+    function record(mode, geometry) {
+        closeControlCenter();
+        recorder.startRecording(mode || "screen", geometry || "");
+    }
+
+    function openFolder(kind) {
+        const key = kind === "video" ? "recordingDirectory" : "saveDirectory";
+        Proc.runCommand("quickCapture.openFolder", ["xdg-open", Paths.expandTilde(String(Defaults.get(pluginData, key)))]);
     }
 
     function toggleHideControlCenter() {
@@ -106,11 +93,50 @@ PluginComponent {
     }
 
     function closeControlCenter() {
-        if (typeof PopoutService !== "undefined" && PopoutService)
-            PopoutService.closeControlCenter();
+        PopoutService.closeControlCenter();
     }
 
-    function waitForControlCenterClose() {
+    function capturePath() {
+        return "/tmp/dms_capture_" + Date.now() + ".png";
+    }
+
+    function modeFlags(mode) {
+        const flags = [];
+        if (mode === "region" && Defaults.get(pluginData, "skipConfirm"))
+            flags.push("--no-confirm");
+        if (mode === "scroll")
+            flags.push("--interval", String(parseInt(Defaults.get(pluginData, "scrollInterval"), 10) || Defaults.values.scrollInterval));
+        if (mode === "output")
+            flags.push("--output", root.pendingOutputName || Defaults.get(pluginData, "outputTargetName") || "DP-1");
+        if (Defaults.get(pluginData, "resetLastRegion"))
+            flags.push("--reset");
+        return flags;
+    }
+
+    function screenshotArgs(mode, filename) {
+        const cursor = Defaults.get(pluginData, "includeCursor") ? "on" : "off";
+        return [Proc.dmsBin, "screenshot", mode, "--no-clipboard", "--dir", "/tmp", "--filename", filename, "--format", "png", "--cursor", cursor, "--no-notify", "--json"].concat(modeFlags(mode));
+    }
+
+    function triggerCapture(mode, action, outputName) {
+        const finalMode = mode || Defaults.get(pluginData, "middleClickAction");
+        if (!root.allowedModes.includes(finalMode)) {
+            console.warn("quickCapture: rejected screenshot mode", finalMode);
+            return;
+        }
+        if (root.isCapturing || modal.shouldBeVisible)
+            return;
+
+        root.isCapturing = true;
+        root.pendingCaptureAction = action || "edit";
+        root.pendingCaptureMode = finalMode;
+        root.pendingOutputName = outputName || "";
+
+        if (!root.hideControlCenter) {
+            startActualCapture();
+            return;
+        }
+        closeControlCenter();
         root.waitingForControlCenterClose = true;
         captureDelayTimer.start();
     }
@@ -120,34 +146,7 @@ PluginComponent {
             return;
         root.waitingForControlCenterClose = false;
         captureDelayTimer.stop();
-        root.startActualCapture();
-    }
-
-    function resolveSaveDir(rawDir) {
-        const dir = rawDir || "~/Pictures/Screenshots";
-        return (typeof Paths !== "undefined" && Paths && Paths.expandTilde)
-            ? Paths.expandTilde(String(dir))
-            : String(dir).replace(/^~/, Quickshell.env("HOME") || "");
-    }
-
-    function generateTimestampFilename() {
-        const now = new Date();
-        const pad = n => (n < 10 ? "0" : "") + n;
-        return "Screenshot-" + now.getFullYear() + "-" +
-               pad(now.getMonth() + 1) + "-" +
-               pad(now.getDate()) + "_" +
-               pad(now.getHours()) + "-" +
-               pad(now.getMinutes()) + "-" +
-               pad(now.getSeconds()) + ".png";
-    }
-
-    readonly property bool hasToast: typeof ToastService !== "undefined" && !!ToastService
-    function toastInfo(m)    { if (hasToast) ToastService.showInfo(m); }
-    function toastError(m)   { if (hasToast) ToastService.showError(m); }
-    function toastWarning(m) { if (hasToast) ToastService.showWarning(m); }
-
-    function parseJsonMeta(stdout) {
-        return JSON.parse((stdout || "").trim());
+        startActualCapture();
     }
 
     function startActualCapture() {
@@ -156,261 +155,231 @@ PluginComponent {
         const action = root.pendingCaptureAction;
         const timeout = mode === "scroll" ? root.scrollCaptureTimeoutMs : root.captureTimeoutMs;
 
-        root.currentCapturePath = root.capturePath();
+        root.currentCapturePath = capturePath();
         const filename = root.currentCapturePath.split("/").pop();
-        const args = root.screenshotArgs(mode, filename);
-        Proc.runCommand("screenshot-trigger", args, (stdout, exitCode) => {
+        Proc.runCommand("quickCapture.screenshot", screenshotArgs(mode, filename), (stdout, exitCode) => {
             root.isCapturing = false;
             root.pendingCaptureMode = "";
             root.pendingCaptureAction = "edit";
-            root.captureOutputName = "";
+            root.pendingOutputName = "";
+            const fallback = I18n.trFor("quickCapture", "Screenshot failed (mode: %1).").arg(mode);
+            let meta = null;
             try {
-                const meta = root.parseJsonMeta(stdout);
-                if (meta.status === "success") {
-                    root.currentCapturePath = meta.path;
-                    root.openCapturedImageWithDimensions(meta.path, action, meta.width, meta.height);
-                } else if (meta.status !== "aborted") {
-                    root.toastError(meta.message || meta.error || I18n.trFor("quickCapture", "Screenshot failed (mode: %1).").arg(mode));
-                }
+                meta = JSON.parse((stdout || "").trim());
             } catch (e) {
-                root.toastError((stdout && stdout.trim()) || I18n.trFor("quickCapture", "Screenshot failed (mode: %1).").arg(mode));
+                captureActions.notifyError((stdout && stdout.trim()) || fallback);
+                return;
             }
+            if (meta.status === "success") {
+                root.currentCapturePath = meta.path;
+                openCaptured(meta.path, action, meta.width, meta.height);
+                return;
+            }
+            if (meta.status !== "aborted")
+                captureActions.notifyError(meta.message || meta.error || fallback);
         }, 0, timeout);
     }
 
-    function selectImageAndAnnotateWithAction(action) {
-        root.closeControlCenter();
+    function selectImage(action) {
+        closeControlCenter();
         fileBrowserModal.captureAction = action || "edit";
         fileBrowserModal.open();
     }
 
-    function fromClipboardWithAction(action) {
-        root.closeControlCenter();
-        const destPath = root.capturePath();
+    function fromClipboard(action) {
+        closeControlCenter();
+        const destPath = capturePath();
         root.currentCapturePath = destPath;
-
-        // Step 1: Try to paste clipboard as a file.
-        Proc.runCommand("clipboard-paste-file", ["sh", "-c", 'dms cl paste > "$1" 2>/dev/null', "_", destPath], (stdout, exitCode) => {
-            if (exitCode === 0) {
-                // Step 2a: Confirm the pasted file is actually an image.
-                Proc.runCommand("clipboard-check-image", ["file", "-b", destPath], (fileOut, fileExit) => {
-                    if (fileExit === 0 && fileOut.toLowerCase().includes("image")) {
-                        root.openCapturedImageUnknown(destPath, action);
-                    } else {
-                        // Pasted file exists but isn't an image — try reading as text URI.
-                        root.tryClipboardAsText(action);
-                    }
-                });
-            } else {
-                // Step 2b: Paste failed entirely — try reading clipboard as text URI.
-                root.tryClipboardAsText(action);
+        Proc.runCommand("quickCapture.clipboardPasteFile", ["sh", "-c", '"$1" cl paste > "$2" 2>/dev/null', "_", Proc.dmsBin, destPath], (stdout, exitCode) => {
+            if (exitCode !== 0) {
+                tryClipboardAsText(action);
+                return;
             }
+            Proc.runCommand("quickCapture.clipboardCheckImage", ["file", "-b", destPath], (fileOut, fileExit) => {
+                if (fileExit === 0 && fileOut.toLowerCase().includes("image")) {
+                    validateAndOpen(destPath, action);
+                    return;
+                }
+                tryClipboardAsText(action);
+            });
         });
     }
 
     function tryClipboardAsText(action) {
-        Proc.runCommand("clipboard-paste-text", ["dms", "cl", "paste"], (stdout, exitCode) => {
-            const text = stdout.trim();
+        Proc.runCommand("quickCapture.clipboardPasteText", [Proc.dmsBin, "cl", "paste"], (stdout, exitCode) => {
+            const text = (stdout || "").trim();
             if (exitCode !== 0 || text === "") {
-                root.toastError("No valid image, URL, or path in clipboard.");
+                captureActions.notifyWarning(I18n.trFor("quickCapture", "No valid image, URL, or path in clipboard."));
                 return;
             }
-            root.loadImageFromUriWithAction(text, action);
+            loadImageFromUri(text, action);
         });
     }
 
-    // Called when we already have image dimensions (e.g. from screenshot JSON metadata).
-    function openCapturedImageWithDimensions(path, action, width, height) {
-        const minSize = pluginData.minImageSize ?? 16;
+    function openCaptured(path, action, width, height) {
+        const minSize = Defaults.get(pluginData, "minImageSize");
         if (width < minSize || height < minSize) {
-            root.toastError(`Image is too small (${width}x${height}). Minimum: ${minSize}px`);
+            captureActions.notifyWarning(I18n.trFor("quickCapture", "Image is too small (%1×%2). Minimum: %3px").arg(width).arg(height).arg(minSize));
             return;
         }
-        root.openAction(path, action);
+        openAction(path, action);
     }
 
-    // Called when we don't have dimensions — runs `file -b` to confirm it's a valid image.
-    function openCapturedImageUnknown(path, action) {
-        Proc.runCommand("validate-image", ["file", "-b", path], (stdout, exitCode) => {
-            const output = stdout.toLowerCase();
+    function validateAndOpen(path, action) {
+        Proc.runCommand("quickCapture.validateImage", ["file", "-b", path], (stdout, exitCode) => {
+            const output = (stdout || "").toLowerCase();
             if (exitCode !== 0 || output.includes("empty") || !output.includes("image")) {
-                root.toastError("Invalid or corrupted image file.");
+                captureActions.notifyError(I18n.trFor("quickCapture", "Invalid or corrupted image file."));
                 return;
             }
-            root.openAction(path, action);
+            openAction(path, action);
         });
     }
 
     function openAction(path, action) {
-        if (action === "float") {
-            floatServiceItem.spawnWindow("file://" + path, pluginData, null, [path]);
-        } else if (action === "copy") {
-            DMSService.sendRequest("clipboard.copyFile", { "filePath": path });
-            root.toastInfo(I18n.trFor("quickCapture", "Copied to clipboard"));
-        } else if (action === "save") {
-            const targetDir = root.resolveSaveDir(pluginData.saveDirectory);
-            const targetFilename = root.generateTimestampFilename();
-            const targetFilePath = targetDir.replace(/\/$/, "") + "/" + targetFilename;
-            Proc.runCommand("capture-save", ["sh", "-c", 'mkdir -p -- "$1" && cp -- "$2" "$3"', "_", targetDir, path, targetFilePath], (stdout, exitCode) => {
-                if (exitCode === 0)
-                    root.toastInfo(I18n.trFor("quickCapture", "Screenshot saved"));
-                else
-                    root.toastError(I18n.trFor("quickCapture", "Failed to save screenshot"));
-                if (path.startsWith("/tmp/dms_capture_"))
-                    Proc.runCommand("cleanup-temp-save", ["rm", "-f", "--", path]);
-            });
-        } else if (action === "copyAndSave") {
-            const targetDir = root.resolveSaveDir(pluginData.saveDirectory);
-            const targetFilename = root.generateTimestampFilename();
-            const targetFilePath = targetDir.replace(/\/$/, "") + "/" + targetFilename;
-            DMSService.sendRequest("clipboard.copyFile", { "filePath": path });
-            Proc.runCommand("capture-copy-save", ["sh", "-c", 'mkdir -p -- "$1" && cp -- "$2" "$3"', "_", targetDir, path, targetFilePath], (stdout, exitCode) => {
-                if (exitCode === 0)
-                    root.toastInfo(I18n.trFor("quickCapture", "Copied & saved"));
-                else
-                    root.toastError(I18n.trFor("quickCapture", "Failed to save screenshot"));
-            });
-        } else {
-            root.closeControlCenter();
+        switch (action) {
+        case "float":
+            floatServiceItem.spawnWindow("file://" + path, null, [path]);
+            return;
+        case "copy":
+            captureActions.copyImage(path, () => captureActions.cleanupTemp(path));
+            return;
+        case "save":
+            captureActions.saveImage(path, () => captureActions.cleanupTemp(path));
+            return;
+        case "copyAndSave":
+            captureActions.copyAndSaveImage(path, () => captureActions.cleanupTemp(path));
+            return;
+        default:
+            closeControlCenter();
             modal.currentCapturePath = path;
             modal.shouldBeVisible = true;
             modal.open();
         }
     }
 
-    function loadImageFromUriWithAction(uri, action) {
+    function loadImageFromUri(uri, action) {
         if (uri.startsWith("file://"))
             uri = uri.substring(7);
+        root.currentCapturePath = capturePath();
 
         if (uri.startsWith("http://") || uri.startsWith("https://")) {
             root.isDownloading = true;
-            root.currentCapturePath = root.capturePath();
-            Proc.runCommand("download-image", ["curl", "-s", "-L", "-o", root.currentCapturePath, uri], (stdout, exitCode) => {
+            Proc.runCommand("quickCapture.download", ["curl", "-s", "-L", "-o", root.currentCapturePath, uri], (stdout, exitCode) => {
                 root.isDownloading = false;
-                if (exitCode === 0)
-                    root.openCapturedImageUnknown(root.currentCapturePath, action);
-                else
-                    root.toastError("Failed to download image.");
+                if (exitCode !== 0) {
+                    captureActions.notifyError(I18n.trFor("quickCapture", "Failed to download image."));
+                    return;
+                }
+                validateAndOpen(root.currentCapturePath, action);
             });
-        } else {
-            root.currentCapturePath = root.capturePath();
-            Proc.runCommand("copy-image", ["cp", "-f", "--", uri, root.currentCapturePath], (stdout, exitCode) => {
-                if (exitCode === 0)
-                    root.openCapturedImageUnknown(root.currentCapturePath, action);
-                else
-                    root.toastError("Failed to copy image.");
-            });
-        }
-    }
-
-    function handleDrop(drop) {
-        let urlStr = "";
-        if (drop.hasUrls && drop.urls.length > 0) {
-            urlStr = drop.urls[0].toString();
-        } else if (drop.hasText) {
-            const trimmed = drop.text.trim();
-            if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-                urlStr = trimmed;
-            }
-        }
-
-        if (urlStr === "") {
-            root.toastWarning("No valid image file or URL found in drop.");
             return;
         }
 
-        root.loadImageFromUriWithAction(urlStr, "edit");
+        Proc.runCommand("quickCapture.copyImage", ["cp", "-f", "--", uri, root.currentCapturePath], (stdout, exitCode) => {
+            if (exitCode !== 0) {
+                captureActions.notifyError(I18n.trFor("quickCapture", "Failed to load image: %1").arg(uri));
+                return;
+            }
+            validateAndOpen(root.currentCapturePath, action);
+        });
     }
 
-    // ── Plugin identity ───────────────────────────────────────────────────────
-    pluginId: "quickCapture"
-    pluginService: PluginService
+    function handleDrop(drop) {
+        let url = "";
+        if (drop.hasUrls && drop.urls.length > 0)
+            url = drop.urls[0].toString();
+        else if (drop.hasText && /^https?:\/\//.test(drop.text.trim()))
+            url = drop.text.trim();
 
-    // ── IPC handlers ─────────────────────────────────────────────────────────
+        if (url === "") {
+            captureActions.notifyWarning(I18n.trFor("quickCapture", "No valid image file or URL found in drop."));
+            return;
+        }
+        loadImageFromUri(url, "edit");
+    }
+
+    function showHistoryCarousel() {
+        historyModal.shouldBeVisible = true;
+        historyModal.open();
+    }
+
     IpcHandler {
-        function screenshot(mode: string, action: string) : string {
-            root.triggerCaptureWithAction(mode, action);
+        target: "quickCapture"
+
+        function screenshot(mode: string, action: string): string {
+            root.triggerCapture(mode, action);
             return "SUCCESS";
         }
 
-        function selectFile(action: string) : string {
-            root.selectImageAndAnnotateWithAction(action);
+        function selectFile(action: string): string {
+            root.selectImage(action);
             return "SUCCESS";
         }
 
-        function fromClipboard(action: string) : string {
-            root.fromClipboardWithAction(action);
+        function fromClipboard(action: string): string {
+            root.fromClipboard(action);
             return "SUCCESS";
         }
 
-        function openImage(path: string, action: string) : string {
-            if (path.startsWith("file://")) {
-                path = path.substring(7);
-            }
-            root.loadImageFromUriWithAction(path, action);
+        function openImage(path: string, action: string): string {
+            root.loadImageFromUri(path, action);
             return "SUCCESS";
         }
 
-        function close() : string {
-            modal.shouldBeVisible = false;
+        function close(): string {
             modal.close();
             return "SUCCESS";
         }
 
-        function showHistory() : string {
+        function showHistory(): string {
             root.showHistoryCarousel();
             return "SUCCESS";
         }
 
-        function recordStart(mode: string, geometry: string) : string {
-            root.startRecording(mode || "screen", geometry || "");
+        function recordStart(mode: string, geometry: string): string {
+            root.record(mode, geometry);
             return "SUCCESS";
         }
 
-        function recordStop() : string {
-            root.stopRecording();
+        function recordStop(): string {
+            recorder.stopRecording();
             return "SUCCESS";
         }
 
-        function recordPause() : string {
-            root.pauseRecording();
+        function recordPause(): string {
+            recorder.pauseRecording();
             return "SUCCESS";
         }
 
-        function recordCancel() : string {
-            root.cancelRecording();
+        function recordCancel(): string {
+            recorder.cancelRecording();
             return "SUCCESS";
         }
 
-        function recordToggle(mode: string) : string {
-            if (root.isRecording) {
-                root.stopRecording();
+        function recordToggle(mode: string): string {
+            if (recorder.isRecording) {
+                recorder.stopRecording();
                 return "STOPPED";
-            } else {
-                root.startRecording(mode || "screen");
-                return "STARTED";
             }
+            root.record(mode);
+            return "STARTED";
         }
 
-        function recordStatus() : string {
+        function recordStatus(): string {
             return JSON.stringify({
-                "recordingState": recordingControllerItem.recordingState,
-                "isRecording": recordingControllerItem.isRecording,
-                "isPaused": recordingControllerItem.isPaused,
-                "duration": recordingControllerItem.recordingSeconds,
-                "outputPath": recordingControllerItem.outputPath
+                "recordingState": recorder.recordingState,
+                "isRecording": recorder.isRecording,
+                "isPaused": recorder.isPaused,
+                "duration": recorder.recordingSeconds,
+                "outputPath": recorder.outputPath
             });
         }
-
-        target: "quickCapture"
-        enabled: true
     }
 
-    // ── Capture delay timer ───────────────────────────────────────────────────
     Timer {
         id: captureDelayTimer
         interval: Math.max(50, Theme.popoutAnimationDuration + 50)
-        repeat: false
         onTriggered: {
             if (root.waitingForControlCenterClose)
                 root.startCaptureAfterControlCenterClose();
@@ -420,29 +389,33 @@ PluginComponent {
     }
 
     Connections {
-        target: (typeof PopoutService !== "undefined" && PopoutService)
-            ? PopoutService.controlCenterPopout
-            : null
-
+        target: PopoutService.controlCenterPopout
         function onPopoutClosed() {
             root.startCaptureAfterControlCenterClose();
         }
     }
 
-    // ── Float service ─────────────────────────────────────────────────────────
     FloatService {
         id: floatServiceItem
+        pluginData: root.pluginData
     }
 
-    // ── Modal ─────────────────────────────────────────────────────────────────
+    QuickCaptureActions {
+        id: captureActions
+        daemon: root
+        modal: modal
+        floatService: floatServiceItem
+        exportAndExecute: callback => modal.exportAndExecute(callback)
+        onCloseRequested: modal.discardAndClose()
+    }
+
     QuickCaptureModal {
         id: modal
-
         parentWidget: root
         floatService: floatServiceItem
+        actions: captureActions
     }
 
-    // ── File browser ──────────────────────────────────────────────────────────
     FileBrowserModal {
         id: fileBrowserModal
         property string captureAction: "edit"
@@ -450,25 +423,9 @@ PluginComponent {
         browserIcon: "image"
         fileExtensions: ["*.png", "*.jpg", "*.jpeg", "*.webp", "*.bmp"]
         onFileSelected: path => {
-            const action = fileBrowserModal.captureAction;
-            root.currentCapturePath = root.capturePath();
-            Proc.runCommand("copy-image", ["cp", "-f", "--", path, root.currentCapturePath], (stdout, exitCode) => {
-                if (exitCode === 0) {
-                    root.openCapturedImageUnknown(root.currentCapturePath, action);
-                } else {
-                    root.toastError("Failed to load image.");
-                }
-            });
+            root.loadImageFromUri(path, fileBrowserModal.captureAction);
             close();
         }
-    }
-
-    // ── History carousel modal ────────────────────────────────────────────────
-    function showHistoryCarousel() {
-        if (historyModal.contentLoader && historyModal.contentLoader.item)
-            historyModal.contentLoader.item.refresh()
-        historyModal.shouldBeVisible = true
-        historyModal.open()
     }
 
     DankModal {
@@ -477,10 +434,15 @@ PluginComponent {
         positioning: "center"
         enableShadow: true
         useOverlayLayer: true
-        keepContentLoaded: true
         closeOnEscapeKey: true
         closeOnBackgroundClick: true
         onBackgroundClicked: close()
+
+        readonly property real screenW: targetScreen ? targetScreen.width : (Quickshell.screens[0]?.width ?? 1920)
+        readonly property real screenH: targetScreen ? targetScreen.height : (Quickshell.screens[0]?.height ?? 1080)
+        readonly property real heightFraction: contentLoader?.item?.heightFraction ?? 0.45
+        modalWidth: Math.round(screenW * 0.9)
+        modalHeight: Math.round(screenH * heightFraction)
 
         content: Component {
             RecentEditsCarousel {
@@ -488,68 +450,14 @@ PluginComponent {
                 onCloseRequested: historyModal.close()
             }
         }
-
-        readonly property real _screenW: targetScreen ? targetScreen.width : (Quickshell.screens[0] ? Quickshell.screens[0].width : 1920)
-        readonly property real _screenH: targetScreen ? targetScreen.height : (Quickshell.screens[0] ? Quickshell.screens[0].height : 1080)
-        modalWidth: Math.round(_screenW * 0.9)
-        modalHeight: Math.round(_screenH * (historyModal.contentLoader && historyModal.contentLoader.item ? historyModal.contentLoader.item.heightFraction : 0.45))
-    }
-
-    // ── Screen Recording Controller & Overlays ────────────────────────────────
-    function startRecording(mode, customGeometry) {
-        root.closeControlCenter();
-        recordingControllerItem.startRecording(mode, customGeometry);
-    }
-
-    function stopRecording() {
-        recordingControllerItem.stopRecording();
-    }
-
-    function pauseRecording() {
-        recordingControllerItem.pauseRecording();
-    }
-
-    function cancelRecording() {
-        recordingControllerItem.cancelRecording();
-    }
-
-    function savePluginData(key, value) {
-        if (pluginService && pluginId) {
-            pluginService.savePluginData(pluginId, key, value);
-        }
-        const pData = Object.assign({}, root.pluginData);
-        pData[key] = value;
-        root.pluginData = pData;
     }
 
     RecordingController {
-        id: recordingControllerItem
+        id: recorder
         daemon: root
     }
 
     RecordingRegionBorder {
-        id: recordingRegionBorderItem
-        recordingController: recordingControllerItem
-    }
-
-
-    // ── Lifecycle: register self so widget surface can delegate to daemon ─────
-    Component.onCompleted: {
-        if (pluginService && pluginId) {
-            const newInstances = Object.assign({}, pluginService.pluginInstances);
-            newInstances[pluginId] = root;
-            pluginService.pluginInstances = newInstances;
-            if (typeof pluginService.setGlobalVar === "function") {
-                pluginService.setGlobalVar(pluginId, "instance", root);
-            }
-        }
-    }
-
-    Component.onDestruction: {
-        if (pluginService && pluginService.pluginInstances[pluginId] === root) {
-            const newInstances = Object.assign({}, pluginService.pluginInstances);
-            delete newInstances[pluginId];
-            pluginService.pluginInstances = newInstances;
-        }
+        recordingController: recorder
     }
 }
