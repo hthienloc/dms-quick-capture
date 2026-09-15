@@ -48,7 +48,7 @@
     "Aspect Ratio": ""
   },
   "Audio": {
-    "Audio": ""
+    "Audio": "Dźwięk"
   },
   "Audio & Overlay": {
     "Audio & Overlay": ""
@@ -105,7 +105,7 @@
     "Background Presets": ""
   },
   "Background image": {
-    "Background image": ""
+    "Background image": "Obraz tła"
   },
   "Balanced": {
     "Balanced": "Zbalansowane"
@@ -120,7 +120,7 @@
     "Blur Background Image": ""
   },
   "Bold": {
-    "Bold": ""
+    "Bold": "Pobrubienie"
   },
   "Border Color": {
     "Border Color": "Kolor obramowania"
@@ -150,7 +150,7 @@
     "Callout Zoom": ""
   },
   "Cancel": {
-    "Cancel": ""
+    "Cancel": "Anuluj"
   },
   "Capture": {
     "Capture": ""
@@ -195,16 +195,16 @@
     "Close": "Zamknij"
   },
   "Color": {
-    "Color": ""
+    "Color": "Kolor"
   },
   "Color %1 copied": {
-    "Color %1 copied": ""
+    "Color %1 copied": "Kolor %1 skopiowany"
   },
   "Color Palette": {
     "Color Palette": ""
   },
   "Color Picker": {
-    "Color Picker": ""
+    "Color Picker": "Próbnik kolorów"
   },
   "Configure up to %1 quick-access tool presets. Right-click during capture to open the radial menu.": {
     "Configure up to %1 quick-access tool presets. Right-click during capture to open the radial menu.": ""
@@ -228,7 +228,7 @@
     "Copied to clipboard": "Skopiowano do schowka"
   },
   "Copied!": {
-    "Copied!": ""
+    "Copied!": "Skopiowane!"
   },
   "Copy": {
     "Copy": "Kopiuj"
@@ -249,7 +249,7 @@
     "Copy vector / Paste / Duplicate": ""
   },
   "Corner Radius": {
-    "Corner Radius": ""
+    "Corner Radius": "Promień narożnika"
   },
   "Could not crop image": {
     "Could not crop image": ""
@@ -291,7 +291,7 @@
     "Discard & Close": ""
   },
   "Display": {
-    "Display": ""
+    "Display": "Wyświetlacz"
   },
   "Display Mode": {
     "Display Mode": ""
@@ -360,7 +360,7 @@
     "Failed to save screenshot": ""
   },
   "File": {
-    "File": ""
+    "File": "Plik"
   },
   "Filename Pattern": {
     "Filename Pattern": ""
@@ -395,8 +395,8 @@
   "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
     "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": ""
   },
-  "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
-    "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
+  "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
+    "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
   },
   "Framerate": {
     "Framerate": ""
@@ -405,7 +405,7 @@
     "Free": ""
   },
   "Fullscreen": {
-    "Fullscreen": ""
+    "Fullscreen": "Pełny Ekran"
   },
   "Fullscreen Target": {
     "Fullscreen Target": ""
@@ -525,7 +525,7 @@
     "Left": "Lewa"
   },
   "Left Center": {
-    "Left Center": ""
+    "Left Center": "Lewo Środek"
   },
   "Left Click": {
     "Left Click": ""
@@ -534,7 +534,7 @@
     "Light": ""
   },
   "Line": {
-    "Line": ""
+    "Line": "Linia"
   },
   "Linear Gradient": {
     "Linear Gradient": ""
@@ -561,7 +561,7 @@
     "Merging audio tracks...": ""
   },
   "Microphone": {
-    "Microphone": ""
+    "Microphone": "Mikrofon"
   },
   "Microphone Device": {
     "Microphone Device": ""
@@ -633,7 +633,7 @@
     "OCR failed": ""
   },
   "Off": {
-    "Off": ""
+    "Off": "Wyłączony"
   },
   "Opacity": {
     "Opacity": "Przezroczystość"
@@ -648,7 +648,7 @@
     "Open Image": ""
   },
   "Open folder": {
-    "Open folder": ""
+    "Open folder": "Otwórz katalog"
   },
   "Outline Variant": {
     "Outline Variant": ""
@@ -663,7 +663,7 @@
     "Overlay Opacity": ""
   },
   "Padding": {
-    "Padding": ""
+    "Padding": "Dopełnienie"
   },
   "Palette Preset": {
     "Palette Preset": ""
@@ -675,7 +675,7 @@
     "Pause / Resume": ""
   },
   "Paused": {
-    "Paused": ""
+    "Paused": "Wstrzymano"
   },
   "Pausing is not supported with %1.": {
     "Pausing is not supported with %1.": ""
@@ -738,7 +738,7 @@
     "QR scan failed": ""
   },
   "Quality": {
-    "Quality": ""
+    "Quality": "Jakość"
   },
   "Quick Capture": {
     "Quick Capture": ""
@@ -810,7 +810,7 @@
     "Right": "Prawo"
   },
   "Right Center": {
-    "Right Center": ""
+    "Right Center": "Prawo Środek"
   },
   "Right Click": {
     "Right Click": ""
@@ -834,7 +834,7 @@
     "Rounded Rectangle": ""
   },
   "Save": {
-    "Save": ""
+    "Save": "Zapisz"
   },
   "Save As": {
     "Save As": ""
@@ -957,7 +957,7 @@
     "Show only the image on a transparent background": ""
   },
   "Skip confirmation": {
-    "Skip confirmation": ""
+    "Skip confirmation": "Pomiń potwierdzenie"
   },
   "Slot %1": {
     "Slot %1": ""
@@ -1065,7 +1065,7 @@
     "Toolbar Position": ""
   },
   "Tools": {
-    "Tools": ""
+    "Tools": "Narzędzia"
   },
   "Top": {
     "Top": "Góra"

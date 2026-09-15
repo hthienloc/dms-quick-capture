@@ -48,7 +48,7 @@
     "Aspect Ratio": ""
   },
   "Audio": {
-    "Audio": ""
+    "Audio": "صدا"
   },
   "Audio & Overlay": {
     "Audio & Overlay": ""
@@ -105,7 +105,7 @@
     "Background Presets": ""
   },
   "Background image": {
-    "Background image": ""
+    "Background image": "تصویر پس‌زمینه"
   },
   "Balanced": {
     "Balanced": "متعادل"
@@ -120,7 +120,7 @@
     "Blur Background Image": ""
   },
   "Bold": {
-    "Bold": ""
+    "Bold": "پررنگ"
   },
   "Border Color": {
     "Border Color": "رنگ حاشیه"
@@ -150,7 +150,7 @@
     "Callout Zoom": ""
   },
   "Cancel": {
-    "Cancel": ""
+    "Cancel": "لغو"
   },
   "Capture": {
     "Capture": ""
@@ -195,16 +195,16 @@
     "Close": "بستن"
   },
   "Color": {
-    "Color": ""
+    "Color": "رنگ"
   },
   "Color %1 copied": {
-    "Color %1 copied": ""
+    "Color %1 copied": "رنگ %1 کپی شد"
   },
   "Color Palette": {
     "Color Palette": ""
   },
   "Color Picker": {
-    "Color Picker": ""
+    "Color Picker": "انتخابگر رنگ"
   },
   "Configure up to %1 quick-access tool presets. Right-click during capture to open the radial menu.": {
     "Configure up to %1 quick-access tool presets. Right-click during capture to open the radial menu.": ""
@@ -228,7 +228,7 @@
     "Copied to clipboard": "در کلیپ‌بورد کپی شد"
   },
   "Copied!": {
-    "Copied!": ""
+    "Copied!": "کپی شد!"
   },
   "Copy": {
     "Copy": "کپی"
@@ -249,7 +249,7 @@
     "Copy vector / Paste / Duplicate": ""
   },
   "Corner Radius": {
-    "Corner Radius": ""
+    "Corner Radius": "شعاع گوشه"
   },
   "Could not crop image": {
     "Could not crop image": ""
@@ -291,7 +291,7 @@
     "Discard & Close": ""
   },
   "Display": {
-    "Display": ""
+    "Display": "نمایشگر"
   },
   "Display Mode": {
     "Display Mode": ""
@@ -360,7 +360,7 @@
     "Failed to save screenshot": ""
   },
   "File": {
-    "File": ""
+    "File": "فایل"
   },
   "Filename Pattern": {
     "Filename Pattern": ""
@@ -395,8 +395,8 @@
   "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
     "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": ""
   },
-  "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
-    "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
+  "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
+    "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
   },
   "Framerate": {
     "Framerate": ""
@@ -405,7 +405,7 @@
     "Free": ""
   },
   "Fullscreen": {
-    "Fullscreen": ""
+    "Fullscreen": "تمام‌صفحه"
   },
   "Fullscreen Target": {
     "Fullscreen Target": ""
@@ -525,7 +525,7 @@
     "Left": "چپ"
   },
   "Left Center": {
-    "Left Center": ""
+    "Left Center": "چپ وسط"
   },
   "Left Click": {
     "Left Click": ""
@@ -534,7 +534,7 @@
     "Light": "کم‌رنگ"
   },
   "Line": {
-    "Line": ""
+    "Line": "خط"
   },
   "Linear Gradient": {
     "Linear Gradient": ""
@@ -561,7 +561,7 @@
     "Merging audio tracks...": ""
   },
   "Microphone": {
-    "Microphone": ""
+    "Microphone": "میکروفون"
   },
   "Microphone Device": {
     "Microphone Device": ""
@@ -633,7 +633,7 @@
     "OCR failed": ""
   },
   "Off": {
-    "Off": ""
+    "Off": "خاموش"
   },
   "Opacity": {
     "Opacity": "شفافیت"
@@ -648,7 +648,7 @@
     "Open Image": ""
   },
   "Open folder": {
-    "Open folder": ""
+    "Open folder": "باز کردن پوشه"
   },
   "Outline Variant": {
     "Outline Variant": ""
@@ -663,7 +663,7 @@
     "Overlay Opacity": ""
   },
   "Padding": {
-    "Padding": ""
+    "Padding": "فاصله درونی"
   },
   "Palette Preset": {
     "Palette Preset": ""
@@ -675,7 +675,7 @@
     "Pause / Resume": ""
   },
   "Paused": {
-    "Paused": ""
+    "Paused": "متوقف شده"
   },
   "Pausing is not supported with %1.": {
     "Pausing is not supported with %1.": ""
@@ -738,7 +738,7 @@
     "QR scan failed": ""
   },
   "Quality": {
-    "Quality": ""
+    "Quality": "کمیت"
   },
   "Quick Capture": {
     "Quick Capture": ""
@@ -810,7 +810,7 @@
     "Right": "راست"
   },
   "Right Center": {
-    "Right Center": ""
+    "Right Center": "راست وسط"
   },
   "Right Click": {
     "Right Click": ""
@@ -834,7 +834,7 @@
     "Rounded Rectangle": ""
   },
   "Save": {
-    "Save": ""
+    "Save": "ذخیره"
   },
   "Save As": {
     "Save As": ""
@@ -957,7 +957,7 @@
     "Show only the image on a transparent background": ""
   },
   "Skip confirmation": {
-    "Skip confirmation": ""
+    "Skip confirmation": "رد کردن تأیید"
   },
   "Slot %1": {
     "Slot %1": ""
@@ -1065,7 +1065,7 @@
     "Toolbar Position": ""
   },
   "Tools": {
-    "Tools": ""
+    "Tools": "ابزارها"
   },
   "Top": {
     "Top": "بالا"

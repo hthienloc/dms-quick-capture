@@ -48,7 +48,7 @@
     "Aspect Ratio": ""
   },
   "Audio": {
-    "Audio": ""
+    "Audio": "Аудио"
   },
   "Audio & Overlay": {
     "Audio & Overlay": ""
@@ -105,7 +105,7 @@
     "Background Presets": ""
   },
   "Background image": {
-    "Background image": ""
+    "Background image": "Фоновое изображение"
   },
   "Balanced": {
     "Balanced": "Сбалансированный"
@@ -120,7 +120,7 @@
     "Blur Background Image": ""
   },
   "Bold": {
-    "Bold": ""
+    "Bold": "Полужирный"
   },
   "Border Color": {
     "Border Color": "Цвет рамки"
@@ -150,7 +150,7 @@
     "Callout Zoom": ""
   },
   "Cancel": {
-    "Cancel": ""
+    "Cancel": "Отмена"
   },
   "Capture": {
     "Capture": ""
@@ -195,16 +195,16 @@
     "Close": "Закрыть"
   },
   "Color": {
-    "Color": ""
+    "Color": "Цвет"
   },
   "Color %1 copied": {
-    "Color %1 copied": ""
+    "Color %1 copied": "Цвет %1 скопирован"
   },
   "Color Palette": {
     "Color Palette": ""
   },
   "Color Picker": {
-    "Color Picker": ""
+    "Color Picker": "Выбор Цвета"
   },
   "Configure up to %1 quick-access tool presets. Right-click during capture to open the radial menu.": {
     "Configure up to %1 quick-access tool presets. Right-click during capture to open the radial menu.": ""
@@ -228,7 +228,7 @@
     "Copied to clipboard": "Скопировано в буфер обмена"
   },
   "Copied!": {
-    "Copied!": ""
+    "Copied!": "Скопировано!"
   },
   "Copy": {
     "Copy": "Копировать"
@@ -249,7 +249,7 @@
     "Copy vector / Paste / Duplicate": ""
   },
   "Corner Radius": {
-    "Corner Radius": ""
+    "Corner Radius": "Радиус скругления углов"
   },
   "Could not crop image": {
     "Could not crop image": ""
@@ -291,7 +291,7 @@
     "Discard & Close": ""
   },
   "Display": {
-    "Display": ""
+    "Display": "Дисплей"
   },
   "Display Mode": {
     "Display Mode": ""
@@ -360,7 +360,7 @@
     "Failed to save screenshot": ""
   },
   "File": {
-    "File": ""
+    "File": "Файл"
   },
   "Filename Pattern": {
     "Filename Pattern": ""
@@ -395,8 +395,8 @@
   "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
     "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": ""
   },
-  "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
-    "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
+  "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
+    "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
   },
   "Framerate": {
     "Framerate": ""
@@ -525,7 +525,7 @@
     "Left": "Слева"
   },
   "Left Center": {
-    "Left Center": ""
+    "Left Center": "Слева по центру"
   },
   "Left Click": {
     "Left Click": ""
@@ -534,7 +534,7 @@
     "Light": "Светлый"
   },
   "Line": {
-    "Line": "Прямая линия"
+    "Line": "Линия"
   },
   "Linear Gradient": {
     "Linear Gradient": ""
@@ -561,7 +561,7 @@
     "Merging audio tracks...": ""
   },
   "Microphone": {
-    "Microphone": ""
+    "Microphone": "Микрофон"
   },
   "Microphone Device": {
     "Microphone Device": ""
@@ -633,7 +633,7 @@
     "OCR failed": ""
   },
   "Off": {
-    "Off": ""
+    "Off": "Выкл"
   },
   "Opacity": {
     "Opacity": "Непрозрачность"
@@ -648,7 +648,7 @@
     "Open Image": ""
   },
   "Open folder": {
-    "Open folder": ""
+    "Open folder": "Открыть папку"
   },
   "Outline Variant": {
     "Outline Variant": ""
@@ -663,7 +663,7 @@
     "Overlay Opacity": ""
   },
   "Padding": {
-    "Padding": ""
+    "Padding": "Отступ"
   },
   "Palette Preset": {
     "Palette Preset": ""
@@ -675,7 +675,7 @@
     "Pause / Resume": ""
   },
   "Paused": {
-    "Paused": ""
+    "Paused": "На паузе"
   },
   "Pausing is not supported with %1.": {
     "Pausing is not supported with %1.": ""
@@ -738,7 +738,7 @@
     "QR scan failed": ""
   },
   "Quality": {
-    "Quality": ""
+    "Quality": "Качество"
   },
   "Quick Capture": {
     "Quick Capture": ""
@@ -810,7 +810,7 @@
     "Right": "Справа"
   },
   "Right Center": {
-    "Right Center": ""
+    "Right Center": "Справа по центру"
   },
   "Right Click": {
     "Right Click": ""
@@ -834,7 +834,7 @@
     "Rounded Rectangle": ""
   },
   "Save": {
-    "Save": ""
+    "Save": "Сохранить"
   },
   "Save As": {
     "Save As": ""
@@ -957,7 +957,7 @@
     "Show only the image on a transparent background": ""
   },
   "Skip confirmation": {
-    "Skip confirmation": ""
+    "Skip confirmation": "Пропустить подтверждение"
   },
   "Slot %1": {
     "Slot %1": ""
@@ -1065,7 +1065,7 @@
     "Toolbar Position": ""
   },
   "Tools": {
-    "Tools": ""
+    "Tools": "Инструменты"
   },
   "Top": {
     "Top": "Сверху"

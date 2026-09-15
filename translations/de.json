@@ -6,10 +6,10 @@
     "%1 is not installed": ""
   },
   "1 Connecting Line": {
-    "1 Connecting Line": ""
+    "1 Connecting Line": "1 Verbindungslinie"
   },
   "2 Connecting Lines": {
-    "2 Connecting Lines": ""
+    "2 Connecting Lines": "2 Verbindungslinien"
   },
   "Action": {
     "Action": "Aktion"
@@ -24,19 +24,19 @@
     "Add": "Hinzufügen"
   },
   "Add Text Note": {
-    "Add Text Note": ""
+    "Add Text Note": "Textnotiz hinzufügen"
   },
   "Alignment": {
     "Alignment": ""
   },
   "All Outputs": {
-    "All Outputs": ""
+    "All Outputs": "Alle Ausgaben"
   },
   "Annotating": {
-    "Annotating": ""
+    "Annotating": "Kommentieren"
   },
   "Annotation Tools": {
-    "Annotation Tools": ""
+    "Annotation Tools": "Anmerkungswerkzeuge"
   },
   "Anonymous Copy": {
     "Anonymous Copy": ""
@@ -48,10 +48,10 @@
     "Aspect Ratio": ""
   },
   "Audio": {
-    "Audio": ""
+    "Audio": "Audio"
   },
   "Audio & Overlay": {
-    "Audio & Overlay": ""
+    "Audio & Overlay": "Audio & Overlay"
   },
   "Audio Codec": {
     "Audio Codec": "Audio Codec"
@@ -63,28 +63,28 @@
     "Auto": "Auto"
   },
   "Auto Balance": {
-    "Auto Balance": ""
+    "Auto Balance": "Auto-Balance"
   },
   "Auto-apply background defaults": {
-    "Auto-apply background defaults": ""
+    "Auto-apply background defaults": "Hintergrund-Standardwerte automatisch anwenden"
   },
   "Auto-close the loop when ending near the start point.": {
-    "Auto-close the loop when ending near the start point.": ""
+    "Auto-close the loop when ending near the start point.": "Die Schleife automatisch schließen, wenn sie nahe dem Startpunkt endet."
   },
   "Auto-minimize": {
-    "Auto-minimize": ""
+    "Auto-minimize": "Automatisch minimieren"
   },
   "Auto-select a tool preset on hover, without releasing the mouse.": {
-    "Auto-select a tool preset on hover, without releasing the mouse.": ""
+    "Auto-select a tool preset on hover, without releasing the mouse.": "Werkzeugvoreinstellung beim Drüberfahren automatisch auswählen, ohne die Maus loszulassen."
   },
   "Auto-tiling": {
-    "Auto-tiling": ""
+    "Auto-tiling": "Automatisches Tiling"
   },
   "Automatically minimize the float window after a delay": {
-    "Automatically minimize the float window after a delay": ""
+    "Automatically minimize the float window after a delay": "Das schwebende Fenster nach einer Verzögerung automatisch minimieren"
   },
   "Automatically stack windows to avoid overlap": {
-    "Automatically stack windows to avoid overlap": ""
+    "Automatically stack windows to avoid overlap": "Fenster automatisch stapeln, um Überlappungen zu vermeiden"
   },
   "Back to Annotation": {
     "Back to Annotation": ""
@@ -93,34 +93,34 @@
     "Background": "Hintergrund"
   },
   "Background Defaults": {
-    "Background Defaults": ""
+    "Background Defaults": "Hintergrund-Standardwerte"
   },
   "Background Images": {
-    "Background Images": ""
+    "Background Images": "Hintergrundbilder"
   },
   "Background Mode": {
     "Background Mode": ""
   },
   "Background Presets": {
-    "Background Presets": ""
+    "Background Presets": "Hintergrund-Voreinstellungen"
   },
   "Background image": {
-    "Background image": ""
+    "Background image": "Hintergrundbild"
   },
   "Balanced": {
     "Balanced": "Ausgeglichen"
   },
   "Bar Interactions": {
-    "Bar Interactions": ""
+    "Bar Interactions": "Leisten-Interaktionen"
   },
   "Blink Recording Dot": {
-    "Blink Recording Dot": ""
+    "Blink Recording Dot": "Blinkender Aufnahme-Punkt"
   },
   "Blur Background Image": {
-    "Blur Background Image": ""
+    "Blur Background Image": "Hintergrundbild weichzeichnen"
   },
   "Bold": {
-    "Bold": ""
+    "Bold": "Fett"
   },
   "Border Color": {
     "Border Color": "Rahmenfarbe"
@@ -144,49 +144,49 @@
     "Bottom Right": "Unten rechts"
   },
   "Callout": {
-    "Callout": ""
+    "Callout": "Hinweislinie"
   },
   "Callout Zoom": {
-    "Callout Zoom": ""
+    "Callout Zoom": "Hinweislinien-Zoom"
   },
   "Cancel": {
-    "Cancel": ""
+    "Cancel": "Abbrechen"
   },
   "Capture": {
-    "Capture": ""
+    "Capture": "Aufnahme"
   },
   "Capture Actions": {
-    "Capture Actions": ""
+    "Capture Actions": "Aufnahmeaktionen"
   },
   "Capture Options": {
-    "Capture Options": ""
+    "Capture Options": "Aufnahmeoptionen"
   },
   "Capturing...": {
-    "Capturing...": ""
+    "Capturing...": "Aufnahme läuft..."
   },
   "Center": {
-    "Center": ""
+    "Center": "Mitte"
   },
   "Choose Color": {
     "Choose Color": "Farbe"
   },
   "Choose notifications shown after copy or save.": {
-    "Choose notifications shown after copy or save.": ""
+    "Choose notifications shown after copy or save.": "Wählen Sie die Benachrichtigungen aus, die nach dem Kopieren oder Speichern angezeigt werden."
   },
   "Choose the editor shape for portrait or landscape screens.": {
-    "Choose the editor shape for portrait or landscape screens.": ""
+    "Choose the editor shape for portrait or landscape screens.": "Wählen Sie die Editor-Form für Hoch- oder Querformat-Bildschirme."
   },
   "Choose whether the editor opens as a modal overlay or a movable floating window.": {
-    "Choose whether the editor opens as a modal overlay or a movable floating window.": ""
+    "Choose whether the editor opens as a modal overlay or a movable floating window.": "Wählen Sie, ob der Editor als modales Overlay oder als bewegliches, schwebendes Fenster geöffnet wird."
   },
   "Choose which monitor to capture during full screen recording.": {
-    "Choose which monitor to capture during full screen recording.": ""
+    "Choose which monitor to capture during full screen recording.": "Wählen Sie aus, welcher Monitor während der Vollbildaufnahme erfasst werden soll."
   },
   "Clean Text Eraser": {
-    "Clean Text Eraser": ""
+    "Clean Text Eraser": "Text-Radierer (Sauber)"
   },
   "Clear saved region selection before each capture": {
-    "Clear saved region selection before each capture": ""
+    "Clear saved region selection before each capture": "Gespeicherte Regionsauswahl vor jeder Aufnahme löschen"
   },
   "Clipboard": {
     "Clipboard": "Zwischenablage"
@@ -195,61 +195,61 @@
     "Close": "Schließen"
   },
   "Color": {
-    "Color": ""
+    "Color": "Farbe"
   },
   "Color %1 copied": {
-    "Color %1 copied": ""
+    "Color %1 copied": "Farbe %1 kopiert"
   },
   "Color Palette": {
-    "Color Palette": ""
+    "Color Palette": "Farbpalette"
   },
   "Color Picker": {
-    "Color Picker": ""
+    "Color Picker": "Farbwähler"
   },
   "Configure up to %1 quick-access tool presets. Right-click during capture to open the radial menu.": {
     "Configure up to %1 quick-access tool presets. Right-click during capture to open the radial menu.": ""
   },
   "Conic Gradient": {
-    "Conic Gradient": ""
+    "Conic Gradient": "Konischer Verlauf"
   },
   "Container Format": {
-    "Container Format": ""
+    "Container Format": "Container-Format"
   },
   "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": {
-    "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": ""
+    "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": "Steuert das Pixelbudget der Vorschau während der Bearbeitung. Verringern Sie es bei Verzögerungen. Beeinflusst nicht die Qualität des endgültig gespeicherten Bildes."
   },
   "Converting recording to GIF...": {
-    "Converting recording to GIF...": ""
+    "Converting recording to GIF...": "Aufnahme wird in GIF umgewandelt..."
   },
   "Copied Anonymously": {
-    "Copied Anonymously": ""
+    "Copied Anonymously": "Anonym kopiert"
   },
   "Copied to clipboard": {
     "Copied to clipboard": "In Zwischenablage kopiert"
   },
   "Copied!": {
-    "Copied!": ""
+    "Copied!": "Kopiert!"
   },
   "Copy": {
     "Copy": "Kopieren"
   },
   "Copy & Save": {
-    "Copy & Save": ""
+    "Copy & Save": "Kopieren & Speichern"
   },
   "Copy Color": {
-    "Copy Color": ""
+    "Copy Color": "Farbe kopieren"
   },
   "Copy Current Palette": {
-    "Copy Current Palette": ""
+    "Copy Current Palette": "Aktuelle Palette kopieren"
   },
   "Copy and customize this preset": {
-    "Copy and customize this preset": ""
+    "Copy and customize this preset": "Diese Voreinstellung kopieren und anpassen"
   },
   "Copy vector / Paste / Duplicate": {
-    "Copy vector / Paste / Duplicate": ""
+    "Copy vector / Paste / Duplicate": "Vektor kopieren / Einfügen / Duplizieren"
   },
   "Corner Radius": {
-    "Corner Radius": ""
+    "Corner Radius": "Abrundungsradius"
   },
   "Could not crop image": {
     "Could not crop image": ""
@@ -261,55 +261,55 @@
     "Custom": "Individuell"
   },
   "Dark": {
-    "Dark": ""
+    "Dark": "Dunkel"
   },
   "Darken the image to improve foreground contrast": {
-    "Darken the image to improve foreground contrast": ""
+    "Darken the image to improve foreground contrast": "Bild abdunkeln, um den Vordergrundkontrast zu verbessern"
   },
   "Dashed Line": {
-    "Dashed Line": ""
+    "Dashed Line": "Gestrichelte Linie"
   },
   "Default Microphone": {
-    "Default Microphone": ""
+    "Default Microphone": "Standard-Mikrofon"
   },
   "Default Output": {
-    "Default Output": ""
+    "Default Output": "Standard-Ausgabe"
   },
   "Default Watermark": {
-    "Default Watermark": ""
+    "Default Watermark": "Standard-Wasserzeichen"
   },
   "Delete": {
     "Delete": "Löschen"
   },
   "Dim Background Image": {
-    "Dim Background Image": ""
+    "Dim Background Image": "Hintergrundbild dimmen"
   },
   "Dim Intensity": {
-    "Dim Intensity": ""
+    "Dim Intensity": "Dimm-Intensität"
   },
   "Discard & Close": {
-    "Discard & Close": ""
+    "Discard & Close": "Verwerfen & Schließen"
   },
   "Display": {
-    "Display": ""
+    "Display": "Anzeige"
   },
   "Display Mode": {
     "Display Mode": ""
   },
   "Done": {
-    "Done": ""
+    "Done": "Fertig"
   },
   "Dotted Line": {
-    "Dotted Line": ""
+    "Dotted Line": "Punktierte Linie"
   },
   "Drag Image": {
-    "Drag Image": ""
+    "Drag Image": "Bild ziehen"
   },
   "Draw an outer ring using the stamp number color": {
-    "Draw an outer ring using the stamp number color": ""
+    "Draw an outer ring using the stamp number color": "Einen Außenring in der Farbe der Stempelnummer zeichnen"
   },
   "Drop image onto bar icon to annotate it": {
-    "Drop image onto bar icon to annotate it": ""
+    "Drop image onto bar icon to annotate it": "Bild auf das Leistensymbol ziehen, um es zu annotieren"
   },
   "Each command accepts action: %1 (open editor) or %2 (always-on-top window).": {
     "Each command accepts action: %1 (open editor) or %2 (always-on-top window).": ""
@@ -321,25 +321,25 @@
     "Edit": "Bearbeiten"
   },
   "Edit Color Palette": {
-    "Edit Color Palette": ""
+    "Edit Color Palette": "Farbpalette bearbeiten"
   },
   "Edit Text Note": {
-    "Edit Text Note": ""
+    "Edit Text Note": "Textnotiz bearbeiten"
   },
   "Editor": {
-    "Editor": ""
+    "Editor": "Editor"
   },
   "Ellipse": {
-    "Ellipse": "Ellipse / Kreis"
+    "Ellipse": "Ellipse"
   },
   "Enable background automatically when opening the editor": {
-    "Enable background automatically when opening the editor": ""
+    "Enable background automatically when opening the editor": "Hintergrund beim Öffnen des Editors automatisch aktivieren"
   },
   "Eraser": {
     "Eraser": "Radiergummi"
   },
   "Failed to convert recording to GIF.": {
-    "Failed to convert recording to GIF.": ""
+    "Failed to convert recording to GIF.": "Konvertierung der Aufnahme in GIF fehlgeschlagen."
   },
   "Failed to copy screenshot": {
     "Failed to copy screenshot": ""
@@ -351,16 +351,16 @@
     "Failed to download image.": ""
   },
   "Failed to generate blurred background image": {
-    "Failed to generate blurred background image": ""
+    "Failed to generate blurred background image": "Fehler beim Erzeugen des unscharfen Hintergrundbildes"
   },
   "Failed to load image: %1": {
     "Failed to load image: %1": ""
   },
   "Failed to save screenshot": {
-    "Failed to save screenshot": ""
+    "Failed to save screenshot": "Screenshot konnte nicht gespeichert werden"
   },
   "File": {
-    "File": ""
+    "File": "Datei"
   },
   "Filename Pattern": {
     "Filename Pattern": ""
@@ -375,7 +375,7 @@
     "Float": "Schwebend"
   },
   "Float Window": {
-    "Float Window": ""
+    "Float Window": "Fenster schweben lassen"
   },
   "Float service not available.": {
     "Float service not available.": ""
@@ -384,25 +384,25 @@
     "Floating": "Schwebend"
   },
   "Focused Screen": {
-    "Focused Screen": ""
+    "Focused Screen": "Fokussierter Bildschirm"
   },
   "Font Size": {
     "Font Size": "Schriftgrösse"
   },
   "Font family used for number stamp labels": {
-    "Font family used for number stamp labels": ""
+    "Font family used for number stamp labels": "Schriftfamilie für Nummernstempel"
   },
   "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
-    "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": ""
+    "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": "Format-Token: %Y (Jahr), %y (2-stelliges Jahr), %m (Monat), %d (Tag), %H (Stunde), %M (Minute), %S (Sekunde), {zzz} (Ms)"
   },
-  "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
-    "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
+  "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
+    "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": "Format-Token: {user} (Benutzername), \\n (Zeilenumbruch), %Y (Jahr), %y (2-stelliges Jahr), %m (Monat), %d (Tag), %H (Stunde), %M (Minute), %S (Sekunde)"
   },
   "Framerate": {
-    "Framerate": ""
+    "Framerate": "Bildrate"
   },
   "Free": {
-    "Free": ""
+    "Free": "Frei"
   },
   "Fullscreen": {
     "Fullscreen": "Vollbild"
@@ -411,13 +411,13 @@
     "Fullscreen Target": ""
   },
   "GIF Framerate": {
-    "GIF Framerate": ""
+    "GIF Framerate": "GIF-Bildrate"
   },
   "GPU encoder failed. Retrying with %1...": {
     "GPU encoder failed. Retrying with %1...": ""
   },
   "General Shortcuts": {
-    "General Shortcuts": ""
+    "General Shortcuts": "Allgemeine Tastenkürzel"
   },
   "Gradient Angle": {
     "Gradient Angle": ""
@@ -435,10 +435,10 @@
     "Hide Annotations": ""
   },
   "Hide Control Center": {
-    "Hide Control Center": ""
+    "Hide Control Center": "Control Center ausblenden"
   },
   "Hide Control Center by Default": {
-    "Hide Control Center by Default": ""
+    "Hide Control Center by Default": "Control Center standardmäßig ausblenden"
   },
   "High": {
     "High": "Hoch"
@@ -453,55 +453,55 @@
     "Hold %1 for Loupe": ""
   },
   "Hover Trigger Delay": {
-    "Hover Trigger Delay": ""
+    "Hover Trigger Delay": "Verzögerung beim Hover-Trigger"
   },
   "IPC Commands": {
-    "IPC Commands": ""
+    "IPC Commands": "IPC-Befehle"
   },
   "Image": {
     "Image": "Bild"
   },
   "Image + Text": {
-    "Image + Text": ""
+    "Image + Text": "Bild + Text"
   },
   "Image Background": {
-    "Image Background": ""
+    "Image Background": "Bildhintergrund"
   },
   "Image Error": {
-    "Image Error": ""
+    "Image Error": "Bildfehler"
   },
   "Image Folder": {
     "Image Folder": ""
   },
   "Image Size": {
-    "Image Size": ""
+    "Image Size": "Bildgröße"
   },
   "Image is too small (%1×%2). Minimum: %3px": {
     "Image is too small (%1×%2). Minimum: %3px": ""
   },
   "Image selected automatically when using Image Background mode": {
-    "Image selected automatically when using Image Background mode": ""
+    "Image selected automatically when using Image Background mode": "Bild wird automatisch ausgewählt, wenn der Modus Bildhintergrund verwendet wird"
   },
   "Include Cursor": {
-    "Include Cursor": ""
+    "Include Cursor": "Cursor einschließen"
   },
   "Initial Width": {
-    "Initial Width": ""
+    "Initial Width": "Anfangsbreite"
   },
   "Initial state for the Control Center toggle.": {
-    "Initial state for the Control Center toggle.": ""
+    "Initial state for the Control Center toggle.": "Anfangszustand für den Control-Center-Umschalter."
   },
   "Inline": {
     "Inline": ""
   },
   "Input Mode": {
-    "Input Mode": ""
+    "Input Mode": "Eingabemodus"
   },
   "Insert Image": {
-    "Insert Image": ""
+    "Insert Image": "Bild einfügen"
   },
   "Interaction / Result": {
-    "Interaction / Result": ""
+    "Interaction / Result": "Interaktion / Ergebnis"
   },
   "Invalid or corrupted image file.": {
     "Invalid or corrupted image file.": ""
@@ -510,43 +510,43 @@
     "Italic": ""
   },
   "JPEG Quality": {
-    "JPEG Quality": ""
+    "JPEG Quality": "JPEG-Qualität"
   },
   "Key": {
     "Key": "Taste"
   },
   "Landscape": {
-    "Landscape": ""
+    "Landscape": "Querformat"
   },
   "Last Region": {
-    "Last Region": ""
+    "Last Region": "Letzter Bereich"
   },
   "Left": {
     "Left": "Links"
   },
   "Left Center": {
-    "Left Center": ""
+    "Left Center": "Links zentriert"
   },
   "Left Click": {
-    "Left Click": ""
+    "Left Click": "Linksklick"
   },
   "Light": {
     "Light": "Leicht"
   },
   "Line": {
-    "Line": "Gerade"
+    "Line": "Linie"
   },
   "Linear Gradient": {
-    "Linear Gradient": ""
+    "Linear Gradient": "Linearer Gradient"
   },
   "Live Preview": {
-    "Live Preview": ""
+    "Live Preview": "Live-Vorschau"
   },
   "Low": {
     "Low": "Niedrig"
   },
   "Magnifier Loupe": {
-    "Magnifier Loupe": ""
+    "Magnifier Loupe": "Lupenglas"
   },
   "Max Height (%1 = no limit)": {
     "Max Height (%1 = no limit)": ""
@@ -555,52 +555,52 @@
     "Medium": "Mittel"
   },
   "Menu Item Right Click": {
-    "Menu Item Right Click": ""
+    "Menu Item Right Click": "Rechtsklick auf Menüeintrag"
   },
   "Merging audio tracks...": {
-    "Merging audio tracks...": ""
+    "Merging audio tracks...": "Audiospuren werden zusammengeführt..."
   },
   "Microphone": {
-    "Microphone": ""
+    "Microphone": "Mikrofon"
   },
   "Microphone Device": {
-    "Microphone Device": ""
+    "Microphone Device": "Mikrofon-Gerät"
   },
   "Middle Click": {
-    "Middle Click": ""
+    "Middle Click": "Mittelklick"
   },
   "Middle Click Action": {
-    "Middle Click Action": ""
+    "Middle Click Action": "Mittelklick-Aktion"
   },
   "Minimize Delay": {
-    "Minimize Delay": ""
+    "Minimize Delay": "Verzögerung minimieren"
   },
   "Modal": {
-    "Modal": ""
+    "Modal": "Modal"
   },
   "More Tools": {
-    "More Tools": ""
+    "More Tools": "Weitere Werkzeuge"
   },
   "Niri Binding Example": {
-    "Niri Binding Example": ""
+    "Niri Binding Example": "Niri-Bindungsbeispiel"
   },
   "No Background": {
     "No Background": "Kein Hintergrund"
   },
   "No Image Specified": {
-    "No Image Specified": ""
+    "No Image Specified": "Kein Bild angegeben"
   },
   "No QR code detected": {
     "No QR code detected": ""
   },
   "No output available": {
-    "No output available": ""
+    "No output available": "Keine Ausgabe verfügbar"
   },
   "No saved images yet": {
-    "No saved images yet": ""
+    "No saved images yet": "Noch keine gespeicherten Bilder"
   },
   "No supported images found": {
-    "No supported images found": ""
+    "No supported images found": "Keine unterstützten Bilder gefunden"
   },
   "No text detected": {
     "No text detected": ""
@@ -615,7 +615,7 @@
     "None": "Nichts"
   },
   "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": {
-    "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": ""
+    "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": "Hinweis: Das Starten des Werkzeugmodus überschreibt die Standardwerte für Werkzeugstärke und -farbe, wenn das Startwerkzeug damit übereinstimmt."
   },
   "Notification": {
     "Notification": "Benachrichtigung"
@@ -624,16 +624,16 @@
     "Notifications": "Benachrichtigungen"
   },
   "OCR": {
-    "OCR": ""
+    "OCR": "OCR"
   },
   "OCR Result": {
-    "OCR Result": ""
+    "OCR Result": "OCR-Ergebnis"
   },
   "OCR failed": {
     "OCR failed": ""
   },
   "Off": {
-    "Off": ""
+    "Off": "Aus"
   },
   "Opacity": {
     "Opacity": "Deckkraft"
@@ -648,34 +648,34 @@
     "Open Image": ""
   },
   "Open folder": {
-    "Open folder": ""
+    "Open folder": "Ordner öffnen"
   },
   "Outline Variant": {
-    "Outline Variant": ""
+    "Outline Variant": "Umrissvariante"
   },
   "Output Format": {
-    "Output Format": ""
+    "Output Format": "Ausgabeformat"
   },
   "Output format applies only to disk saves. Clipboard copies are always PNG.": {
-    "Output format applies only to disk saves. Clipboard copies are always PNG.": ""
+    "Output format applies only to disk saves. Clipboard copies are always PNG.": "Das Ausgabeformat gilt nur für Speicherungen auf der Festplatte. Kopien in die Zwischenablage sind immer PNG."
   },
   "Overlay Opacity": {
-    "Overlay Opacity": ""
+    "Overlay Opacity": "Overlay-Deckkraft"
   },
   "Padding": {
-    "Padding": ""
+    "Padding": "Innenabstand"
   },
   "Palette Preset": {
-    "Palette Preset": ""
+    "Palette Preset": "Palette-Voreinstellung"
   },
   "Pause": {
     "Pause": "Pause"
   },
   "Pause / Resume": {
-    "Pause / Resume": ""
+    "Pause / Resume": "Pause / Fortsetzen"
   },
   "Paused": {
-    "Paused": ""
+    "Paused": "Pausiert"
   },
   "Pausing is not supported with %1.": {
     "Pausing is not supported with %1.": ""
@@ -684,37 +684,37 @@
     "Pen": "Freihandstift"
   },
   "Pen Auto-Close": {
-    "Pen Auto-Close": ""
+    "Pen Auto-Close": "Stift automatisch schließen"
   },
   "Pick Color": {
-    "Pick Color": ""
+    "Pick Color": "Farbe wählen"
   },
   "Pick a palette preset or customize individual color slots.": {
-    "Pick a palette preset or customize individual color slots.": ""
+    "Pick a palette preset or customize individual color slots.": "Wählen Sie eine Paletten-Voreinstellung oder passen Sie einzelne Farbslots an."
   },
   "Pixelate": {
     "Pixelate": "Verpixeln"
   },
   "Pixelate Intensity": {
-    "Pixelate Intensity": ""
+    "Pixelate Intensity": "Pixelierungsintensität"
   },
   "Popup": {
     "Popup": ""
   },
   "Portrait": {
-    "Portrait": ""
+    "Portrait": "Porträt"
   },
   "Position": {
     "Position": "Position"
   },
   "Post-Capture Notification": {
-    "Post-Capture Notification": ""
+    "Post-Capture Notification": "Benachrichtigung nach Aufnahme"
   },
   "Preset": {
     "Preset": ""
   },
   "Preset %1": {
-    "Preset %1": ""
+    "Preset %1": "Voreinstellung %1"
   },
   "Presets": {
     "Presets": ""
@@ -729,64 +729,64 @@
     "Primary": "Primär"
   },
   "Primary Screen": {
-    "Primary Screen": ""
+    "Primary Screen": "Primärer Bildschirm"
   },
   "QR Result": {
-    "QR Result": ""
+    "QR Result": "QR-Ergebnis"
   },
   "QR scan failed": {
     "QR scan failed": ""
   },
   "Quality": {
-    "Quality": ""
+    "Quality": "Qualität"
   },
   "Quick Capture": {
-    "Quick Capture": ""
+    "Quick Capture": "Quick-Capture"
   },
   "Quick Capture Error": {
-    "Quick Capture Error": ""
+    "Quick Capture Error": "Quick-Capture-Fehler"
   },
   "Radial Gradient": {
-    "Radial Gradient": ""
+    "Radial Gradient": "Radialer Gradient"
   },
   "Radial Menu": {
-    "Radial Menu": ""
+    "Radial Menu": "Radialmenü"
   },
   "Ratio": {
-    "Ratio": ""
+    "Ratio": "Verhältnis"
   },
   "Ready": {
     "Ready": "Bereit"
   },
   "Recent Edits": {
-    "Recent Edits": ""
+    "Recent Edits": "Letzte Bearbeitungen"
   },
   "Record Microphone": {
-    "Record Microphone": ""
+    "Record Microphone": "Mikrofon aufnehmen"
   },
   "Record System Audio": {
-    "Record System Audio": ""
+    "Record System Audio": "System-Audio aufnehmen"
   },
   "Recording": {
-    "Recording": ""
+    "Recording": "Aufnahme"
   },
   "Recording Backend": {
     "Recording Backend": ""
   },
   "Recording Folder": {
-    "Recording Folder": ""
+    "Recording Folder": "Aufnahmeordner"
   },
   "Recording ended with error code %1.": {
-    "Recording ended with error code %1.": ""
+    "Recording ended with error code %1.": "Aufnahme mit Fehlercode %1 beendet."
   },
   "Recording...": {
-    "Recording...": ""
+    "Recording...": "Aufnahme..."
   },
   "Rectangle": {
-    "Rectangle": "Rechteckiger Umriss"
+    "Rectangle": "Rechteck"
   },
   "Redact": {
-    "Redact": ""
+    "Redact": "Zensieren"
   },
   "Redo": {
     "Redo": ""
@@ -795,13 +795,13 @@
     "Refresh": "Aktualisieren"
   },
   "Region": {
-    "Region": ""
+    "Region": "Region"
   },
   "Reset": {
     "Reset": "Zurücksetzen"
   },
   "Reset Last Region": {
-    "Reset Last Region": ""
+    "Reset Last Region": "Letzte Region zurücksetzen"
   },
   "Resume": {
     "Resume": "Fortsetzen"
@@ -810,13 +810,13 @@
     "Right": "Rechts"
   },
   "Right Center": {
-    "Right Center": ""
+    "Right Center": "Rechts zentriert"
   },
   "Right Click": {
-    "Right Click": ""
+    "Right Click": "Rechtsklick"
   },
   "Right Click Action": {
-    "Right Click Action": ""
+    "Right Click Action": "Rechtsklick-Aktion"
   },
   "Rotate Left": {
     "Rotate Left": ""
@@ -825,76 +825,76 @@
     "Rotate Right": ""
   },
   "Round Highlighter Tips": {
-    "Round Highlighter Tips": ""
+    "Round Highlighter Tips": "Runde Textmarker-Spitzen"
   },
   "Round Rectangle Corners": {
-    "Round Rectangle Corners": ""
+    "Round Rectangle Corners": "Abgerundete Rechteck-Ecken"
   },
   "Rounded Rectangle": {
-    "Rounded Rectangle": ""
+    "Rounded Rectangle": "Abgerundetes Rechteck"
   },
   "Save": {
-    "Save": ""
+    "Save": "Speichern"
   },
   "Save As": {
     "Save As": ""
   },
   "Save Screenshot As": {
-    "Save Screenshot As": ""
+    "Save Screenshot As": "Screenshot speichern unter"
   },
   "Saved %1 (%2)": {
-    "Saved %1 (%2)": ""
+    "Saved %1 (%2)": "%1 gespeichert (%2)"
   },
   "Scale Editor to Screenshot Size": {
-    "Scale Editor to Screenshot Size": ""
+    "Scale Editor to Screenshot Size": "Editor auf Screenshot-Größe skalieren"
   },
   "Scan QR": {
-    "Scan QR": ""
+    "Scan QR": "QR scannen"
   },
   "Screen Recording": {
     "Screen Recording": ""
   },
   "Screen Recording Error": {
-    "Screen Recording Error": ""
+    "Screen Recording Error": "Fehler bei Bildschirmaufnahme"
   },
   "Screen Recording Saved": {
-    "Screen Recording Saved": ""
+    "Screen Recording Saved": "Bildschirmaufnahme gespeichert"
   },
   "Screen recording timed out or was cancelled.": {
-    "Screen recording timed out or was cancelled.": ""
+    "Screen recording timed out or was cancelled.": "Bildschirmaufnahme zeitlich abgelaufen oder abgebrochen."
   },
   "Screenshot": {
     "Screenshot": ""
   },
   "Screenshot Copied": {
-    "Screenshot Copied": ""
+    "Screenshot Copied": "Screenshot kopiert"
   },
   "Screenshot Folder": {
-    "Screenshot Folder": "Verzeichnis speichern"
+    "Screenshot Folder": "Screenshot-Ordner"
   },
   "Screenshot Saved": {
-    "Screenshot Saved": ""
+    "Screenshot Saved": "Screenshot gespeichert"
   },
   "Screenshot copied anonymously with randomized name and stripped metadata.": {
-    "Screenshot copied anonymously with randomized name and stripped metadata.": ""
+    "Screenshot copied anonymously with randomized name and stripped metadata.": "Screenshot anonym mit zufälligem Namen und ohne Metadaten kopiert."
   },
   "Screenshot copied to clipboard and saved to %1": {
-    "Screenshot copied to clipboard and saved to %1": ""
+    "Screenshot copied to clipboard and saved to %1": "Screenshot in die Zwischenablage kopiert und unter %1 gespeichert"
   },
   "Screenshot copied to clipboard but failed to save file: %1": {
-    "Screenshot copied to clipboard but failed to save file: %1": ""
+    "Screenshot copied to clipboard but failed to save file: %1": "Screenshot in die Zwischenablage kopiert, aber Datei konnte nicht gespeichert werden: %1"
   },
   "Screenshot copied with randomized name.": {
-    "Screenshot copied with randomized name.": ""
+    "Screenshot copied with randomized name.": "Screenshot mit zufälligem Namen kopiert."
   },
   "Screenshot failed (mode: %1).": {
-    "Screenshot failed (mode: %1).": ""
+    "Screenshot failed (mode: %1).": "Screenshot fehlgeschlagen (Modus: %1)."
   },
   "Screenshot saved to %1": {
-    "Screenshot saved to %1": ""
+    "Screenshot saved to %1": "Screenshot gespeichert unter %1"
   },
   "Scroll Interval": {
-    "Scroll Interval": ""
+    "Scroll Interval": "Scroll-Intervall"
   },
   "Scroll capture: select a region, scroll content, then press %1 to finish.": {
     "Scroll capture: select a region, scroll content, then press %1 to finish.": ""
@@ -909,13 +909,13 @@
     "Select Color Slots %1": ""
   },
   "Select Image to Annotate": {
-    "Select Image to Annotate": ""
+    "Select Image to Annotate": "Bild zum Annotieren auswählen"
   },
   "Select screen recording backend. Auto attempts GPU first and falls back to CPU (%1).": {
     "Select screen recording backend. Auto attempts GPU first and falls back to CPU (%1).": ""
   },
   "Selected Tool / Action": {
-    "Selected Tool / Action": ""
+    "Selected Tool / Action": "Ausgewähltes Werkzeug / Aktion"
   },
   "Settings": {
     "Settings": "Einstellungen"
@@ -924,100 +924,100 @@
     "Shadow Strength": ""
   },
   "Shapes": {
-    "Shapes": ""
+    "Shapes": "Formen"
   },
   "Shortcut Action": {
-    "Shortcut Action": ""
+    "Shortcut Action": "Shortcut-Aktion"
   },
   "Show Annotations": {
     "Show Annotations": ""
   },
   "Show Control Center": {
-    "Show Control Center": ""
+    "Show Control Center": "Kontrollzentrum anzeigen"
   },
   "Show Keyboard Shortcut Hints": {
-    "Show Keyboard Shortcut Hints": ""
+    "Show Keyboard Shortcut Hints": "Tastenkombinations-Hinweise anzeigen"
   },
   "Show Pill Border": {
-    "Show Pill Border": ""
+    "Show Pill Border": "Pill-Rahmen anzeigen"
   },
   "Show Region Border": {
-    "Show Region Border": ""
+    "Show Region Border": "Regions-Rahmen anzeigen"
   },
   "Show Screenshot Border": {
-    "Show Screenshot Border": ""
+    "Show Screenshot Border": "Screenshot-Rahmen anzeigen"
   },
   "Show Toolbar": {
-    "Show Toolbar": ""
+    "Show Toolbar": "Symbolleiste anzeigen"
   },
   "Show Toolbar Border": {
-    "Show Toolbar Border": ""
+    "Show Toolbar Border": "Symbolleisten-Rahmen anzeigen"
   },
   "Show only the image on a transparent background": {
-    "Show only the image on a transparent background": ""
+    "Show only the image on a transparent background": "Nur das Bild auf transparentem Hintergrund anzeigen"
   },
   "Skip confirmation": {
-    "Skip confirmation": ""
+    "Skip confirmation": "Bestätigung überspringen"
   },
   "Slot %1": {
     "Slot %1": ""
   },
   "Soften image details so screenshot content stands out": {
-    "Soften image details so screenshot content stands out": ""
+    "Soften image details so screenshot content stands out": "Bilddetails weichzeichnen, damit Screenshot-Inhalt hervorsticht"
   },
   "Solid Color": {
-    "Solid Color": ""
+    "Solid Color": "Vollfarbe"
   },
   "Solid Fill": {
-    "Solid Fill": ""
+    "Solid Fill": "Vollflächige Füllung"
   },
   "Solid Line": {
-    "Solid Line": ""
+    "Solid Line": "Durchgehende Linie"
   },
   "Spawn Position": {
-    "Spawn Position": ""
+    "Spawn Position": "Spawn-Position"
   },
   "Specific Output": {
-    "Specific Output": ""
+    "Specific Output": "Spezifische Ausgabe"
   },
   "Spotlight": {
     "Spotlight": "Spotlight"
   },
   "Spotlight Opacity": {
-    "Spotlight Opacity": ""
+    "Spotlight Opacity": "Spotlight-Deckkraft"
   },
   "Stamp": {
     "Stamp": "Nummernstempel"
   },
   "Stamp Contrast Ring": {
-    "Stamp Contrast Ring": ""
+    "Stamp Contrast Ring": "Stempel-Kontrastring"
   },
   "Stamp Size": {
-    "Stamp Size": ""
+    "Stamp Size": "Stempelgröße"
   },
   "Starting Preset": {
-    "Starting Preset": ""
+    "Starting Preset": "Start-Voreinstellung"
   },
   "Starting Tool": {
     "Starting Tool": "Startwerkzeug"
   },
   "Starting Tool Mode": {
-    "Starting Tool Mode": ""
+    "Starting Tool Mode": "Start-Werkzeugmodus"
   },
   "Stop & Save": {
-    "Stop & Save": ""
+    "Stop & Save": "Stoppen & Speichern"
   },
   "Surface Container Highest": {
-    "Surface Container Highest": ""
+    "Surface Container Highest": "Oberflächencontainer Höchste"
   },
   "Switch to your custom preset": {
-    "Switch to your custom preset": ""
+    "Switch to your custom preset": "Zu Ihrer benutzerdefinierten Voreinstellung wechseln"
   },
   "System Audio Device": {
-    "System Audio Device": ""
+    "System Audio Device": "System-Audiogerät"
   },
   "Target Output Name": {
-    "Target Output Name": ""
+    "Target Output Name": "Ziel-Ausgabename"
   },
   "Text": {
     "Text": "Text"
@@ -1026,16 +1026,16 @@
     "Text Background": ""
   },
   "Text Background Roundness": {
-    "Text Background Roundness": ""
+    "Text Background Roundness": "Rundung des Texthintergrunds"
   },
   "Text Size": {
-    "Text Size": ""
+    "Text Size": "Textgröße"
   },
   "Thickness": {
     "Thickness": "Stärke"
   },
   "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": {
-    "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": ""
+    "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": "Diese Paletten-Voreinstellung ist schreibgeschützt. Wählen Sie eine der folgenden Optionen, um zur benutzerdefinierten Palette zu wechseln und Farben zu bearbeiten:"
   },
   "Toast": {
     "Toast": "Toast-Benachrichtigung"
@@ -1044,7 +1044,7 @@
     "Toggle Annotations": ""
   },
   "Toggle Start / Stop": {
-    "Toggle Start / Stop": ""
+    "Toggle Start / Stop": "Start / Stopp umschalten"
   },
   "Toggle between %1 latest presets": {
     "Toggle between %1 latest presets": ""
@@ -1053,19 +1053,19 @@
     "Tool": ""
   },
   "Tool Defaults": {
-    "Tool Defaults": ""
+    "Tool Defaults": "Werkzeug-Standardwerte"
   },
   "Toolbar": {
-    "Toolbar": ""
+    "Toolbar": "Symbolleiste"
   },
   "Toolbar Palette": {
-    "Toolbar Palette": ""
+    "Toolbar Palette": "Symbolleisten-Palette"
   },
   "Toolbar Position": {
-    "Toolbar Position": ""
+    "Toolbar Position": "Position der Symbolleiste"
   },
   "Tools": {
-    "Tools": ""
+    "Tools": "Werkzeuge"
   },
   "Top": {
     "Top": "Oben"
@@ -1080,16 +1080,16 @@
     "Top Right": "Oben rechts"
   },
   "Transparent": {
-    "Transparent": ""
+    "Transparent": "Transparent"
   },
   "Transparent Background": {
-    "Transparent Background": ""
+    "Transparent Background": "Transparenter Hintergrund"
   },
   "Trigger on Hover": {
-    "Trigger on Hover": ""
+    "Trigger on Hover": "Beim Hovern auslösen"
   },
   "Type note...": {
-    "Type note...": ""
+    "Type note...": "Notiz eingeben..."
   },
   "Underline": {
     "Underline": ""
@@ -1098,16 +1098,16 @@
     "Undo": ""
   },
   "Usage Guide": {
-    "Usage Guide": ""
+    "Usage Guide": "Bedienungsanleitung"
   },
   "Use Existing Custom": {
-    "Use Existing Custom": ""
+    "Use Existing Custom": "Bestehende benutzerdefinierte verwenden"
   },
   "Use Floating Editor": {
-    "Use Floating Editor": ""
+    "Use Floating Editor": "Schwebenden Editor verwenden"
   },
   "Use Modal Editor": {
-    "Use Modal Editor": ""
+    "Use Modal Editor": "Modalen Editor verwenden"
   },
   "Variant": {
     "Variant": ""
@@ -1119,24 +1119,24 @@
     "Video": ""
   },
   "Video Codec": {
-    "Video Codec": ""
+    "Video Codec": "Video-Codec"
   },
   "Watermark": {
-    "Watermark": ""
+    "Watermark": "Wasserzeichen"
   },
   "Watermark Type": {
-    "Watermark Type": ""
+    "Watermark Type": "Wasserzeichentyp"
   },
   "WebP Quality": {
-    "WebP Quality": ""
+    "WebP Quality": "WebP-Qualität"
   },
   "When enabled, the editor shrinks to match the captured region instead of filling %1% of the screen.": {
     "When enabled, the editor shrinks to match the captured region instead of filling %1% of the screen.": ""
   },
   "Window": {
-    "Window": ""
+    "Window": "Fenster"
   },
   "Window / Portal": {
-    "Window / Portal": ""
+    "Window / Portal": "Fenster / Portal"
   }
 }
