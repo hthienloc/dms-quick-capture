@@ -48,7 +48,7 @@
     "Aspect Ratio": ""
   },
   "Audio": {
-    "Audio": ""
+    "Audio": "Audio"
   },
   "Audio & Overlay": {
     "Audio & Overlay": ""
@@ -105,7 +105,7 @@
     "Background Presets": ""
   },
   "Background image": {
-    "Background image": ""
+    "Background image": "Image d’arrière-plan"
   },
   "Balanced": {
     "Balanced": "Equilibré"
@@ -150,7 +150,7 @@
     "Callout Zoom": ""
   },
   "Cancel": {
-    "Cancel": ""
+    "Cancel": "Annuler"
   },
   "Capture": {
     "Capture": ""
@@ -195,7 +195,7 @@
     "Close": "Fermer"
   },
   "Color": {
-    "Color": ""
+    "Color": "Couleur"
   },
   "Color %1 copied": {
     "Color %1 copied": ""
@@ -204,7 +204,7 @@
     "Color Palette": ""
   },
   "Color Picker": {
-    "Color Picker": ""
+    "Color Picker": "Sélecteur de couleur"
   },
   "Configure up to %1 quick-access tool presets. Right-click during capture to open the radial menu.": {
     "Configure up to %1 quick-access tool presets. Right-click during capture to open the radial menu.": ""
@@ -228,7 +228,7 @@
     "Copied to clipboard": "Copié dans le presse-papiers"
   },
   "Copied!": {
-    "Copied!": ""
+    "Copied!": "Copié !"
   },
   "Copy": {
     "Copy": "Copier"
@@ -249,7 +249,7 @@
     "Copy vector / Paste / Duplicate": ""
   },
   "Corner Radius": {
-    "Corner Radius": ""
+    "Corner Radius": "Rayon des coins"
   },
   "Could not crop image": {
     "Could not crop image": ""
@@ -291,7 +291,7 @@
     "Discard & Close": ""
   },
   "Display": {
-    "Display": ""
+    "Display": "Écran"
   },
   "Display Mode": {
     "Display Mode": ""
@@ -360,7 +360,7 @@
     "Failed to save screenshot": ""
   },
   "File": {
-    "File": ""
+    "File": "Fichier"
   },
   "Filename Pattern": {
     "Filename Pattern": ""
@@ -395,8 +395,8 @@
   "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
     "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": ""
   },
-  "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
-    "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
+  "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
+    "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
   },
   "Framerate": {
     "Framerate": ""
@@ -525,7 +525,7 @@
     "Left": "Gauche"
   },
   "Left Center": {
-    "Left Center": ""
+    "Left Center": "Au centre à gauche"
   },
   "Left Click": {
     "Left Click": ""
@@ -534,7 +534,7 @@
     "Light": ""
   },
   "Line": {
-    "Line": "Ligne droite"
+    "Line": "Ligne"
   },
   "Linear Gradient": {
     "Linear Gradient": ""
@@ -561,7 +561,7 @@
     "Merging audio tracks...": ""
   },
   "Microphone": {
-    "Microphone": ""
+    "Microphone": "Microphone"
   },
   "Microphone Device": {
     "Microphone Device": ""
@@ -633,7 +633,7 @@
     "OCR failed": ""
   },
   "Off": {
-    "Off": ""
+    "Off": "Désactivé"
   },
   "Opacity": {
     "Opacity": "Opacité"
@@ -648,7 +648,7 @@
     "Open Image": ""
   },
   "Open folder": {
-    "Open folder": ""
+    "Open folder": "Ouvrir dossier"
   },
   "Outline Variant": {
     "Outline Variant": ""
@@ -663,7 +663,7 @@
     "Overlay Opacity": ""
   },
   "Padding": {
-    "Padding": ""
+    "Padding": "Marge"
   },
   "Palette Preset": {
     "Palette Preset": ""
@@ -675,7 +675,7 @@
     "Pause / Resume": ""
   },
   "Paused": {
-    "Paused": ""
+    "Paused": "En pause"
   },
   "Pausing is not supported with %1.": {
     "Pausing is not supported with %1.": ""
@@ -810,7 +810,7 @@
     "Right": "Droite"
   },
   "Right Center": {
-    "Right Center": ""
+    "Right Center": "Au centre à droite"
   },
   "Right Click": {
     "Right Click": ""
@@ -834,7 +834,7 @@
     "Rounded Rectangle": ""
   },
   "Save": {
-    "Save": ""
+    "Save": "Enregistrer"
   },
   "Save As": {
     "Save As": ""
@@ -957,7 +957,7 @@
     "Show only the image on a transparent background": ""
   },
   "Skip confirmation": {
-    "Skip confirmation": ""
+    "Skip confirmation": "Passer la confirmation"
   },
   "Slot %1": {
     "Slot %1": ""
@@ -1065,7 +1065,7 @@
     "Toolbar Position": ""
   },
   "Tools": {
-    "Tools": ""
+    "Tools": "Outils"
   },
   "Top": {
     "Top": "Haut"

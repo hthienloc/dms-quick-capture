@@ -48,7 +48,7 @@
     "Aspect Ratio": ""
   },
   "Audio": {
-    "Audio": ""
+    "Audio": "音訊"
   },
   "Audio & Overlay": {
     "Audio & Overlay": ""
@@ -105,7 +105,7 @@
     "Background Presets": ""
   },
   "Background image": {
-    "Background image": ""
+    "Background image": "背景圖片"
   },
   "Balanced": {
     "Balanced": "平衡"
@@ -120,7 +120,7 @@
     "Blur Background Image": ""
   },
   "Bold": {
-    "Bold": ""
+    "Bold": "粗體"
   },
   "Border Color": {
     "Border Color": "邊框顏色"
@@ -150,7 +150,7 @@
     "Callout Zoom": ""
   },
   "Cancel": {
-    "Cancel": ""
+    "Cancel": "取消"
   },
   "Capture": {
     "Capture": ""
@@ -195,16 +195,16 @@
     "Close": "關閉"
   },
   "Color": {
-    "Color": ""
+    "Color": "顏色"
   },
   "Color %1 copied": {
-    "Color %1 copied": ""
+    "Color %1 copied": "顏色 %1 已複製"
   },
   "Color Palette": {
     "Color Palette": ""
   },
   "Color Picker": {
-    "Color Picker": ""
+    "Color Picker": "顏色選擇器"
   },
   "Configure up to %1 quick-access tool presets. Right-click during capture to open the radial menu.": {
     "Configure up to %1 quick-access tool presets. Right-click during capture to open the radial menu.": ""
@@ -228,7 +228,7 @@
     "Copied to clipboard": "複製到剪貼簿"
   },
   "Copied!": {
-    "Copied!": ""
+    "Copied!": "已複製!"
   },
   "Copy": {
     "Copy": "複製"
@@ -249,7 +249,7 @@
     "Copy vector / Paste / Duplicate": ""
   },
   "Corner Radius": {
-    "Corner Radius": ""
+    "Corner Radius": "圓角半徑"
   },
   "Could not crop image": {
     "Could not crop image": ""
@@ -291,7 +291,7 @@
     "Discard & Close": ""
   },
   "Display": {
-    "Display": ""
+    "Display": "顯示"
   },
   "Display Mode": {
     "Display Mode": ""
@@ -360,7 +360,7 @@
     "Failed to save screenshot": ""
   },
   "File": {
-    "File": ""
+    "File": "檔案"
   },
   "Filename Pattern": {
     "Filename Pattern": ""
@@ -395,8 +395,8 @@
   "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
     "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": ""
   },
-  "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
-    "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
+  "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
+    "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
   },
   "Framerate": {
     "Framerate": ""
@@ -405,7 +405,7 @@
     "Free": ""
   },
   "Fullscreen": {
-    "Fullscreen": ""
+    "Fullscreen": "全螢幕"
   },
   "Fullscreen Target": {
     "Fullscreen Target": ""
@@ -525,7 +525,7 @@
     "Left": "左"
   },
   "Left Center": {
-    "Left Center": ""
+    "Left Center": "左中央"
   },
   "Left Click": {
     "Left Click": ""
@@ -534,7 +534,7 @@
     "Light": "細"
   },
   "Line": {
-    "Line": ""
+    "Line": "線"
   },
   "Linear Gradient": {
     "Linear Gradient": ""
@@ -561,7 +561,7 @@
     "Merging audio tracks...": ""
   },
   "Microphone": {
-    "Microphone": ""
+    "Microphone": "麥克風"
   },
   "Microphone Device": {
     "Microphone Device": ""
@@ -633,7 +633,7 @@
     "OCR failed": ""
   },
   "Off": {
-    "Off": ""
+    "Off": "關閉"
   },
   "Opacity": {
     "Opacity": "不透明度"
@@ -648,7 +648,7 @@
     "Open Image": ""
   },
   "Open folder": {
-    "Open folder": ""
+    "Open folder": "開啟資料夾"
   },
   "Outline Variant": {
     "Outline Variant": ""
@@ -663,7 +663,7 @@
     "Overlay Opacity": ""
   },
   "Padding": {
-    "Padding": ""
+    "Padding": "內距"
   },
   "Palette Preset": {
     "Palette Preset": ""
@@ -675,7 +675,7 @@
     "Pause / Resume": ""
   },
   "Paused": {
-    "Paused": ""
+    "Paused": "暫停"
   },
   "Pausing is not supported with %1.": {
     "Pausing is not supported with %1.": ""
@@ -738,7 +738,7 @@
     "QR scan failed": ""
   },
   "Quality": {
-    "Quality": ""
+    "Quality": "品質"
   },
   "Quick Capture": {
     "Quick Capture": ""
@@ -810,7 +810,7 @@
     "Right": "右方"
   },
   "Right Center": {
-    "Right Center": ""
+    "Right Center": "右中"
   },
   "Right Click": {
     "Right Click": ""
@@ -834,7 +834,7 @@
     "Rounded Rectangle": ""
   },
   "Save": {
-    "Save": ""
+    "Save": "儲存"
   },
   "Save As": {
     "Save As": ""
@@ -957,7 +957,7 @@
     "Show only the image on a transparent background": ""
   },
   "Skip confirmation": {
-    "Skip confirmation": ""
+    "Skip confirmation": "跳過確認"
   },
   "Slot %1": {
     "Slot %1": ""
@@ -1065,7 +1065,7 @@
     "Toolbar Position": ""
   },
   "Tools": {
-    "Tools": ""
+    "Tools": "工具"
   },
   "Top": {
     "Top": "上方"

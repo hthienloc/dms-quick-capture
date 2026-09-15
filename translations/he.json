@@ -6,10 +6,10 @@
     "%1 is not installed": ""
   },
   "1 Connecting Line": {
-    "1 Connecting Line": ""
+    "1 Connecting Line": "קו מחבר 1"
   },
   "2 Connecting Lines": {
-    "2 Connecting Lines": ""
+    "2 Connecting Lines": "2 קווים מחברים"
   },
   "Action": {
     "Action": "פעולה"
@@ -24,19 +24,19 @@
     "Add": "הוספה"
   },
   "Add Text Note": {
-    "Add Text Note": ""
+    "Add Text Note": "הוספת הערת טקסט"
   },
   "Alignment": {
     "Alignment": ""
   },
   "All Outputs": {
-    "All Outputs": ""
+    "All Outputs": "כל הפלטים"
   },
   "Annotating": {
-    "Annotating": ""
+    "Annotating": "עורך הערה"
   },
   "Annotation Tools": {
-    "Annotation Tools": ""
+    "Annotation Tools": "כלי ביאור"
   },
   "Anonymous Copy": {
     "Anonymous Copy": ""
@@ -48,10 +48,10 @@
     "Aspect Ratio": ""
   },
   "Audio": {
-    "Audio": ""
+    "Audio": "שמע"
   },
   "Audio & Overlay": {
-    "Audio & Overlay": ""
+    "Audio & Overlay": "שמע ושכבת כיסוי"
   },
   "Audio Codec": {
     "Audio Codec": "קודק אודיו"
@@ -63,28 +63,28 @@
     "Auto": "אוטומטי"
   },
   "Auto Balance": {
-    "Auto Balance": ""
+    "Auto Balance": "איזון אוטומטי"
   },
   "Auto-apply background defaults": {
-    "Auto-apply background defaults": ""
+    "Auto-apply background defaults": "החלת ברירות המחדל של הרקע אוטומטית"
   },
   "Auto-close the loop when ending near the start point.": {
-    "Auto-close the loop when ending near the start point.": ""
+    "Auto-close the loop when ending near the start point.": "סגירה אוטומטית של הלולאה כאשר מסיימים בסמוך לנקודת ההתחלה."
   },
   "Auto-minimize": {
-    "Auto-minimize": ""
+    "Auto-minimize": "מזעור אוטומטי"
   },
   "Auto-select a tool preset on hover, without releasing the mouse.": {
-    "Auto-select a tool preset on hover, without releasing the mouse.": ""
+    "Auto-select a tool preset on hover, without releasing the mouse.": "בחירה אוטומטית של ערכת כלי מוכנה בריחוף, ללא שחרור העכבר."
   },
   "Auto-tiling": {
-    "Auto-tiling": ""
+    "Auto-tiling": "ריצוף אוטומטי"
   },
   "Automatically minimize the float window after a delay": {
-    "Automatically minimize the float window after a delay": ""
+    "Automatically minimize the float window after a delay": "מזער/י אוטומטית את החלון הצף לאחר השהיה"
   },
   "Automatically stack windows to avoid overlap": {
-    "Automatically stack windows to avoid overlap": ""
+    "Automatically stack windows to avoid overlap": "ערום/ערמי חלונות אוטומטית כדי למנוע חפיפה"
   },
   "Back to Annotation": {
     "Back to Annotation": ""
@@ -93,34 +93,34 @@
     "Background": "רקע"
   },
   "Background Defaults": {
-    "Background Defaults": ""
+    "Background Defaults": "ברירות מחדל לרקע"
   },
   "Background Images": {
-    "Background Images": ""
+    "Background Images": "תמונות רקע"
   },
   "Background Mode": {
     "Background Mode": ""
   },
   "Background Presets": {
-    "Background Presets": ""
+    "Background Presets": "הגדרות רקע מוכנות"
   },
   "Background image": {
-    "Background image": ""
+    "Background image": "תמונת רקע"
   },
   "Balanced": {
     "Balanced": "מאוזן"
   },
   "Bar Interactions": {
-    "Bar Interactions": ""
+    "Bar Interactions": "אינטראקציות בסרגל"
   },
   "Blink Recording Dot": {
-    "Blink Recording Dot": ""
+    "Blink Recording Dot": "הבהוב נקודת הקלטה"
   },
   "Blur Background Image": {
-    "Blur Background Image": ""
+    "Blur Background Image": "טשטוש תמונת הרקע"
   },
   "Bold": {
-    "Bold": ""
+    "Bold": "מודגש"
   },
   "Border Color": {
     "Border Color": "צבע מסגרת"
@@ -129,7 +129,7 @@
     "Border Width": "רוחב המסגרת"
   },
   "Both": {
-    "Both": ""
+    "Both": "שניהם"
   },
   "Bottom": {
     "Bottom": "למטה"
@@ -144,49 +144,49 @@
     "Bottom Right": "ימין למטה"
   },
   "Callout": {
-    "Callout": ""
+    "Callout": "הבלטה"
   },
   "Callout Zoom": {
-    "Callout Zoom": ""
+    "Callout Zoom": "תקריב הבלטה"
   },
   "Cancel": {
-    "Cancel": ""
+    "Cancel": "ביטול"
   },
   "Capture": {
-    "Capture": ""
+    "Capture": "לכידה"
   },
   "Capture Actions": {
-    "Capture Actions": ""
+    "Capture Actions": "פעולות לכידה"
   },
   "Capture Options": {
-    "Capture Options": ""
+    "Capture Options": "אפשרויות לכידה"
   },
   "Capturing...": {
-    "Capturing...": ""
+    "Capturing...": "לוכד..."
   },
   "Center": {
-    "Center": ""
+    "Center": "מרכז"
   },
   "Choose Color": {
     "Choose Color": "בחר/י צבע"
   },
   "Choose notifications shown after copy or save.": {
-    "Choose notifications shown after copy or save.": ""
+    "Choose notifications shown after copy or save.": "בחר/י אילו התראות יוצגו לאחר העתקה או שמירה."
   },
   "Choose the editor shape for portrait or landscape screens.": {
-    "Choose the editor shape for portrait or landscape screens.": ""
+    "Choose the editor shape for portrait or landscape screens.": "בחר/י את צורת העורך למסכים לאורך או לרוחב."
   },
   "Choose whether the editor opens as a modal overlay or a movable floating window.": {
-    "Choose whether the editor opens as a modal overlay or a movable floating window.": ""
+    "Choose whether the editor opens as a modal overlay or a movable floating window.": "בחר/י האם העורך ייפתח כשכבת כיסוי מודלית או כחלון צף הניתן להזזה."
   },
   "Choose which monitor to capture during full screen recording.": {
-    "Choose which monitor to capture during full screen recording.": ""
+    "Choose which monitor to capture during full screen recording.": "בחר/י איזה מסך ללכוד במהלך הקלטת מסך מלא."
   },
   "Clean Text Eraser": {
-    "Clean Text Eraser": ""
+    "Clean Text Eraser": "מחק טקסט נקי"
   },
   "Clear saved region selection before each capture": {
-    "Clear saved region selection before each capture": ""
+    "Clear saved region selection before each capture": "נקה/י את בחירת האזור השמורה לפני כל לכידה"
   },
   "Clipboard": {
     "Clipboard": "לוח ההעתקה"
@@ -195,121 +195,121 @@
     "Close": "סגירה"
   },
   "Color": {
-    "Color": ""
+    "Color": "צבע"
   },
   "Color %1 copied": {
-    "Color %1 copied": ""
+    "Color %1 copied": "צבע %1 הועתק"
   },
   "Color Palette": {
-    "Color Palette": ""
+    "Color Palette": "פלטת צבעים"
   },
   "Color Picker": {
-    "Color Picker": ""
+    "Color Picker": "בוחר הצבעים"
   },
   "Configure up to %1 quick-access tool presets. Right-click during capture to open the radial menu.": {
     "Configure up to %1 quick-access tool presets. Right-click during capture to open the radial menu.": ""
   },
   "Conic Gradient": {
-    "Conic Gradient": ""
+    "Conic Gradient": "מעבר צבעים חרוטי (קוני)"
   },
   "Container Format": {
-    "Container Format": ""
+    "Container Format": "פורמט מארז (Container)"
   },
   "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": {
-    "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": ""
+    "Controls the preview pixel budget while editing. Lower it if you experience lag. Does not affect the final saved image quality.": "שולט בתקציב הפיקסלים של התצוגה המקדימה בעת העריכה. הנמך/הנמי אותו במקרה של איטיות. אינו משפיע על איכות התמונה השמורה הסופית."
   },
   "Converting recording to GIF...": {
-    "Converting recording to GIF...": ""
+    "Converting recording to GIF...": "ממיר את ההקלטה לGIF..."
   },
   "Copied Anonymously": {
-    "Copied Anonymously": ""
+    "Copied Anonymously": "הועתק באופן אנונימי"
   },
   "Copied to clipboard": {
     "Copied to clipboard": "הועתק ללוח"
   },
   "Copied!": {
-    "Copied!": ""
+    "Copied!": "הועתק!"
   },
   "Copy": {
     "Copy": "העתקה"
   },
   "Copy & Save": {
-    "Copy & Save": ""
+    "Copy & Save": "העתקה ושמירה"
   },
   "Copy Color": {
-    "Copy Color": ""
+    "Copy Color": "העתק/י צבע"
   },
   "Copy Current Palette": {
-    "Copy Current Palette": ""
+    "Copy Current Palette": "העתק/י פלטה נוכחית"
   },
   "Copy and customize this preset": {
-    "Copy and customize this preset": ""
+    "Copy and customize this preset": "העתק/י והתאם/י אישית ערכה זו"
   },
   "Copy vector / Paste / Duplicate": {
-    "Copy vector / Paste / Duplicate": ""
+    "Copy vector / Paste / Duplicate": "העתקת וקטור / הדבקה / שכפול"
   },
   "Corner Radius": {
-    "Corner Radius": ""
+    "Corner Radius": "רדיוס פינות"
   },
   "Could not crop image": {
     "Could not crop image": ""
   },
   "Crop / Resize": {
-    "Crop / Resize": ""
+    "Crop / Resize": "חיתוך / שינוי גודל"
   },
   "Custom": {
     "Custom": "מותאם אישית"
   },
   "Dark": {
-    "Dark": ""
+    "Dark": "כהה"
   },
   "Darken the image to improve foreground contrast": {
-    "Darken the image to improve foreground contrast": ""
+    "Darken the image to improve foreground contrast": "הכהה/הכהי את התמונה כדי לשפר את הניגודיות עם הרקע הקדמי"
   },
   "Dashed Line": {
-    "Dashed Line": ""
+    "Dashed Line": "קו מקווקו"
   },
   "Default Microphone": {
-    "Default Microphone": ""
+    "Default Microphone": "מיקרופון ברירת מחדל"
   },
   "Default Output": {
-    "Default Output": ""
+    "Default Output": "פלט ברירת מחדל"
   },
   "Default Watermark": {
-    "Default Watermark": ""
+    "Default Watermark": "סימן מים ברירת מחדל"
   },
   "Delete": {
     "Delete": "מחיקה"
   },
   "Dim Background Image": {
-    "Dim Background Image": ""
+    "Dim Background Image": "עמעום תמונת רקע"
   },
   "Dim Intensity": {
-    "Dim Intensity": ""
+    "Dim Intensity": "עוצמת עמעום"
   },
   "Discard & Close": {
-    "Discard & Close": ""
+    "Discard & Close": "השלכה וסגירה"
   },
   "Display": {
-    "Display": ""
+    "Display": "תצוגה"
   },
   "Display Mode": {
     "Display Mode": ""
   },
   "Done": {
-    "Done": ""
+    "Done": "סיום"
   },
   "Dotted Line": {
-    "Dotted Line": ""
+    "Dotted Line": "קו נקודות"
   },
   "Drag Image": {
-    "Drag Image": ""
+    "Drag Image": "גרירת תמונה"
   },
   "Draw an outer ring using the stamp number color": {
-    "Draw an outer ring using the stamp number color": ""
+    "Draw an outer ring using the stamp number color": "ציור טבעת חיצונית באמצעות צבע מספר החותמת"
   },
   "Drop image onto bar icon to annotate it": {
-    "Drop image onto bar icon to annotate it": ""
+    "Drop image onto bar icon to annotate it": "גרור/גררי ושחרר/י תמונה על סמל הסרגל כדי להוסיף לה ביאורים"
   },
   "Each command accepts action: %1 (open editor) or %2 (always-on-top window).": {
     "Each command accepts action: %1 (open editor) or %2 (always-on-top window).": ""
@@ -321,25 +321,25 @@
     "Edit": "עריכה"
   },
   "Edit Color Palette": {
-    "Edit Color Palette": ""
+    "Edit Color Palette": "עריכת פלטת צבעים"
   },
   "Edit Text Note": {
-    "Edit Text Note": ""
+    "Edit Text Note": "עריכת הערת טקסט"
   },
   "Editor": {
-    "Editor": ""
+    "Editor": "עורך"
   },
   "Ellipse": {
-    "Ellipse": ""
+    "Ellipse": "אליפסה"
   },
   "Enable background automatically when opening the editor": {
-    "Enable background automatically when opening the editor": ""
+    "Enable background automatically when opening the editor": "הפעל/י רקע אוטומטית בעת פתיחת העורך"
   },
   "Eraser": {
-    "Eraser": ""
+    "Eraser": "מחק"
   },
   "Failed to convert recording to GIF.": {
-    "Failed to convert recording to GIF.": ""
+    "Failed to convert recording to GIF.": "המרה של ההקלטה לGIF נכשלה."
   },
   "Failed to copy screenshot": {
     "Failed to copy screenshot": ""
@@ -351,16 +351,16 @@
     "Failed to download image.": ""
   },
   "Failed to generate blurred background image": {
-    "Failed to generate blurred background image": ""
+    "Failed to generate blurred background image": "יצירת תמונת רקע מטושטשת נכשלה"
   },
   "Failed to load image: %1": {
     "Failed to load image: %1": ""
   },
   "Failed to save screenshot": {
-    "Failed to save screenshot": ""
+    "Failed to save screenshot": "שמירת צילום המסך נכשלה"
   },
   "File": {
-    "File": ""
+    "File": "קובץ"
   },
   "Filename Pattern": {
     "Filename Pattern": ""
@@ -375,7 +375,7 @@
     "Float": "צף"
   },
   "Float Window": {
-    "Float Window": ""
+    "Float Window": "חלון צף"
   },
   "Float service not available.": {
     "Float service not available.": ""
@@ -384,40 +384,40 @@
     "Floating": "צף"
   },
   "Focused Screen": {
-    "Focused Screen": ""
+    "Focused Screen": "מסך ממוקד"
   },
   "Font Size": {
     "Font Size": "גודל הגופן"
   },
   "Font family used for number stamp labels": {
-    "Font family used for number stamp labels": ""
+    "Font family used for number stamp labels": "משפחת גופן המשמשת לתוויות מספרי החותמת"
   },
   "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
-    "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": ""
+    "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": "תווי תבנית: %Y (שנה), %y (שנה ב2 ספרות), %m (חודש), %d (יום), %H (שעה), %M (דקה), %S (שנייה), {zzz} (מילישניות)"
   },
-  "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
-    "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
+  "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
+    "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": "תווי תבנית: {user} (שם משתמש), ‎\\n (שורה חדשה), %Y (שנה), %y (שנה ב2 ספרות), %m (חודש), %d (יום), %H (שעה), %M (דקה), %S (שנייה)"
   },
   "Framerate": {
-    "Framerate": ""
+    "Framerate": "קצב פריימים"
   },
   "Free": {
-    "Free": ""
+    "Free": "חופשי"
   },
   "Fullscreen": {
-    "Fullscreen": ""
+    "Fullscreen": "מסך מלא"
   },
   "Fullscreen Target": {
     "Fullscreen Target": ""
   },
   "GIF Framerate": {
-    "GIF Framerate": ""
+    "GIF Framerate": "קצב פריימים של GIF"
   },
   "GPU encoder failed. Retrying with %1...": {
     "GPU encoder failed. Retrying with %1...": ""
   },
   "General Shortcuts": {
-    "General Shortcuts": ""
+    "General Shortcuts": "קיצורים כלליים"
   },
   "Gradient Angle": {
     "Gradient Angle": ""
@@ -435,16 +435,16 @@
     "Hide Annotations": ""
   },
   "Hide Control Center": {
-    "Hide Control Center": ""
+    "Hide Control Center": "הסתרת מרכז הבקרה"
   },
   "Hide Control Center by Default": {
-    "Hide Control Center by Default": ""
+    "Hide Control Center by Default": "הסתרת מרכז הבקרה כברירת מחדל"
   },
   "High": {
     "High": "גבוה"
   },
   "Highlighter": {
-    "Highlighter": ""
+    "Highlighter": "מרקר"
   },
   "History": {
     "History": "היסטוריה"
@@ -453,55 +453,55 @@
     "Hold %1 for Loupe": ""
   },
   "Hover Trigger Delay": {
-    "Hover Trigger Delay": ""
+    "Hover Trigger Delay": "השהיית הפעלה בריחוף"
   },
   "IPC Commands": {
-    "IPC Commands": ""
+    "IPC Commands": "פקודות IPC"
   },
   "Image": {
     "Image": "תמונה"
   },
   "Image + Text": {
-    "Image + Text": ""
+    "Image + Text": "תמונה + טקסט"
   },
   "Image Background": {
-    "Image Background": ""
+    "Image Background": "רקע תמונה"
   },
   "Image Error": {
-    "Image Error": ""
+    "Image Error": "שגיאת תמונה"
   },
   "Image Folder": {
     "Image Folder": ""
   },
   "Image Size": {
-    "Image Size": ""
+    "Image Size": "גודל תמונה"
   },
   "Image is too small (%1×%2). Minimum: %3px": {
     "Image is too small (%1×%2). Minimum: %3px": ""
   },
   "Image selected automatically when using Image Background mode": {
-    "Image selected automatically when using Image Background mode": ""
+    "Image selected automatically when using Image Background mode": "התמונה שנבחרת אוטומטית בעת שימוש במצב רקע תמונה"
   },
   "Include Cursor": {
-    "Include Cursor": ""
+    "Include Cursor": "הכללת הסמן"
   },
   "Initial Width": {
-    "Initial Width": ""
+    "Initial Width": "רוחב התחלתי"
   },
   "Initial state for the Control Center toggle.": {
-    "Initial state for the Control Center toggle.": ""
+    "Initial state for the Control Center toggle.": "מצב התחלתי עבור מתג מרכז הבקרה."
   },
   "Inline": {
     "Inline": ""
   },
   "Input Mode": {
-    "Input Mode": ""
+    "Input Mode": "מצב קלט"
   },
   "Insert Image": {
-    "Insert Image": ""
+    "Insert Image": "הוספת תמונה"
   },
   "Interaction / Result": {
-    "Interaction / Result": ""
+    "Interaction / Result": "אינטראקציה / תוצאה"
   },
   "Invalid or corrupted image file.": {
     "Invalid or corrupted image file.": ""
@@ -510,43 +510,43 @@
     "Italic": ""
   },
   "JPEG Quality": {
-    "JPEG Quality": ""
+    "JPEG Quality": "איכות JPEG"
   },
   "Key": {
     "Key": "מקש"
   },
   "Landscape": {
-    "Landscape": ""
+    "Landscape": "לרוחב"
   },
   "Last Region": {
-    "Last Region": ""
+    "Last Region": "אזור אחרון"
   },
   "Left": {
     "Left": "שמאל"
   },
   "Left Center": {
-    "Left Center": ""
+    "Left Center": "צד שמאל במרכז"
   },
   "Left Click": {
-    "Left Click": ""
+    "Left Click": "לחיצה שמאלית"
   },
   "Light": {
     "Light": "דק"
   },
   "Line": {
-    "Line": ""
+    "Line": "קו"
   },
   "Linear Gradient": {
-    "Linear Gradient": ""
+    "Linear Gradient": "מעבר צבעים ליניארי"
   },
   "Live Preview": {
-    "Live Preview": ""
+    "Live Preview": "תצוגה מקדימה חיה"
   },
   "Low": {
     "Low": "נמוך"
   },
   "Magnifier Loupe": {
-    "Magnifier Loupe": ""
+    "Magnifier Loupe": "זכוכית מגדלת"
   },
   "Max Height (%1 = no limit)": {
     "Max Height (%1 = no limit)": ""
@@ -555,52 +555,52 @@
     "Medium": "בינוני"
   },
   "Menu Item Right Click": {
-    "Menu Item Right Click": ""
+    "Menu Item Right Click": "לחיצה ימנית על פריט תפריט"
   },
   "Merging audio tracks...": {
-    "Merging audio tracks...": ""
+    "Merging audio tracks...": "ממזג רצועות שמע..."
   },
   "Microphone": {
-    "Microphone": ""
+    "Microphone": "מיקרופון"
   },
   "Microphone Device": {
-    "Microphone Device": ""
+    "Microphone Device": "התקן מיקרופון"
   },
   "Middle Click": {
-    "Middle Click": ""
+    "Middle Click": "לחיצה אמצעית"
   },
   "Middle Click Action": {
-    "Middle Click Action": ""
+    "Middle Click Action": "פעולת לחיצה אמצעית"
   },
   "Minimize Delay": {
-    "Minimize Delay": ""
+    "Minimize Delay": "השהיית מזעור"
   },
   "Modal": {
-    "Modal": ""
+    "Modal": "מודל"
   },
   "More Tools": {
-    "More Tools": ""
+    "More Tools": "כלים נוספים"
   },
   "Niri Binding Example": {
-    "Niri Binding Example": ""
+    "Niri Binding Example": "דוגמה לקישור (binding) בNiri"
   },
   "No Background": {
     "No Background": "ללא רקע"
   },
   "No Image Specified": {
-    "No Image Specified": ""
+    "No Image Specified": "לא צוינה תמונה"
   },
   "No QR code detected": {
     "No QR code detected": ""
   },
   "No output available": {
-    "No output available": ""
+    "No output available": "אין פלט זמין"
   },
   "No saved images yet": {
-    "No saved images yet": ""
+    "No saved images yet": "אין תמונות שמורות עדיין"
   },
   "No supported images found": {
-    "No supported images found": ""
+    "No supported images found": "לא נמצאו תמונות נתמכות"
   },
   "No text detected": {
     "No text detected": ""
@@ -615,7 +615,7 @@
     "None": "ללא"
   },
   "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": {
-    "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": ""
+    "Note: Starting tool mode overrides tool thickness and color defaults if the starting tool matches it.": "הערה: מצב כלי ההתחלה דורס את ברירות המחדל של עובי וצבע הכלי אם כלי ההתחלה תואם לו."
   },
   "Notification": {
     "Notification": "התראה"
@@ -624,16 +624,16 @@
     "Notifications": "התראות"
   },
   "OCR": {
-    "OCR": ""
+    "OCR": "זיהוי תווים אופטי (OCR)"
   },
   "OCR Result": {
-    "OCR Result": ""
+    "OCR Result": "תוצאת OCR"
   },
   "OCR failed": {
     "OCR failed": ""
   },
   "Off": {
-    "Off": ""
+    "Off": "כבוי"
   },
   "Opacity": {
     "Opacity": "שקיפות"
@@ -648,34 +648,34 @@
     "Open Image": ""
   },
   "Open folder": {
-    "Open folder": ""
+    "Open folder": "פתח/י תיקייה"
   },
   "Outline Variant": {
-    "Outline Variant": ""
+    "Outline Variant": "גרסת קו מתאר"
   },
   "Output Format": {
-    "Output Format": ""
+    "Output Format": "פורמט פלט"
   },
   "Output format applies only to disk saves. Clipboard copies are always PNG.": {
-    "Output format applies only to disk saves. Clipboard copies are always PNG.": ""
+    "Output format applies only to disk saves. Clipboard copies are always PNG.": "פורמט הפלט חל רק על שמירות בדיסק. העתקות ללוח ההעתקה תמיד בפורמט PNG."
   },
   "Overlay Opacity": {
-    "Overlay Opacity": ""
+    "Overlay Opacity": "שקיפות שכבת כיסוי"
   },
   "Padding": {
-    "Padding": ""
+    "Padding": "ריווח פנימי"
   },
   "Palette Preset": {
-    "Palette Preset": ""
+    "Palette Preset": "ערכת פלטה מוכנה"
   },
   "Pause": {
     "Pause": "השהיה"
   },
   "Pause / Resume": {
-    "Pause / Resume": ""
+    "Pause / Resume": "השהיה / המשך"
   },
   "Paused": {
-    "Paused": ""
+    "Paused": "מושהה"
   },
   "Pausing is not supported with %1.": {
     "Pausing is not supported with %1.": ""
@@ -684,37 +684,37 @@
     "Pen": ""
   },
   "Pen Auto-Close": {
-    "Pen Auto-Close": ""
+    "Pen Auto-Close": "סגירה אוטומטית של העט"
   },
   "Pick Color": {
-    "Pick Color": ""
+    "Pick Color": "דגימת צבע"
   },
   "Pick a palette preset or customize individual color slots.": {
-    "Pick a palette preset or customize individual color slots.": ""
+    "Pick a palette preset or customize individual color slots.": "בחר/י ערכת פלטה מוכנה מראש או התאם/י אישית משבצות צבע בודדות."
   },
   "Pixelate": {
     "Pixelate": "פיקסול"
   },
   "Pixelate Intensity": {
-    "Pixelate Intensity": ""
+    "Pixelate Intensity": "עוצמת פיקסול"
   },
   "Popup": {
     "Popup": ""
   },
   "Portrait": {
-    "Portrait": ""
+    "Portrait": "לאורך"
   },
   "Position": {
     "Position": "מיקום"
   },
   "Post-Capture Notification": {
-    "Post-Capture Notification": ""
+    "Post-Capture Notification": "התראה לאחר לכידה"
   },
   "Preset": {
     "Preset": ""
   },
   "Preset %1": {
-    "Preset %1": ""
+    "Preset %1": "ערכה מוכנה %1"
   },
   "Presets": {
     "Presets": ""
@@ -729,64 +729,64 @@
     "Primary": "ראשי"
   },
   "Primary Screen": {
-    "Primary Screen": ""
+    "Primary Screen": "מסך ראשי"
   },
   "QR Result": {
-    "QR Result": ""
+    "QR Result": "תוצאת QR"
   },
   "QR scan failed": {
     "QR scan failed": ""
   },
   "Quality": {
-    "Quality": ""
+    "Quality": "איכות"
   },
   "Quick Capture": {
-    "Quick Capture": ""
+    "Quick Capture": "Quick Capture"
   },
   "Quick Capture Error": {
-    "Quick Capture Error": ""
+    "Quick Capture Error": "שגיאת Quick Capture"
   },
   "Radial Gradient": {
-    "Radial Gradient": ""
+    "Radial Gradient": "מעבר צבעים מעגלי (רדיאלי)"
   },
   "Radial Menu": {
-    "Radial Menu": ""
+    "Radial Menu": "תפריט מעגלי (רדיאלי)"
   },
   "Ratio": {
-    "Ratio": ""
+    "Ratio": "יחס"
   },
   "Ready": {
     "Ready": "מוכנה"
   },
   "Recent Edits": {
-    "Recent Edits": ""
+    "Recent Edits": "עריכות אחרונות"
   },
   "Record Microphone": {
-    "Record Microphone": ""
+    "Record Microphone": "הקלטת מיקרופון"
   },
   "Record System Audio": {
-    "Record System Audio": ""
+    "Record System Audio": "הקלטת שמע מערכת"
   },
   "Recording": {
-    "Recording": ""
+    "Recording": "הקלטה"
   },
   "Recording Backend": {
     "Recording Backend": ""
   },
   "Recording Folder": {
-    "Recording Folder": ""
+    "Recording Folder": "תיקיית הקלטות"
   },
   "Recording ended with error code %1.": {
-    "Recording ended with error code %1.": ""
+    "Recording ended with error code %1.": "ההקלטה הסתיימה עם קוד שגיאה %1."
   },
   "Recording...": {
-    "Recording...": ""
+    "Recording...": "מקליט..."
   },
   "Rectangle": {
-    "Rectangle": ""
+    "Rectangle": "מלבן"
   },
   "Redact": {
-    "Redact": ""
+    "Redact": "צנזורה"
   },
   "Redo": {
     "Redo": ""
@@ -795,13 +795,13 @@
     "Refresh": "רענון"
   },
   "Region": {
-    "Region": ""
+    "Region": "אזור"
   },
   "Reset": {
     "Reset": "איפוס"
   },
   "Reset Last Region": {
-    "Reset Last Region": ""
+    "Reset Last Region": "איפוס אזור אחרון"
   },
   "Resume": {
     "Resume": "המשך"
@@ -810,13 +810,13 @@
     "Right": "ימין"
   },
   "Right Center": {
-    "Right Center": ""
+    "Right Center": "צד ימין במרכז"
   },
   "Right Click": {
-    "Right Click": ""
+    "Right Click": "לחיצה ימנית"
   },
   "Right Click Action": {
-    "Right Click Action": ""
+    "Right Click Action": "פעולת לחיצה ימנית"
   },
   "Rotate Left": {
     "Rotate Left": ""
@@ -825,76 +825,76 @@
     "Rotate Right": ""
   },
   "Round Highlighter Tips": {
-    "Round Highlighter Tips": ""
+    "Round Highlighter Tips": "עיגול קצוות המרקר"
   },
   "Round Rectangle Corners": {
-    "Round Rectangle Corners": ""
+    "Round Rectangle Corners": "עיגול פינות מלבן"
   },
   "Rounded Rectangle": {
-    "Rounded Rectangle": ""
+    "Rounded Rectangle": "מלבן מעוגל"
   },
   "Save": {
-    "Save": ""
+    "Save": "שמירה"
   },
   "Save As": {
     "Save As": ""
   },
   "Save Screenshot As": {
-    "Save Screenshot As": ""
+    "Save Screenshot As": "שמירת צילום מסך בשם"
   },
   "Saved %1 (%2)": {
-    "Saved %1 (%2)": ""
+    "Saved %1 (%2)": "%1 נשמר (%2)"
   },
   "Scale Editor to Screenshot Size": {
-    "Scale Editor to Screenshot Size": ""
+    "Scale Editor to Screenshot Size": "התאמת גודל העורך לגודל צילום המסך"
   },
   "Scan QR": {
-    "Scan QR": ""
+    "Scan QR": "סריקת QR"
   },
   "Screen Recording": {
     "Screen Recording": ""
   },
   "Screen Recording Error": {
-    "Screen Recording Error": ""
+    "Screen Recording Error": "שגיאת הקלטת מסך"
   },
   "Screen Recording Saved": {
-    "Screen Recording Saved": ""
+    "Screen Recording Saved": "הקלטת המסך נשמרה"
   },
   "Screen recording timed out or was cancelled.": {
-    "Screen recording timed out or was cancelled.": ""
+    "Screen recording timed out or was cancelled.": "זמן הקלטת המסך עבר או שההקלטה בוטלה."
   },
   "Screenshot": {
     "Screenshot": ""
   },
   "Screenshot Copied": {
-    "Screenshot Copied": ""
+    "Screenshot Copied": "צילום המסך הועתק"
   },
   "Screenshot Folder": {
-    "Screenshot Folder": ""
+    "Screenshot Folder": "תיקיית צילומי מסך"
   },
   "Screenshot Saved": {
-    "Screenshot Saved": ""
+    "Screenshot Saved": "צילום המסך נשמר"
   },
   "Screenshot copied anonymously with randomized name and stripped metadata.": {
-    "Screenshot copied anonymously with randomized name and stripped metadata.": ""
+    "Screenshot copied anonymously with randomized name and stripped metadata.": "צילום המסך הועתק באופן אנונימי עם שם אקראי וללא מטא-נתונים."
   },
   "Screenshot copied to clipboard and saved to %1": {
-    "Screenshot copied to clipboard and saved to %1": ""
+    "Screenshot copied to clipboard and saved to %1": "צילום המסך הועתק ללוח ונשמר ב%1"
   },
   "Screenshot copied to clipboard but failed to save file: %1": {
-    "Screenshot copied to clipboard but failed to save file: %1": ""
+    "Screenshot copied to clipboard but failed to save file: %1": "צילום המסך הועתק ללוח אך שמירת הקובץ נכשלה: %1"
   },
   "Screenshot copied with randomized name.": {
-    "Screenshot copied with randomized name.": ""
+    "Screenshot copied with randomized name.": "צילום המסך הועתק עם שם אקראי."
   },
   "Screenshot failed (mode: %1).": {
-    "Screenshot failed (mode: %1).": ""
+    "Screenshot failed (mode: %1).": "צילום המסך נכשל (מצב: %1)."
   },
   "Screenshot saved to %1": {
-    "Screenshot saved to %1": ""
+    "Screenshot saved to %1": "צילום המסך נשמר ב%1"
   },
   "Scroll Interval": {
-    "Scroll Interval": ""
+    "Scroll Interval": "מרווח גלילה"
   },
   "Scroll capture: select a region, scroll content, then press %1 to finish.": {
     "Scroll capture: select a region, scroll content, then press %1 to finish.": ""
@@ -909,13 +909,13 @@
     "Select Color Slots %1": ""
   },
   "Select Image to Annotate": {
-    "Select Image to Annotate": ""
+    "Select Image to Annotate": "בחירת תמונה להוספת ביאור"
   },
   "Select screen recording backend. Auto attempts GPU first and falls back to CPU (%1).": {
     "Select screen recording backend. Auto attempts GPU first and falls back to CPU (%1).": ""
   },
   "Selected Tool / Action": {
-    "Selected Tool / Action": ""
+    "Selected Tool / Action": "כלי / פעולה שנבחרו"
   },
   "Settings": {
     "Settings": "הגדרות"
@@ -924,100 +924,100 @@
     "Shadow Strength": ""
   },
   "Shapes": {
-    "Shapes": ""
+    "Shapes": "צורות"
   },
   "Shortcut Action": {
-    "Shortcut Action": ""
+    "Shortcut Action": "פעולת קיצור דרך"
   },
   "Show Annotations": {
     "Show Annotations": ""
   },
   "Show Control Center": {
-    "Show Control Center": ""
+    "Show Control Center": "הצגת מרכז הבקרה"
   },
   "Show Keyboard Shortcut Hints": {
-    "Show Keyboard Shortcut Hints": ""
+    "Show Keyboard Shortcut Hints": "הצגת רמזים לקיצורי מקלדת"
   },
   "Show Pill Border": {
-    "Show Pill Border": ""
+    "Show Pill Border": "הצגת מסגרת כפתור"
   },
   "Show Region Border": {
-    "Show Region Border": ""
+    "Show Region Border": "הצגת מסגרת אזור"
   },
   "Show Screenshot Border": {
-    "Show Screenshot Border": ""
+    "Show Screenshot Border": "הצגת מסגרת צילום מסך"
   },
   "Show Toolbar": {
-    "Show Toolbar": ""
+    "Show Toolbar": "הצגת סרגל כלים"
   },
   "Show Toolbar Border": {
-    "Show Toolbar Border": ""
+    "Show Toolbar Border": "הצגת מסגרת סרגל כלים"
   },
   "Show only the image on a transparent background": {
-    "Show only the image on a transparent background": ""
+    "Show only the image on a transparent background": "הצג/י רק את התמונה על גבי רקע שקוף"
   },
   "Skip confirmation": {
-    "Skip confirmation": ""
+    "Skip confirmation": "דלג/י על אישור"
   },
   "Slot %1": {
     "Slot %1": ""
   },
   "Soften image details so screenshot content stands out": {
-    "Soften image details so screenshot content stands out": ""
+    "Soften image details so screenshot content stands out": "רכך/רככי את פרטי התמונה כך שתוכן צילום המסך יבלוט"
   },
   "Solid Color": {
-    "Solid Color": ""
+    "Solid Color": "צבע אחיד"
   },
   "Solid Fill": {
-    "Solid Fill": ""
+    "Solid Fill": "מילוי אחיד"
   },
   "Solid Line": {
-    "Solid Line": ""
+    "Solid Line": "קו רציף"
   },
   "Spawn Position": {
-    "Spawn Position": ""
+    "Spawn Position": "מיקום הופעה"
   },
   "Specific Output": {
-    "Specific Output": ""
+    "Specific Output": "פלט ספציפי"
   },
   "Spotlight": {
     "Spotlight": "Spotlight"
   },
   "Spotlight Opacity": {
-    "Spotlight Opacity": ""
+    "Spotlight Opacity": "שקיפות זרקור"
   },
   "Stamp": {
     "Stamp": ""
   },
   "Stamp Contrast Ring": {
-    "Stamp Contrast Ring": ""
+    "Stamp Contrast Ring": "טבעת ניגודיות לחותמת"
   },
   "Stamp Size": {
-    "Stamp Size": ""
+    "Stamp Size": "גודל חותמת"
   },
   "Starting Preset": {
-    "Starting Preset": ""
+    "Starting Preset": "ערכה מוכנה להתחלה"
   },
   "Starting Tool": {
-    "Starting Tool": ""
+    "Starting Tool": "כלי התחלתי"
   },
   "Starting Tool Mode": {
-    "Starting Tool Mode": ""
+    "Starting Tool Mode": "מצב כלי התחלתי"
   },
   "Stop & Save": {
-    "Stop & Save": ""
+    "Stop & Save": "עצירה ושמירה"
   },
   "Surface Container Highest": {
-    "Surface Container Highest": ""
+    "Surface Container Highest": "Surface Container Highest"
   },
   "Switch to your custom preset": {
-    "Switch to your custom preset": ""
+    "Switch to your custom preset": "מעבר לערכה המותאמת אישית שלך"
   },
   "System Audio Device": {
-    "System Audio Device": ""
+    "System Audio Device": "התקן שמע מערכת"
   },
   "Target Output Name": {
-    "Target Output Name": ""
+    "Target Output Name": "שם פלט יעד"
   },
   "Text": {
     "Text": "טקסט"
@@ -1026,16 +1026,16 @@
     "Text Background": ""
   },
   "Text Background Roundness": {
-    "Text Background Roundness": ""
+    "Text Background Roundness": "עקמומיות רקע טקסט"
   },
   "Text Size": {
-    "Text Size": ""
+    "Text Size": "גודל טקסט"
   },
   "Thickness": {
     "Thickness": "עובי"
   },
   "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": {
-    "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": ""
+    "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": "ערכת פלטה זו לקריאה בלבד. בחר/י אחת מהאפשרויות להלן כדי לעבור לפלטה המותאמת אישית ולערוך צבעים:"
   },
   "Toast": {
     "Toast": "התראה קופצת"
@@ -1044,7 +1044,7 @@
     "Toggle Annotations": ""
   },
   "Toggle Start / Stop": {
-    "Toggle Start / Stop": ""
+    "Toggle Start / Stop": "החלפת מצב התחלה / עצירה"
   },
   "Toggle between %1 latest presets": {
     "Toggle between %1 latest presets": ""
@@ -1053,19 +1053,19 @@
     "Tool": ""
   },
   "Tool Defaults": {
-    "Tool Defaults": ""
+    "Tool Defaults": "ברירות מחדל לכלים"
   },
   "Toolbar": {
-    "Toolbar": ""
+    "Toolbar": "סרגל הכלים"
   },
   "Toolbar Palette": {
-    "Toolbar Palette": ""
+    "Toolbar Palette": "פלטת סרגל הכלים"
   },
   "Toolbar Position": {
-    "Toolbar Position": ""
+    "Toolbar Position": "מיקום סרגל הכלים"
   },
   "Tools": {
-    "Tools": ""
+    "Tools": "כלים"
   },
   "Top": {
     "Top": "למעלה"
@@ -1080,16 +1080,16 @@
     "Top Right": "ימין למעלה"
   },
   "Transparent": {
-    "Transparent": ""
+    "Transparent": "שקוף"
   },
   "Transparent Background": {
-    "Transparent Background": ""
+    "Transparent Background": "רקע שקוף"
   },
   "Trigger on Hover": {
-    "Trigger on Hover": ""
+    "Trigger on Hover": "הפעלה בריחוף"
   },
   "Type note...": {
-    "Type note...": ""
+    "Type note...": "הקלד/י הערה..."
   },
   "Underline": {
     "Underline": ""
@@ -1098,16 +1098,16 @@
     "Undo": ""
   },
   "Usage Guide": {
-    "Usage Guide": ""
+    "Usage Guide": "מדריך שימוש"
   },
   "Use Existing Custom": {
-    "Use Existing Custom": ""
+    "Use Existing Custom": "שימוש במותאם אישית קיים"
   },
   "Use Floating Editor": {
-    "Use Floating Editor": ""
+    "Use Floating Editor": "שימוש בעורך צף"
   },
   "Use Modal Editor": {
-    "Use Modal Editor": ""
+    "Use Modal Editor": "שימוש בעורך מודלי"
   },
   "Variant": {
     "Variant": ""
@@ -1119,24 +1119,24 @@
     "Video": ""
   },
   "Video Codec": {
-    "Video Codec": ""
+    "Video Codec": "קודק וידאו"
   },
   "Watermark": {
-    "Watermark": ""
+    "Watermark": "סימן מים"
   },
   "Watermark Type": {
-    "Watermark Type": ""
+    "Watermark Type": "סוג סימן מים"
   },
   "WebP Quality": {
-    "WebP Quality": ""
+    "WebP Quality": "איכות WebP"
   },
   "When enabled, the editor shrinks to match the captured region instead of filling %1% of the screen.": {
     "When enabled, the editor shrinks to match the captured region instead of filling %1% of the screen.": ""
   },
   "Window": {
-    "Window": ""
+    "Window": "חלון"
   },
   "Window / Portal": {
-    "Window / Portal": ""
+    "Window / Portal": "חלון / פורטל"
   }
 }

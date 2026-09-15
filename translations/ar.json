@@ -48,7 +48,7 @@
     "Aspect Ratio": "نسبة عرض المحرر"
   },
   "Audio": {
-    "Audio": ""
+    "Audio": "الصوت"
   },
   "Audio & Overlay": {
     "Audio & Overlay": "الصوت والتراكب"
@@ -105,7 +105,7 @@
     "Background Presets": "إعدادات الخلفية المسبقة"
   },
   "Background image": {
-    "Background image": ""
+    "Background image": "صورة الخلفية"
   },
   "Balanced": {
     "Balanced": "متوازن"
@@ -120,7 +120,7 @@
     "Blur Background Image": "تمويه صورة الخلفية"
   },
   "Bold": {
-    "Bold": ""
+    "Bold": "عريض"
   },
   "Border Color": {
     "Border Color": "لون الحد"
@@ -150,7 +150,7 @@
     "Callout Zoom": "تكبير وسيلة الإيضاح"
   },
   "Cancel": {
-    "Cancel": ""
+    "Cancel": "إلغاء"
   },
   "Capture": {
     "Capture": "التقاط"
@@ -195,16 +195,16 @@
     "Close": "اغلاق"
   },
   "Color": {
-    "Color": "لون الإعداد المسبق"
+    "Color": "اللون"
   },
   "Color %1 copied": {
-    "Color %1 copied": "تم نسخ اللون إلى الحافظة: %1"
+    "Color %1 copied": "تم نسخ اللون %1"
   },
   "Color Palette": {
     "Color Palette": "لوحة الألوان"
   },
   "Color Picker": {
-    "Color Picker": ""
+    "Color Picker": "اداة اختيار الالوان"
   },
   "Configure up to %1 quick-access tool presets. Right-click during capture to open the radial menu.": {
     "Configure up to %1 quick-access tool presets. Right-click during capture to open the radial menu.": "قم بتهيئة ما يصل إلى %1 إعدادات مسبقة لأدوات الوصول السريع. انقر بزر الماوس الأيمن أثناء الالتقاط لفتح القائمة الشعاعية."
@@ -228,7 +228,7 @@
     "Copied to clipboard": "تم النسخ إلى الحافظة"
   },
   "Copied!": {
-    "Copied!": "تم النسخ"
+    "Copied!": "تم النسخ!"
   },
   "Copy": {
     "Copy": "نسخ"
@@ -249,7 +249,7 @@
     "Copy vector / Paste / Duplicate": "نسخ المتجه / لصق / تكرار"
   },
   "Corner Radius": {
-    "Corner Radius": "نصف قطر الزاوية الافتراضي"
+    "Corner Radius": "نصف قطر الزاوية"
   },
   "Could not crop image": {
     "Could not crop image": ""
@@ -291,7 +291,7 @@
     "Discard & Close": "تجاهل وإغلاق"
   },
   "Display": {
-    "Display": ""
+    "Display": "العرض"
   },
   "Display Mode": {
     "Display Mode": "وضع عرض المحرر"
@@ -360,7 +360,7 @@
     "Failed to save screenshot": "فشل حفظ لقطة الشاشة"
   },
   "File": {
-    "File": ""
+    "File": "ملف"
   },
   "Filename Pattern": {
     "Filename Pattern": ""
@@ -395,8 +395,8 @@
   "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
     "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": "رموز التنسيق: %Y (السنة)، %y (السنة برقمين)، %m (الشهر)، %d (اليوم)، %H (الساعة)، %M (الدقيقة)، %S (الثانية)، {zzz} (جزء من الثانية)"
   },
-  "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
-    "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
+  "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
+    "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": "رموز التنسيق: {user} (اسم المستخدم)، \\n (سطر جديد)، %Y (السنة)، %y (السنة برقمين)، %m (الشهر)، %d (اليوم)، %H (الساعة)، %M (الدقيقة)، %S (الثانية)"
   },
   "Framerate": {
     "Framerate": "معدل الإطارات"
@@ -525,7 +525,7 @@
     "Left": "اليسار"
   },
   "Left Center": {
-    "Left Center": ""
+    "Left Center": "يسار المنتصف"
   },
   "Left Click": {
     "Left Click": "النقر الأيسر"
@@ -534,7 +534,7 @@
     "Light": "خفيف"
   },
   "Line": {
-    "Line": "خط مستقيم"
+    "Line": "خط"
   },
   "Linear Gradient": {
     "Linear Gradient": "تدرج خطي"
@@ -561,7 +561,7 @@
     "Merging audio tracks...": "جاري دمج المسارات الصوتية..."
   },
   "Microphone": {
-    "Microphone": ""
+    "Microphone": "الميكروفون"
   },
   "Microphone Device": {
     "Microphone Device": "جهاز الميكروفون"
@@ -579,7 +579,7 @@
     "Modal": "مشروط (Modal)"
   },
   "More Tools": {
-    "More Tools": ""
+    "More Tools": "المزيد من الأدوات"
   },
   "Niri Binding Example": {
     "Niri Binding Example": "مثال ربط Niri"
@@ -633,7 +633,7 @@
     "OCR failed": ""
   },
   "Off": {
-    "Off": ""
+    "Off": "إيقاف"
   },
   "Opacity": {
     "Opacity": "الشفافية"
@@ -663,7 +663,7 @@
     "Overlay Opacity": "عتامة التراكب"
   },
   "Padding": {
-    "Padding": "الهامش الافتراضي"
+    "Padding": "الهوامش"
   },
   "Palette Preset": {
     "Palette Preset": "إعدادات اللوحة المسبقة"
@@ -672,10 +672,10 @@
     "Pause": "إيقاف مؤقت"
   },
   "Pause / Resume": {
-    "Pause / Resume": ""
+    "Pause / Resume": "إيقاف مؤقت / استئناف"
   },
   "Paused": {
-    "Paused": ""
+    "Paused": "متوقف"
   },
   "Pausing is not supported with %1.": {
     "Pausing is not supported with %1.": ""
@@ -738,7 +738,7 @@
     "QR scan failed": ""
   },
   "Quality": {
-    "Quality": "جودة الفيديو"
+    "Quality": "الجودة"
   },
   "Quick Capture": {
     "Quick Capture": "التقاط سريع"
@@ -810,7 +810,7 @@
     "Right": "يمين"
   },
   "Right Center": {
-    "Right Center": ""
+    "Right Center": "يمين المنتصف"
   },
   "Right Click": {
     "Right Click": "نقرة يمين"
@@ -834,7 +834,7 @@
     "Rounded Rectangle": "مستطيل مستدير الزوايا"
   },
   "Save": {
-    "Save": ""
+    "Save": "حفظ"
   },
   "Save As": {
     "Save As": ""
@@ -1044,7 +1044,7 @@
     "Toggle Annotations": ""
   },
   "Toggle Start / Stop": {
-    "Toggle Start / Stop": ""
+    "Toggle Start / Stop": "تبديل البدء / الإيقاف"
   },
   "Toggle between %1 latest presets": {
     "Toggle between %1 latest presets": ""
@@ -1065,7 +1065,7 @@
     "Toolbar Position": "موقع شريط الأدوات"
   },
   "Tools": {
-    "Tools": ""
+    "Tools": "الأدوات"
   },
   "Top": {
     "Top": "أعلى"
@@ -1137,6 +1137,6 @@
     "Window": "نافذة"
   },
   "Window / Portal": {
-    "Window / Portal": ""
+    "Window / Portal": "نافذة / بوابة"
   }
 }

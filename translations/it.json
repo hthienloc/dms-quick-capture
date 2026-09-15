@@ -48,7 +48,7 @@
     "Aspect Ratio": "Proporzioni dell'editor"
   },
   "Audio": {
-    "Audio": ""
+    "Audio": "Audio"
   },
   "Audio & Overlay": {
     "Audio & Overlay": "Audio e Overlay"
@@ -105,7 +105,7 @@
     "Background Presets": "Preset di sfondo"
   },
   "Background image": {
-    "Background image": ""
+    "Background image": "Immagine di sfondo"
   },
   "Balanced": {
     "Balanced": "Bilanciato"
@@ -120,7 +120,7 @@
     "Blur Background Image": "Sfoca l'immagine di sfondo"
   },
   "Bold": {
-    "Bold": ""
+    "Bold": "Grassetto"
   },
   "Border Color": {
     "Border Color": "Colore del bordo"
@@ -150,7 +150,7 @@
     "Callout Zoom": "Zoom richiamo"
   },
   "Cancel": {
-    "Cancel": ""
+    "Cancel": "Annulla"
   },
   "Capture": {
     "Capture": "Cattura"
@@ -195,16 +195,16 @@
     "Close": "Chiudi"
   },
   "Color": {
-    "Color": "Colore del preset"
+    "Color": "Colore"
   },
   "Color %1 copied": {
-    "Color %1 copied": "Colore copiato negli appunti: %1"
+    "Color %1 copied": "Colore %1 copiato"
   },
   "Color Palette": {
     "Color Palette": "Palette dei colori"
   },
   "Color Picker": {
-    "Color Picker": ""
+    "Color Picker": "Selettore colori"
   },
   "Configure up to %1 quick-access tool presets. Right-click during capture to open the radial menu.": {
     "Configure up to %1 quick-access tool presets. Right-click during capture to open the radial menu.": "Configura fino a %1 preset degli strumenti ad accesso rapido. Fai clic destro durante la cattura per aprire il menu radiale."
@@ -228,7 +228,7 @@
     "Copied to clipboard": "Copiato negli appunti"
   },
   "Copied!": {
-    "Copied!": "Copiato"
+    "Copied!": "Copiato!"
   },
   "Copy": {
     "Copy": "Copia"
@@ -249,7 +249,7 @@
     "Copy vector / Paste / Duplicate": "Copia vettore / Incolla / Duplica"
   },
   "Corner Radius": {
-    "Corner Radius": "Raggio degli angoli predefinito"
+    "Corner Radius": "Raggio degli angoli"
   },
   "Could not crop image": {
     "Could not crop image": ""
@@ -291,7 +291,7 @@
     "Discard & Close": "Scarta e chiudi"
   },
   "Display": {
-    "Display": ""
+    "Display": "Schermo"
   },
   "Display Mode": {
     "Display Mode": "Modalità di visualizzazione dell'editor"
@@ -360,7 +360,7 @@
     "Failed to save screenshot": "Impossibile salvare lo screenshot"
   },
   "File": {
-    "File": ""
+    "File": "File"
   },
   "Filename Pattern": {
     "Filename Pattern": ""
@@ -395,8 +395,8 @@
   "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
     "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": "oken di formato: %Y (Anno), %y (Anno a 2 cifre), %m (Mese), %d (Giorno), %H (Ora), %M (Minuto), %S (Secondo), {zzz} (Ms)"
   },
-  "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
-    "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
+  "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
+    "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": "Token di formato: {user} (Nome utente), \\n (Nuova riga), %Y (Anno), %y (Anno a 2 cifre), %m (Mese), %d (Giorno), %H (Ora), %M (Minuto), %S (Secondo)"
   },
   "Framerate": {
     "Framerate": "Frequenza fotogrammi"
@@ -525,7 +525,7 @@
     "Left": "Sinistra"
   },
   "Left Center": {
-    "Left Center": ""
+    "Left Center": "Al centro a sinistra"
   },
   "Left Click": {
     "Left Click": "Clic sinistro"
@@ -534,7 +534,7 @@
     "Light": "Chiaro"
   },
   "Line": {
-    "Line": "Linea retta"
+    "Line": "Linea"
   },
   "Linear Gradient": {
     "Linear Gradient": "Gradiente lineare"
@@ -561,7 +561,7 @@
     "Merging audio tracks...": "Unione delle tracce audio in corso..."
   },
   "Microphone": {
-    "Microphone": ""
+    "Microphone": "Microfono"
   },
   "Microphone Device": {
     "Microphone Device": "Dispositivo microfono"
@@ -579,7 +579,7 @@
     "Modal": "Modale"
   },
   "More Tools": {
-    "More Tools": ""
+    "More Tools": "Altri strumenti"
   },
   "Niri Binding Example": {
     "Niri Binding Example": "Esempio di associazione Niri"
@@ -633,7 +633,7 @@
     "OCR failed": ""
   },
   "Off": {
-    "Off": ""
+    "Off": "Disattivato"
   },
   "Opacity": {
     "Opacity": "Opacità"
@@ -648,7 +648,7 @@
     "Open Image": ""
   },
   "Open folder": {
-    "Open folder": "Apri la cartella"
+    "Open folder": "Apri cartella"
   },
   "Outline Variant": {
     "Outline Variant": "Variante contorno"
@@ -663,7 +663,7 @@
     "Overlay Opacity": "Opacità dell'overlay"
   },
   "Padding": {
-    "Padding": "Spaziatura predefinita"
+    "Padding": "Spaziatura Interna"
   },
   "Palette Preset": {
     "Palette Preset": "Preset della palette"
@@ -672,10 +672,10 @@
     "Pause": "Pausa"
   },
   "Pause / Resume": {
-    "Pause / Resume": ""
+    "Pause / Resume": "Pausa / Riprendi"
   },
   "Paused": {
-    "Paused": ""
+    "Paused": "In Pausa"
   },
   "Pausing is not supported with %1.": {
     "Pausing is not supported with %1.": ""
@@ -738,7 +738,7 @@
     "QR scan failed": ""
   },
   "Quality": {
-    "Quality": "Qualità dei video"
+    "Quality": "Qualità"
   },
   "Quick Capture": {
     "Quick Capture": "Cattura rapida"
@@ -810,7 +810,7 @@
     "Right": "Destra"
   },
   "Right Center": {
-    "Right Center": ""
+    "Right Center": "Al centro a destra"
   },
   "Right Click": {
     "Right Click": "Clic destro"
@@ -834,7 +834,7 @@
     "Rounded Rectangle": "Rettangolo arrotondato"
   },
   "Save": {
-    "Save": ""
+    "Save": "Salva"
   },
   "Save As": {
     "Save As": ""
@@ -1044,7 +1044,7 @@
     "Toggle Annotations": ""
   },
   "Toggle Start / Stop": {
-    "Toggle Start / Stop": ""
+    "Toggle Start / Stop": "Attiva/disattiva Avvio/Arresto"
   },
   "Toggle between %1 latest presets": {
     "Toggle between %1 latest presets": "Alterna tra gli ultimi %1 preset"
@@ -1065,7 +1065,7 @@
     "Toolbar Position": "Posizione della barra degli strumenti"
   },
   "Tools": {
-    "Tools": ""
+    "Tools": "Strumenti"
   },
   "Top": {
     "Top": "In alto"
@@ -1137,6 +1137,6 @@
     "Window": "Finestra"
   },
   "Window / Portal": {
-    "Window / Portal": ""
+    "Window / Portal": "Finestra / Portale"
   }
 }

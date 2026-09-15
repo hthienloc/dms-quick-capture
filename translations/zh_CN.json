@@ -105,7 +105,7 @@
     "Background Presets": "背景预设"
   },
   "Background image": {
-    "Background image": ""
+    "Background image": "背景图片"
   },
   "Balanced": {
     "Balanced": "平衡"
@@ -120,7 +120,7 @@
     "Blur Background Image": "模糊背景图像"
   },
   "Bold": {
-    "Bold": ""
+    "Bold": "粗体"
   },
   "Border Color": {
     "Border Color": "边框颜色"
@@ -195,16 +195,16 @@
     "Close": "关闭"
   },
   "Color": {
-    "Color": "预设颜色"
+    "Color": "颜色"
   },
   "Color %1 copied": {
-    "Color %1 copied": "颜色已复制到剪贴板：%1"
+    "Color %1 copied": "已复制 HEX 颜色 %1"
   },
   "Color Palette": {
     "Color Palette": "调色板"
   },
   "Color Picker": {
-    "Color Picker": ""
+    "Color Picker": "取色器"
   },
   "Configure up to %1 quick-access tool presets. Right-click during capture to open the radial menu.": {
     "Configure up to %1 quick-access tool presets. Right-click during capture to open the radial menu.": "配置最多 %1 个快速访问工具预设。截图时右键单击可打开径向菜单。"
@@ -228,7 +228,7 @@
     "Copied to clipboard": "已复制到剪贴板"
   },
   "Copied!": {
-    "Copied!": "已复制"
+    "Copied!": "已复制！"
   },
   "Copy": {
     "Copy": "复制"
@@ -249,7 +249,7 @@
     "Copy vector / Paste / Duplicate": "复制矢量 / 粘贴 / 复制"
   },
   "Corner Radius": {
-    "Corner Radius": "默认圆角半径"
+    "Corner Radius": "圆角半径"
   },
   "Could not crop image": {
     "Could not crop image": ""
@@ -360,7 +360,7 @@
     "Failed to save screenshot": "保存截图失败"
   },
   "File": {
-    "File": ""
+    "File": "文件"
   },
   "Filename Pattern": {
     "Filename Pattern": ""
@@ -395,8 +395,8 @@
   "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": {
     "Format tokens: %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second), {zzz} (Ms)": "格式标记：%Y（年）、%y（两位全年）、%m（月）、%d（日）、%H（时）、%M（分）、%S（秒）、{zzz}（毫秒）"
   },
-  "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
-    "Format tokens: {user} (Username), \n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": "格式标记：{user}（用户名）、\\n（换行）、%Y（年）、%y（两位全年）、%m（月）、%d（日）、%H（时）、%M（分）、%S（秒）"
+  "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": {
+    "Format tokens: {user} (Username), \\n (New Line), %Y (Year), %y (2-digit year), %m (Month), %d (Day), %H (Hour), %M (Minute), %S (Second)": ""
   },
   "Framerate": {
     "Framerate": "帧率"
@@ -525,16 +525,16 @@
     "Left": "左侧"
   },
   "Left Center": {
-    "Left Center": ""
+    "Left Center": "左侧中部"
   },
   "Left Click": {
     "Left Click": "左键单击"
   },
   "Light": {
-    "Light": "细"
+    "Light": "细体"
   },
   "Line": {
-    "Line": "直线"
+    "Line": "线条"
   },
   "Linear Gradient": {
     "Linear Gradient": "线性渐变"
@@ -663,7 +663,7 @@
     "Overlay Opacity": "覆盖层不透明度"
   },
   "Padding": {
-    "Padding": "默认内边距"
+    "Padding": "内边距"
   },
   "Palette Preset": {
     "Palette Preset": "调色板预设"
@@ -738,7 +738,7 @@
     "QR scan failed": ""
   },
   "Quality": {
-    "Quality": "视频质量"
+    "Quality": "质量"
   },
   "Quick Capture": {
     "Quick Capture": "Quick Capture"
@@ -810,7 +810,7 @@
     "Right": "右侧"
   },
   "Right Center": {
-    "Right Center": ""
+    "Right Center": "右侧中部"
   },
   "Right Click": {
     "Right Click": "右键单击"
@@ -981,7 +981,7 @@
     "Specific Output": "指定输出"
   },
   "Spotlight": {
-    "Spotlight": "聚光灯"
+    "Spotlight": "聚焦"
   },
   "Spotlight Opacity": {
     "Spotlight Opacity": "聚光灯不透明度"
@@ -1032,7 +1032,7 @@
     "Text Size": "文本大小"
   },
   "Thickness": {
-    "Thickness": "粗细"
+    "Thickness": "厚度"
   },
   "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": {
     "This palette preset is read-only. Select one of the options below to switch to the Custom Palette and edit colors:": "此调色板预设为只读。选择下方任一选项切换到自定义调色板并编辑颜色："
@@ -1065,7 +1065,7 @@
     "Toolbar Position": "工具栏位置"
   },
   "Tools": {
-    "Tools": ""
+    "Tools": "工具"
   },
   "Top": {
     "Top": "顶部"
