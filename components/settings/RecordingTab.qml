@@ -233,6 +233,14 @@ SettingsGroup {
             label: I18n.trFor("quickCapture", "Include Cursor")
             defaultValue: Defaults.values.recordCursor
         }
+
+        Separator {}
+
+        ToggleSettingPlus {
+            settingKey: "recordingSkipConfirm"
+            label: I18n.trFor("quickCapture", "Skip confirmation")
+            defaultValue: Defaults.values.recordingSkipConfirm
+        }
     }
 
     SettingsSection {

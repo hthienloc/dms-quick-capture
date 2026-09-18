@@ -243,7 +243,9 @@ Item {
                 executeRecordingProcess("region", root.regionGeometry || customGeometry);
                 return;
             }
-            const geomArgs = [Proc.dmsBin, "screenshot", "-g", "--no-confirm"];
+            const geomArgs = [Proc.dmsBin, "screenshot", "-g"];
+            if (setting("recordingSkipConfirm"))
+                geomArgs.push("--no-confirm");
             const hudScale = setting("regionHudScale");
             if (hudScale && hudScale !== "auto")
                 geomArgs.push("--hud", hudScale);

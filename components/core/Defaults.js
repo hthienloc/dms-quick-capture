@@ -21,6 +21,7 @@ const values = {
     recordingQuality: "medium",
     recordingCodec: "auto",
     recordCursor: true,
+    recordingSkipConfirm: false,
     recordSystemAudio: true,
     systemAudioDevice: "default_output",
     recordMic: false,
