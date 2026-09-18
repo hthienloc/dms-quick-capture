@@ -9,6 +9,7 @@ const values = {
     includeCursor: false,
     defaultHideControlCenter: true,
     resetLastRegion: false,
+    regionHudScale: "auto",
     scrollInterval: 500,
     minImageSize: 16,
     recordingDirectory: "~/Videos/Recordings",

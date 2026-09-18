@@ -243,7 +243,11 @@ Item {
                 executeRecordingProcess("region", root.regionGeometry || customGeometry);
                 return;
             }
-            Proc.runCommand("quickCapture.regionGeometry", [Proc.dmsBin, "screenshot", "-g", "--no-confirm"], (stdout, exitCode) => {
+            const geomArgs = [Proc.dmsBin, "screenshot", "-g", "--no-confirm"];
+            const hudScale = setting("regionHudScale");
+            if (hudScale && hudScale !== "auto")
+                geomArgs.push("--hud", hudScale);
+            Proc.runCommand("quickCapture.regionGeometry", geomArgs, (stdout, exitCode) => {
                 if (exitCode !== 0 || !stdout?.trim())
                     return;
                 setRegionFromGeometry(stdout);

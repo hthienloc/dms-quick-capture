@@ -110,6 +110,9 @@ PluginComponent {
             flags.push("--output", root.pendingOutputName || Defaults.get(pluginData, "outputTargetName") || "DP-1");
         if (Defaults.get(pluginData, "resetLastRegion"))
             flags.push("--reset");
+        const hudScale = Defaults.get(pluginData, "regionHudScale");
+        if (hudScale && hudScale !== "auto")
+            flags.push("--hud", hudScale);
         return flags;
     }
 

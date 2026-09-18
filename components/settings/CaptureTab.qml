@@ -136,6 +136,41 @@ SettingsGroup {
 
         Separator {}
 
+        SelectionSettingPlus {
+            settingKey: "regionHudScale"
+            label: I18n.trFor("quickCapture", "Region HUD Scale")
+            description: I18n.trFor("quickCapture", "Keybinding overlay size in interactive region selector.")
+            options: [
+                {
+                    label: I18n.trFor("quickCapture", "Auto (Screen Scale)"),
+                    value: "auto"
+                },
+                {
+                    label: I18n.trFor("quickCapture", "Off (Hidden)"),
+                    value: "off"
+                },
+                {
+                    label: "1x",
+                    value: "1"
+                },
+                {
+                    label: "2x",
+                    value: "2"
+                },
+                {
+                    label: "3x",
+                    value: "3"
+                },
+                {
+                    label: "4x",
+                    value: "4"
+                }
+            ]
+            defaultValue: "auto"
+        }
+
+        Separator {}
+
         InfoText {
             text: I18n.trFor("quickCapture", "Scroll capture: select a region, scroll content, then press %1 to finish.").arg("Enter")
         }
