@@ -30,8 +30,6 @@ Grid {
 
     columns: isVertical ? 1 : 4
     spacing: isVertical ? 10 : Theme.spacingXS
-    anchors.verticalCenter: isVertical ? undefined : parent.verticalCenter
-    anchors.horizontalCenter: isVertical ? parent.horizontalCenter : undefined
 
     Item {
         visible: controlRoot.backgroundMode === "solid"

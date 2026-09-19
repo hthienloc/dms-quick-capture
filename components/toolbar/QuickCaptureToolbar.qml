@@ -44,6 +44,8 @@ Rectangle {
 
     property string gradientActiveSlot: "start"
     property string backgroundColorPickingSlot: "none"
+    readonly property bool hasBackground: root.backgroundMode !== "none"
+    readonly property bool gradientLike: ["gradient", "radial", "conic"].includes(root.backgroundMode)
 
     signal changeBackgroundMode(string mode, var controlItem)
     signal changeBackgroundSolidColor(color col)
@@ -377,9 +379,6 @@ Rectangle {
         id: backgroundLayout
 
         ToolbarGrid {
-            readonly property bool hasBackground: root.backgroundMode !== "none"
-            readonly property bool gradientLike: ["gradient", "radial", "conic"].includes(root.backgroundMode)
-
             DankActionButton {
                 iconName: "arrow_back"
                 buttonSize: Constants.btnSize
@@ -472,15 +471,15 @@ Rectangle {
             }
 
             Divider {
-                opacity: parent.hasBackground ? 1 : 0
-                enabled: parent.hasBackground
+                opacity: root.hasBackground ? 1 : 0
+                enabled: root.hasBackground
             }
 
             ToolbarGrid {
                 id: colorGroup
                 gap: Theme.spacingS
-                opacity: parent.hasBackground ? 1 : 0
-                enabled: parent.hasBackground
+                opacity: root.hasBackground ? 1 : 0
+                enabled: root.hasBackground
 
                 BackgroundColorSelectors {
                     isVertical: root.isVertical
@@ -517,7 +516,7 @@ Rectangle {
                             root.changeBackgroundSolidColor(col);
                             return;
                         }
-                        if (!colorGroup.parent.gradientLike)
+                        if (!root.gradientLike)
                             return;
                         if (root.gradientActiveSlot === "start")
                             root.changeBackgroundGradientStart(col);
